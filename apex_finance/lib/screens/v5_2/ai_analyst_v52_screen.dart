@@ -104,13 +104,13 @@ class AiAnalystV52Screen extends StatelessWidget {
         final (emoji, title, body, priority, color) = insights[i];
         return Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.3))),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.3))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               Text(emoji, style: const TextStyle(fontSize: 22)),
               const SizedBox(width: 10),
               Expanded(child: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800))),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text(_priority(priority), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)), child: Text(_priority(priority), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: color))),
             ]),
             const SizedBox(height: 8),
             Text(body, style: TextStyle(fontSize: 12, height: 1.5, color: core_theme.AC.tp)),
@@ -141,7 +141,7 @@ class AiAnalystV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: alerts[i].$4 == 'critical' ? core_theme.AC.err.withOpacity(0.05) : core_theme.AC.warn.withOpacity(0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: alerts[i].$4 == 'critical' ? core_theme.AC.err : core_theme.AC.warn, width: 1.5)),
+        decoration: BoxDecoration(color: alerts[i].$4 == 'critical' ? core_theme.AC.err.withValues(alpha: 0.05) : core_theme.AC.warn.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: alerts[i].$4 == 'critical' ? core_theme.AC.err : core_theme.AC.warn, width: 1.5)),
         child: Row(children: [
           Text(alerts[i].$1, style: const TextStyle(fontSize: 26)),
           const SizedBox(width: 12),
@@ -169,7 +169,7 @@ class AiAnalystV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.04), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok.withOpacity(0.3))),
+        decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.04), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok.withValues(alpha: 0.3))),
         child: Row(children: [
           Text(ops[i].$1, style: const TextStyle(fontSize: 28)),
           const SizedBox(width: 12),
@@ -194,7 +194,7 @@ class AiAnalystV52Screen extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(gradient: LinearGradient(colors: [_purple.withOpacity(0.08), _gold.withOpacity(0.06)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _purple)),
+          decoration: BoxDecoration(gradient: LinearGradient(colors: [_purple.withValues(alpha: 0.08), _gold.withValues(alpha: 0.06)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _purple)),
           child: Row(children: [
             Icon(Icons.timeline, color: _purple, size: 28),
             SizedBox(width: 12),
@@ -269,15 +269,15 @@ class AiAnalystV52Screen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        if (!isMe) CircleAvatar(radius: 16, backgroundColor: _gold.withOpacity(0.15), child: Icon(Icons.auto_awesome, color: _gold, size: 16)),
+        if (!isMe) CircleAvatar(radius: 16, backgroundColor: _gold.withValues(alpha: 0.15), child: Icon(Icons.auto_awesome, color: _gold, size: 16)),
         if (!isMe) const SizedBox(width: 8),
         Flexible(
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isMe ? _navy.withOpacity(0.08) : core_theme.AC.navy3,
+              color: isMe ? _navy.withValues(alpha: 0.08) : core_theme.AC.navy3,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isMe ? _navy.withOpacity(0.2) : core_theme.AC.bdr),
+              border: Border.all(color: isMe ? _navy.withValues(alpha: 0.2) : core_theme.AC.bdr),
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(name, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ts)),
@@ -287,7 +287,7 @@ class AiAnalystV52Screen extends StatelessWidget {
           ),
         ),
         if (isMe) const SizedBox(width: 8),
-        if (isMe) CircleAvatar(radius: 16, backgroundColor: _navy.withOpacity(0.15), child: Icon(Icons.person, color: _navy, size: 16)),
+        if (isMe) CircleAvatar(radius: 16, backgroundColor: _navy.withValues(alpha: 0.15), child: Icon(Icons.person, color: _navy, size: 16)),
       ]),
     );
   }

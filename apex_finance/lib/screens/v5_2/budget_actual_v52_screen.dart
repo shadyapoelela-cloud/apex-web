@@ -96,7 +96,7 @@ class _BudgetActualV52ScreenState extends State<BudgetActualV52Screen> {
                     const SizedBox(width: 6),
                     Expanded(child: Text(l.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                   ])),
-                  SizedBox(width: 70, child: Center(child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _catColor(l.category).withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text(l.category, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _catColor(l.category)))))),
+                  SizedBox(width: 70, child: Center(child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _catColor(l.category).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)), child: Text(l.category, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _catColor(l.category)))))),
                   ...[for (int m = 0; m < 4; m++) Expanded(child: _cell(l.budget[m], l.actual[m], l.category == 'إيراد'))],
                   SizedBox(width: 110, child: Text((ytdBudget / 1000).toStringAsFixed(0) + 'K', style: const TextStyle(fontSize: 11, fontFamily: 'monospace'), textAlign: TextAlign.end)),
                   SizedBox(width: 110, child: Text((ytdActual / 1000).toStringAsFixed(0) + 'K', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: isFavorable ? core_theme.AC.ok : variance == 0 ? core_theme.AC.tp : core_theme.AC.err, fontFamily: 'monospace'), textAlign: TextAlign.end)),
@@ -120,7 +120,7 @@ class _BudgetActualV52ScreenState extends State<BudgetActualV52Screen> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2),
       padding: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(color: isFavorable ? core_theme.AC.ok.withOpacity(0.05) : core_theme.AC.err.withOpacity(0.05), borderRadius: BorderRadius.circular(3)),
+      decoration: BoxDecoration(color: isFavorable ? core_theme.AC.ok.withValues(alpha: 0.05) : core_theme.AC.err.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(3)),
       child: Column(children: [
         Text((actual.abs() / 1000).toStringAsFixed(0) + 'K', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: isFavorable ? core_theme.AC.ok : core_theme.AC.err), textAlign: TextAlign.center),
         Text('${variance >= 0 ? '+' : ''}${(variance.abs() / 1000).toStringAsFixed(0)}K', style: TextStyle(fontSize: 8, color: isFavorable ? core_theme.AC.ok : core_theme.AC.err), textAlign: TextAlign.center),
@@ -133,7 +133,7 @@ class _BudgetActualV52ScreenState extends State<BudgetActualV52Screen> {
     final actualTotal = _lines.fold<double>(0, (s, l) => s + l.actual.take(4).fold<double>(0, (a, v) => a + v));
     return Container(
       padding: const EdgeInsets.all(12),
-      color: _gold.withOpacity(0.08),
+      color: _gold.withValues(alpha: 0.08),
       child: Row(children: [
         SizedBox(width: 180, child: Text('الإجماليات', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy))),
         const SizedBox(width: 70),

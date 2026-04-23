@@ -123,7 +123,7 @@ class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
                             child: Row(
                               children: [
                                 CircleAvatar(
-                                  backgroundColor: _navy.withOpacity(0.1),
+                                  backgroundColor: _navy.withValues(alpha: 0.1),
                                   child: Text(p.name.substring(0, 1),
                                       style: TextStyle(color: _navy, fontWeight: FontWeight.w800)),
                                 ),
@@ -176,7 +176,7 @@ class _ResourceAllocationScreenState extends State<ResourceAllocationScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: barColor.withOpacity(0.1),
+                                    color: barColor.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(statusText,
@@ -304,9 +304,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -316,7 +316,7 @@ class _StatCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 11, color: color.withOpacity(0.8))),
+                Text(label, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.8))),
                 Text(value,
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: color),
                     maxLines: 1,

@@ -37,7 +37,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       ),
       child: Row(
         children: [
@@ -59,9 +59,9 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF2E7D5B).withOpacity(0.15) : null,
+          color: active ? const Color(0xFF2E7D5B).withValues(alpha: 0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: const Color(0xFF2E7D5B).withOpacity(0.4)) : null,
+          border: active ? Border.all(color: const Color(0xFF2E7D5B).withValues(alpha: 0.4)) : null,
         ),
         child: Row(
           children: [
@@ -121,7 +121,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -145,7 +145,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.06))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.06))),
       ),
       child: const Row(
         children: [
@@ -164,7 +164,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04))),
       ),
       child: Row(
         children: [
@@ -201,8 +201,8 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: nationality == 'سعودي'
-                    ? const Color(0xFF2E7D5B).withOpacity(0.12)
-                    : core_theme.AC.tp.withOpacity(0.06),
+                    ? const Color(0xFF2E7D5B).withValues(alpha: 0.12)
+                    : core_theme.AC.tp.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -280,7 +280,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -296,9 +296,9 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: core_theme.AC.warn.withOpacity(0.08),
+              color: core_theme.AC.warn.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.warn.withOpacity(0.3)),
+              border: Border.all(color: core_theme.AC.warn.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -350,14 +350,14 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: TextStyle(fontSize: 10, color: color.withOpacity(0.8))),
+          Text(label, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.8))),
           Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: color)),
         ],
       ),
@@ -404,7 +404,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.shield, color: Colors.white, size: 28),
@@ -451,7 +451,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -565,14 +565,14 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(Icons.warning, color: color, size: 18),
@@ -631,7 +631,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+                border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
               ),
               child: Row(
                 children: [
@@ -654,7 +654,7 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: h.color.withOpacity(0.12),
+                      color: h.color.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(h.status, style: TextStyle(fontSize: 11, color: h.color, fontWeight: FontWeight.w700)),
@@ -675,9 +675,9 @@ class _GosiWpsScreenState extends State<GosiWpsScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: s.color.withOpacity(0.08),
+                color: s.color.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: s.color.withOpacity(0.2)),
+                border: Border.all(color: s.color.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [

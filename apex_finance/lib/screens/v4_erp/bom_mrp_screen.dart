@@ -149,7 +149,7 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
               final isParent = b.level == 0;
               final shortage = b.available < b.qty * 10;
               return Container(
-                color: isParent ? _gold.withOpacity(0.05) : null,
+                color: isParent ? _gold.withValues(alpha: 0.05) : null,
                 padding: EdgeInsetsDirectional.only(
                   start: 16 + (b.level * 32.0),
                   end: 16,
@@ -194,7 +194,7 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: shortage ? core_theme.AC.err.withOpacity(0.1) : core_theme.AC.ok.withOpacity(0.1),
+                          color: shortage ? core_theme.AC.err.withValues(alpha: 0.1) : core_theme.AC.ok.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text('متوفر: ${b.available}',
@@ -236,7 +236,7 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: _gold.withOpacity(0.1),
+                    color: _gold.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(Icons.inventory_2, color: _gold),
@@ -263,7 +263,7 @@ class _BomMrpScreenState extends State<BomMrpScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(label,
@@ -354,9 +354,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -366,7 +366,7 @@ class _StatCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 11, color: color.withOpacity(0.8))),
+                Text(label, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.8))),
                 Text(value,
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: color),
                     maxLines: 1,

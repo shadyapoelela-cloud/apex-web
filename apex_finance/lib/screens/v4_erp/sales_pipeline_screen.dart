@@ -121,9 +121,9 @@ class _SalesPipelineScreenState extends State<SalesPipelineScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -159,9 +159,9 @@ class _SalesPipelineScreenState extends State<SalesPipelineScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: stage.color.withOpacity(0.12),
+              color: stage.color.withValues(alpha: 0.12),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              border: Border(bottom: BorderSide(color: stage.color.withOpacity(0.3))),
+              border: Border(bottom: BorderSide(color: stage.color.withValues(alpha: 0.3))),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,7 +215,7 @@ class _SalesPipelineScreenState extends State<SalesPipelineScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: core_theme.AC.bdr),
-        boxShadow: [BoxShadow(color: core_theme.AC.bdr.withOpacity(0.04), blurRadius: 4)],
+        boxShadow: [BoxShadow(color: core_theme.AC.bdr.withValues(alpha: 0.04), blurRadius: 4)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,7 +227,7 @@ class _SalesPipelineScreenState extends State<SalesPipelineScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: core_theme.AC.gold.withOpacity(0.1),
+              color: core_theme.AC.gold.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Row(
@@ -244,7 +244,7 @@ class _SalesPipelineScreenState extends State<SalesPipelineScreen> {
             children: [
               CircleAvatar(
                 radius: 10,
-                backgroundColor: stageColor.withOpacity(0.15),
+                backgroundColor: stageColor.withValues(alpha: 0.15),
                 child: Text(d.owner.substring(0, 1),
                     style: TextStyle(color: stageColor, fontSize: 10, fontWeight: FontWeight.w900)),
               ),

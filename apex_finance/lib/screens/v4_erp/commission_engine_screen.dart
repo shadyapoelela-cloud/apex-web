@@ -113,7 +113,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -149,7 +149,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: tier.color.withOpacity(0.3), width: 2),
+            border: Border.all(color: tier.color.withValues(alpha: 0.3), width: 2),
           ),
           child: Row(
             children: [
@@ -289,7 +289,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: t.color.withOpacity(0.3)),
+              border: Border.all(color: t.color.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -321,7 +321,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: t.color.withOpacity(0.12),
+                    color: t.color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -336,9 +336,9 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: core_theme.AC.gold.withOpacity(0.08),
+            color: core_theme.AC.gold.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: core_theme.AC.gold.withOpacity(0.25)),
+            border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.25)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -439,7 +439,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
                   ),
                   child: Row(
                     children: [
@@ -449,7 +449,7 @@ class _CommissionEngineScreenState extends State<CommissionEngineScreen>
                           children: [
                             CircleAvatar(
                               radius: 12,
-                              backgroundColor: core_theme.AC.gold.withOpacity(0.15),
+                              backgroundColor: core_theme.AC.gold.withValues(alpha: 0.15),
                               child: Text(p.rep.name.substring(0, 1),
                                   style: TextStyle(color: core_theme.AC.gold, fontSize: 11, fontWeight: FontWeight.w900)),
                             ),

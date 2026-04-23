@@ -109,7 +109,7 @@ class _CostCentersV52ScreenState extends State<CostCentersV52Screen> {
                 ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: (util / 100).clamp(0.0, 1.0), minHeight: 6, backgroundColor: core_theme.AC.bdr, color: c.status.color)),
               ])),
               const SizedBox(width: 16),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: c.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(c.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.status.color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: c.status.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text(c.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.status.color))),
             ]),
           ),
         );
@@ -137,7 +137,7 @@ class _CostCentersV52ScreenState extends State<CostCentersV52Screen> {
             final isRoot = c.parent == null;
             return Container(
               padding: EdgeInsetsDirectional.only(start: 10 + depth * 20, end: 10, top: 10, bottom: 10),
-              decoration: BoxDecoration(color: isRoot ? _gold.withOpacity(0.05) : null, border: Border(top: BorderSide(color: core_theme.AC.bdr))),
+              decoration: BoxDecoration(color: isRoot ? _gold.withValues(alpha: 0.05) : null, border: Border(top: BorderSide(color: core_theme.AC.bdr))),
               child: Row(children: [
                 Expanded(flex: 3, child: Row(children: [
                   if (depth > 0) Text('└ ', style: TextStyle(color: core_theme.AC.td)),
@@ -178,7 +178,7 @@ class _CostCentersV52ScreenState extends State<CostCentersV52Screen> {
                   child: Container(
                     height: 24,
                     padding: const EdgeInsets.symmetric(horizontal: 6),
-                    decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.8), borderRadius: const BorderRadius.only(topRight: Radius.circular(3), bottomRight: Radius.circular(3))),
+                    decoration: BoxDecoration(color: core_theme.AC.err.withValues(alpha: 0.8), borderRadius: const BorderRadius.only(topRight: Radius.circular(3), bottomRight: Radius.circular(3))),
                     child: Center(child: Text('+${((util - 1) * 100).toStringAsFixed(0)}%', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white))),
                   ),
                 ),

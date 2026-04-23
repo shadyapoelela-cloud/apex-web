@@ -109,7 +109,7 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: DropdownButton<String>(
@@ -271,9 +271,9 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.25)),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisSize.min == MainAxisAlignment.spaceBetween
@@ -294,7 +294,7 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,7 +346,7 @@ class _VatReturnBuilderScreenState extends State<VatReturnBuilderScreen>
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: core_theme.AC.bdr),
-            boxShadow: [BoxShadow(color: core_theme.AC.bdr.withOpacity(0.05), blurRadius: 8)],
+            boxShadow: [BoxShadow(color: core_theme.AC.bdr.withValues(alpha: 0.05), blurRadius: 8)],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

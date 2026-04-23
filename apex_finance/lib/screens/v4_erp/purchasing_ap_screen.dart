@@ -43,7 +43,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
               decoration: BoxDecoration(
                 color: const Color(0xFFF9FAFB),
                 border: Border(
-                  bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)),
+                  bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)),
                 ),
               ),
               child: Row(
@@ -102,9 +102,9 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: core_theme.AC.gold.withOpacity(0.15),
+          color: core_theme.AC.gold.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: core_theme.AC.gold.withOpacity(0.4)),
+          border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.4)),
         ),
         child: Row(
           children: [
@@ -231,7 +231,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -241,7 +241,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF9FAFB),
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-                    border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.06))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.06))),
                   ),
                   child: Row(
                     children: [
@@ -385,7 +385,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -434,7 +434,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -477,7 +477,7 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -508,9 +508,9 @@ class _PurchasingApScreenState extends State<PurchasingApScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: s.color.withOpacity(0.08),
+                color: s.color.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: s.color.withOpacity(0.2)),
+                border: Border.all(color: s.color.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
@@ -771,8 +771,8 @@ class _VendorRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: selected ? core_theme.AC.gold.withOpacity(0.05) : null,
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
+        color: selected ? core_theme.AC.gold.withValues(alpha: 0.05) : null,
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04))),
       ),
       child: Row(
         children: [
@@ -861,7 +861,7 @@ class _POCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -873,7 +873,7 @@ class _POCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.12),
+                  color: statusColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -898,7 +898,7 @@ class _POCard extends StatelessWidget {
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: po.progress,
-            backgroundColor: core_theme.AC.tp.withOpacity(0.06),
+            backgroundColor: core_theme.AC.tp.withValues(alpha: 0.06),
             valueColor: AlwaysStoppedAnimation(statusColor),
             minHeight: 4,
           ),
@@ -925,8 +925,8 @@ class _BillRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: selected ? core_theme.AC.gold.withOpacity(0.05) : null,
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
+        color: selected ? core_theme.AC.gold.withValues(alpha: 0.05) : null,
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04))),
       ),
       child: Row(
         children: [
@@ -952,8 +952,8 @@ class _BillRow extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
               color: bill.threeWay
-                  ? core_theme.AC.ok.withOpacity(0.12)
-                  : const Color(0xFFB91C1C).withOpacity(0.12),
+                  ? core_theme.AC.ok.withValues(alpha: 0.12)
+                  : const Color(0xFFB91C1C).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Row(

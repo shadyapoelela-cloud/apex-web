@@ -68,7 +68,7 @@ class ClosingCockpitV52Screen extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: _purple.withOpacity(0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: _purple)),
+          decoration: BoxDecoration(color: _purple.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: _purple)),
           child: Row(children: [
             Icon(Icons.schema, color: _purple, size: 24),
             SizedBox(width: 10),
@@ -135,14 +135,14 @@ class ClosingCockpitV52Screen extends StatelessWidget {
       width: 200,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isBlocker ? core_theme.AC.err.withOpacity(0.06) : Colors.white,
+        color: isBlocker ? core_theme.AC.err.withValues(alpha: 0.06) : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: isBlocker ? core_theme.AC.err : color.withOpacity(0.4), width: isBlocker ? 2 : 1),
-        boxShadow: [BoxShadow(color: core_theme.AC.tp.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
+        border: Border.all(color: isBlocker ? core_theme.AC.err : color.withValues(alpha: 0.4), width: isBlocker ? 2 : 1),
+        boxShadow: [BoxShadow(color: core_theme.AC.tp.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Container(padding: const EdgeInsets.all(5), decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(4)), child: Icon(icon, color: color, size: 14)),
+          Container(padding: const EdgeInsets.all(5), decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(4)), child: Icon(icon, color: color, size: 14)),
           const SizedBox(width: 6),
           Text(id, style: TextStyle(fontFamily: 'monospace', fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ts)),
           const Spacer(),
@@ -213,7 +213,7 @@ class ClosingCockpitV52Screen extends StatelessWidget {
           Expanded(flex: 2, child: Text(tasks[i].$2, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, decoration: tasks[i].$4 ? TextDecoration.lineThrough : null))),
           Text(tasks[i].$3, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(width: 10),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(8)), child: Text(tasks[i].$5, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _navy))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _navy.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)), child: Text(tasks[i].$5, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _navy))),
           const SizedBox(width: 10),
           if (tasks[i].$6.isNotEmpty) ...[
             Icon(Icons.arrow_upward, size: 10, color: core_theme.AC.ts),
@@ -237,7 +237,7 @@ class ClosingCockpitV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: entities[i].$5 == _ES.done ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.warn.withOpacity(0.3))),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: entities[i].$5 == _ES.done ? core_theme.AC.ok.withValues(alpha: 0.3) : core_theme.AC.warn.withValues(alpha: 0.3))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             Icon(entities[i].$5 == _ES.done ? Icons.check_circle : Icons.sync, color: entities[i].$5 == _ES.done ? core_theme.AC.ok : _gold, size: 24),
@@ -246,7 +246,7 @@ class ClosingCockpitV52Screen extends StatelessWidget {
               Text(entities[i].$1, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
               Text('${entities[i].$2} · مسؤول: ${entities[i].$4}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ])),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (entities[i].$5 == _ES.done ? core_theme.AC.ok : _gold).withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(entities[i].$5 == _ES.done ? '✓ مكتمل' : 'قيد الإقفال', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: entities[i].$5 == _ES.done ? core_theme.AC.ok : _gold))),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (entities[i].$5 == _ES.done ? core_theme.AC.ok : _gold).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text(entities[i].$5 == _ES.done ? '✓ مكتمل' : 'قيد الإقفال', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: entities[i].$5 == _ES.done ? core_theme.AC.ok : _gold))),
           ]),
           const SizedBox(height: 12),
           Row(children: [
@@ -267,7 +267,7 @@ class ClosingCockpitV52Screen extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.err, width: 1.5)),
+          decoration: BoxDecoration(color: core_theme.AC.err.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.err, width: 1.5)),
           child: Row(children: [
             Icon(Icons.warning_amber, color: core_theme.AC.err, size: 28),
             const SizedBox(width: 12),
@@ -292,7 +292,7 @@ class ClosingCockpitV52Screen extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
       child: Row(children: [
-        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.12), borderRadius: BorderRadius.circular(6)), child: Text(id, style: TextStyle(fontFamily: 'monospace', fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.err))),
+        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: core_theme.AC.err.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)), child: Text(id, style: TextStyle(fontFamily: 'monospace', fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.err))),
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(task, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
@@ -320,7 +320,7 @@ class ClosingCockpitV52Screen extends StatelessWidget {
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
         child: Row(children: [
-          CircleAvatar(radius: 14, backgroundColor: entries[i].$5.withOpacity(0.15), child: Icon(entries[i].$4, color: entries[i].$5, size: 14)),
+          CircleAvatar(radius: 14, backgroundColor: entries[i].$5.withValues(alpha: 0.15), child: Icon(entries[i].$4, color: entries[i].$5, size: 14)),
           const SizedBox(width: 10),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(entries[i].$3, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),

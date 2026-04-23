@@ -27,7 +27,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
         Container(
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)))),
           child: Row(
             children: [
               _tabBtn(0, 'حزمة المجلس', Icons.folder_special),
@@ -52,9 +52,9 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF2E7D5B).withOpacity(0.15) : null,
+          color: active ? const Color(0xFF2E7D5B).withValues(alpha: 0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: const Color(0xFF2E7D5B).withOpacity(0.4)) : null,
+          border: active ? Border.all(color: const Color(0xFF2E7D5B).withValues(alpha: 0.4)) : null,
         ),
         child: Row(
           children: [
@@ -144,12 +144,12 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(color: const Color(0xFF2E7D5B).withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+            decoration: BoxDecoration(color: const Color(0xFF2E7D5B).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
             child: Text(item.number, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF2E7D5B), fontFamily: 'monospace')),
           ),
           const SizedBox(width: 10),
@@ -208,13 +208,13 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Row(
         children: [
           Container(
             width: 60,
             padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(color: m.color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+            decoration: BoxDecoration(color: m.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
             child: Column(
               children: [
                 Text(m.date.substring(8, 10), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: m.color)),
@@ -243,7 +243,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
           const SizedBox(width: 16),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(color: m.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: m.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
             child: Text(m.status, style: TextStyle(fontSize: 11, color: m.color, fontWeight: FontWeight.w700)),
           ),
         ],
@@ -279,7 +279,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: r.color.withOpacity(0.3))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: r.color.withValues(alpha: 0.3))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -287,14 +287,14 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: r.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: r.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                 child: Text(r.id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', fontWeight: FontWeight.w700, color: r.color)),
               ),
               const SizedBox(width: 10),
               Expanded(child: Text(r.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800))),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: r.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(color: r.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
                 child: Text(r.status, style: TextStyle(fontSize: 11, color: r.color, fontWeight: FontWeight.w700)),
               ),
             ],
@@ -328,7 +328,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
             ],
           ),
           const SizedBox(height: 2),
-          LinearProgressIndicator(value: pct, backgroundColor: color.withOpacity(0.1), valueColor: AlwaysStoppedAnimation(color), minHeight: 4),
+          LinearProgressIndicator(value: pct, backgroundColor: color.withValues(alpha: 0.1), valueColor: AlwaysStoppedAnimation(color), minHeight: 4),
         ],
       ),
     );
@@ -353,7 +353,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
             Container(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
               child: Row(
                 children: [
                   const Icon(Icons.policy, size: 18, color: Color(0xFF2E7D5B)),
@@ -373,7 +373,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
                   Expanded(child: Text('اعتماد: ${p.approvedDate}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: p.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                    decoration: BoxDecoration(color: p.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
                     child: Text(p.status, style: TextStyle(fontSize: 11, color: p.color, fontWeight: FontWeight.w700)),
                   ),
                 ],
@@ -418,7 +418,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
   Widget _committeeCard(String ar, String en, int members, int meetings, List<String> names, Color color) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.3))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.3))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -426,7 +426,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
                 child: Icon(Icons.groups, color: color, size: 20),
               ),
               const SizedBox(width: 10),
@@ -457,7 +457,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
               for (final n in names)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(3)),
+                  decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(3)),
                   child: Text(n, style: const TextStyle(fontSize: 10)),
                 ),
             ],
@@ -471,7 +471,7 @@ class _GovernanceScreenState extends State<GovernanceScreen> {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        decoration: BoxDecoration(color: color.withOpacity(0.06), borderRadius: BorderRadius.circular(4)),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(4)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -545,7 +545,7 @@ class _NotificationsCenterScreenState extends State<NotificationsCenterScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)))),
           child: Row(
             children: [
               Icon(Icons.notifications_active, size: 22, color: core_theme.AC.purple),
@@ -619,7 +619,7 @@ class _NotificationsCenterScreenState extends State<NotificationsCenterScreen> {
         decoration: BoxDecoration(
           color: active ? core_theme.AC.purple : Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: active ? core_theme.AC.purple : core_theme.AC.tp.withOpacity(0.1)),
+          border: Border.all(color: active ? core_theme.AC.purple : core_theme.AC.tp.withValues(alpha: 0.1)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -628,7 +628,7 @@ class _NotificationsCenterScreenState extends State<NotificationsCenterScreen> {
             const SizedBox(width: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-              decoration: BoxDecoration(color: (active ? Colors.white : core_theme.AC.purple).withOpacity(active ? 0.25 : 0.12), borderRadius: BorderRadius.circular(8)),
+              decoration: BoxDecoration(color: (active ? Colors.white : core_theme.AC.purple).withValues(alpha: active ? 0.25 : 0.12), borderRadius: BorderRadius.circular(8)),
               child: Text('$count', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: active ? Colors.white : core_theme.AC.purple)),
             ),
           ],
@@ -641,14 +641,14 @@ class _NotificationsCenterScreenState extends State<NotificationsCenterScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.06))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.06))),
       child: Row(
         children: [
           Container(
             width: 40,
             height: 40,
             alignment: Alignment.center,
-            decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
             child: Text(emoji, style: const TextStyle(fontSize: 20)),
           ),
           const SizedBox(width: 12),

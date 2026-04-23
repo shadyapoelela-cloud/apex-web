@@ -200,10 +200,10 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: (widget.statusColor ?? _gold).withOpacity(0.12),
+                color: (widget.statusColor ?? _gold).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                    color: (widget.statusColor ?? _gold).withOpacity(0.4)),
+                    color: (widget.statusColor ?? _gold).withValues(alpha: 0.4)),
               ),
               child: Text(
                 widget.statusLabelAr!,
@@ -275,7 +275,7 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: isActive ? _gold : (isPast ? _gold.withOpacity(0.15) : core_theme.AC.navy3),
+                    color: isActive ? _gold : (isPast ? _gold.withValues(alpha: 0.15) : core_theme.AC.navy3),
                     shape: BoxShape.circle,
                     border: Border.all(color: color, width: 2),
                   ),
@@ -324,9 +324,9 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: (b.color ?? _navy).withOpacity(0.06),
+                          color: (b.color ?? _navy).withValues(alpha: 0.06),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: (b.color ?? _navy).withOpacity(0.2)),
+                          border: Border.all(color: (b.color ?? _navy).withValues(alpha: 0.2)),
                         ),
                         child: Row(
                           children: [
@@ -367,7 +367,7 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: active ? _gold.withOpacity(0.08) : null,
+                color: active ? _gold.withValues(alpha: 0.08) : null,
                 border: BorderDirectional(
                   end: BorderSide(
                     color: active ? _gold : Colors.transparent,
@@ -416,7 +416,7 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
           Container(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             decoration: BoxDecoration(
-              color: _navy.withOpacity(0.04),
+              color: _navy.withValues(alpha: 0.04),
               border: Border(bottom: BorderSide(color: core_theme.AC.bdr)),
             ),
             child: Row(
@@ -507,7 +507,7 @@ class _ChatterItem extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 14,
-          backgroundColor: (entry.color ?? color).withOpacity(0.15),
+          backgroundColor: (entry.color ?? color).withValues(alpha: 0.15),
           child: Icon(entry.icon ?? icon, size: 14, color: entry.color ?? color),
         ),
         const SizedBox(width: 8),

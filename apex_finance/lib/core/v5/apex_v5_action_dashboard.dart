@@ -168,16 +168,16 @@ class _ActionListCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.06),
+        color: color.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(widget.icon, color: color, size: 22),
@@ -293,7 +293,7 @@ class _KpiCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+            border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -374,7 +374,7 @@ class _ChartCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -398,20 +398,20 @@ class _ChartCard extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  color: color.withOpacity(0.05),
-                  border: Border.all(color: color.withOpacity(0.15)),
+                  color: color.withValues(alpha: 0.05),
+                  border: Border.all(color: color.withValues(alpha: 0.15)),
                 ),
                 padding: const EdgeInsets.all(12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.bar_chart, size: 32, color: color.withOpacity(0.4)),
+                    Icon(Icons.bar_chart, size: 32, color: color.withValues(alpha: 0.4)),
                     const SizedBox(width: 8),
                     Text(
                       'رسم بياني — بيانات حيّة قريباً',
                       style: TextStyle(
                         fontSize: 11,
-                        color: color.withOpacity(0.7),
+                        color: color.withValues(alpha: 0.7),
                       ),
                     ),
                   ],

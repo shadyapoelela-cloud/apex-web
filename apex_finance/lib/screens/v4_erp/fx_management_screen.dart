@@ -135,7 +135,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: core_theme.AC.bdr),
-            boxShadow: [BoxShadow(color: core_theme.AC.bdr.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
+            boxShadow: [BoxShadow(color: core_theme.AC.bdr.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
           ),
           child: Column(
             children: [
@@ -169,7 +169,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: core_theme.AC.gold.withOpacity(0.15),
+                        color: core_theme.AC.gold.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
                       ),
                       child: InkWell(
@@ -308,7 +308,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
                   ),
                   child: Row(
                     children: [
@@ -318,7 +318,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
                           children: [
                             CircleAvatar(
                               radius: 14,
-                              backgroundColor: _currencyColor(b.code).withOpacity(0.15),
+                              backgroundColor: _currencyColor(b.code).withValues(alpha: 0.15),
                               child: Text(b.symbol, style: TextStyle(color: _currencyColor(b.code), fontWeight: FontWeight.w900, fontSize: 12)),
                             ),
                             const SizedBox(width: 8),
@@ -379,7 +379,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
           child: Row(
             children: [
               CircleAvatar(
-                backgroundColor: _currencyColor(code).withOpacity(0.12),
+                backgroundColor: _currencyColor(code).withValues(alpha: 0.12),
                 child: Text(_currencySymbol(code), style: TextStyle(color: _currencyColor(code), fontWeight: FontWeight.w900)),
               ),
               const SizedBox(width: 12),
@@ -396,7 +396,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: change > 0 ? core_theme.AC.ok.withOpacity(0.12) : core_theme.AC.err.withOpacity(0.12),
+                  color: change > 0 ? core_theme.AC.ok.withValues(alpha: 0.12) : core_theme.AC.err.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
@@ -462,9 +462,9 @@ class _FxManagementScreenState extends State<FxManagementScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: core_theme.AC.gold.withOpacity(0.08),
+            color: core_theme.AC.gold.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: core_theme.AC.gold.withOpacity(0.3)),
+            border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -510,7 +510,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
             children: [
               CircleAvatar(
                 radius: 14,
-                backgroundColor: color.withOpacity(0.12),
+                backgroundColor: color.withValues(alpha: 0.12),
                 child: Text(code, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w800)),
               ),
               const SizedBox(width: 10),
@@ -539,7 +539,7 @@ class _FxManagementScreenState extends State<FxManagementScreen>
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Column(

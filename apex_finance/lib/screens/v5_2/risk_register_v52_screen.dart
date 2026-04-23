@@ -75,7 +75,7 @@ class _RiskRegisterV52ScreenState extends State<RiskRegisterV52Screen> {
         return Card(
           elevation: 0.5,
           child: Padding(padding: const EdgeInsets.all(12), child: Row(children: [
-            Container(width: 50, height: 50, decoration: BoxDecoration(color: scoreColor.withOpacity(0.15), borderRadius: BorderRadius.circular(10), border: Border.all(color: scoreColor, width: 2)), child: Center(child: Text('${r.score}', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: scoreColor)))),
+            Container(width: 50, height: 50, decoration: BoxDecoration(color: scoreColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10), border: Border.all(color: scoreColor, width: 2)), child: Center(child: Text('${r.score}', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: scoreColor)))),
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
@@ -91,7 +91,7 @@ class _RiskRegisterV52ScreenState extends State<RiskRegisterV52Screen> {
               Row(children: [Text('الأثر    ', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)), ..._dots(r.impact, core_theme.AC.err)]),
             ])),
             const SizedBox(width: 16),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: r.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(14)), child: Text(r.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: r.status.color))),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: r.status.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(14)), child: Text(r.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: r.status.color))),
           ])),
         );
       },
@@ -151,9 +151,9 @@ class _RiskRegisterV52ScreenState extends State<RiskRegisterV52Screen> {
     final cellColor = _scoreColor(score);
     return Container(
       margin: const EdgeInsets.all(2),
-      decoration: BoxDecoration(color: cellColor.withOpacity(0.12), borderRadius: BorderRadius.circular(6), border: Border.all(color: cellColor.withOpacity(0.4))),
+      decoration: BoxDecoration(color: cellColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6), border: Border.all(color: cellColor.withValues(alpha: 0.4))),
       child: risksHere.isEmpty
-          ? Center(child: Text('$score', style: TextStyle(fontSize: 9, color: cellColor.withOpacity(0.6))))
+          ? Center(child: Text('$score', style: TextStyle(fontSize: 9, color: cellColor.withValues(alpha: 0.6))))
           : Tooltip(
               message: risksHere.map((r) => r.title).join('\n'),
               child: Center(child: Container(

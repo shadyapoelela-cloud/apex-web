@@ -229,7 +229,7 @@ class _QuickCreateItem extends StatelessWidget {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: action.color.withOpacity(0.12),
+              color: action.color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(action.icon, size: 16, color: action.color),

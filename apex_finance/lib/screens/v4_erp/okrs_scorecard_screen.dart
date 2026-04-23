@@ -184,9 +184,9 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -263,7 +263,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.3), width: 2),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,7 +275,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(o.category,
@@ -285,7 +285,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: (o.level == 'company' ? core_theme.AC.purple : core_theme.AC.info).withOpacity(0.12),
+                  color: (o.level == 'company' ? core_theme.AC.purple : core_theme.AC.info).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(o.level == 'company' ? '🏢 شركة' : '👥 قسم',
@@ -312,7 +312,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: health.withOpacity(0.08),
+              color: health.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -362,7 +362,7 @@ class _OkrsScorecardScreenState extends State<OkrsScorecardScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(3),
             ),
             child: Text(kr.id,

@@ -189,7 +189,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                             margin: const EdgeInsets.only(bottom: 6),
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: _selectedCat == c.id ? core_theme.AC.gold.withOpacity(0.1) : core_theme.AC.navy3,
+                              color: _selectedCat == c.id ? core_theme.AC.gold.withValues(alpha: 0.1) : core_theme.AC.navy3,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: _selectedCat == c.id ? core_theme.AC.gold : core_theme.AC.bdr,
@@ -490,7 +490,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
                   ),
                   child: Row(
                     children: [
@@ -509,7 +509,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           margin: const EdgeInsets.only(left: 4),
                           decoration: BoxDecoration(
-                            color: (e.status == 'مدفوع' ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.15),
+                            color: (e.status == 'مدفوع' ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(e.status,
@@ -611,7 +611,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
                   ),
                   child: Row(
                     children: [
@@ -635,7 +635,7 @@ class _WhtCalculatorV5ScreenState extends State<WhtCalculatorV5Screen>
       margin: const EdgeInsets.only(left: 4),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text('$rate%',

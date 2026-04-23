@@ -143,9 +143,9 @@ class _PriceListScreenState extends State<PriceListScreen>
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -241,7 +241,7 @@ class _PriceListScreenState extends State<PriceListScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
         color: p.status != 'active' ? core_theme.AC.navy3 : null,
       ),
       child: Row(
@@ -261,7 +261,7 @@ class _PriceListScreenState extends State<PriceListScreen>
             child: Container(
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: _catColor(p.category).withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(color: _catColor(p.category).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
               child: Text(_catLabel(p.category),
                   style: TextStyle(fontSize: 10, color: _catColor(p.category), fontWeight: FontWeight.w800),
                   textAlign: TextAlign.center),
@@ -275,7 +275,7 @@ class _PriceListScreenState extends State<PriceListScreen>
             child: Container(
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
               child: Text(_statusLabel(p.status),
                   style: TextStyle(fontSize: 10, color: statusColor, fontWeight: FontWeight.w800),
                   textAlign: TextAlign.center),
@@ -307,13 +307,13 @@ class _PriceListScreenState extends State<PriceListScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: d.color.withOpacity(0.3)),
+            border: Border.all(color: d.color.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: d.color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: d.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                 child: Icon(Icons.local_offer, color: d.color),
               ),
               const SizedBox(width: 12),
@@ -380,7 +380,7 @@ class _PriceListScreenState extends State<PriceListScreen>
               const SizedBox(width: 10),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: core_theme.AC.info.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                 child: Text(c.sku,
                     style: TextStyle(fontSize: 11, color: core_theme.AC.info, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
               ),

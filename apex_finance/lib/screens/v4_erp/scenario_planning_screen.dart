@@ -228,7 +228,7 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
                 child: Text('${value > 0 ? '+' : ''}${value.toStringAsFixed(1)}%',
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: color)),
               ),
@@ -237,7 +237,7 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
           SliderTheme(
             data: SliderThemeData(
               activeTrackColor: color,
-              inactiveTrackColor: color.withOpacity(0.2),
+              inactiveTrackColor: color.withValues(alpha: 0.2),
               thumbColor: color,
             ),
             child: Slider(
@@ -299,7 +299,7 @@ class _ScenarioPlanningScreenState extends State<ScenarioPlanningScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(

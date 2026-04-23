@@ -63,7 +63,7 @@ class _ShopFloorScreenState extends State<ShopFloorScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: core_theme.AC.ok.withOpacity(0.1),
+                      color: core_theme.AC.ok.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
@@ -214,9 +214,9 @@ class _StationCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.3), width: 2),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
         boxShadow: [
-          BoxShadow(color: core_theme.AC.tp.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2)),
+          BoxShadow(color: core_theme.AC.tp.withValues(alpha: 0.04), blurRadius: 6, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -227,7 +227,7 @@ class _StationCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(icon, color: color, size: 14),
@@ -296,7 +296,7 @@ class _WOCard extends StatelessWidget {
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(4)),
                 child: Text(label,
                     style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: color)),
               ),
@@ -343,9 +343,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -355,7 +355,7 @@ class _StatCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 11, color: color.withOpacity(0.8))),
+                Text(label, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.8))),
                 Text(value,
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: color),
                     maxLines: 1,

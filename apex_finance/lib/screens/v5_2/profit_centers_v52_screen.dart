@@ -99,7 +99,7 @@ class _ProfitCentersV52ScreenState extends State<ProfitCentersV52Screen> {
                 Text('${margin.toStringAsFixed(1)}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: margin >= 20 ? core_theme.AC.ok : margin >= 10 ? _gold : core_theme.AC.err)),
               ]),
               const SizedBox(width: 14),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: c.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(c.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.status.color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: c.status.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text(c.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.status.color))),
             ]),
           ),
         );
@@ -143,7 +143,7 @@ class _ProfitCentersV52ScreenState extends State<ProfitCentersV52Screen> {
               final isRoot = c.parent == null;
               return Container(
                 padding: EdgeInsetsDirectional.only(start: 10 + depth * 20, end: 10, top: 10, bottom: 10),
-                decoration: BoxDecoration(color: isRoot ? _gold.withOpacity(0.05) : null, border: Border(top: BorderSide(color: core_theme.AC.bdr))),
+                decoration: BoxDecoration(color: isRoot ? _gold.withValues(alpha: 0.05) : null, border: Border(top: BorderSide(color: core_theme.AC.bdr))),
                 child: Row(children: [
                   Expanded(flex: 3, child: Row(children: [
                     if (depth > 0) Text('└ ', style: TextStyle(color: core_theme.AC.td)),

@@ -42,7 +42,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.account_circle, color: Colors.white, size: 28),
@@ -67,7 +67,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -87,10 +87,10 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
               decoration: BoxDecoration(
                 color: const Color(0xFFF3F4F6),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: core_theme.AC.tp.withOpacity(0.12), width: 3),
+                border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.12), width: 3),
                 boxShadow: [
                   BoxShadow(
-                    color: core_theme.AC.tp.withOpacity(0.15),
+                    color: core_theme.AC.tp.withValues(alpha: 0.15),
                     blurRadius: 24,
                     offset: const Offset(0, 10),
                   ),
@@ -104,7 +104,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(17)),
-                      border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
+                      border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08))),
                     ),
                     child: Row(
                       children: [
@@ -170,7 +170,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                             const SizedBox(width: 8),
                             CircleAvatar(
                               radius: 14,
-                              backgroundColor: core_theme.AC.gold.withOpacity(0.2),
+                              backgroundColor: core_theme.AC.gold.withValues(alpha: 0.2),
                               child: Text(
                                 'A',
                                 style: TextStyle(
@@ -231,7 +231,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
                         const SizedBox(height: 12),
                         Container(
                           decoration: BoxDecoration(
-                            border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+                            border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Column(
@@ -287,9 +287,9 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: core_theme.AC.info.withOpacity(0.06),
+              color: core_theme.AC.info.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: core_theme.AC.info.withOpacity(0.2)),
+              border: Border.all(color: core_theme.AC.info.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
@@ -320,9 +320,9 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,9 +379,9 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: active ? core_theme.AC.gold.withOpacity(0.15) : Colors.transparent,
+            color: active ? core_theme.AC.gold.withValues(alpha: 0.15) : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
-            border: active ? Border.all(color: core_theme.AC.gold.withOpacity(0.4)) : null,
+            border: active ? Border.all(color: core_theme.AC.gold.withValues(alpha: 0.4)) : null,
           ),
           child: Row(
             children: [
@@ -406,7 +406,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04))),
       ),
       child: Row(
         children: [
@@ -425,7 +425,7 @@ class _ClientPortalScreenState extends State<ClientPortalScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(

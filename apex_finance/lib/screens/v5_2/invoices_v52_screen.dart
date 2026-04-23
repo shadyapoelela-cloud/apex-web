@@ -153,7 +153,7 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.12),
+                      color: color.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Text(label,
@@ -204,7 +204,7 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.10),
+                    color: color.withValues(alpha: 0.10),
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                   ),
                   child: Row(
@@ -218,7 +218,7 @@ class _InvoicesV52ScreenState extends State<InvoicesV52Screen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.2),
+                          color: color.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text('${items.length}',

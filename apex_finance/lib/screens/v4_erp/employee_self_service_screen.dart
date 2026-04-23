@@ -104,7 +104,7 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -164,13 +164,13 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: a.color.withOpacity(0.25)),
+                    border: Border.all(color: a.color.withValues(alpha: 0.25)),
                   ),
                   child: Column(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(color: a.color.withOpacity(0.12), shape: BoxShape.circle),
+                        decoration: BoxDecoration(color: a.color.withValues(alpha: 0.12), shape: BoxShape.circle),
                         child: Icon(a.icon, color: a.color, size: 22),
                       ),
                       const SizedBox(height: 8),
@@ -235,7 +235,7 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
                 Expanded(
                   child: LinearProgressIndicator(
                     value: used / entitled,
-                    backgroundColor: color.withOpacity(0.15),
+                    backgroundColor: color.withValues(alpha: 0.15),
                     valueColor: AlwaysStoppedAnimation(color),
                     minHeight: 10,
                   ),
@@ -255,7 +255,7 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(color: color.withOpacity(0.05), borderRadius: BorderRadius.circular(6)),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(6)),
       child: Row(
         children: [
           Expanded(
@@ -269,7 +269,7 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
             child: Text(status, style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w800)),
           ),
         ],
@@ -466,7 +466,7 @@ class _EmployeeSelfServiceScreenState extends State<EmployeeSelfServiceScreen> {
                     children: [
                       CircleAvatar(
                         radius: 14,
-                        backgroundColor: core_theme.AC.err.withOpacity(0.15),
+                        backgroundColor: core_theme.AC.err.withValues(alpha: 0.15),
                         child: Text(t.name.substring(0, 1),
                             style: TextStyle(color: core_theme.AC.err, fontSize: 12, fontWeight: FontWeight.w900)),
                       ),

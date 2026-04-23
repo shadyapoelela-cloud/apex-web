@@ -118,12 +118,12 @@ class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
   Widget _statCard(String label, String value, Color color, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: color.withOpacity(0.2))),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Row(children: [
         Icon(icon, color: color, size: 18),
         const SizedBox(width: 8),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label, style: TextStyle(fontSize: 10, color: color.withOpacity(0.8))),
+          Text(label, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.8))),
           Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: color)),
         ])),
       ]),
@@ -168,7 +168,7 @@ class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
             onTap: () => setState(() => _category = c.$1),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(color: selected ? c.$4.withOpacity(0.12) : core_theme.AC.navy3, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? c.$4 : core_theme.AC.bdr)),
+              decoration: BoxDecoration(color: selected ? c.$4.withValues(alpha: 0.12) : core_theme.AC.navy3, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? c.$4 : core_theme.AC.bdr)),
               child: Row(children: [
                 Icon(c.$3, size: 14, color: selected ? c.$4 : core_theme.AC.ts),
                 const SizedBox(width: 6),
@@ -211,8 +211,8 @@ class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: i.status.color.withOpacity(0.3)),
-          boxShadow: [BoxShadow(color: core_theme.AC.tp.withOpacity(0.03), blurRadius: 4, offset: const Offset(0, 1))],
+          border: Border.all(color: i.status.color.withValues(alpha: 0.3)),
+          boxShadow: [BoxShadow(color: core_theme.AC.tp.withValues(alpha: 0.03), blurRadius: 4, offset: const Offset(0, 1))],
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
@@ -224,7 +224,7 @@ class _IntegrationsHubV52ScreenState extends State<IntegrationsHubV52Screen> {
             ])),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(color: i.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: i.status.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
               child: Row(children: [Icon(i.status.icon, size: 10, color: i.status.color), const SizedBox(width: 3), Text(i.status.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: i.status.color))]),
             ),
           ]),

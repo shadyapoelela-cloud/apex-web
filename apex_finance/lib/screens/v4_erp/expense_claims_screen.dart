@@ -123,9 +123,9 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -168,7 +168,7 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: cat.color.withOpacity(0.12),
+                  color: cat.color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(cat.icon, color: cat.color, size: 22),
@@ -214,7 +214,7 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: sc.withOpacity(0.12),
+                      color: sc.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(c.status, style: TextStyle(fontSize: 11, color: sc, fontWeight: FontWeight.w800)),
@@ -483,7 +483,7 @@ class _ExpenseClaimsScreenState extends State<ExpenseClaimsScreen>
                           children: [
                             CircleAvatar(
                               radius: 12,
-                              backgroundColor: core_theme.AC.gold.withOpacity(0.15),
+                              backgroundColor: core_theme.AC.gold.withValues(alpha: 0.15),
                               child: Icon(Icons.person, size: 14, color: core_theme.AC.gold),
                             ),
                             const SizedBox(width: 8),

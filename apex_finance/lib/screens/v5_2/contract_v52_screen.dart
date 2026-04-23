@@ -154,7 +154,7 @@ class ContractV52Screen extends StatelessWidget {
                 child: Icon(m.$4, color: m.$3 ? Colors.white : core_theme.AC.td, size: 16),
               ),
               if (i < milestones.length - 1)
-                Expanded(child: Container(width: 2, color: m.$3 ? _gold.withOpacity(0.3) : core_theme.AC.bdr, margin: const EdgeInsets.symmetric(vertical: 4))),
+                Expanded(child: Container(width: 2, color: m.$3 ? _gold.withValues(alpha: 0.3) : core_theme.AC.bdr, margin: const EdgeInsets.symmetric(vertical: 4))),
             ]),
             const SizedBox(width: 16),
             Expanded(
@@ -162,7 +162,7 @@ class ContractV52Screen extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: m.$3 ? _gold.withOpacity(0.06) : core_theme.AC.navy3, borderRadius: BorderRadius.circular(8), border: Border.all(color: m.$3 ? _gold.withOpacity(0.3) : core_theme.AC.bdr)),
+                  decoration: BoxDecoration(color: m.$3 ? _gold.withValues(alpha: 0.06) : core_theme.AC.navy3, borderRadius: BorderRadius.circular(8), border: Border.all(color: m.$3 ? _gold.withValues(alpha: 0.3) : core_theme.AC.bdr)),
                   child: Row(children: [
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(m.$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
@@ -185,7 +185,7 @@ class ContractV52Screen extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: core_theme.AC.warn.withOpacity(0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.warn.withOpacity(0.3))),
+          decoration: BoxDecoration(color: core_theme.AC.warn.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.warn.withValues(alpha: 0.3))),
           child: Row(children: [
             Icon(Icons.autorenew, color: core_theme.AC.warn, size: 28),
             SizedBox(width: 12),
@@ -241,16 +241,16 @@ class ContractV52Screen extends StatelessWidget {
         final s = sigs[i];
         return Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: s.$5 ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.bdr)),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: s.$5 ? core_theme.AC.ok.withValues(alpha: 0.3) : core_theme.AC.bdr)),
           child: Row(children: [
-            CircleAvatar(backgroundColor: _gold.withOpacity(0.15), child: Text(s.$2[0], style: TextStyle(color: _gold, fontWeight: FontWeight.w800))),
+            CircleAvatar(backgroundColor: _gold.withValues(alpha: 0.15), child: Text(s.$2[0], style: TextStyle(color: _gold, fontWeight: FontWeight.w800))),
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(s.$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
               Text('${s.$1} · ${s.$3}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
               Text('تاريخ التوقيع: ${s.$4}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
             ])),
-            if (s.$5) Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Row(children: [Icon(Icons.check_circle, size: 12, color: core_theme.AC.ok), SizedBox(width: 4), Text('موقّع', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ok))])),
+            if (s.$5) Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Row(children: [Icon(Icons.check_circle, size: 12, color: core_theme.AC.ok), SizedBox(width: 4), Text('موقّع', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ok))])),
           ]),
         );
       },
@@ -317,13 +317,13 @@ class _Kpi extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.2))),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Row(children: [
         Icon(icon, color: color, size: 22),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label, style: TextStyle(fontSize: 11, color: color.withOpacity(0.9))),
-          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 4), Text(unit, style: TextStyle(fontSize: 10, color: color.withOpacity(0.8)))]),
+          Text(label, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.9))),
+          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 4), Text(unit, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.8)))]),
         ])),
       ]),
     );

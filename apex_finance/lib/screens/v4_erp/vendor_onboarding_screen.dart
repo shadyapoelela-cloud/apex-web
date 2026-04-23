@@ -62,7 +62,7 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
             child: Text('الخطوة ${_currentStep + 1} من ${_steps.length}',
                 style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
           ),
@@ -351,7 +351,7 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: (d.uploaded ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.3)),
+        border: Border.all(color: (d.uploaded ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -359,7 +359,7 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: (d.uploaded ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12),
+              color: (d.uploaded ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(d.uploaded ? Icons.check : Icons.upload,
@@ -382,7 +382,7 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
           if (d.uploaded)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+              decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(4)),
               child: Text('مرفوع',
                   style: TextStyle(color: core_theme.AC.ok, fontSize: 10, fontWeight: FontWeight.w800)),
             )
@@ -511,9 +511,9 @@ class _VendorOnboardingScreenState extends State<VendorOnboardingScreen> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: core_theme.AC.gold.withOpacity(0.08),
+            color: core_theme.AC.gold.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: core_theme.AC.gold.withOpacity(0.25)),
+            border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.25)),
           ),
           child: Row(
             children: [

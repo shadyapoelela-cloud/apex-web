@@ -131,9 +131,9 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -198,7 +198,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
                   ),
                   child: Row(
                     children: [
@@ -212,7 +212,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           margin: const EdgeInsets.only(left: 4),
                           decoration: BoxDecoration(
-                            color: _catColor(a.category).withOpacity(0.15),
+                            color: _catColor(a.category).withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(a.category, style: TextStyle(fontSize: 10, color: _catColor(a.category), fontWeight: FontWeight.w700), textAlign: TextAlign.center),
@@ -230,7 +230,7 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           margin: const EdgeInsets.only(left: 4),
                           decoration: BoxDecoration(
-                            color: _statusColor(a.status).withOpacity(0.15),
+                            color: _statusColor(a.status).withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(a.status, style: TextStyle(fontSize: 10, color: _statusColor(a.status), fontWeight: FontWeight.w700), textAlign: TextAlign.center),
@@ -299,9 +299,9 @@ class _FixedAssetsRegisterScreenState extends State<FixedAssetsRegisterScreen>
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: core_theme.AC.gold.withOpacity(0.08),
+            color: core_theme.AC.gold.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: core_theme.AC.gold.withOpacity(0.3)),
+            border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.3)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

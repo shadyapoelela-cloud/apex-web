@@ -180,13 +180,13 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: active
-                  ? _gold.withOpacity(0.08)
-                  : (done ? core_theme.AC.ok.withOpacity(0.04) : Colors.transparent),
+                  ? _gold.withValues(alpha: 0.08)
+                  : (done ? core_theme.AC.ok.withValues(alpha: 0.04) : Colors.transparent),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: active
                     ? _gold
-                    : (done ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.bdr),
+                    : (done ? core_theme.AC.ok.withValues(alpha: 0.3) : core_theme.AC.bdr),
                 width: active ? 1.5 : 1,
               ),
             ),

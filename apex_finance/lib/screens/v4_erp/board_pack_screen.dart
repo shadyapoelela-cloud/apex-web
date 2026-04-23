@@ -106,7 +106,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: core_theme.AC.err.withOpacity(0.2),
+              color: core_theme.AC.err.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: core_theme.AC.err),
             ),
@@ -138,14 +138,14 @@ class _BoardPackScreenState extends State<BoardPackScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.3), width: isUpcoming ? 2 : 1),
+            border: Border.all(color: color.withValues(alpha: 0.3), width: isUpcoming ? 2 : 1),
           ),
           child: Row(
             children: [
               Container(
                 width: 60,
                 height: 60,
-                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                 child: Icon(isUpcoming ? Icons.upcoming : Icons.event_available, color: color, size: 30),
               ),
               const SizedBox(width: 14),
@@ -159,7 +159,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                          decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
                           child: Text(m.status, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w800)),
                         ),
                         if (m.requiresAction) ...[
@@ -308,7 +308,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
           Container(
             width: 28,
             height: 28,
-            decoration: BoxDecoration(color: typeInfo.color.withOpacity(0.12), shape: BoxShape.circle),
+            decoration: BoxDecoration(color: typeInfo.color.withValues(alpha: 0.12), shape: BoxShape.circle),
             child: Center(
               child: Text(d.number,
                   style: TextStyle(color: typeInfo.color, fontSize: 13, fontWeight: FontWeight.w900)),
@@ -326,7 +326,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                      decoration: BoxDecoration(color: typeInfo.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                      decoration: BoxDecoration(color: typeInfo.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                       child: Text(typeInfo.label,
                           style: TextStyle(fontSize: 10, color: typeInfo.color, fontWeight: FontWeight.w800)),
                     ),
@@ -342,13 +342,13 @@ class _BoardPackScreenState extends State<BoardPackScreen>
           if (d.ready)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
               child: Text('جاهز', style: TextStyle(color: core_theme.AC.ok, fontSize: 10, fontWeight: FontWeight.w800)),
             )
           else
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: core_theme.AC.warn.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(color: core_theme.AC.warn.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
               child: Text('قيد الإعداد', style: TextStyle(color: core_theme.AC.warn, fontSize: 10, fontWeight: FontWeight.w800)),
             ),
           IconButton(
@@ -391,7 +391,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: r.status == 'passed' ? core_theme.AC.ok.withOpacity(0.12) : core_theme.AC.err.withOpacity(0.12),
+                  color: r.status == 'passed' ? core_theme.AC.ok.withValues(alpha: 0.12) : core_theme.AC.err.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -425,7 +425,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: r.status == 'passed' ? core_theme.AC.ok.withOpacity(0.15) : core_theme.AC.err.withOpacity(0.15),
+                  color: r.status == 'passed' ? core_theme.AC.ok.withValues(alpha: 0.15) : core_theme.AC.err.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -450,7 +450,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
         Container(
           width: 36,
           height: 28,
-          decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
           child: Center(
             child: Text('$count', style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.w900)),
           ),
@@ -477,7 +477,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
             children: [
               CircleAvatar(
                 radius: 26,
-                backgroundColor: _roleColor(d.role).withOpacity(0.15),
+                backgroundColor: _roleColor(d.role).withValues(alpha: 0.15),
                 child: Text(d.name.substring(0, 1),
                     style: TextStyle(color: _roleColor(d.role), fontSize: 20, fontWeight: FontWeight.w900)),
               ),
@@ -494,7 +494,7 @@ class _BoardPackScreenState extends State<BoardPackScreen>
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: _roleColor(d.role).withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: _roleColor(d.role).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                           child: Text(d.role,
                               style: TextStyle(fontSize: 10, color: _roleColor(d.role), fontWeight: FontWeight.w800)),
                         ),

@@ -118,7 +118,7 @@ class _UniversalGlV52ScreenState extends State<UniversalGlV52Screen> {
       )),
       Container(
         padding: const EdgeInsets.all(12),
-        color: _gold.withOpacity(0.08),
+        color: _gold.withValues(alpha: 0.08),
         child: Row(children: [
           Text('الإجماليات:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
           const Spacer(),
@@ -158,7 +158,7 @@ class _UniversalGlV52ScreenState extends State<UniversalGlV52Screen> {
         return Container(
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(children: [
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: _gold.withOpacity(0.06), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: _gold.withValues(alpha: 0.06), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Icon(Icons.folder, color: _gold, size: 18),
               const SizedBox(width: 8),
               Expanded(child: Text(key, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy))),
@@ -219,7 +219,7 @@ class _MiniPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-      decoration: BoxDecoration(color: const Color(0xFF1A237E).withOpacity(0.06), borderRadius: BorderRadius.circular(6), border: Border.all(color: const Color(0xFF1A237E).withOpacity(0.2))),
+      decoration: BoxDecoration(color: const Color(0xFF1A237E).withValues(alpha: 0.06), borderRadius: BorderRadius.circular(6), border: Border.all(color: const Color(0xFF1A237E).withValues(alpha: 0.2))),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, size: 12, color: const Color(0xFF1A237E)),
         const SizedBox(width: 4),

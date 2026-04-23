@@ -123,9 +123,9 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 3),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -177,7 +177,7 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: slaBreach ? core_theme.AC.err : pc.withOpacity(0.3), width: slaBreach ? 2 : 1),
+        border: Border.all(color: slaBreach ? core_theme.AC.err : pc.withValues(alpha: 0.3), width: slaBreach ? 2 : 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,7 +186,7 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: pc.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: pc.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
                 child: Icon(Icons.confirmation_number, color: pc, size: 18),
               ),
               const SizedBox(width: 12),
@@ -252,7 +252,7 @@ class _HelpdeskTicketsScreenState extends State<HelpdeskTicketsScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: sc.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+                    decoration: BoxDecoration(color: sc.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(4)),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

@@ -43,7 +43,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.architecture, color: Colors.white, size: 28),
@@ -68,7 +68,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: const Text(
@@ -86,7 +86,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
             ),
             child: Row(
               children: [
@@ -116,7 +116,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: active ? core_theme.AC.purple.withOpacity(0.1) : Colors.transparent,
+            color: active ? core_theme.AC.purple.withValues(alpha: 0.1) : Colors.transparent,
             border: Border(
               bottom: BorderSide(
                 color: active ? core_theme.AC.purple : Colors.transparent,
@@ -154,7 +154,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,7 +212,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
   Widget _fieldList() {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -223,7 +223,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
               decoration: BoxDecoration(
                 border: Border(
                   bottom: i < _customFields.length - 1
-                      ? BorderSide(color: core_theme.AC.tp.withOpacity(0.04))
+                      ? BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04))
                       : BorderSide.none,
                 ),
               ),
@@ -234,7 +234,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: _fieldTypeColor(_customFields[i].type).withOpacity(0.12),
+                      color: _fieldTypeColor(_customFields[i].type).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Icon(
@@ -259,7 +259,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFB91C1C).withOpacity(0.12),
+                                  color: const Color(0xFFB91C1C).withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(3),
                                 ),
                                 child: const Text(
@@ -305,7 +305,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,7 +327,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -354,7 +354,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                           decoration: BoxDecoration(
-                            border: Border.all(color: core_theme.AC.tp.withOpacity(0.15)),
+                            border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.15)),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Row(
@@ -385,7 +385,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -428,9 +428,9 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: core_theme.AC.purple.withOpacity(0.04),
+        color: core_theme.AC.purple.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: core_theme.AC.purple.withOpacity(0.15)),
+        border: Border.all(color: core_theme.AC.purple.withValues(alpha: 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -466,7 +466,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(3),
             ),
             child: Text(
@@ -489,7 +489,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
       ),
       child: Column(
         children: [
@@ -523,7 +523,7 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -546,9 +546,9 @@ class _ApexStudioScreenState extends State<ApexStudioScreen> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: core_theme.AC.ok.withOpacity(0.04),
+        color: core_theme.AC.ok.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: core_theme.AC.ok.withOpacity(0.15)),
+        border: Border.all(color: core_theme.AC.ok.withValues(alpha: 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

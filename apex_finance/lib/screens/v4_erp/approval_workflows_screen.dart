@@ -121,9 +121,9 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -158,13 +158,13 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: sc.withOpacity(0.3)),
+            border: Border.all(color: sc.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: ti.color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: ti.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                 child: Icon(ti.icon, color: ti.color),
               ),
               const SizedBox(width: 12),
@@ -180,7 +180,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: ti.color.withOpacity(0.12),
+                            color: ti.color.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text(ti.label,
@@ -227,7 +227,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: sc.withOpacity(0.15),
+                  color: sc.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(_statusLabel(r.status),
@@ -313,7 +313,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: d.color.withOpacity(0.3)),
+              border: Border.all(color: d.color.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -321,7 +321,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: d.color.withOpacity(0.12),
+                    color: d.color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(Icons.verified_user, color: d.color, size: 24),
@@ -446,7 +446,7 @@ class _ApprovalWorkflowsScreenState extends State<ApprovalWorkflowsScreen>
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: core_theme.AC.gold.withOpacity(0.15),
+            backgroundColor: core_theme.AC.gold.withValues(alpha: 0.15),
             child: Text('${s.order}',
                 style: TextStyle(color: core_theme.AC.gold, fontWeight: FontWeight.w900, fontSize: 14)),
           ),

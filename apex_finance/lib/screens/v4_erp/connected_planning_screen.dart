@@ -69,7 +69,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.tune, color: Colors.white, size: 28),
@@ -94,7 +94,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: const Text(
@@ -161,7 +161,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,9 +237,9 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: core_theme.AC.info.withOpacity(0.06),
+              color: core_theme.AC.info.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: core_theme.AC.info.withOpacity(0.2)),
+              border: Border.all(color: core_theme.AC.info.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
@@ -316,7 +316,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -334,9 +334,9 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
           SliderTheme(
             data: SliderThemeData(
               activeTrackColor: color,
-              inactiveTrackColor: color.withOpacity(0.12),
+              inactiveTrackColor: color.withValues(alpha: 0.12),
               thumbColor: color,
-              overlayColor: color.withOpacity(0.1),
+              overlayColor: color.withValues(alpha: 0.1),
               trackHeight: 3,
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
             ),
@@ -363,7 +363,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,8 +381,8 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: delta >= 0
-                      ? core_theme.AC.ok.withOpacity(0.1)
-                      : const Color(0xFFB91C1C).withOpacity(0.1),
+                      ? core_theme.AC.ok.withValues(alpha: 0.1)
+                      : const Color(0xFFB91C1C).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
@@ -430,7 +430,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: core_theme.AC.tp.withOpacity(0.03),
+              color: core_theme.AC.tp.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Row(
@@ -494,7 +494,7 @@ class _ConnectedPlanningScreenState extends State<ConnectedPlanningScreen> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       decoration: top
           ? BoxDecoration(
-              border: Border(top: BorderSide(color: core_theme.AC.tp.withOpacity(0.1))),
+              border: Border(top: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.1))),
             )
           : null,
       child: Row(

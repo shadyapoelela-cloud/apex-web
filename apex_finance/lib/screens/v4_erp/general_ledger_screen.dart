@@ -120,9 +120,9 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                 decoration: BoxDecoration(
-                                  color: isSelected ? core_theme.AC.gold.withOpacity(0.12) : null,
+                                  color: isSelected ? core_theme.AC.gold.withValues(alpha: 0.12) : null,
                                   border: Border(
-                                    bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)),
+                                    bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5)),
                                     right: BorderSide(
                                       color: isSelected ? core_theme.AC.gold : Colors.transparent,
                                       width: 3,
@@ -134,7 +134,7 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: _typeColor(a.type).withOpacity(0.15),
+                                        color: _typeColor(a.type).withValues(alpha: 0.15),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
@@ -197,7 +197,7 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: _typeColor(account.type).withOpacity(0.15),
+                                color: _typeColor(account.type).withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(account.code,
@@ -250,7 +250,7 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
                             return Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                               decoration: BoxDecoration(
-                                border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+                                border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
                               ),
                               child: Row(
                                 children: [
@@ -340,7 +340,7 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: DropdownButton<String>(
@@ -387,9 +387,9 @@ class _GeneralLedgerScreenState extends State<GeneralLedgerScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [

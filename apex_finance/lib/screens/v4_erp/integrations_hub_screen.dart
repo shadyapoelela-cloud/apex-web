@@ -146,9 +146,9 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -195,7 +195,7 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: statusColor.withOpacity(0.3), width: 1.5),
+        border: Border.all(color: statusColor.withValues(alpha: 0.3), width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,13 +204,13 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: i.color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: i.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
                 child: Icon(_categoryIcon(i.category), color: i.color, size: 20),
               ),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -331,7 +331,7 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
         color: k.active ? null : core_theme.AC.err,
       ),
       child: Row(
@@ -359,7 +359,7 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: (k.active ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
+                color: (k.active ? core_theme.AC.ok : core_theme.AC.err).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(3),
               ),
               child: Text(k.active ? 'نشط' : 'ملغى',
@@ -389,14 +389,14 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: (isActive ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.3), width: 1.5),
+        border: Border.all(color: (isActive ? core_theme.AC.ok : core_theme.AC.err).withValues(alpha: 0.3), width: 1.5),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: (isActive ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
+              color: (isActive ? core_theme.AC.ok : core_theme.AC.err).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(Icons.webhook, color: isActive ? core_theme.AC.ok : core_theme.AC.err),
@@ -440,7 +440,7 @@ class _IntegrationsHubScreenState extends State<IntegrationsHubScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: (isActive ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.15),
+              color: (isActive ? core_theme.AC.ok : core_theme.AC.err).withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(isActive ? 'نشط' : 'فاشل',

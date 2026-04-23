@@ -138,9 +138,9 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -180,7 +180,7 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                backgroundColor: _typeColor(l.type).withOpacity(0.15),
+                backgroundColor: _typeColor(l.type).withValues(alpha: 0.15),
                 child: Icon(_typeIcon(l.type), color: _typeColor(l.type), size: 18),
               ),
               const SizedBox(width: 12),
@@ -195,7 +195,7 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: _typeColor(l.type).withOpacity(0.15),
+                            color: _typeColor(l.type).withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(l.type, style: TextStyle(fontSize: 10, color: _typeColor(l.type), fontWeight: FontWeight.w700)),
@@ -217,7 +217,7 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: sc.withOpacity(0.15),
+                      color: sc.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(l.status, style: TextStyle(fontSize: 11, color: sc, fontWeight: FontWeight.w800)),
@@ -286,7 +286,7 @@ class _LeaveManagementScreenState extends State<LeaveManagementScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
                   ),
                   child: Row(
                     children: [

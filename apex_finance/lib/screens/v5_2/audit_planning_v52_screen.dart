@@ -118,7 +118,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: _purple.withOpacity(0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: _purple.withOpacity(0.3))),
+          decoration: BoxDecoration(color: _purple.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: _purple.withValues(alpha: 0.3))),
           child: Row(children: [
             Icon(Icons.info_outline, color: _purple),
             SizedBox(width: 10),
@@ -129,7 +129,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
         ...checks.map((c) => Container(
               margin: const EdgeInsets.only(bottom: 6),
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.ok.withOpacity(0.3))),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.ok.withValues(alpha: 0.3))),
               child: Row(children: [
                 Icon(Icons.check_circle, color: core_theme.AC.ok),
                 const SizedBox(width: 10),
@@ -165,7 +165,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
             child: Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: _riskLevel == r.$1 ? r.$4.withOpacity(0.08) : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: _riskLevel == r.$1 ? r.$4 : core_theme.AC.bdr, width: _riskLevel == r.$1 ? 2 : 1)),
+              decoration: BoxDecoration(color: _riskLevel == r.$1 ? r.$4.withValues(alpha: 0.08) : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: _riskLevel == r.$1 ? r.$4 : core_theme.AC.bdr, width: _riskLevel == r.$1 ? 2 : 1)),
               child: Row(children: [
                 Icon(_riskLevel == r.$1 ? Icons.radio_button_checked : Icons.radio_button_unchecked, color: _riskLevel == r.$1 ? r.$4 : core_theme.AC.td),
                 const SizedBox(width: 12),
@@ -173,7 +173,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
                   Text('مخاطرة ${r.$2}', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _riskLevel == r.$1 ? r.$4 : core_theme.AC.tp)),
                   Text(r.$3, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ])),
-                Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: r.$4.withOpacity(0.15), borderRadius: BorderRadius.circular(12)), child: Text(r.$2, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: r.$4))),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: r.$4.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)), child: Text(r.$2, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: r.$4))),
               ]),
             ),
           )),
@@ -185,7 +185,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: _gold.withOpacity(0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: _gold)),
+          decoration: BoxDecoration(color: _gold.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: _gold)),
           child: Row(children: [
             Icon(Icons.calculate, color: _gold),
             SizedBox(width: 10),
@@ -235,9 +235,9 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
       ...team.map((m) => Container(
             margin: const EdgeInsets.only(bottom: 6),
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: _teamAssigned ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.bdr)),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: _teamAssigned ? core_theme.AC.ok.withValues(alpha: 0.3) : core_theme.AC.bdr)),
             child: Row(children: [
-              CircleAvatar(backgroundColor: m.$4.withOpacity(0.15), child: Text(m.$1[0], style: TextStyle(color: m.$4, fontWeight: FontWeight.w800))),
+              CircleAvatar(backgroundColor: m.$4.withValues(alpha: 0.15), child: Text(m.$1[0], style: TextStyle(color: m.$4, fontWeight: FontWeight.w800))),
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(m.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
@@ -254,7 +254,7 @@ class _AuditPlanningV52ScreenState extends State<AuditPlanningV52Screen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(gradient: LinearGradient(colors: [_purple.withOpacity(0.08), _gold.withOpacity(0.06)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _purple)),
+          decoration: BoxDecoration(gradient: LinearGradient(colors: [_purple.withValues(alpha: 0.08), _gold.withValues(alpha: 0.06)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _purple)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               Icon(Icons.check_circle, color: _purple, size: 28),

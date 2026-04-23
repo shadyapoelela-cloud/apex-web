@@ -107,9 +107,9 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 3),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -220,7 +220,7 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
       ),
       child: Row(
         children: [
@@ -230,7 +230,7 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
             child: Container(
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(color: core_theme.AC.info.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
               child: Text(c.domain, style: TextStyle(fontSize: 10, color: core_theme.AC.info, fontWeight: FontWeight.w700), textAlign: TextAlign.center),
             ),
           ),
@@ -239,7 +239,7 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: (c.type == 'preventive' ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12),
+                color: (c.type == 'preventive' ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(3),
               ),
               child: Text(c.type == 'preventive' ? 'وقائي' : 'اكتشافي',
@@ -265,7 +265,7 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: _riskColor(c.risk).withOpacity(0.12),
+                color: _riskColor(c.risk).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(3),
               ),
               child: Text(c.risk, style: TextStyle(fontSize: 10, color: _riskColor(c.risk), fontWeight: FontWeight.w700), textAlign: TextAlign.center),
@@ -294,7 +294,7 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: _statusColor(c.status).withOpacity(0.15),
+                color: _statusColor(c.status).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(3),
               ),
               child: Text(_statusLabel(c.status),
@@ -349,7 +349,7 @@ class _ControlsLibraryScreenState extends State<ControlsLibraryScreen> {
           Container(
             width: 40,
             height: 40,
-            decoration: BoxDecoration(color: c.color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: c.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
             child: Icon(Icons.verified_user, color: c.color, size: 20),
           ),
           const SizedBox(width: 12),

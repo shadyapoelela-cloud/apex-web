@@ -125,7 +125,7 @@ class Customer360V52Screen extends StatelessWidget {
             ),
             Text('${txns[i].$4.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
             const SizedBox(width: 12),
-            Chip(label: Text(txns[i].$5, style: const TextStyle(fontSize: 10)), backgroundColor: core_theme.AC.ok.withOpacity(0.1)),
+            Chip(label: Text(txns[i].$5, style: const TextStyle(fontSize: 10)), backgroundColor: core_theme.AC.ok.withValues(alpha: 0.1)),
           ],
         ),
       ),
@@ -147,7 +147,7 @@ class Customer360V52Screen extends StatelessWidget {
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: contacts[i].$5 ? _gold : core_theme.AC.bdr)),
         child: Row(
           children: [
-            CircleAvatar(backgroundColor: _gold.withOpacity(0.15), child: Text(contacts[i].$1[0], style: TextStyle(color: _gold, fontWeight: FontWeight.w800))),
+            CircleAvatar(backgroundColor: _gold.withValues(alpha: 0.15), child: Text(contacts[i].$1[0], style: TextStyle(color: _gold, fontWeight: FontWeight.w800))),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -192,7 +192,7 @@ class Customer360V52Screen extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(projects[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 const Spacer(),
-                Chip(label: Text(projects[i].$5, style: const TextStyle(fontSize: 10)), backgroundColor: projects[i].$3 == 1.0 ? core_theme.AC.ok.withOpacity(0.1) : core_theme.AC.info.withOpacity(0.1)),
+                Chip(label: Text(projects[i].$5, style: const TextStyle(fontSize: 10)), backgroundColor: projects[i].$3 == 1.0 ? core_theme.AC.ok.withValues(alpha: 0.1) : core_theme.AC.info.withValues(alpha: 0.1)),
               ],
             ),
             const SizedBox(height: 4),
@@ -243,13 +243,13 @@ class _Kpi extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.2))),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Row(children: [
         Icon(icon, color: color, size: 22),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label, style: TextStyle(fontSize: 11, color: color.withOpacity(0.9))),
-          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 4), Text(unit, style: TextStyle(fontSize: 10, color: color.withOpacity(0.8)))]),
+          Text(label, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.9))),
+          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 4), Text(unit, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.8)))]),
         ])),
       ]),
     );

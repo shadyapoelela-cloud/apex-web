@@ -143,9 +143,9 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -179,13 +179,13 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: sColor.withOpacity(0.3)),
+            border: Border.all(color: sColor.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: sColor.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: sColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                 child: Icon(Icons.work, color: sColor, size: 22),
               ),
               const SizedBox(width: 12),
@@ -200,7 +200,7 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: sColor.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: sColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
                           child: Text(_posStatusLabel(p.status),
                               style: TextStyle(fontSize: 10, color: sColor, fontWeight: FontWeight.w800)),
                         ),
@@ -264,13 +264,13 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: c.color.withOpacity(0.3)),
+            border: Border.all(color: c.color.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: c.color.withOpacity(0.15),
+                backgroundColor: c.color.withValues(alpha: 0.15),
                 child: Text(c.name.substring(0, 1),
                     style: TextStyle(color: c.color, fontSize: 18, fontWeight: FontWeight.w900)),
               ),
@@ -351,7 +351,7 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
     final label = _stageLabel(stage);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
       child: Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w800)),
     );
   }
@@ -385,7 +385,7 @@ class _RecruitmentAtsScreenState extends State<RecruitmentAtsScreen>
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: stage.color.withOpacity(0.12),
+                          color: stage.color.withValues(alpha: 0.12),
                           borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
                         ),
                         child: Row(

@@ -129,9 +129,9 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -214,7 +214,7 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
       ),
       child: Row(
         children: [
@@ -224,7 +224,7 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
             child: Container(
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: h.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(color: h.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
               child: Text(_typeLabel(h.type),
                   style: TextStyle(fontSize: 10, color: h.color, fontWeight: FontWeight.w800), textAlign: TextAlign.center),
             ),
@@ -336,7 +336,7 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: (diff.abs() < 2 ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12),
+                  color: (diff.abs() < 2 ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(3),
                 ),
                 child: Text(
@@ -394,9 +394,9 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: m.color.withOpacity(0.08),
+                  color: m.color.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: m.color.withOpacity(0.25)),
+                  border: Border.all(color: m.color.withValues(alpha: 0.25)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,7 +493,7 @@ class _InvestmentPortfolioScreenState extends State<InvestmentPortfolioScreen>
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: t.color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: t.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
                 child: Icon(
                   t.action == 'شراء'
                       ? Icons.add_circle

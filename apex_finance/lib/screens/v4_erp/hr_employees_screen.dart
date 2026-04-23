@@ -65,7 +65,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       ),
       child: Row(
         children: [
@@ -89,9 +89,9 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? core_theme.AC.gold.withOpacity(0.15) : null,
+          color: active ? core_theme.AC.gold.withValues(alpha: 0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: core_theme.AC.gold.withOpacity(0.4)) : null,
+          border: active ? Border.all(color: core_theme.AC.gold.withValues(alpha: 0.4)) : null,
         ),
         child: Row(
           children: [
@@ -313,10 +313,10 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
       padding: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.15), color.withOpacity(0.08)],
+          colors: [color.withValues(alpha: 0.15), color.withValues(alpha: 0.08)],
         ),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.4)),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
       child: Column(
         children: [
@@ -349,7 +349,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
   Widget _connector() => Container(
         width: 2,
         height: 20,
-        color: core_theme.AC.tp.withOpacity(0.2),
+        color: core_theme.AC.tp.withValues(alpha: 0.2),
       );
 
   // ── Tab 3: Contracts ──────────────────────────────────────────────
@@ -373,7 +373,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -394,7 +394,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04))),
       ),
       child: Row(
         children: [
@@ -420,7 +420,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -462,13 +462,13 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+                border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
               ),
               child: Row(
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor: core_theme.AC.gold.withOpacity(0.2),
+                    backgroundColor: core_theme.AC.gold.withValues(alpha: 0.2),
                     child: Text(
                       r.employee.substring(0, 1),
                       style: TextStyle(color: core_theme.AC.gold, fontWeight: FontWeight.w800),
@@ -486,7 +486,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: _leaveColor(r.type).withOpacity(0.12),
+                                color: _leaveColor(r.type).withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
@@ -536,8 +536,8 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: r.status == 'approved'
-                            ? core_theme.AC.ok.withOpacity(0.12)
-                            : const Color(0xFFB91C1C).withOpacity(0.12),
+                            ? core_theme.AC.ok.withValues(alpha: 0.12)
+                            : const Color(0xFFB91C1C).withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -614,14 +614,14 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 22),
@@ -643,7 +643,7 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.08),
+                    color: color.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -672,9 +672,9 @@ class _HrEmployeesScreenState extends State<HrEmployeesScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: s.color.withOpacity(0.08),
+                color: s.color.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: s.color.withOpacity(0.2)),
+                border: Border.all(color: s.color.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
@@ -822,12 +822,12 @@ class _EmployeeCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: selected ? core_theme.AC.gold.withOpacity(0.05) : Colors.white,
+        color: selected ? core_theme.AC.gold.withValues(alpha: 0.05) : Colors.white,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: selected
               ? core_theme.AC.gold
-              : core_theme.AC.tp.withOpacity(0.08),
+              : core_theme.AC.tp.withValues(alpha: 0.08),
           width: selected ? 2 : 1,
         ),
       ),
@@ -836,7 +836,7 @@ class _EmployeeCard extends StatelessWidget {
           Checkbox(value: selected, onChanged: (v) => onToggle(v ?? false)),
           CircleAvatar(
             radius: 22,
-            backgroundColor: core_theme.AC.gold.withOpacity(0.2),
+            backgroundColor: core_theme.AC.gold.withValues(alpha: 0.2),
             child: Text(
               employee.name.substring(0, 1),
               style: TextStyle(
@@ -875,7 +875,7 @@ class _EmployeeCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                       decoration: BoxDecoration(
-                        color: core_theme.AC.tp.withOpacity(0.06),
+                        color: core_theme.AC.tp.withValues(alpha: 0.06),
                         borderRadius: BorderRadius.circular(3),
                       ),
                       child: Text(

@@ -71,9 +71,9 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: selected ? core_theme.AC.gold.withOpacity(0.12) : null,
+                      color: selected ? core_theme.AC.gold.withValues(alpha: 0.12) : null,
                       border: Border(
-                        bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)),
+                        bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5)),
                         right: BorderSide(
                           color: selected ? core_theme.AC.gold : Colors.transparent,
                           width: 3,
@@ -104,7 +104,7 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                                 children: [
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                    decoration: BoxDecoration(color: c.color.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+                                    decoration: BoxDecoration(color: c.color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
                                     child: Text(c.rating,
                                         style: TextStyle(fontSize: 9, color: c.color, fontWeight: FontWeight.w800)),
                                   ),
@@ -156,7 +156,7 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [c.color, c.color.withOpacity(0.7)]),
+        gradient: LinearGradient(colors: [c.color, c.color.withValues(alpha: 0.7)]),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -172,7 +172,7 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                     child: CircularProgressIndicator(
                       value: c.score / 100,
                       strokeWidth: 10,
-                      backgroundColor: Colors.white.withOpacity(0.3),
+                      backgroundColor: Colors.white.withValues(alpha: 0.3),
                       valueColor: const AlwaysStoppedAnimation(Colors.white),
                     ),
                   ),
@@ -213,7 +213,7 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
                     const SizedBox(width: 10),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                       child: Text(c.commentary,
                           style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
                     ),
@@ -437,9 +437,9 @@ class _CreditScoringScreenState extends State<CreditScoringScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: c.color.withOpacity(0.08),
+        color: c.color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: c.color.withOpacity(0.3)),
+        border: Border.all(color: c.color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

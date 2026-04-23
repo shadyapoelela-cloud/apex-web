@@ -34,7 +34,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       ),
       child: Row(
         children: [
@@ -56,9 +56,9 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF1565C0).withOpacity(0.15) : null,
+          color: active ? const Color(0xFF1565C0).withValues(alpha: 0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: const Color(0xFF1565C0).withOpacity(0.4)) : null,
+          border: active ? Border.all(color: const Color(0xFF1565C0).withValues(alpha: 0.4)) : null,
         ),
         child: Row(
           children: [
@@ -128,9 +128,9 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  _circle(480, const Color(0xFF1565C0).withOpacity(0.12), const Color(0xFF1565C0)),
-                  _circle(320, core_theme.AC.purple.withOpacity(0.18), core_theme.AC.purple),
-                  _circle(160, core_theme.AC.ok.withOpacity(0.25), core_theme.AC.ok),
+                  _circle(480, const Color(0xFF1565C0).withValues(alpha: 0.12), const Color(0xFF1565C0)),
+                  _circle(320, core_theme.AC.purple.withValues(alpha: 0.18), core_theme.AC.purple),
+                  _circle(160, core_theme.AC.ok.withValues(alpha: 0.25), core_theme.AC.ok),
                   Positioned(
                     top: 20,
                     child: _circleLabel('TAM', '12 مليار ر.س', 'الإمارات + السعودية', const Color(0xFF1565C0)),
@@ -151,7 +151,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -262,7 +262,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.3), width: self ? 2 : 1),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: self ? 2 : 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,7 +282,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.08), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(4)),
             child: Row(
               children: [
                 Icon(Icons.add_circle, size: 11, color: core_theme.AC.ok),
@@ -294,7 +294,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
           const SizedBox(height: 4),
           Container(
             padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: const Color(0xFFB91C1C).withOpacity(0.06), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: const Color(0xFFB91C1C).withValues(alpha: 0.06), borderRadius: BorderRadius.circular(4)),
             child: Row(
               children: [
                 const Icon(Icons.remove_circle, size: 11, color: Color(0xFFB91C1C)),
@@ -330,7 +330,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               children: [
                 _demandHeader(),
@@ -373,7 +373,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
   Widget _demandHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.06)))),
+      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.06)))),
       child: const Row(
         children: [
           Expanded(child: Text('السنة', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
@@ -388,7 +388,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
   Widget _demandRow(String year, int customers, double revenue, String driver) {
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04)))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04)))),
       child: Row(
         children: [
           Expanded(child: Text(year, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800))),
@@ -421,7 +421,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
             Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: f.color.withOpacity(0.3))),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: f.color.withValues(alpha: 0.3))),
               child: Row(
                 children: [
                   Container(
@@ -443,7 +443,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: f.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                    decoration: BoxDecoration(color: f.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
                     child: Text(
                       f.impact == 'positive' ? 'إيجابي' : f.impact == 'opportunity' ? 'فرصة' : 'محايد',
                       style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: f.color),
@@ -475,7 +475,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
             Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -485,13 +485,13 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
                       const Spacer(),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(color: force.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                        decoration: BoxDecoration(color: force.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
                         child: Text(force.level, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: force.color)),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  LinearProgressIndicator(value: force.value, backgroundColor: core_theme.AC.tp.withOpacity(0.06), valueColor: AlwaysStoppedAnimation(force.color), minHeight: 6),
+                  LinearProgressIndicator(value: force.value, backgroundColor: core_theme.AC.tp.withValues(alpha: 0.06), valueColor: AlwaysStoppedAnimation(force.color), minHeight: 6),
                   const SizedBox(height: 6),
                   Text(force.note, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ],
@@ -500,7 +500,7 @@ class _FeasibilityMarketScreenState extends State<FeasibilityMarketScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: const Color(0xFF1565C0).withOpacity(0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFF1565C0).withOpacity(0.2))),
+            decoration: BoxDecoration(color: const Color(0xFF1565C0).withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFF1565C0).withValues(alpha: 0.2))),
             child: const Row(
               children: [
                 Icon(Icons.insights, color: Color(0xFF1565C0), size: 18),
@@ -553,7 +553,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             color: const Color(0xFFF9FAFB),
-            border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
+            border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08))),
           ),
           child: Row(
             children: [
@@ -578,9 +578,9 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF1565C0).withOpacity(0.15) : null,
+          color: active ? const Color(0xFF1565C0).withValues(alpha: 0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: const Color(0xFF1565C0).withOpacity(0.4)) : null,
+          border: active ? Border.all(color: const Color(0xFF1565C0).withValues(alpha: 0.4)) : null,
         ),
         child: Row(
           children: [
@@ -644,9 +644,9 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: selected ? const Color(0xFF1565C0).withOpacity(0.08) : Colors.white,
+        color: selected ? const Color(0xFF1565C0).withValues(alpha: 0.08) : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: selected ? const Color(0xFF1565C0) : core_theme.AC.tp.withOpacity(0.08), width: selected ? 2 : 1),
+        border: Border.all(color: selected ? const Color(0xFF1565C0) : core_theme.AC.tp.withValues(alpha: 0.08), width: selected ? 2 : 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -706,9 +706,9 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: p.self ? core_theme.AC.gold.withOpacity(0.08) : Colors.white,
+        color: p.self ? core_theme.AC.gold.withValues(alpha: 0.08) : Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: p.self ? core_theme.AC.gold : core_theme.AC.tp.withOpacity(0.08), width: p.self ? 2 : 1),
+        border: Border.all(color: p.self ? core_theme.AC.gold : core_theme.AC.tp.withValues(alpha: 0.08), width: p.self ? 2 : 1),
       ),
       child: Row(
         children: [
@@ -782,7 +782,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -800,13 +800,13 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
           // Quartile bar
           Stack(
             children: [
-              Container(height: 12, decoration: BoxDecoration(color: core_theme.AC.tp.withOpacity(0.05), borderRadius: BorderRadius.circular(6))),
+              Container(height: 12, decoration: BoxDecoration(color: core_theme.AC.tp.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(6))),
               Row(
                 children: [
-                  Expanded(child: Container(height: 12, color: const Color(0xFFB91C1C).withOpacity(0.3))),
-                  Expanded(child: Container(height: 12, color: core_theme.AC.warn.withOpacity(0.3))),
-                  Expanded(child: Container(height: 12, color: core_theme.AC.ok.withOpacity(0.3))),
-                  Expanded(child: Container(height: 12, color: core_theme.AC.info.withOpacity(0.3))),
+                  Expanded(child: Container(height: 12, color: const Color(0xFFB91C1C).withValues(alpha: 0.3))),
+                  Expanded(child: Container(height: 12, color: core_theme.AC.warn.withValues(alpha: 0.3))),
+                  Expanded(child: Container(height: 12, color: core_theme.AC.ok.withValues(alpha: 0.3))),
+                  Expanded(child: Container(height: 12, color: core_theme.AC.info.withValues(alpha: 0.3))),
                 ],
               ),
               // Marker
@@ -887,7 +887,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -908,7 +908,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Row(
         children: [
           Container(
@@ -924,7 +924,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
               children: [
                 Text(desc, style: const TextStyle(fontSize: 12)),
                 const SizedBox(height: 4),
-                LinearProgressIndicator(value: progress, backgroundColor: core_theme.AC.tp.withOpacity(0.06), valueColor: const AlwaysStoppedAnimation(Color(0xFF1565C0)), minHeight: 4),
+                LinearProgressIndicator(value: progress, backgroundColor: core_theme.AC.tp.withValues(alpha: 0.06), valueColor: const AlwaysStoppedAnimation(Color(0xFF1565C0)), minHeight: 4),
               ],
             ),
           ),
@@ -940,7 +940,7 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
       margin: const EdgeInsets.symmetric(vertical: 3),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: active ? color.withOpacity(0.1) : null,
+        color: active ? color.withValues(alpha: 0.1) : null,
         borderRadius: BorderRadius.circular(4),
         border: active ? Border.all(color: color) : null,
       ),
@@ -1015,9 +1015,9 @@ class _ExternalAnalysisScreenState extends State<ExternalAnalysisScreen> {
       margin: const EdgeInsets.only(bottom: 4),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: r.active ? r.color.withOpacity(0.1) : Colors.white,
+        color: r.active ? r.color.withValues(alpha: 0.1) : Colors.white,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: r.active ? r.color : core_theme.AC.tp.withOpacity(0.08), width: r.active ? 2 : 1),
+        border: Border.all(color: r.active ? r.color : core_theme.AC.tp.withValues(alpha: 0.08), width: r.active ? 2 : 1),
       ),
       child: Row(
         children: [

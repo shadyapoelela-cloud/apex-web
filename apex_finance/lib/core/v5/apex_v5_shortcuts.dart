@@ -91,9 +91,9 @@ class ApexV5ShortcutHint extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
       decoration: BoxDecoration(
-        color: c.withOpacity(0.08),
+        color: c.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(3),
-        border: Border.all(color: c.withOpacity(0.18)),
+        border: Border.all(color: c.withValues(alpha: 0.18)),
       ),
       child: Text(
         hint,

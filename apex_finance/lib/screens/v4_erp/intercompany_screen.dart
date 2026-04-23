@@ -143,9 +143,9 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -185,7 +185,7 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: statusColor.withOpacity(0.3)),
+        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -261,7 +261,7 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+            decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -292,7 +292,7 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: statusColor.withOpacity(0.3)),
+            border: Border.all(color: statusColor.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -300,7 +300,7 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
               const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: fromEntity.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: fromEntity.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                 child: Text(t.fromEntity,
                     style: TextStyle(fontSize: 10, color: fromEntity.color, fontWeight: FontWeight.w800)),
               ),
@@ -310,7 +310,7 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: toEntity.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: toEntity.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                 child: Text(t.toEntity,
                     style: TextStyle(fontSize: 10, color: toEntity.color, fontWeight: FontWeight.w800)),
               ),
@@ -323,7 +323,7 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
               const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(4)),
                 child: Text(_txnStatusLabel(t.status),
                     style: TextStyle(fontSize: 11, color: statusColor, fontWeight: FontWeight.w800)),
               ),
@@ -375,7 +375,7 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(color: _catColor(e.category).withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+                        decoration: BoxDecoration(color: _catColor(e.category).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
                         child: Icon(_catIcon(e.category), color: _catColor(e.category), size: 20),
                       ),
                       const SizedBox(width: 12),
@@ -400,9 +400,9 @@ class _IntercompanyScreenState extends State<IntercompanyScreen>
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: core_theme.AC.gold.withOpacity(0.1),
+                  color: core_theme.AC.gold.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: core_theme.AC.gold.withOpacity(0.3)),
+                  border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [

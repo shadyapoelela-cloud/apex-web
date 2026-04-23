@@ -95,7 +95,7 @@ class _PurchasingApV52ScreenState extends State<PurchasingApV52Screen> {
                 Text(b.dueDate, style: const TextStyle(fontSize: 11)),
               ]),
               const SizedBox(width: 16),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: b.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(14)), child: Text(b.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: b.status.color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: b.status.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(14)), child: Text(b.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: b.status.color))),
               IconButton(icon: const Icon(Icons.more_vert, size: 18), onPressed: () {}),
             ]),
           ),
@@ -117,14 +117,14 @@ class _PurchasingApV52ScreenState extends State<PurchasingApV52Screen> {
           margin: const EdgeInsets.only(left: 10),
           decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Container(width: 8, height: 8, decoration: BoxDecoration(color: s.color, shape: BoxShape.circle)),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(s.labelAr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: s.color)),
                 Text('${(total / 1e3).toStringAsFixed(0)}K ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
             ])),
             ...items.map((b) => Container(
               margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),

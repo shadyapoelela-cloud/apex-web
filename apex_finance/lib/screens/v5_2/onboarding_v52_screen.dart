@@ -110,9 +110,9 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: core_theme.AC.info.withOpacity(0.06),
+              color: core_theme.AC.info.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: core_theme.AC.info.withOpacity(0.2)),
+              border: Border.all(color: core_theme.AC.info.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
@@ -180,7 +180,7 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: value ? _gold.withOpacity(0.04) : core_theme.AC.navy3,
+        color: value ? _gold.withValues(alpha: 0.04) : core_theme.AC.navy3,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: value ? _gold : core_theme.AC.bdr),
       ),
@@ -189,7 +189,7 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: _gold.withOpacity(value ? 0.15 : 0.06),
+              color: _gold.withValues(alpha: value ? 0.15 : 0.06),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(icon, color: _gold, size: 18),
@@ -240,7 +240,7 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: selected ? _gold.withOpacity(0.06) : Colors.white,
+        color: selected ? _gold.withValues(alpha: 0.06) : Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: selected ? _gold : core_theme.AC.bdr, width: selected ? 2 : 1),
       ),
@@ -322,7 +322,7 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: _gold.withOpacity(0.15),
+            backgroundColor: _gold.withValues(alpha: 0.15),
             child: Text(name.substring(0, 1), style: TextStyle(color: _gold, fontWeight: FontWeight.w800)),
           ),
           const SizedBox(width: 12),
@@ -351,7 +351,7 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [_gold.withOpacity(0.1), core_theme.AC.ok.withOpacity(0.08)],
+                colors: [_gold.withValues(alpha: 0.1), core_theme.AC.ok.withValues(alpha: 0.08)],
               ),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: _gold),
@@ -471,7 +471,7 @@ class _OnboardingV52ScreenState extends State<OnboardingV52Screen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: selected ? _gold.withOpacity(0.06) : Colors.white,
+        color: selected ? _gold.withValues(alpha: 0.06) : Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: selected ? _gold : core_theme.AC.bdr, width: selected ? 2 : 1),
       ),

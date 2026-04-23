@@ -208,9 +208,9 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                   margin: const EdgeInsets.only(bottom: 6),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: core_theme.AC.gold.withOpacity(0.05),
+                    color: core_theme.AC.gold.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: core_theme.AC.gold.withOpacity(0.2)),
+                    border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.2)),
                   ),
                   child: Text(_suggestions[i], style: const TextStyle(fontSize: 12, height: 1.4)),
                 ),
@@ -352,7 +352,7 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                   if (!isUser) ...[
                     CircleAvatar(
                       radius: 14,
-                      backgroundColor: core_theme.AC.gold.withOpacity(0.15),
+                      backgroundColor: core_theme.AC.gold.withValues(alpha: 0.15),
                       child: Icon(Icons.auto_awesome, color: core_theme.AC.gold, size: 14),
                     ),
                     const SizedBox(width: 8),
@@ -364,7 +364,7 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                     const SizedBox(width: 8),
                     CircleAvatar(
                       radius: 14,
-                      backgroundColor: core_theme.AC.info.withOpacity(0.15),
+                      backgroundColor: core_theme.AC.info.withValues(alpha: 0.15),
                       child: Icon(Icons.person, color: core_theme.AC.info, size: 14),
                     ),
                   ],
@@ -374,7 +374,7 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: isUser ? core_theme.AC.info : core_theme.AC.gold.withOpacity(0.08),
+                  color: isUser ? core_theme.AC.info : core_theme.AC.gold.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.only(
                     topRight: const Radius.circular(14),
                     topLeft: const Radius.circular(14),
@@ -382,7 +382,7 @@ class _AiCopilotScreenState extends State<AiCopilotScreen> {
                     bottomLeft: Radius.circular(isUser ? 2 : 14),
                   ),
                   border: Border.all(
-                    color: isUser ? core_theme.AC.info.withOpacity(0.2) : core_theme.AC.gold.withOpacity(0.2),
+                    color: isUser ? core_theme.AC.info.withValues(alpha: 0.2) : core_theme.AC.gold.withValues(alpha: 0.2),
                   ),
                 ),
                 child: SelectableText(

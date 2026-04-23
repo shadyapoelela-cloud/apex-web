@@ -141,9 +141,9 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -179,7 +179,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: statusColor.withOpacity(0.3), width: s.status == 'at-risk' ? 2 : 1),
+            border: Border.all(color: statusColor.withValues(alpha: 0.3), width: s.status == 'at-risk' ? 2 : 1),
           ),
           child: Row(
             children: [
@@ -196,14 +196,14 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: plan.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: plan.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                           child: Text(s.plan,
                               style: TextStyle(fontSize: 10, color: plan.color, fontWeight: FontWeight.w800)),
                         ),
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
                           child: Text(_statusLabel(s.status),
                               style: TextStyle(fontSize: 10, color: statusColor, fontWeight: FontWeight.w800)),
                         ),
@@ -293,7 +293,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [p.color, p.color.withOpacity(0.7)],
+          colors: [p.color, p.color.withValues(alpha: 0.7)],
         ),
         borderRadius: BorderRadius.circular(14),
       ),
@@ -319,7 +319,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -581,7 +581,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
   Widget _cohortRow(_Cohort c) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5)))),
       child: Row(
         children: [
           SizedBox(width: 100, child: Text(c.period, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),

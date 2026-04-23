@@ -95,7 +95,7 @@ class _ScenariosV52ScreenState extends State<ScenariosV52Screen> {
           onTap: () => _applyPreset(p.$1),
           child: Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: selected ? p.$4.withOpacity(0.12) : core_theme.AC.navy3, borderRadius: BorderRadius.circular(8), border: Border.all(color: selected ? p.$4 : core_theme.AC.bdr, width: selected ? 2 : 1)),
+            decoration: BoxDecoration(color: selected ? p.$4.withValues(alpha: 0.12) : core_theme.AC.navy3, borderRadius: BorderRadius.circular(8), border: Border.all(color: selected ? p.$4 : core_theme.AC.bdr, width: selected ? 2 : 1)),
             child: Column(children: [
               Text(p.$3, style: const TextStyle(fontSize: 20)),
               const SizedBox(height: 4),
@@ -175,10 +175,10 @@ class _ScenariosV52ScreenState extends State<ScenariosV52Screen> {
           Icon(icon, color: color, size: 16),
           const SizedBox(width: 8),
           Expanded(child: Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)), child: Text('${value >= 0 ? '+' : ''}${value.toStringAsFixed(1)}$unit', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3), decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)), child: Text('${value >= 0 ? '+' : ''}${value.toStringAsFixed(1)}$unit', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color))),
         ]),
         SliderTheme(
-          data: SliderThemeData(activeTrackColor: color, thumbColor: color, inactiveTrackColor: color.withOpacity(0.2)),
+          data: SliderThemeData(activeTrackColor: color, thumbColor: color, inactiveTrackColor: color.withValues(alpha: 0.2)),
           child: Slider(value: value, min: min, max: max, onChanged: onChanged),
         ),
         Row(children: [Text('${min.toStringAsFixed(0)}$unit', style: TextStyle(fontSize: 10, color: core_theme.AC.td)), const Spacer(), Text('${max.toStringAsFixed(0)}$unit', style: TextStyle(fontSize: 10, color: core_theme.AC.td))]),
@@ -234,7 +234,7 @@ class _ScenariosV52ScreenState extends State<ScenariosV52Screen> {
         const SizedBox(width: 8),
         SizedBox(width: 100, child: Text('${(projected / 1e6).toStringAsFixed(2)}M', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, fontFamily: 'monospace'), textAlign: TextAlign.end)),
         const Spacer(),
-        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (isFavorable ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text('${changePct >= 0 ? '+' : ''}${changePct.toStringAsFixed(1)}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: isFavorable ? core_theme.AC.ok : core_theme.AC.err))),
+        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (isFavorable ? core_theme.AC.ok : core_theme.AC.err).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)), child: Text('${changePct >= 0 ? '+' : ''}${changePct.toStringAsFixed(1)}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: isFavorable ? core_theme.AC.ok : core_theme.AC.err))),
       ]),
     );
   }
@@ -265,7 +265,7 @@ class _ScenariosV52ScreenState extends State<ScenariosV52Screen> {
     return insights.map((i) => Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: i.$3.withOpacity(0.06), borderRadius: BorderRadius.circular(6), border: Border.all(color: i.$3.withOpacity(0.3))),
+      decoration: BoxDecoration(color: i.$3.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(6), border: Border.all(color: i.$3.withValues(alpha: 0.3))),
       child: Row(children: [
         Icon(i.$1, color: i.$3, size: 18),
         const SizedBox(width: 10),
@@ -277,17 +277,17 @@ class _ScenariosV52ScreenState extends State<ScenariosV52Screen> {
   Widget _bigStat(String label, String value, String unit, Color color, String delta) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.2))),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: color.withOpacity(0.9))),
+        Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: color.withValues(alpha: 0.9))),
         const SizedBox(height: 6),
         Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
           Text(value, style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: color)),
           const SizedBox(width: 4),
-          Text(unit, style: TextStyle(fontSize: 12, color: color.withOpacity(0.8))),
+          Text(unit, style: TextStyle(fontSize: 12, color: color.withValues(alpha: 0.8))),
         ]),
         const SizedBox(height: 4),
-        Text(delta + ' مقابل الأساس', style: TextStyle(fontSize: 10, color: color.withOpacity(0.7))),
+        Text(delta + ' مقابل الأساس', style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.7))),
       ]),
     );
   }

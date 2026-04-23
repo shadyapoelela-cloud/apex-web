@@ -111,9 +111,9 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -155,7 +155,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: (t.armsLength ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.3)),
+            border: Border.all(color: (t.armsLength ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,7 +167,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: core_theme.AC.purple.withOpacity(0.12),
+                      color: core_theme.AC.purple.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(t.method,
@@ -177,7 +177,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: (t.armsLength ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.15),
+                      color: (t.armsLength ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Row(
@@ -312,7 +312,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: core_theme.AC.info.withOpacity(0.1),
+                      color: core_theme.AC.info.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text('${c.rate}%',
@@ -437,7 +437,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: (done ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12),
+                  color: (done ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -475,7 +475,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: (done ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.15),
+                      color: (done ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(d.status,
@@ -561,7 +561,7 @@ class _TransferPricingV5ScreenState extends State<TransferPricingV5Screen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
                   ),
                   child: Row(
                     children: [

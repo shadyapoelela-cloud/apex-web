@@ -154,9 +154,9 @@ class ApexV5RiskBadge extends StatelessWidget {
             vertical: 3,
           ),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: color.withOpacity(0.4)),
+            border: Border.all(color: color.withValues(alpha: 0.4)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -215,7 +215,7 @@ class ApexV5RiskBadge extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: _color().withOpacity(0.15),
+                        color: _color().withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(Icons.psychology, color: _color(), size: 22),
@@ -245,7 +245,7 @@ class ApexV5RiskBadge extends StatelessWidget {
                 // Score visualization
                 LinearProgressIndicator(
                   value: riskScore.score / 100,
-                  backgroundColor: core_theme.AC.tp.withOpacity(0.06),
+                  backgroundColor: core_theme.AC.tp.withValues(alpha: 0.06),
                   valueColor: AlwaysStoppedAnimation(_color()),
                   minHeight: 8,
                 ),
@@ -269,14 +269,14 @@ class ApexV5RiskBadge extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: const Color(0xFFF9FAFB),
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: core_theme.AC.tp.withOpacity(0.05)),
+                          border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.05)),
                         ),
                         child: Row(
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: _color().withOpacity(0.12),
+                                color: _color().withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
@@ -304,9 +304,9 @@ class ApexV5RiskBadge extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: core_theme.AC.info.withOpacity(0.06),
+                    color: core_theme.AC.info.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: core_theme.AC.info.withOpacity(0.2)),
+                    border: Border.all(color: core_theme.AC.info.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     children: [

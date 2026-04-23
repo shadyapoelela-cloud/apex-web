@@ -55,7 +55,7 @@ class _BudgetPlanningV52ScreenState extends State<BudgetPlanningV52Screen> {
           child: Container(
             width: 200,
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: selected ? _gold.withOpacity(0.06) : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: selected ? _gold : core_theme.AC.bdr, width: selected ? 2 : 1)),
+            decoration: BoxDecoration(color: selected ? _gold.withValues(alpha: 0.06) : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: selected ? _gold : core_theme.AC.bdr, width: selected ? 2 : 1)),
             child: Column(children: [
               Icon(Icons.calendar_month, color: selected ? _gold : core_theme.AC.td, size: 28),
               const SizedBox(height: 8),
@@ -86,7 +86,7 @@ class _BudgetPlanningV52ScreenState extends State<BudgetPlanningV52Screen> {
             child: Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(color: _method == m.$1 ? m.$5.withOpacity(0.06) : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: _method == m.$1 ? m.$5 : core_theme.AC.bdr, width: _method == m.$1 ? 2 : 1)),
+              decoration: BoxDecoration(color: _method == m.$1 ? m.$5.withValues(alpha: 0.06) : Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: _method == m.$1 ? m.$5 : core_theme.AC.bdr, width: _method == m.$1 ? 2 : 1)),
               child: Row(children: [
                 Icon(_method == m.$1 ? Icons.radio_button_checked : Icons.radio_button_unchecked, color: _method == m.$1 ? m.$5 : core_theme.AC.td),
                 const SizedBox(width: 12),
@@ -198,7 +198,7 @@ class _BudgetPlanningV52ScreenState extends State<BudgetPlanningV52Screen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(gradient: LinearGradient(colors: [_gold.withOpacity(0.1), core_theme.AC.ok.withOpacity(0.08)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _gold)),
+          decoration: BoxDecoration(gradient: LinearGradient(colors: [_gold.withValues(alpha: 0.1), core_theme.AC.ok.withValues(alpha: 0.08)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _gold)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('ملخّص الموازنة — $_period', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
             const SizedBox(height: 12),
@@ -233,7 +233,7 @@ class _BudgetPlanningV52ScreenState extends State<BudgetPlanningV52Screen> {
         Row(children: [
           Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
           const Spacer(),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)), child: Text('${value.toStringAsFixed(1)}$unit', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: color))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)), child: Text('${value.toStringAsFixed(1)}$unit', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: color))),
         ]),
         Slider(value: value, min: min, max: max, onChanged: onChanged, activeColor: color),
       ]);
@@ -245,20 +245,20 @@ class _BudgetPlanningV52ScreenState extends State<BudgetPlanningV52Screen> {
   Widget _summaryRow(String k, String v, Color color, {bool big = false}) => Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [Expanded(child: Text(k, style: TextStyle(fontSize: big ? 14 : 12, fontWeight: big ? FontWeight.w800 : FontWeight.w500))), Text(v, style: TextStyle(fontSize: big ? 18 : 13, fontWeight: FontWeight.w800, color: color))]));
 
   Widget _expCategoryRow(String k, int amount, String pct, Color color) => Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Expanded(child: Text(k, style: const TextStyle(fontSize: 12))), Text('${(amount / 1e6).toStringAsFixed(1)}M ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 8), SizedBox(width: 40, child: Text(pct, style: TextStyle(fontSize: 11, color: color.withOpacity(0.8))))]),
+        Row(children: [Expanded(child: Text(k, style: const TextStyle(fontSize: 12))), Text('${(amount / 1e6).toStringAsFixed(1)}M ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 8), SizedBox(width: 40, child: Text(pct, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.8))))]),
         const SizedBox(height: 2),
         ClipRRect(borderRadius: BorderRadius.circular(2), child: LinearProgressIndicator(value: double.parse(pct.replaceAll('%', '')) / 100, minHeight: 4, backgroundColor: core_theme.AC.bdr, color: color)),
       ]));
 
   Widget _reviewerRow(String name, String role, bool signed) => Padding(padding: const EdgeInsets.symmetric(vertical: 6), child: Row(children: [
-        CircleAvatar(radius: 14, backgroundColor: _navy.withOpacity(0.1), child: Text(name[0], style: TextStyle(color: _navy, fontWeight: FontWeight.w800))),
+        CircleAvatar(radius: 14, backgroundColor: _navy.withValues(alpha: 0.1), child: Text(name[0], style: TextStyle(color: _navy, fontWeight: FontWeight.w800))),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
           Text(role, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
         ])),
-        if (signed) Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text('✓ موافق', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ok)))
-        else Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.warn.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text('قيد الانتظار', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.warn))),
+        if (signed) Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)), child: Text('✓ موافق', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ok)))
+        else Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.warn.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)), child: Text('قيد الانتظار', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.warn))),
       ]));
 
   Widget _dropdown(String label, String value, List<String> options) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

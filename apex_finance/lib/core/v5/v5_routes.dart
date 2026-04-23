@@ -203,7 +203,7 @@ class V5Launchpad extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.25),
+                          color: Colors.white.withValues(alpha: 0.25),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Row(
@@ -403,23 +403,23 @@ class _LaunchpadServiceCardState extends State<_LaunchpadServiceCard> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: _hover ? color.withOpacity(0.1) : Colors.white,
+            color: _hover ? color.withValues(alpha: 0.1) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: color.withOpacity(_hover ? 0.4 : 0.15),
+              color: color.withValues(alpha: _hover ? 0.4 : 0.15),
               width: _hover ? 2 : 1,
             ),
             boxShadow: _hover
                 ? [
                     BoxShadow(
-                      color: color.withOpacity(0.25),
+                      color: color.withValues(alpha: 0.25),
                       blurRadius: 20,
                       offset: const Offset(0, 6),
                     ),
                   ]
                 : [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -433,7 +433,7 @@ class _LaunchpadServiceCardState extends State<_LaunchpadServiceCard> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.15),
+                      color: color.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(widget.service.icon, color: color, size: 26),
@@ -460,7 +460,7 @@ class _LaunchpadServiceCardState extends State<_LaunchpadServiceCard> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
+                          color: color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -488,7 +488,7 @@ class _LaunchpadServiceCardState extends State<_LaunchpadServiceCard> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.12),
+                    color: color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -534,16 +534,16 @@ class _WorkspaceCardState extends State<_WorkspaceCard> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: _hover ? color.withOpacity(0.08) : Colors.white,
+            color: _hover ? color.withValues(alpha: 0.08) : Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: color.withOpacity(_hover ? 0.3 : 0.12)),
+            border: Border.all(color: color.withValues(alpha: _hover ? 0.3 : 0.12)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(widget.workspace.icon, color: color, size: 22),

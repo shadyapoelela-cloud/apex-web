@@ -123,9 +123,9 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -160,7 +160,7 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: severityColor.withOpacity(0.3), width: r.severity == 'critical' ? 2 : 1),
+            border: Border.all(color: severityColor.withValues(alpha: 0.3), width: r.severity == 'critical' ? 2 : 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,7 +170,7 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: severityColor.withOpacity(0.12),
+                      color: severityColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(_categoryIcon(r.category), color: severityColor),
@@ -201,7 +201,7 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
                               const SizedBox(width: 6),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(color: const Color(0xFF4A148C).withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                                decoration: BoxDecoration(color: const Color(0xFF4A148C).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                                 child: const Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -238,7 +238,7 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+                    decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -298,14 +298,14 @@ class _WhistleblowerScreenState extends State<WhistleblowerScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: c.color.withOpacity(0.3), width: 2),
+              border: Border.all(color: c.color.withValues(alpha: 0.3), width: 2),
             ),
             child: Row(
               children: [
                 Container(
                   width: 56,
                   height: 56,
-                  decoration: BoxDecoration(color: c.color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: c.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                   child: Icon(_channelIcon(c.type), color: c.color, size: 28),
                 ),
                 const SizedBox(width: 14),

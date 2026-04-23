@@ -113,7 +113,7 @@ class _ServicePickerDialog extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: core_theme.AC.tp.withOpacity(0.04),
+                    color: core_theme.AC.tp.withValues(alpha: 0.04),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -173,19 +173,19 @@ class _ServiceTileState extends State<_ServiceTile> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: widget.isActive
-                ? color.withOpacity(0.12)
+                ? color.withValues(alpha: 0.12)
                 : _hover
-                    ? color.withOpacity(0.06)
-                    : core_theme.AC.tp.withOpacity(0.03),
+                    ? color.withValues(alpha: 0.06)
+                    : core_theme.AC.tp.withValues(alpha: 0.03),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: widget.isActive ? color : color.withOpacity(_hover ? 0.4 : 0.15),
+              color: widget.isActive ? color : color.withValues(alpha: _hover ? 0.4 : 0.15),
               width: widget.isActive ? 2 : 1,
             ),
             boxShadow: _hover
                 ? [
                     BoxShadow(
-                      color: color.withOpacity(0.2),
+                      color: color.withValues(alpha: 0.2),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -201,7 +201,7 @@ class _ServiceTileState extends State<_ServiceTile> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.18),
+                      color: color.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(widget.service.icon, color: color, size: 16),
@@ -231,7 +231,7 @@ class _ServiceTileState extends State<_ServiceTile> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
+                    color: color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(

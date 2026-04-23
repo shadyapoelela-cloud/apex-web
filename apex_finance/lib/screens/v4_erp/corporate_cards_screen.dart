@@ -185,7 +185,7 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(
@@ -222,7 +222,7 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
           elevation: 1,
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: (problem ? core_theme.AC.err : core_theme.AC.ok).withOpacity(0.1),
+              backgroundColor: (problem ? core_theme.AC.err : core_theme.AC.ok).withValues(alpha: 0.1),
               child: Icon(
                 problem ? Icons.warning : Icons.check_circle,
                 color: problem ? core_theme.AC.err : core_theme.AC.ok,
@@ -265,7 +265,7 @@ class _CorporateCardsScreenState extends State<CorporateCardsScreen> {
         return Card(
           elevation: 1,
           child: ListTile(
-            leading: CircleAvatar(backgroundColor: color.withOpacity(0.15), child: Icon(icon, color: color)),
+            leading: CircleAvatar(backgroundColor: color.withValues(alpha: 0.15), child: Icon(icon, color: color)),
             title: Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
             subtitle: Text(rule, style: const TextStyle(fontSize: 11)),
             trailing: Switch(value: true, onChanged: (_) {}),
@@ -326,9 +326,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -338,7 +338,7 @@ class _StatCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 11, color: color.withOpacity(0.8))),
+                Text(label, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.8))),
                 Text(value,
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: color),
                     maxLines: 1,

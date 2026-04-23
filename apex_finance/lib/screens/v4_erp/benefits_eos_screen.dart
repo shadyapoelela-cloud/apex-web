@@ -99,7 +99,7 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: DropdownButton<String>(
@@ -150,7 +150,7 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: core_theme.AC.gold.withOpacity(0.15),
+            backgroundColor: core_theme.AC.gold.withValues(alpha: 0.15),
             radius: 22,
             child: Icon(Icons.person, color: core_theme.AC.gold),
           ),
@@ -270,7 +270,7 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: core_theme.AC.info.withOpacity(0.12),
+                      color: core_theme.AC.info.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text(d.relation,
@@ -284,7 +284,7 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: core_theme.AC.gold.withOpacity(0.15),
+                      color: core_theme.AC.gold.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text(d.class_,
@@ -337,7 +337,7 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: (c.status == 'موافق' ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.15),
+                      color: (c.status == 'موافق' ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text(c.status,
@@ -518,9 +518,9 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,7 +566,7 @@ class _BenefitsEosScreenState extends State<BenefitsEosScreen>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: core_theme.AC.ok.withOpacity(0.12),
+                color: core_theme.AC.ok.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text('+${ytd.toStringAsFixed(1)}%',

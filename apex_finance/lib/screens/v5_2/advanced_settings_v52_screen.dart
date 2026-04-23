@@ -76,11 +76,11 @@ class _AdvancedSettingsV52ScreenState extends State<AdvancedSettingsV52Screen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: selected ? c.$4.withOpacity(0.06) : null,
+              color: selected ? c.$4.withValues(alpha: 0.06) : null,
               border: BorderDirectional(end: BorderSide(color: selected ? c.$4 : Colors.transparent, width: 3)),
             ),
             child: Row(children: [
-              Container(width: 36, height: 36, decoration: BoxDecoration(color: c.$4.withOpacity(0.12), borderRadius: BorderRadius.circular(8)), child: Icon(c.$3, color: c.$4, size: 18)),
+              Container(width: 36, height: 36, decoration: BoxDecoration(color: c.$4.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)), child: Icon(c.$3, color: c.$4, size: 18)),
               const SizedBox(width: 12),
               Expanded(child: Text(c.$2, style: TextStyle(fontSize: 13, fontWeight: selected ? FontWeight.w800 : FontWeight.w500, color: selected ? _navy : core_theme.AC.tp))),
               if (selected) Icon(Icons.chevron_left, color: c.$4, size: 16),
@@ -138,7 +138,7 @@ class _AdvancedSettingsV52ScreenState extends State<AdvancedSettingsV52Screen> {
         Icon(p.$3 == core_theme.AC.ok ? Icons.lock_open : p.$3 == core_theme.AC.warn ? Icons.lock_clock : Icons.lock, size: 16, color: p.$3),
         const SizedBox(width: 8),
         Expanded(child: Text(p.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
-        Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: p.$3.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text(p.$2, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: p.$3))),
+        Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: p.$3.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)), child: Text(p.$2, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: p.$3))),
       ]),
     )).toList();
   }
@@ -169,7 +169,7 @@ class _AdvancedSettingsV52ScreenState extends State<AdvancedSettingsV52Screen> {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
       child: Row(children: [
-        Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text(code, style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: core_theme.AC.ok))),
+        Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)), child: Text(code, style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: core_theme.AC.ok))),
         const SizedBox(width: 10),
         Expanded(child: Text(name, style: const TextStyle(fontSize: 13))),
         Text('1 $code = $rate SAR', style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: core_theme.AC.ts)),
@@ -221,7 +221,7 @@ class _AdvancedSettingsV52ScreenState extends State<AdvancedSettingsV52Screen> {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(6)),
       child: Row(children: [
-        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.purple.withOpacity(0.12), borderRadius: BorderRadius.circular(6)), child: Text(level, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.purple))),
+        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.purple.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)), child: Text(level, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.purple))),
         const SizedBox(width: 12),
         Expanded(flex: 2, child: Text(limit, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
         Expanded(flex: 2, child: Text(approver, style: TextStyle(fontSize: 12, color: core_theme.AC.tp))),
@@ -248,7 +248,7 @@ class _AdvancedSettingsV52ScreenState extends State<AdvancedSettingsV52Screen> {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(6)),
       child: Row(children: [
-        Container(width: 40, height: 40, decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(6)), child: Icon(Icons.numbers, color: color, size: 18)),
+        Container(width: 40, height: 40, decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)), child: Icon(Icons.numbers, color: color, size: 18)),
         const SizedBox(width: 12),
         Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),

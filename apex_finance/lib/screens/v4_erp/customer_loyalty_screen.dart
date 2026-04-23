@@ -154,9 +154,9 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -194,7 +194,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [t.color, t.color.withOpacity(0.7)],
+          colors: [t.color, t.color.withValues(alpha: 0.7)],
         ),
         borderRadius: BorderRadius.circular(16),
       ),
@@ -226,7 +226,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
@@ -254,7 +254,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: c.tierColor.withOpacity(0.3)),
+            border: Border.all(color: c.tierColor.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -346,7 +346,7 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: r.color.withOpacity(0.3), width: 1.5),
+        border: Border.all(color: r.color.withValues(alpha: 0.3), width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,14 +355,14 @@ class _CustomerLoyaltyScreenState extends State<CustomerLoyaltyScreen>
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: r.color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: r.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
                 child: Icon(_catIcon(r.category), color: r.color, size: 20),
               ),
               const Spacer(),
               if (!r.available)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                  decoration: BoxDecoration(color: core_theme.AC.err.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                   child: Text('نفد', style: TextStyle(color: core_theme.AC.err, fontSize: 10, fontWeight: FontWeight.w800)),
                 ),
             ],

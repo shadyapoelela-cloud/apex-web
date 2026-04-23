@@ -128,9 +128,9 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
       margin: const EdgeInsets.only(left: 8, top: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -201,7 +201,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: core_theme.AC.ok.withOpacity(0.12),
+                    color: core_theme.AC.ok.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(Icons.check, color: core_theme.AC.ok, size: 20),
@@ -263,7 +263,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: _checkColor(c.status).withOpacity(0.3)),
+              border: Border.all(color: _checkColor(c.status).withValues(alpha: 0.3)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,7 +272,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: _checkColor(c.status).withOpacity(0.15),
+                    color: _checkColor(c.status).withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -294,7 +294,7 @@ class _AuditAcceptanceScreenState extends State<AuditAcceptanceScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _checkColor(c.status).withOpacity(0.15),
+                    color: _checkColor(c.status).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(_statusLabel(c.status),

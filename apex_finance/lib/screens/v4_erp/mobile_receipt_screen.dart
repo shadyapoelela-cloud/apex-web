@@ -44,7 +44,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.camera_alt, color: Colors.white, size: 28),
@@ -69,7 +69,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: const Text(
@@ -94,14 +94,14 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: core_theme.AC.ok.withOpacity(0.3), width: 2),
+        border: Border.all(color: core_theme.AC.ok.withValues(alpha: 0.3), width: 2),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: core_theme.AC.ok.withOpacity(0.08),
+              color: core_theme.AC.ok.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.receipt_long, size: 48, color: core_theme.AC.ok),
@@ -201,7 +201,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+            border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
           ),
           child: Column(
             children: [
@@ -209,7 +209,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: core_theme.AC.ok.withOpacity(0.06),
+                  color: core_theme.AC.ok.withValues(alpha: 0.06),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
                 ),
                 child: Row(
@@ -217,7 +217,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: core_theme.AC.ok.withOpacity(0.15),
+                        color: core_theme.AC.ok.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(Icons.check_circle, color: core_theme.AC.ok, size: 22),
@@ -280,9 +280,9 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: core_theme.AC.tp.withOpacity(0.02),
+                  color: core_theme.AC.tp.withValues(alpha: 0.02),
                   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)),
-                  border: Border(top: BorderSide(color: core_theme.AC.tp.withOpacity(0.06))),
+                  border: Border(top: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.06))),
                 ),
                 child: Row(
                   children: [
@@ -330,9 +330,9 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
     return Container(
       height: 280,
       decoration: BoxDecoration(
-        color: core_theme.AC.tp.withOpacity(0.04),
+        color: core_theme.AC.tp.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
       ),
       child: Stack(
         children: [
@@ -361,7 +361,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
               decoration: BoxDecoration(
-                color: core_theme.AC.ok.withOpacity(0.2),
+                color: core_theme.AC.ok.withValues(alpha: 0.2),
                 border: Border.all(color: core_theme.AC.ok, width: 2),
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -390,7 +390,7 @@ class _MobileReceiptScreenState extends State<MobileReceiptScreen> {
           trailing: Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: core_theme.AC.info.withOpacity(0.12),
+              color: core_theme.AC.info.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -512,7 +512,7 @@ class _FeatureChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        color: core_theme.AC.ok.withOpacity(0.06),
+        color: core_theme.AC.ok.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(

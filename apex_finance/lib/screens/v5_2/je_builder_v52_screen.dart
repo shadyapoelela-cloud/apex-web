@@ -212,9 +212,9 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.25)),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
@@ -224,7 +224,7 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 11, color: color.withOpacity(0.9))),
+                Text(label, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.9))),
                 Text('$value ر.س',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: color)),
               ],
@@ -406,7 +406,7 @@ class _JeBuilderV52ScreenState extends State<JeBuilderV52Screen> {
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundColor: _gold.withOpacity(0.15),
+              backgroundColor: _gold.withValues(alpha: 0.15),
               child: Icon(trail[i].$4, color: _gold, size: 14),
             ),
             const SizedBox(width: 12),

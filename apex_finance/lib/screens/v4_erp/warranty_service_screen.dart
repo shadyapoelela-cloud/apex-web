@@ -136,9 +136,9 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -173,13 +173,13 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: statusColor.withOpacity(0.3)),
+            border: Border.all(color: statusColor.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: tierColor.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: tierColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                 child: Icon(Icons.verified, color: tierColor, size: 24),
               ),
               const SizedBox(width: 12),
@@ -238,7 +238,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                   Text('SLA تحقق', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+                    decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
                     child: Text(_statusLabel(w.status),
                         style: TextStyle(fontSize: 10, color: statusColor, fontWeight: FontWeight.w800)),
                   ),
@@ -265,7 +265,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: pColor.withOpacity(0.3), width: t.priority == 'critical' ? 2 : 1),
+            border: Border.all(color: pColor.withValues(alpha: 0.3), width: t.priority == 'critical' ? 2 : 1),
           ),
           child: Row(
             children: [
@@ -317,7 +317,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: sColor.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+                decoration: BoxDecoration(color: sColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
                 child: Text(_ticketStatusLabel(t.status),
                     style: TextStyle(fontSize: 11, color: sColor, fontWeight: FontWeight.w800)),
               ),
@@ -341,13 +341,13 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: color.withOpacity(0.3)),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                 child: Icon(Icons.assignment_return, color: color),
               ),
               const SizedBox(width: 12),
@@ -362,7 +362,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: core_theme.AC.info.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                           child: Text(r.sku,
                               style: TextStyle(fontSize: 10, color: core_theme.AC.info, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
                         ),
@@ -390,7 +390,7 @@ class _WarrantyServiceScreenState extends State<WarrantyServiceScreen>
                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+                      decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
                       child: Text(_rmaStatusLabel(r.status),
                           style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w800)),
                     ),

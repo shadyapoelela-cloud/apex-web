@@ -126,7 +126,7 @@ class Supplier360V52Screen extends StatelessWidget {
           ])),
           Text('${pos[i].$3.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
           const SizedBox(width: 12),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: pos[i].$5.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(pos[i].$4, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: pos[i].$5))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: pos[i].$5.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text(pos[i].$4, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: pos[i].$5))),
         ]),
       ),
     );
@@ -154,7 +154,7 @@ class Supplier360V52Screen extends StatelessWidget {
           ])),
           Text('${pays[i].$3.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
           const SizedBox(width: 12),
-          Chip(label: Text(pays[i].$5, style: const TextStyle(fontSize: 10)), backgroundColor: (pays[i].$5 == 'معلّق' ? core_theme.AC.warn : core_theme.AC.ok).withOpacity(0.12)),
+          Chip(label: Text(pays[i].$5, style: const TextStyle(fontSize: 10)), backgroundColor: (pays[i].$5 == 'معلّق' ? core_theme.AC.warn : core_theme.AC.ok).withValues(alpha: 0.12)),
         ]),
       ),
     );
@@ -172,7 +172,7 @@ class Supplier360V52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (ctx, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: contracts[i].$4 == 'نشط' ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.bdr)),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: contracts[i].$4 == 'نشط' ? core_theme.AC.ok.withValues(alpha: 0.3) : core_theme.AC.bdr)),
         child: Row(children: [
           Icon(Icons.gavel, color: contracts[i].$5),
           const SizedBox(width: 12),
@@ -182,7 +182,7 @@ class Supplier360V52Screen extends StatelessWidget {
           ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text('${contracts[i].$3.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
-            Chip(label: Text(contracts[i].$4, style: const TextStyle(fontSize: 10)), backgroundColor: contracts[i].$5.withOpacity(0.12)),
+            Chip(label: Text(contracts[i].$4, style: const TextStyle(fontSize: 10)), backgroundColor: contracts[i].$5.withValues(alpha: 0.12)),
           ]),
         ]),
       ),
@@ -238,7 +238,7 @@ class Supplier360V52Screen extends StatelessWidget {
         final urgent = daysLeft < 30;
         return Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: urgent ? core_theme.AC.err.withOpacity(0.4) : core_theme.AC.bdr)),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: urgent ? core_theme.AC.err.withValues(alpha: 0.4) : core_theme.AC.bdr)),
           child: Row(children: [
             Icon(Icons.verified, color: urgent ? core_theme.AC.err : core_theme.AC.ok),
             const SizedBox(width: 12),
@@ -246,7 +246,7 @@ class Supplier360V52Screen extends StatelessWidget {
               Text(docs[i].$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
               Text(docs[i].$2, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             ])),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (urgent ? core_theme.AC.err : core_theme.AC.ok).withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text('${daysLeft > 0 ? daysLeft : "منتهية"} يوم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: urgent ? core_theme.AC.err : core_theme.AC.ok))),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (urgent ? core_theme.AC.err : core_theme.AC.ok).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text('${daysLeft > 0 ? daysLeft : "منتهية"} يوم', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: urgent ? core_theme.AC.err : core_theme.AC.ok))),
           ]),
         );
       },
@@ -283,13 +283,13 @@ class _Kpi extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.2))),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Row(children: [
         Icon(icon, color: color, size: 22),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label, style: TextStyle(fontSize: 11, color: color.withOpacity(0.9))),
-          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 4), Text(unit, style: TextStyle(fontSize: 10, color: color.withOpacity(0.8)))]),
+          Text(label, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.9))),
+          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 4), Text(unit, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.8)))]),
         ])),
       ]),
     );

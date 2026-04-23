@@ -72,7 +72,7 @@ class _FinancialStatementsFsvV52ScreenState extends State<FinancialStatementsFsv
         Row(children: [
           Text('إصدار القائمة (FSV)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _navy)),
           const SizedBox(width: 8),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _gold.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text('Financial Statement Version', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _gold))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _gold.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)), child: Text('Financial Statement Version', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _gold))),
         ]),
         const SizedBox(height: 8),
         Row(children: fsvs.map((f) {
@@ -82,7 +82,7 @@ class _FinancialStatementsFsvV52ScreenState extends State<FinancialStatementsFsv
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: selected ? f.$5.withOpacity(0.10) : core_theme.AC.navy3,
+                color: selected ? f.$5.withValues(alpha: 0.10) : core_theme.AC.navy3,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: selected ? f.$5 : core_theme.AC.bdr, width: selected ? 2 : 1),
               ),
@@ -136,7 +136,7 @@ class _FinancialStatementsFsvV52ScreenState extends State<FinancialStatementsFsv
       Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [_fsvColor().withOpacity(0.1), _gold.withOpacity(0.06)]),
+          gradient: LinearGradient(colors: [_fsvColor().withValues(alpha: 0.1), _gold.withValues(alpha: 0.06)]),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: _fsvColor()),
         ),
@@ -150,7 +150,7 @@ class _FinancialStatementsFsvV52ScreenState extends State<FinancialStatementsFsv
             'عرض ضريبي ZATCA — يفصل البنود الخاضعة للضريبة عن المُعفاة',
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
           )),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: _fsvColor().withOpacity(0.15), borderRadius: BorderRadius.circular(6)), child: Text(fsvName, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _fsvColor()))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: _fsvColor().withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)), child: Text(fsvName, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _fsvColor()))),
         ]),
       ),
       const SizedBox(height: 12),
@@ -294,7 +294,7 @@ class _FinancialStatementsFsvV52ScreenState extends State<FinancialStatementsFsv
             return Container(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: r.$5 ? 10 : 6),
               decoration: BoxDecoration(
-                color: r.$5 ? core_theme.AC.navy3 : (r.$6 ? _gold.withOpacity(0.05) : null),
+                color: r.$5 ? core_theme.AC.navy3 : (r.$6 ? _gold.withValues(alpha: 0.05) : null),
                 border: r.$6 ? Border(top: BorderSide(color: _gold, width: 1.5), bottom: BorderSide(color: _gold, width: 0.5)) : Border(bottom: BorderSide(color: core_theme.AC.navy3)),
               ),
               child: Row(children: [

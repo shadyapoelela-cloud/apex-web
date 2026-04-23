@@ -109,7 +109,7 @@ class _ApexV5DraftWithAiState extends State<ApexV5DraftWithAi> {
                 : LinearGradient(
                     colors: [core_theme.AC.purple, Color(0xFFEC4899)],
                   ),
-            color: _loading ? core_theme.AC.tp.withOpacity(0.05) : null,
+            color: _loading ? core_theme.AC.tp.withValues(alpha: 0.05) : null,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Row(
@@ -143,9 +143,9 @@ class _ApexV5DraftWithAiState extends State<ApexV5DraftWithAi> {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: core_theme.AC.purple.withOpacity(0.05),
+        color: core_theme.AC.purple.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: core_theme.AC.purple.withOpacity(0.2)),
+        border: Border.all(color: core_theme.AC.purple.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +181,7 @@ class _ApexV5DraftWithAiState extends State<ApexV5DraftWithAi> {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+                      border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
                     ),
                     child: Row(
                       children: [

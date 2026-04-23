@@ -113,7 +113,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
@@ -131,7 +131,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
                   borderRadius: BorderRadius.circular(8),
                   child: LinearProgressIndicator(
                     value: progress,
-                    backgroundColor: Colors.white.withOpacity(0.3),
+                    backgroundColor: Colors.white.withValues(alpha: 0.3),
                     valueColor: const AlwaysStoppedAnimation(Colors.white),
                     minHeight: 10,
                   ),
@@ -150,9 +150,9 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -195,7 +195,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,7 +204,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
             children: [
               CircleAvatar(
                 radius: 18,
-                backgroundColor: color.withOpacity(0.15),
+                backgroundColor: color.withValues(alpha: 0.15),
                 child: allDone
                     ? Icon(Icons.check, color: color, size: 20)
                     : Text('$day', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16)),
@@ -226,7 +226,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
               margin: const EdgeInsets.only(top: 6),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: _statusColor(t.status).withOpacity(0.05),
+                color: _statusColor(t.status).withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -236,7 +236,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: _categoryColor(t.category).withOpacity(0.12),
+                      color: _categoryColor(t.category).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text(_categoryLabel(t.category),
@@ -270,7 +270,7 @@ class _CloseChecklistScreenState extends State<CloseChecklistScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: _statusColor(t.status).withOpacity(0.15),
+                      color: _statusColor(t.status).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(_statusLabel(t.status),

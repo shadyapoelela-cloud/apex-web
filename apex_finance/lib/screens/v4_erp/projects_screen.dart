@@ -39,7 +39,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       ),
       child: Row(
         children: [
@@ -63,9 +63,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? core_theme.AC.gold.withOpacity(0.15) : null,
+          color: active ? core_theme.AC.gold.withValues(alpha: 0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: core_theme.AC.gold.withOpacity(0.4)) : null,
+          border: active ? Border.all(color: core_theme.AC.gold.withValues(alpha: 0.4)) : null,
         ),
         child: Row(
           children: [
@@ -215,7 +215,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.06)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +223,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
             ),
             child: Row(
@@ -235,7 +235,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
+                    color: color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -277,7 +277,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -301,7 +301,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.06))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.06))),
       ),
       child: const Row(
         children: [
@@ -325,7 +325,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04))),
       ),
       child: Row(
         children: [
@@ -401,7 +401,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -468,7 +468,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     Container(
                       height: 20,
                       decoration: BoxDecoration(
-                        color: core_theme.AC.tp.withOpacity(0.04),
+                        color: core_theme.AC.tp.withValues(alpha: 0.04),
                         borderRadius: BorderRadius.circular(3),
                       ),
                     ),
@@ -478,7 +478,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         height: 20,
                         width: barWidth,
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.3),
+                          color: color.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(3),
                           border: Border.all(color: color),
                         ),
@@ -536,7 +536,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -557,7 +557,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04))),
       ),
       child: Row(
         children: [
@@ -581,7 +581,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(status, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w700)),
@@ -618,9 +618,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: s.color.withOpacity(0.08),
+                color: s.color.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: s.color.withOpacity(0.2)),
+                border: Border.all(color: s.color.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
@@ -713,7 +713,7 @@ class _ProjectCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -725,7 +725,7 @@ class _ProjectCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(3),
                 ),
                 child: Text(
@@ -756,7 +756,7 @@ class _ProjectCard extends StatelessWidget {
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: project.progress,
-            backgroundColor: core_theme.AC.tp.withOpacity(0.06),
+            backgroundColor: core_theme.AC.tp.withValues(alpha: 0.06),
             valueColor: AlwaysStoppedAnimation(color),
             minHeight: 5,
           ),
@@ -783,9 +783,9 @@ class _TaskCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
         boxShadow: [
-          BoxShadow(color: core_theme.AC.tp.withOpacity(0.03), blurRadius: 3, offset: const Offset(0, 1)),
+          BoxShadow(color: core_theme.AC.tp.withValues(alpha: 0.03), blurRadius: 3, offset: const Offset(0, 1)),
         ],
       ),
       child: Column(
@@ -799,7 +799,7 @@ class _TaskCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 9,
-                backgroundColor: core_theme.AC.gold.withOpacity(0.2),
+                backgroundColor: core_theme.AC.gold.withValues(alpha: 0.2),
                 child: Text(
                   task.assignee.substring(0, 1),
                   style: TextStyle(fontSize: 10, color: core_theme.AC.gold, fontWeight: FontWeight.w800),

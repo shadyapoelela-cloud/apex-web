@@ -77,17 +77,17 @@ class _AnomaliesV52ScreenState extends State<AnomaliesV52Screen> {
         final a = items[i];
         return Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: a.severity.color.withOpacity(0.3), width: a.severity == _Sev.critical ? 2 : 1)),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: a.severity.color.withValues(alpha: 0.3), width: a.severity == _Sev.critical ? 2 : 1)),
           child: Row(children: [
             Container(width: 4, height: 60, color: a.severity.color),
             const SizedBox(width: 12),
-            Container(width: 44, height: 44, decoration: BoxDecoration(color: _purple.withOpacity(0.12), borderRadius: BorderRadius.circular(8)), child: Icon(Icons.psychology, color: _purple)),
+            Container(width: 44, height: 44, decoration: BoxDecoration(color: _purple.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)), child: Icon(Icons.psychology, color: _purple)),
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Text(a.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 const SizedBox(width: 8),
-                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _purple.withOpacity(0.08), borderRadius: BorderRadius.circular(4)), child: Text(a.kind.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _purple))),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _purple.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(4)), child: Text(a.kind.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _purple))),
               ]),
               Text(a.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
               Text(a.description, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, height: 1.4)),
@@ -101,7 +101,7 @@ class _AnomaliesV52ScreenState extends State<AnomaliesV52Screen> {
               Text('${(a.confidence * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: a.confidence >= 0.9 ? core_theme.AC.err : a.confidence >= 0.8 ? core_theme.AC.warn : core_theme.AC.info)),
             ]),
             const SizedBox(width: 16),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: a.severity.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(a.severity.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: a.severity.color))),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: a.severity.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text(a.severity.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: a.severity.color))),
             const SizedBox(width: 10),
             OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), minimumSize: Size.zero), child: Text('تجاهل', style: TextStyle(fontSize: 11))),
             const SizedBox(width: 6),
@@ -124,7 +124,7 @@ class _AnomaliesV52ScreenState extends State<AnomaliesV52Screen> {
           margin: const EdgeInsets.only(left: 10),
           decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Icon(Icons.warning_amber, color: s.color, size: 18),
               const SizedBox(width: 8),
               Expanded(child: Text('${s.labelAr} (${items.length})', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: s.color))),

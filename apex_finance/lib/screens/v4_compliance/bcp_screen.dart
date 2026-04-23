@@ -128,9 +128,9 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -163,7 +163,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: s.color.withOpacity(0.3), width: s.severity == 'critical' ? 2 : 1),
+            border: Border.all(color: s.color.withValues(alpha: 0.3), width: s.severity == 'critical' ? 2 : 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +172,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: s.color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                    decoration: BoxDecoration(color: s.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
                     child: Icon(_categoryIcon(s.category), color: s.color),
                   ),
                   const SizedBox(width: 12),
@@ -209,7 +209,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                        decoration: BoxDecoration(color: core_theme.AC.info.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
                         child: Column(
                           children: [
                             Text('RTO', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
@@ -221,7 +221,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
                       const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: core_theme.AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                        decoration: BoxDecoration(color: core_theme.AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
                         child: Column(
                           children: [
                             Text('RPO', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
@@ -276,14 +276,14 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: s.color.withOpacity(0.3)),
+            border: Border.all(color: s.color.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
               Container(
                 width: 56,
                 height: 56,
-                decoration: BoxDecoration(color: s.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(color: s.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
                 child: Icon(_siteIcon(s.type), color: s.color, size: 30),
               ),
               const SizedBox(width: 16),
@@ -297,7 +297,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: s.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: s.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                           child: Text(_siteTypeLabel(s.type),
                               style: TextStyle(fontSize: 10, color: s.color, fontWeight: FontWeight.w800)),
                         ),
@@ -344,13 +344,13 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: color.withOpacity(0.3)),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
                 child: Icon(_testResultIcon(t.result), color: color),
               ),
               const SizedBox(width: 12),
@@ -377,7 +377,7 @@ class _BcpScreenState extends State<BcpScreen> with SingleTickerProviderStateMix
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: color)),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+                    decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
                     child: Text(_testResultLabel(t.result),
                         style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w800)),
                   ),

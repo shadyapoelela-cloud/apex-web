@@ -32,7 +32,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
     return Container(
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
+      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)))),
       child: Row(
         children: [
           _tabBtn(0, 'الفواتير', Icons.receipt),
@@ -53,9 +53,9 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFFE65100).withOpacity(0.15) : null,
+          color: active ? const Color(0xFFE65100).withValues(alpha: 0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: const Color(0xFFE65100).withOpacity(0.4)) : null,
+          border: active ? Border.all(color: const Color(0xFFE65100).withValues(alpha: 0.4)) : null,
         ),
         child: Row(
           children: [
@@ -111,7 +111,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Row(
         children: [
           const Icon(Icons.receipt, color: Color(0xFFE65100), size: 20),
@@ -131,7 +131,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
           const SizedBox(width: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(color: inv.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: inv.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
             child: Text(inv.status, style: TextStyle(fontSize: 11, color: inv.color, fontWeight: FontWeight.w700)),
           ),
         ],
@@ -194,7 +194,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -202,7 +202,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: (ready ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+                decoration: BoxDecoration(color: (ready ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
                 child: Icon(ready ? Icons.lock_open : Icons.lock, color: ready ? core_theme.AC.ok : core_theme.AC.warn, size: 18),
               ),
               const SizedBox(width: 12),
@@ -232,7 +232,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
                       height: 28,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: done ? core_theme.AC.ok : core_theme.AC.tp.withOpacity(0.08),
+                        color: done ? core_theme.AC.ok : core_theme.AC.tp.withValues(alpha: 0.08),
                         shape: BoxShape.circle,
                       ),
                       child: Text(
@@ -244,7 +244,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
                       Expanded(
                         child: Container(
                           height: 2,
-                          color: done ? core_theme.AC.ok : core_theme.AC.tp.withOpacity(0.08),
+                          color: done ? core_theme.AC.ok : core_theme.AC.tp.withValues(alpha: 0.08),
                         ),
                       ),
                   ],
@@ -330,13 +330,13 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: active ? color.withOpacity(0.4) : core_theme.AC.tp.withOpacity(0.08), width: active ? 2 : 1),
+        border: Border.all(color: active ? color.withValues(alpha: 0.4) : core_theme.AC.tp.withValues(alpha: 0.08), width: active ? 2 : 1),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
             child: Icon(icon, color: color, size: 22),
           ),
           const SizedBox(width: 12),
@@ -365,7 +365,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: const Color(0xFFB91C1C).withOpacity(0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFB91C1C).withOpacity(0.3))),
+            decoration: BoxDecoration(color: const Color(0xFFB91C1C).withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFB91C1C).withValues(alpha: 0.3))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -418,7 +418,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               children: [
                 _statementRow('إجمالي المعاملات', '285,000 ر.س'),
@@ -469,7 +469,7 @@ class _MarketplaceBillingScreenState extends State<MarketplaceBillingScreen> {
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: s.color.withOpacity(0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: s.color.withOpacity(0.2))),
+              decoration: BoxDecoration(color: s.color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: s.color.withValues(alpha: 0.2))),
               child: Row(
                 children: [
                   Icon(s.icon, size: 18, color: s.color),
@@ -533,7 +533,7 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
         Container(
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)))),
           child: Row(
             children: [
               _tabBtn(0, 'تصنيف SME', Icons.business),
@@ -557,9 +557,9 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF2E7D5B).withOpacity(0.15) : null,
+          color: active ? const Color(0xFF2E7D5B).withValues(alpha: 0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: const Color(0xFF2E7D5B).withOpacity(0.4)) : null,
+          border: active ? Border.all(color: const Color(0xFF2E7D5B).withValues(alpha: 0.4)) : null,
         ),
         child: Row(
           children: [
@@ -622,7 +622,7 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok.withOpacity(0.3))),
+            decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok.withValues(alpha: 0.3))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -652,9 +652,9 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: c.active ? core_theme.AC.ok.withOpacity(0.08) : Colors.white,
+        color: c.active ? core_theme.AC.ok.withValues(alpha: 0.08) : Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: c.active ? core_theme.AC.ok : core_theme.AC.tp.withOpacity(0.08), width: c.active ? 2 : 1),
+        border: Border.all(color: c.active ? core_theme.AC.ok : core_theme.AC.tp.withValues(alpha: 0.08), width: c.active ? 2 : 1),
       ),
       child: Row(
         children: [
@@ -707,7 +707,7 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok.withOpacity(0.3))),
+            decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok.withValues(alpha: 0.3))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -739,7 +739,7 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
   Widget _marketCard(String name, String desc, String capital, String age, String status, Color color, {required bool eligible}) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.4), width: eligible ? 2 : 1)),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.4), width: eligible ? 2 : 1)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -749,7 +749,7 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                 child: Text(status, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: color)),
               ),
             ],
@@ -804,7 +804,7 @@ class _EligibilityCheckScreenState extends State<EligibilityCheckScreen> {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(color: core_theme.AC.warn.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+            decoration: BoxDecoration(color: core_theme.AC.warn.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
             child: Text('Wave 29+ — قريباً', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF92400E))),
           ),
         ],

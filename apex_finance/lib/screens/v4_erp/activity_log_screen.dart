@@ -117,9 +117,9 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -219,7 +219,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,7 +232,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
           const SizedBox(width: 10),
           Container(
             padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
             child: Icon(_severityIcon(e.severity), color: color, size: 16),
           ),
           const SizedBox(width: 10),
@@ -247,7 +247,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: _moduleColor(e.module).withOpacity(0.12),
+                        color: _moduleColor(e.module).withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(3),
                       ),
                       child: Text(e.module,

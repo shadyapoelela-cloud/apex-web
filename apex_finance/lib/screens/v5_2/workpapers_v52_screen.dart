@@ -108,7 +108,7 @@ class WorkpapersV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 6),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: procs[i].$4 ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.warn.withOpacity(0.3))),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: procs[i].$4 ? core_theme.AC.ok.withValues(alpha: 0.3) : core_theme.AC.warn.withValues(alpha: 0.3))),
         child: Row(children: [
           Icon(procs[i].$4 ? Icons.check_circle : Icons.pending, color: procs[i].$4 ? core_theme.AC.ok : core_theme.AC.warn),
           const SizedBox(width: 12),
@@ -116,11 +116,11 @@ class WorkpapersV52Screen extends StatelessWidget {
             Row(children: [
               Text(procs[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
               const SizedBox(width: 8),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _purple.withOpacity(0.08), borderRadius: BorderRadius.circular(4)), child: Text(procs[i].$3, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: _purple))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _purple.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(4)), child: Text(procs[i].$3, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: _purple))),
             ]),
             Text(procs[i].$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
           ])),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (procs[i].$4 ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(procs[i].$5, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: procs[i].$4 ? core_theme.AC.ok : core_theme.AC.warn))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (procs[i].$4 ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text(procs[i].$5, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: procs[i].$4 ? core_theme.AC.ok : core_theme.AC.warn))),
         ]),
       ),
     );
@@ -152,7 +152,7 @@ class WorkpapersV52Screen extends StatelessWidget {
                     Expanded(child: Text(r.$2, style: const TextStyle(fontSize: 12, fontFamily: 'monospace'), textAlign: TextAlign.end)),
                     Expanded(child: Text(r.$3, style: const TextStyle(fontSize: 12, fontFamily: 'monospace'), textAlign: TextAlign.end)),
                     Expanded(child: Text(r.$4, style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: r.$4 == '0' ? core_theme.AC.ok : core_theme.AC.err, fontWeight: FontWeight.w800), textAlign: TextAlign.end)),
-                    Expanded(child: Align(alignment: Alignment.centerLeft, child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: (r.$4 == '0' ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text(r.$4 == '0' ? '✓ متطابق' : 'تسوية مطلوبة', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: r.$4 == '0' ? core_theme.AC.ok : core_theme.AC.warn))))),
+                    Expanded(child: Align(alignment: Alignment.centerLeft, child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: (r.$4 == '0' ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)), child: Text(r.$4 == '0' ? '✓ متطابق' : 'تسوية مطلوبة', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: r.$4 == '0' ? core_theme.AC.ok : core_theme.AC.warn))))),
                   ]),
                 )),
           ]),
@@ -214,14 +214,14 @@ class WorkpapersV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: findings[i].$4.withOpacity(0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: findings[i].$4, width: 1.5)),
+        decoration: BoxDecoration(color: findings[i].$4.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: findings[i].$4, width: 1.5)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             Icon(Icons.report, color: findings[i].$4),
             const SizedBox(width: 8),
             Text(findings[i].$1, style: const TextStyle(fontFamily: 'monospace', fontSize: 12, fontWeight: FontWeight.w800)),
             const SizedBox(width: 10),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: findings[i].$4.withOpacity(0.15), borderRadius: BorderRadius.circular(10)), child: Text(findings[i].$3, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: findings[i].$4))),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: findings[i].$4.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)), child: Text(findings[i].$3, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: findings[i].$4))),
           ]),
           const SizedBox(height: 6),
           Text(findings[i].$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
@@ -238,7 +238,7 @@ class WorkpapersV52Screen extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(gradient: LinearGradient(colors: [_purple.withOpacity(0.06), core_theme.AC.ok.withOpacity(0.06)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _purple)),
+          decoration: BoxDecoration(gradient: LinearGradient(colors: [_purple.withValues(alpha: 0.06), core_theme.AC.ok.withValues(alpha: 0.06)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _purple)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [Icon(Icons.done_all, color: _purple), SizedBox(width: 8), Text('خلاصة ورقة العمل', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _purple))]),
             SizedBox(height: 12),
@@ -273,7 +273,7 @@ class WorkpapersV52Screen extends StatelessWidget {
 
   Widget _summaryRow(String label, String value, String sub, Color color) => Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [
         Expanded(child: Text(label, style: TextStyle(fontSize: 12, color: core_theme.AC.ts))),
-        Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color))),
+        Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)), child: Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color))),
         const SizedBox(width: 10),
         Text(sub, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ]));

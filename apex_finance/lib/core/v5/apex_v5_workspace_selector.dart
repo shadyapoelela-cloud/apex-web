@@ -61,7 +61,7 @@ class _ApexV5WorkspaceSelectorState extends State<ApexV5WorkspaceSelector> {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: w.color.withOpacity(0.15),
+                    color: w.color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Icon(w.icon, color: w.color, size: 16),
@@ -97,9 +97,9 @@ class _ApexV5WorkspaceSelectorState extends State<ApexV5WorkspaceSelector> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: ws.color.withOpacity(0.08),
+          color: ws.color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: ws.color.withOpacity(0.2)),
+          border: Border.all(color: ws.color.withValues(alpha: 0.2)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -142,7 +142,7 @@ class ApexV5WorkspaceHome extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: workspace.color.withOpacity(0.15),
+                  color: workspace.color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(workspace.icon, color: workspace.color, size: 28),
@@ -232,11 +232,11 @@ class _ShortcutCardState extends State<_ShortcutCard> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: _hover
-                ? widget.color.withOpacity(0.08)
-                : core_theme.AC.tp.withOpacity(0.03),
+                ? widget.color.withValues(alpha: 0.08)
+                : core_theme.AC.tp.withValues(alpha: 0.03),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: widget.color.withOpacity(_hover ? 0.3 : 0.1),
+              color: widget.color.withValues(alpha: _hover ? 0.3 : 0.1),
             ),
           ),
           child: Row(
@@ -244,7 +244,7 @@ class _ShortcutCardState extends State<_ShortcutCard> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: widget.color.withOpacity(0.12),
+                  color: widget.color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(widget.shortcut.icon,

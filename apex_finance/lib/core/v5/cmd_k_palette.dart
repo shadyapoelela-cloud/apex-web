@@ -227,7 +227,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
-                  BoxShadow(color: core_theme.AC.tp.withOpacity(0.3), blurRadius: 24, offset: const Offset(0, 12)),
+                  BoxShadow(color: core_theme.AC.tp.withValues(alpha: 0.3), blurRadius: 24, offset: const Offset(0, 12)),
                 ],
               ),
               child: Column(
@@ -292,7 +292,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
                                   onTap: () => item.onSelect(context),
                                   child: Container(
                                     color: highlighted
-                                        ? core_theme.AC.gold.withOpacity(0.08)
+                                        ? core_theme.AC.gold.withValues(alpha: 0.08)
                                         : Colors.transparent,
                                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                                     child: Row(
@@ -301,7 +301,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
                                           width: 32,
                                           height: 32,
                                           decoration: BoxDecoration(
-                                            color: item.color.withOpacity(0.12),
+                                            color: item.color.withValues(alpha: 0.12),
                                             borderRadius: BorderRadius.circular(6),
                                           ),
                                           child: Icon(item.icon, size: 16, color: item.color),
@@ -325,7 +325,7 @@ class _CmdKPaletteState extends State<CmdKPalette> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: item.color.withOpacity(0.08),
+                                            color: item.color.withValues(alpha: 0.08),
                                             borderRadius: BorderRadius.circular(4),
                                           ),
                                           child: Text(

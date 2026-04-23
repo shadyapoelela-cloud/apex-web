@@ -74,7 +74,7 @@ class _WorkflowsV52ScreenState extends State<WorkflowsV52Screen> {
           child: Padding(padding: const EdgeInsets.all(12), child: Row(children: [
             Container(width: 4, height: 56, color: w.status.color),
             const SizedBox(width: 12),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(6)), child: Text(w.docType, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _navy, fontFamily: 'monospace'))),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), decoration: BoxDecoration(color: _navy.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(6)), child: Text(w.docType, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _navy, fontFamily: 'monospace'))),
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(w.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
@@ -89,7 +89,7 @@ class _WorkflowsV52ScreenState extends State<WorkflowsV52Screen> {
               ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: w.currentLevel / w.totalLevels, minHeight: 6, backgroundColor: core_theme.AC.bdr, color: w.status.color)),
             ])),
             const SizedBox(width: 16),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: w.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(w.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: w.status.color))),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: w.status.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text(w.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: w.status.color))),
             if (w.status == _St.pending || w.status == _St.inReview) ...[
               const SizedBox(width: 10),
               OutlinedButton.icon(onPressed: () {}, icon: Icon(Icons.close, size: 14, color: core_theme.AC.err), label: Text('رفض', style: TextStyle(fontSize: 11, color: core_theme.AC.err))),
@@ -115,14 +115,14 @@ class _WorkflowsV52ScreenState extends State<WorkflowsV52Screen> {
           margin: const EdgeInsets.only(left: 10),
           decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Container(width: 8, height: 8, decoration: BoxDecoration(color: s.color, shape: BoxShape.circle)),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(s.labelAr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: s.color)),
                 Text('${(total / 1000).toStringAsFixed(0)}K ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
             ])),
             ...items.map((w) => Container(
               margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
@@ -130,7 +130,7 @@ class _WorkflowsV52ScreenState extends State<WorkflowsV52Screen> {
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(3)), child: Text(w.docType, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _navy))),
+                  Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: _navy.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(3)), child: Text(w.docType, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _navy))),
                   const SizedBox(width: 6),
                   Text(w.id, style: TextStyle(fontFamily: 'monospace', fontSize: 9, color: core_theme.AC.ts)),
                   const Spacer(),

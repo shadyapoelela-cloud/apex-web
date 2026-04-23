@@ -155,7 +155,7 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
             color: active ? core_theme.AC.gold : Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: active ? core_theme.AC.gold : core_theme.AC.tp.withOpacity(0.12),
+              color: active ? core_theme.AC.gold : core_theme.AC.tp.withValues(alpha: 0.12),
             ),
           ),
           child: Row(
@@ -174,7 +174,7 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                 decoration: BoxDecoration(
-                  color: active ? Colors.white.withOpacity(0.25) : core_theme.AC.tp.withOpacity(0.08),
+                  color: active ? Colors.white.withValues(alpha: 0.25) : core_theme.AC.tp.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -199,12 +199,12 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            core_theme.AC.ok.withOpacity(0.08),
-            core_theme.AC.info.withOpacity(0.08),
+            core_theme.AC.ok.withValues(alpha: 0.08),
+            core_theme.AC.info.withValues(alpha: 0.08),
           ],
         ),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.06)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
@@ -269,7 +269,7 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,7 +298,7 @@ class _V5ShowcaseScreenState extends State<V5ShowcaseScreen> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: item.color.withOpacity(0.12),
+                      color: item.color.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Icon(item.icon, color: item.color, size: 14),
@@ -663,20 +663,20 @@ class _ShowcaseCardState extends State<_ShowcaseCard> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: widget.item.color.withOpacity(_hover ? 0.4 : 0.12),
+              color: widget.item.color.withValues(alpha: _hover ? 0.4 : 0.12),
               width: _hover ? 2 : 1,
             ),
             boxShadow: _hover
                 ? [
                     BoxShadow(
-                      color: widget.item.color.withOpacity(0.25),
+                      color: widget.item.color.withValues(alpha: 0.25),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
                   ]
                 : [
                     BoxShadow(
-                      color: core_theme.AC.tp.withOpacity(0.04),
+                      color: core_theme.AC.tp.withValues(alpha: 0.04),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -690,7 +690,7 @@ class _ShowcaseCardState extends State<_ShowcaseCard> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: widget.item.color.withOpacity(0.12),
+                      color: widget.item.color.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(widget.item.icon, color: widget.item.color, size: 22),
@@ -699,7 +699,7 @@ class _ShowcaseCardState extends State<_ShowcaseCard> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: core_theme.AC.tp.withOpacity(0.04),
+                      color: core_theme.AC.tp.withValues(alpha: 0.04),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -758,7 +758,7 @@ class _ShowcaseCardState extends State<_ShowcaseCard> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: core_theme.AC.ok.withOpacity(0.08),
+                    color: core_theme.AC.ok.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Row(

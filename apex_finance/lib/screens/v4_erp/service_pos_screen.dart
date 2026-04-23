@@ -152,7 +152,7 @@ class _ServicePosScreenState extends State<ServicePosScreen> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: _navy.withOpacity(0.04),
+                            color: _navy.withValues(alpha: 0.04),
                           ),
                           child: Row(
                             children: [
@@ -171,7 +171,7 @@ class _ServicePosScreenState extends State<ServicePosScreen> {
                               final s = _services[i];
                               return ListTile(
                                 leading: CircleAvatar(
-                                  backgroundColor: _gold.withOpacity(0.15),
+                                  backgroundColor: _gold.withValues(alpha: 0.15),
                                   child: Icon(s.icon, color: _gold, size: 18),
                                 ),
                                 title: Text(s.name,
@@ -252,7 +252,7 @@ class _ApptCard extends StatelessWidget {
               width: 60,
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                color: core_theme.AC.gold.withOpacity(0.1),
+                color: core_theme.AC.gold.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
@@ -293,7 +293,7 @@ class _ApptCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Row(
@@ -323,9 +323,9 @@ class _StatPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.25)),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
@@ -335,7 +335,7 @@ class _StatPill extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(label, style: TextStyle(fontSize: 10, color: color.withOpacity(0.8))),
+              Text(label, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.8))),
               Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color)),
             ],
           ),

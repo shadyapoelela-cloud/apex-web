@@ -148,9 +148,9 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: _filter == t ? t.color.withOpacity(0.15) : t.color.withOpacity(0.06),
+              color: _filter == t ? t.color.withValues(alpha: 0.15) : t.color.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: _filter == t ? t.color : t.color.withOpacity(0.2), width: _filter == t ? 2 : 1),
+              border: Border.all(color: _filter == t ? t.color : t.color.withValues(alpha: 0.2), width: _filter == t ? 2 : 1),
             ),
             child: Row(children: [
               Icon(t.icon, color: t.color, size: 20),
@@ -199,7 +199,7 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
         const Spacer(),
         if (_filter != null) Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(color: _filter!.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(color: _filter!.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
           child: Row(children: [
             Icon(_filter!.icon, size: 12, color: _filter!.color),
             const SizedBox(width: 4),
@@ -249,7 +249,7 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
         child: Container(
           padding: EdgeInsetsDirectional.only(start: 12 + depth * 22, end: 12, top: 10, bottom: 10),
           decoration: BoxDecoration(
-            color: selected ? _gold.withOpacity(0.08) : null,
+            color: selected ? _gold.withValues(alpha: 0.08) : null,
             border: BorderDirectional(
               end: BorderSide(color: selected ? _gold : Colors.transparent, width: 3),
               bottom: BorderSide(color: core_theme.AC.navy3),
@@ -287,7 +287,7 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
               width: 90,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: a.type.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(color: a.type.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
                 child: Text(a.type.labelAr, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: a.type.color), textAlign: TextAlign.center),
               ),
             ),
@@ -330,9 +330,9 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: a.type.color.withOpacity(0.06), border: Border(bottom: BorderSide(color: core_theme.AC.bdr))),
+          decoration: BoxDecoration(color: a.type.color.withValues(alpha: 0.06), border: Border(bottom: BorderSide(color: core_theme.AC.bdr))),
           child: Row(children: [
-            Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: a.type.color.withOpacity(0.15), borderRadius: BorderRadius.circular(8)), child: Icon(a.type.icon, color: a.type.color)),
+            Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: a.type.color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)), child: Icon(a.type.icon, color: a.type.color)),
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(a.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
@@ -378,14 +378,14 @@ class _CoaEditorV52ScreenState extends State<CoaEditorV52Screen> {
   Widget _kvBig(String k, String v, String unit, Color color) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.2))),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(k, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: color.withOpacity(0.9))),
+        Text(k, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: color.withValues(alpha: 0.9))),
         const SizedBox(height: 4),
         Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
           Text(v, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: color, fontFamily: 'monospace')),
           const SizedBox(width: 6),
-          Text(unit, style: TextStyle(fontSize: 11, color: color.withOpacity(0.8))),
+          Text(unit, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.8))),
         ]),
       ]),
     );

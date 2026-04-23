@@ -113,9 +113,9 @@ class _Customer360ScreenState extends State<Customer360Screen>
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: selected ? core_theme.AC.gold.withOpacity(0.12) : null,
+                      color: selected ? core_theme.AC.gold.withValues(alpha: 0.12) : null,
                       border: Border(
-                        bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)),
+                        bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5)),
                         right: BorderSide(
                           color: selected ? core_theme.AC.gold : Colors.transparent,
                           width: 3,
@@ -126,7 +126,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
                       children: [
                         CircleAvatar(
                           radius: 16,
-                          backgroundColor: _segmentColor(c.segment).withOpacity(0.15),
+                          backgroundColor: _segmentColor(c.segment).withValues(alpha: 0.15),
                           child: Text(c.name.substring(0, 1),
                               style: TextStyle(color: _segmentColor(c.segment), fontWeight: FontWeight.w900)),
                         ),
@@ -171,7 +171,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [_segmentColor(_selected.segment), _segmentColor(_selected.segment).withOpacity(0.7)],
+          colors: [_segmentColor(_selected.segment), _segmentColor(_selected.segment).withValues(alpha: 0.7)],
         ),
         borderRadius: BorderRadius.circular(14),
       ),
@@ -245,9 +245,9 @@ class _Customer360ScreenState extends State<Customer360Screen>
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -301,7 +301,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -373,7 +373,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
                   ),
                   child: Row(
                     children: [
@@ -394,7 +394,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           margin: const EdgeInsets.only(left: 4),
                           decoration: BoxDecoration(
-                            color: _invStatusColor(inv.status).withOpacity(0.15),
+                            color: _invStatusColor(inv.status).withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(inv.status,
@@ -496,9 +496,9 @@ class _Customer360ScreenState extends State<Customer360Screen>
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -520,9 +520,9 @@ class _Customer360ScreenState extends State<Customer360Screen>
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: severity.withOpacity(0.05),
+        color: severity.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: severity.withOpacity(0.2)),
+        border: Border.all(color: severity.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -666,7 +666,7 @@ class _Customer360ScreenState extends State<Customer360Screen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -701,9 +701,9 @@ class _Customer360ScreenState extends State<Customer360Screen>
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: core_theme.AC.gold.withOpacity(0.08),
+        color: core_theme.AC.gold.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: core_theme.AC.gold.withOpacity(0.25)),
+        border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.25)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

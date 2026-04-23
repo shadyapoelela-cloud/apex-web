@@ -106,9 +106,9 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -190,7 +190,7 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: statusColor.withOpacity(0.3)),
+        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +201,7 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: _typeColor(c.type).withOpacity(0.12),
+                  color: _typeColor(c.type).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(_typeIcon(c.type), color: _typeColor(c.type)),
@@ -218,7 +218,7 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: _typeColor(c.type).withOpacity(0.12),
+                            color: _typeColor(c.type).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text(_typeLabel(c.type),
@@ -228,7 +228,7 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: (c.side == 'customer' ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12),
+                            color: (c.side == 'customer' ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text(c.side == 'customer' ? 'عميل' : 'مورد',
@@ -255,7 +255,7 @@ class _ContractManagementScreenState extends State<ContractManagementScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.15),
+                      color: statusColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(_statusLabel(c.status),

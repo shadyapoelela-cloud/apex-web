@@ -82,7 +82,7 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
           onTap: () => setState(() => _mode = m.$1),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(color: selected ? m.$4.withOpacity(0.12) : core_theme.AC.navy3, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? m.$4 : core_theme.AC.bdr)),
+            decoration: BoxDecoration(color: selected ? m.$4.withValues(alpha: 0.12) : core_theme.AC.navy3, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? m.$4 : core_theme.AC.bdr)),
             child: Row(children: [
               Icon(m.$3, size: 14, color: selected ? m.$4 : core_theme.AC.ts),
               const SizedBox(width: 6),
@@ -112,10 +112,10 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
           const SizedBox(height: 10),
           _numberField('التكلفة المتغيّرة للوحدة', _variableCostPerUnit, 'ر.س', (v) => setState(() => _variableCostPerUnit = v)),
           const SizedBox(height: 10),
-          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.08), borderRadius: BorderRadius.circular(6)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(6)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [Icon(Icons.calculate, size: 14, color: core_theme.AC.ok), const SizedBox(width: 6), Text('هامش المساهمة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ok)), const Spacer(), Text('${_contributionMargin.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.ok))]),
             const SizedBox(height: 4),
-            Row(children: [Text('النسبة (CMR)', style: TextStyle(fontSize: 10, color: core_theme.AC.ok.withOpacity(0.8))), const Spacer(), Text('${(_contributionMarginRatio * 100).toStringAsFixed(1)}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.ok))]),
+            Row(children: [Text('النسبة (CMR)', style: TextStyle(fontSize: 10, color: core_theme.AC.ok.withValues(alpha: 0.8))), const Spacer(), Text('${(_contributionMarginRatio * 100).toStringAsFixed(1)}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: core_theme.AC.ok))]),
           ])),
         ])),
         const SizedBox(height: 14),
@@ -129,14 +129,14 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
   Widget _card(String title, String subtitle, IconData icon, Color color, Widget child) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: color.withOpacity(0.04), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.2))),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.04), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Container(padding: const EdgeInsets.all(6), decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(4)), child: Icon(icon, color: color, size: 14)),
+          Container(padding: const EdgeInsets.all(6), decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(4)), child: Icon(icon, color: color, size: 14)),
           const SizedBox(width: 8),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color)),
-            Text(subtitle, style: TextStyle(fontSize: 9, color: color.withOpacity(0.7))),
+            Text(subtitle, style: TextStyle(fontSize: 9, color: color.withValues(alpha: 0.7))),
           ]),
         ]),
         const SizedBox(height: 10),
@@ -183,12 +183,12 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [_gold.withOpacity(0.12), core_theme.AC.ok.withOpacity(0.08)]),
+            gradient: LinearGradient(colors: [_gold.withValues(alpha: 0.12), core_theme.AC.ok.withValues(alpha: 0.08)]),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: _gold, width: 2),
           ),
           child: Row(children: [
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: _gold.withOpacity(0.15), borderRadius: BorderRadius.circular(8)), child: Icon(Icons.flag, color: _gold, size: 32)),
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: _gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)), child: Icon(Icons.flag, color: _gold, size: 32)),
             const SizedBox(width: 16),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('نقطة التعادل (Break-Even Point)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
@@ -208,7 +208,7 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
         // Target profit section
         Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.info.withOpacity(0.3))),
+          decoration: BoxDecoration(color: core_theme.AC.info.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.info.withValues(alpha: 0.3))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               Icon(Icons.flag, color: core_theme.AC.info),
@@ -319,7 +319,7 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
           Expanded(child: Container(
             margin: const EdgeInsets.only(right: 60),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(color: (isFav ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: (isFav ? core_theme.AC.ok : core_theme.AC.err).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
             child: Text('${changePct >= 0 ? '+' : ''}${changePct.toStringAsFixed(1)}%', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: isFav ? core_theme.AC.ok : core_theme.AC.err), textAlign: TextAlign.center),
           )),
         ]),
@@ -335,13 +335,13 @@ class _BreakEvenV52ScreenState extends State<BreakEvenV52Screen> {
   Widget _smallStat(String label, String value, String unit, Color color) {
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label, style: TextStyle(fontSize: 10, color: color.withOpacity(0.8))),
+        Text(label, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.8))),
         Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
           Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: color)),
           const SizedBox(width: 2),
-          Text(unit, style: TextStyle(fontSize: 10, color: color.withOpacity(0.8))),
+          Text(unit, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.8))),
         ]),
       ]),
     );

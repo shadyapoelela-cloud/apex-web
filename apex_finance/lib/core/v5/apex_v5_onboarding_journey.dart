@@ -177,7 +177,7 @@ class _ApexV5OnboardingScreenState extends State<ApexV5OnboardingScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -231,7 +231,7 @@ class _ApexV5OnboardingScreenState extends State<ApexV5OnboardingScreen> {
                 child: Container(
                   height: 10,
                   decoration: BoxDecoration(
-                    color: core_theme.AC.tp.withOpacity(0.06),
+                    color: core_theme.AC.tp.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: ClipRRect(
@@ -337,19 +337,19 @@ class _StepCardState extends State<_StepCard> {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: widget.isActive
-              ? core_theme.AC.purple.withOpacity(0.05)
+              ? core_theme.AC.purple.withValues(alpha: 0.05)
               : widget.isComplete
-                  ? core_theme.AC.gold.withOpacity(0.04)
+                  ? core_theme.AC.gold.withValues(alpha: 0.04)
                   : _hover
-                      ? core_theme.AC.tp.withOpacity(0.02)
+                      ? core_theme.AC.tp.withValues(alpha: 0.02)
                       : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: widget.isActive
-                ? core_theme.AC.purple.withOpacity(0.3)
+                ? core_theme.AC.purple.withValues(alpha: 0.3)
                 : widget.isComplete
-                    ? core_theme.AC.gold.withOpacity(0.3)
-                    : core_theme.AC.tp.withOpacity(0.1),
+                    ? core_theme.AC.gold.withValues(alpha: 0.3)
+                    : core_theme.AC.tp.withValues(alpha: 0.1),
             width: widget.isActive ? 2 : 1,
           ),
         ),
@@ -366,8 +366,8 @@ class _StepCardState extends State<_StepCard> {
                   color: widget.isComplete
                       ? core_theme.AC.gold
                       : widget.isActive
-                          ? core_theme.AC.purple.withOpacity(0.15)
-                          : core_theme.AC.tp.withOpacity(0.06),
+                          ? core_theme.AC.purple.withValues(alpha: 0.15)
+                          : core_theme.AC.tp.withValues(alpha: 0.06),
                   shape: BoxShape.circle,
                   border: widget.isActive
                       ? Border.all(color: core_theme.AC.purple, width: 2)
@@ -392,7 +392,7 @@ class _StepCardState extends State<_StepCard> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(widget.step.icon, color: color, size: 18),
@@ -419,7 +419,7 @@ class _StepCardState extends State<_StepCard> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                           decoration: BoxDecoration(
-                            color: core_theme.AC.tp.withOpacity(0.06),
+                            color: core_theme.AC.tp.withValues(alpha: 0.06),
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text(
@@ -450,7 +450,7 @@ class _StepCardState extends State<_StepCard> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: widget.isActive
                       ? core_theme.AC.purple
-                      : core_theme.AC.tp.withOpacity(0.06),
+                      : core_theme.AC.tp.withValues(alpha: 0.06),
                   foregroundColor: widget.isActive ? Colors.white : core_theme.AC.ts,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),

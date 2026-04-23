@@ -51,7 +51,7 @@ class _ApexMatchScreenState extends State<ApexMatchScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
@@ -76,7 +76,7 @@ class _ApexMatchScreenState extends State<ApexMatchScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -95,7 +95,7 @@ class _ApexMatchScreenState extends State<ApexMatchScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,7 +230,7 @@ class _ApexMatchScreenState extends State<ApexMatchScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: core_theme.AC.ok.withOpacity(0.1),
+                color: core_theme.AC.ok.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Row(
@@ -304,7 +304,7 @@ class _ProviderCard extends StatelessWidget {
         border: Border.all(
           color: rank == 1
               ? core_theme.AC.gold
-              : core_theme.AC.tp.withOpacity(0.1),
+              : core_theme.AC.tp.withValues(alpha: 0.1),
           width: rank == 1 ? 2 : 1,
         ),
       ),
@@ -317,7 +317,7 @@ class _ProviderCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE65100).withOpacity(0.12),
+                  color: const Color(0xFFE65100).withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -375,7 +375,7 @@ class _ProviderCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: matchColor.withOpacity(0.12),
+                      color: matchColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: matchColor),
                     ),
@@ -438,9 +438,9 @@ class _ProviderCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: matchColor.withOpacity(0.05),
+              color: matchColor.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: matchColor.withOpacity(0.15)),
+              border: Border.all(color: matchColor.withValues(alpha: 0.15)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -486,7 +486,7 @@ class _ProviderCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: core_theme.AC.tp.withOpacity(0.06),
+                    color: core_theme.AC.tp.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -532,7 +532,7 @@ class _ProviderCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(

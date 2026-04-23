@@ -44,7 +44,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       ),
       child: Row(
         children: [
@@ -65,9 +65,9 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF4A148C).withOpacity(0.15) : null,
+          color: active ? const Color(0xFF4A148C).withValues(alpha: 0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: const Color(0xFF4A148C).withOpacity(0.4)) : null,
+          border: active ? Border.all(color: const Color(0xFF4A148C).withValues(alpha: 0.4)) : null,
         ),
         child: Row(
           children: [
@@ -153,7 +153,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+                    border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
@@ -205,7 +205,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: core_theme.AC.tp.withOpacity(0.15)),
+                    border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.15)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,9 +281,9 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: active ? color.withOpacity(0.08) : Colors.white,
+          color: active ? color.withValues(alpha: 0.08) : Colors.white,
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: active ? color : core_theme.AC.tp.withOpacity(0.08), width: active ? 2 : 1),
+          border: Border.all(color: active ? color : core_theme.AC.tp.withValues(alpha: 0.08), width: active ? 2 : 1),
         ),
         child: Row(
           children: [
@@ -313,9 +313,9 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xFF4A148C).withOpacity(0.04),
+        color: const Color(0xFF4A148C).withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFF4A148C).withOpacity(0.15)),
+        border: Border.all(color: const Color(0xFF4A148C).withValues(alpha: 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,7 +397,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,13 +406,13 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                 child: Text(id, style: TextStyle(fontSize: 10, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: color)),
               ),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                 child: Text(severity, style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w700)),
               ),
               const Spacer(),
@@ -427,9 +427,9 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: core_theme.AC.ok.withOpacity(0.06),
+              color: core_theme.AC.ok.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: core_theme.AC.ok.withOpacity(0.2)),
+              border: Border.all(color: core_theme.AC.ok.withValues(alpha: 0.2)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,9 +494,9 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A148C).withOpacity(0.06),
+              color: const Color(0xFF4A148C).withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFF4A148C).withOpacity(0.2)),
+              border: Border.all(color: const Color(0xFF4A148C).withValues(alpha: 0.2)),
             ),
             child: const Row(
               children: [
@@ -523,7 +523,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -532,7 +532,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
                 child: Icon(Icons.verified_user, color: color, size: 16),
               ),
               const SizedBox(width: 10),
@@ -550,7 +550,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                    decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
                     child: Text(status, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w700)),
                   ),
                   Text(date, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
@@ -563,7 +563,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: core_theme.AC.tp.withOpacity(0.03),
+                color: core_theme.AC.tp.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(notes, style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic)),
@@ -595,7 +595,7 @@ class _AuditReportingScreenState extends State<AuditReportingScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+                border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
               ),
               child: Row(
                 children: [

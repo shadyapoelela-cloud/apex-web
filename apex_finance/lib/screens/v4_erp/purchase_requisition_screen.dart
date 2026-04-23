@@ -108,9 +108,9 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 3),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -184,7 +184,7 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: stage.color.withOpacity(0.12),
+                        color: stage.color.withValues(alpha: 0.12),
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
                       ),
                       child: Row(
@@ -239,7 +239,7 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
           const SizedBox(height: 6),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(color: core_theme.AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(3)),
+            decoration: BoxDecoration(color: core_theme.AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(3)),
             child: Text('${_fmt(r.amount.toDouble())} ر.س',
                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: core_theme.AC.gold, fontFamily: 'monospace')),
           ),
@@ -320,7 +320,7 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
       ),
       child: Row(
         children: [
@@ -362,7 +362,7 @@ class _PurchaseRequisitionScreenState extends State<PurchaseRequisitionScreen> {
             child: Container(
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: stageColor.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(color: stageColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
               child: Text(_stageLabel(r.status),
                   style: TextStyle(fontSize: 10, color: stageColor, fontWeight: FontWeight.w800),
                   textAlign: TextAlign.center),

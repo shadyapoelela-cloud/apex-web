@@ -82,9 +82,9 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.white.withOpacity(0.3)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
             ),
             child: DropdownButton<String>(
               value: _period,
@@ -125,8 +125,8 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.3)),
-          boxShadow: [BoxShadow(color: color.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 2))],
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+          boxShadow: [BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 2))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,14 +135,14 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
                   child: Icon(icon, color: color, size: 20),
                 ),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: (positive ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
+                    color: (positive ? core_theme.AC.ok : core_theme.AC.err).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -430,9 +430,9 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
                   width: 320,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: _riskColor(r.level).withOpacity(0.06),
+                    color: _riskColor(r.level).withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: _riskColor(r.level).withOpacity(0.3)),
+                    border: Border.all(color: _riskColor(r.level).withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
@@ -579,15 +579,15 @@ class _ExecutiveDashboardV5ScreenState extends State<ExecutiveDashboardV5Screen>
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: a.color.withOpacity(0.06),
+                color: a.color.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: a.color.withOpacity(0.25)),
+                border: Border.all(color: a.color.withValues(alpha: 0.25)),
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: a.color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+                    decoration: BoxDecoration(color: a.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
                     child: Icon(a.icon, color: a.color, size: 18),
                   ),
                   const SizedBox(width: 10),

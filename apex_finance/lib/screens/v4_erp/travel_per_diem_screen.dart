@@ -162,7 +162,7 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: core_theme.AC.gold.withOpacity(0.1),
+                    color: core_theme.AC.gold.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(Icons.flight, color: _gold),
@@ -197,7 +197,7 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
+                        color: color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Row(
@@ -233,7 +233,7 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: core_theme.AC.gold.withOpacity(0.15),
+                  backgroundColor: core_theme.AC.gold.withValues(alpha: 0.15),
                   child: Icon(Icons.public, color: _gold),
                 ),
                 const SizedBox(width: 12),
@@ -257,7 +257,7 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: _navy.withOpacity(0.08),
+                    color: _navy.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -294,7 +294,7 @@ class _TravelPerDiemScreenState extends State<TravelPerDiemScreen> {
         return Card(
           elevation: 1,
           child: ListTile(
-            leading: CircleAvatar(backgroundColor: color.withOpacity(0.15), child: Icon(icon, color: color)),
+            leading: CircleAvatar(backgroundColor: color.withValues(alpha: 0.15), child: Icon(icon, color: color)),
             title: Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
             subtitle: Text(rule, style: const TextStyle(fontSize: 11)),
             trailing: const Icon(Icons.chevron_left),
@@ -373,9 +373,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -385,7 +385,7 @@ class _StatCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: TextStyle(fontSize: 11, color: color.withOpacity(0.8))),
+                Text(label, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.8))),
                 Text(value,
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: color),
                     maxLines: 1,

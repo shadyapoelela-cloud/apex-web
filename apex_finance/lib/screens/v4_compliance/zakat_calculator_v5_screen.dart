@@ -111,7 +111,7 @@ class _ZakatCalculatorV5ScreenState extends State<ZakatCalculatorV5Screen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: DropdownButton<String>(

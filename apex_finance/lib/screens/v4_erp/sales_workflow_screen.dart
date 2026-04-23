@@ -23,7 +23,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
         Container(
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)))),
           child: Row(
             children: [
               _tabBtn(0, 'عروض الأسعار', Icons.request_quote),
@@ -46,7 +46,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
-        decoration: BoxDecoration(color: active ? core_theme.AC.gold.withOpacity(0.15) : null, borderRadius: BorderRadius.circular(6), border: active ? Border.all(color: core_theme.AC.gold.withOpacity(0.4)) : null),
+        decoration: BoxDecoration(color: active ? core_theme.AC.gold.withValues(alpha: 0.15) : null, borderRadius: BorderRadius.circular(6), border: active ? Border.all(color: core_theme.AC.gold.withValues(alpha: 0.4)) : null),
         child: Row(
           children: [
             Icon(icon, size: 14, color: active ? core_theme.AC.gold : core_theme.AC.ts),
@@ -106,10 +106,10 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Row(
         children: [
-          Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: q.color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)), child: Icon(Icons.request_quote, color: q.color, size: 18)),
+          Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: q.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)), child: Icon(Icons.request_quote, color: q.color, size: 18)),
           const SizedBox(width: 12),
           Expanded(
             flex: 2,
@@ -135,13 +135,13 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
                 Text('احتمال', style: TextStyle(fontSize: 9, color: core_theme.AC.ts)),
               ]),
               const SizedBox(height: 2),
-              LinearProgressIndicator(value: q.winProb / 100, backgroundColor: core_theme.AC.tp.withOpacity(0.06), valueColor: AlwaysStoppedAnimation(q.color), minHeight: 3),
+              LinearProgressIndicator(value: q.winProb / 100, backgroundColor: core_theme.AC.tp.withValues(alpha: 0.06), valueColor: AlwaysStoppedAnimation(q.color), minHeight: 3),
             ],
           )),
           const SizedBox(width: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(color: q.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: q.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
             child: Text(q.status, style: TextStyle(fontSize: 11, color: q.color, fontWeight: FontWeight.w700)),
           ),
           const SizedBox(width: 8),
@@ -190,7 +190,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Row(
               children: [
                 CircleAvatar(radius: 20, backgroundColor: core_theme.AC.gold, child: Text('S', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800))),
@@ -213,7 +213,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
           Text('البنود', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
           Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               children: [
                 Container(
@@ -257,7 +257,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
                   child: Column(
                     children: [
                       _totalRow('المجموع الفرعي', '45,000.00', core_theme.AC.tp),
@@ -292,7 +292,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
   Widget _itemLine(String item, int qty, double price, int vat, double total) {
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(border: Border(top: BorderSide(color: core_theme.AC.tp.withOpacity(0.04)))),
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04)))),
       child: Row(
         children: [
           Expanded(flex: 3, child: Text(item, style: const TextStyle(fontSize: 12))),
@@ -349,7 +349,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Row(
         children: [
           Icon(Icons.payments, color: core_theme.AC.ok, size: 20),
@@ -357,7 +357,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
           Text(p.id, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
           const SizedBox(width: 12),
           Expanded(child: Text(p.customer, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800))),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: core_theme.AC.tp.withOpacity(0.06), borderRadius: BorderRadius.circular(3)), child: Text(p.method, style: const TextStyle(fontSize: 10))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: core_theme.AC.tp.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(3)), child: Text(p.method, style: const TextStyle(fontSize: 10))),
           const SizedBox(width: 12),
           Text(p.invoice, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
           const SizedBox(width: 12),
@@ -379,7 +379,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               children: [
                 _stmntHeader(),
@@ -392,7 +392,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
                 const Divider(),
                 Container(
                   padding: const EdgeInsets.all(10),
-                  color: core_theme.AC.ok.withOpacity(0.08),
+                  color: core_theme.AC.ok.withValues(alpha: 0.08),
                   child: Row(
                     children: [
                       Text('الرصيد النهائي', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
@@ -412,7 +412,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
   Widget _stmntHeader() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
+      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)))),
       child: const Row(
         children: [
           Expanded(child: Text('التاريخ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -429,7 +429,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
   Widget _stmntRow(String date, String ref, String type, double dr, double cr, double bal) {
     return Container(
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04)))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04)))),
       child: Row(
         children: [
           Expanded(child: Text(date, style: const TextStyle(fontSize: 11, fontFamily: 'monospace'))),
@@ -459,7 +459,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
           Text('أعمار الذمم المدينة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               children: [
                 Container(
@@ -485,7 +485,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
                 const Divider(),
                 Container(
                   padding: const EdgeInsets.all(10),
-                  color: core_theme.AC.ok.withOpacity(0.05),
+                  color: core_theme.AC.ok.withValues(alpha: 0.05),
                   child: Row(
                     children: [
                       Expanded(flex: 2, child: Text('الإجمالي', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900))),
@@ -509,7 +509,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
     final total = b1 + b2 + b3 + b4;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04)))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04)))),
       child: Row(
         children: [
           Expanded(flex: 2, child: Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
@@ -530,7 +530,7 @@ class _SalesWorkflowScreenState extends State<SalesWorkflowScreen> {
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: s.$3.withOpacity(0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: s.$3.withOpacity(0.2))),
+              decoration: BoxDecoration(color: s.$3.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: s.$3.withValues(alpha: 0.2))),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

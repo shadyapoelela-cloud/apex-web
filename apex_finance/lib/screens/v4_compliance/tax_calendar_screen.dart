@@ -97,9 +97,9 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -146,7 +146,7 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? c : c.withOpacity(0.1),
+          color: selected ? c : c.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: c),
         ),
@@ -232,7 +232,7 @@ class _TaxCalendarScreenState extends State<TaxCalendarScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: _typeColor(d.type).withOpacity(0.15),
+                      color: _typeColor(d.type).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(d.type,

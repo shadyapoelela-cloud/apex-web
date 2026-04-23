@@ -242,7 +242,7 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
   Widget _resultCard(String label, String value, String unit, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -367,7 +367,7 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
       ),
       child: Row(
         children: [
@@ -384,7 +384,7 @@ class _BreakEvenScreenState extends State<BreakEvenScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: (profitable ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
+                color: (profitable ? core_theme.AC.ok : core_theme.AC.err).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(3),
               ),
               child: Text(
@@ -474,7 +474,7 @@ class _BreakEvenPainter extends CustomPainter {
     canvas.drawCircle(beXY, 7, bePaint);
     canvas.drawLine(beXY, Offset(beXY.dx, size.height),
         Paint()
-          ..color = core_theme.AC.info.withOpacity(0.3)
+          ..color = core_theme.AC.info.withValues(alpha: 0.3)
           ..strokeWidth = 1.5);
 
     // Expected units marker

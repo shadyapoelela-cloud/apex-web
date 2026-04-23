@@ -173,7 +173,7 @@ class _FinancialStatementsV52ScreenState extends State<FinancialStatementsV52Scr
         Row(children: [
           Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
           const SizedBox(width: 10),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.1), borderRadius: BorderRadius.circular(4)), child: Text('IFRS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ok))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)), child: Text('IFRS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ok))),
           const Spacer(),
           OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.download, size: 14), label: Text('تصدير')),
         ]),
@@ -201,7 +201,7 @@ class _FinancialStatementsV52ScreenState extends State<FinancialStatementsV52Scr
                     return Container(
                       padding: EdgeInsets.symmetric(horizontal: 12, vertical: r.$5 ? 10 : 6),
                       decoration: BoxDecoration(
-                        color: r.$5 ? core_theme.AC.navy3 : (r.$6 ? _gold.withOpacity(0.05) : null),
+                        color: r.$5 ? core_theme.AC.navy3 : (r.$6 ? _gold.withValues(alpha: 0.05) : null),
                         border: r.$6 ? Border(top: BorderSide(color: _gold, width: 1.5), bottom: BorderSide(color: _gold, width: 0.5)) : Border(bottom: BorderSide(color: core_theme.AC.navy3)),
                       ),
                       child: Row(children: [

@@ -124,7 +124,7 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? core_theme.AC.gold.withOpacity(0.12) : null,
+          color: selected ? core_theme.AC.gold.withValues(alpha: 0.12) : null,
           border: Border(
             right: BorderSide(
               color: selected ? core_theme.AC.gold : Colors.transparent,
@@ -201,7 +201,7 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -269,7 +269,7 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+              border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
             ),
             child: Row(
               children: [
@@ -277,7 +277,7 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: _typeColor(d.type).withOpacity(0.12),
+                    color: _typeColor(d.type).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Center(
@@ -317,7 +317,7 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                           decoration: BoxDecoration(
-                            color: _tagColor(t).withOpacity(0.12),
+                            color: _tagColor(t).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text(t, style: TextStyle(fontSize: 9, color: _tagColor(t), fontWeight: FontWeight.w800)),
@@ -346,7 +346,7 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                           decoration: BoxDecoration(
-                            color: core_theme.AC.info.withOpacity(0.1),
+                            color: core_theme.AC.info.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text('v${d.versions}',

@@ -88,7 +88,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         margin: const EdgeInsets.symmetric(vertical: 1),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF4A148C).withOpacity(0.1) : null,
+          color: active ? const Color(0xFF4A148C).withValues(alpha: 0.1) : null,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Row(
@@ -131,7 +131,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               children: [
                 Row(
@@ -139,7 +139,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                     Container(
                       width: 100,
                       height: 100,
-                      decoration: BoxDecoration(color: core_theme.AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(16)),
+                      decoration: BoxDecoration(color: core_theme.AC.gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(16)),
                       child: Icon(Icons.bolt, size: 48, color: core_theme.AC.gold),
                     ),
                     const SizedBox(width: 20),
@@ -181,7 +181,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)), borderRadius: BorderRadius.circular(4)),
+              decoration: BoxDecoration(border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)), borderRadius: BorderRadius.circular(4)),
               child: Text(value, style: const TextStyle(fontSize: 13)),
             ),
           ),
@@ -212,7 +212,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           // Role bundles
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -259,7 +259,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   Widget _roleTile(String name, String capability, int users, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(6), border: Border.all(color: color.withOpacity(0.2))),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(6), border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -286,12 +286,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Row(
         children: [
           CircleAvatar(
             radius: 20,
-            backgroundColor: u.roleColor.withOpacity(0.2),
+            backgroundColor: u.roleColor.withValues(alpha: 0.2),
             child: Text(u.name.substring(0, 1), style: TextStyle(color: u.roleColor, fontSize: 18, fontWeight: FontWeight.w900)),
           ),
           const SizedBox(width: 12),
@@ -308,7 +308,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           Expanded(flex: 2, child: Text(u.email, style: TextStyle(fontSize: 11, color: core_theme.AC.ts, fontFamily: 'monospace'))),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(color: u.roleColor.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: u.roleColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
             child: Text(u.role, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: u.roleColor)),
           ),
           const SizedBox(width: 8),
@@ -407,12 +407,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   Widget _intCard(String name, String purpose, Color color, {required bool connected}) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: connected ? color.withOpacity(0.4) : core_theme.AC.tp.withOpacity(0.08), width: connected ? 2 : 1)),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: connected ? color.withValues(alpha: 0.4) : core_theme.AC.tp.withValues(alpha: 0.08), width: connected ? 2 : 1)),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
             child: Icon(Icons.extension, color: color, size: 20),
           ),
           const SizedBox(width: 10),
@@ -540,7 +540,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
               for (final col in _selectedColumns)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                  decoration: BoxDecoration(color: core_theme.AC.info.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -559,7 +559,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 2),
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: core_theme.AC.warn.withOpacity(0.08), borderRadius: BorderRadius.circular(4)),
+                  decoration: BoxDecoration(color: core_theme.AC.warn.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(4)),
                   child: Row(
                     children: [
                       Icon(Icons.filter_list, size: 12, color: core_theme.AC.warn),
@@ -579,7 +579,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
               for (final g in _groupBy)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                  decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
                   child: Text(g, style: TextStyle(fontSize: 11, color: core_theme.AC.ok, fontWeight: FontWeight.w700)),
                 ),
             ],
@@ -619,7 +619,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -638,9 +638,9 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFF4A148C).withOpacity(0.12) : null,
+          color: active ? const Color(0xFF4A148C).withValues(alpha: 0.12) : null,
           borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: active ? const Color(0xFF4A148C) : core_theme.AC.tp.withOpacity(0.1)),
+          border: Border.all(color: active ? const Color(0xFF4A148C) : core_theme.AC.tp.withValues(alpha: 0.1)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -659,7 +659,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)))),
           child: Row(
             children: [
               Text('معاينة مباشرة', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
@@ -675,7 +675,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
             padding: const EdgeInsets.all(20),
             child: Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.1))),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1))),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -697,7 +697,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
                         errorBuilder: (_, __, ___) => Container(
                           width: 60,
                           height: 60,
-                          decoration: BoxDecoration(color: core_theme.AC.gold.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                          decoration: BoxDecoration(color: core_theme.AC.gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                           child: Icon(Icons.bolt, size: 32, color: core_theme.AC.gold),
                         ),
                       ),
@@ -708,7 +708,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
                   if (_chartType != 'none')
                     Container(
                       height: 180,
-                      decoration: BoxDecoration(color: const Color(0xFF4A148C).withOpacity(0.05), borderRadius: BorderRadius.circular(8)),
+                      decoration: BoxDecoration(color: const Color(0xFF4A148C).withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8)),
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -729,7 +729,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
                   const SizedBox(height: 20),
                   // Table
                   Container(
-                    decoration: BoxDecoration(border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)), borderRadius: BorderRadius.circular(6)),
+                    decoration: BoxDecoration(border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)), borderRadius: BorderRadius.circular(6)),
                     child: DataTable(
                       headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
                       headingTextStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
@@ -776,7 +776,7 @@ class _ReportBuilderScreenState extends State<ReportBuilderScreen> {
                   const SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.08), borderRadius: BorderRadius.circular(4)),
+                    decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(4)),
                     child: Row(
                       children: [
                         Icon(Icons.functions, size: 14, color: core_theme.AC.ok),

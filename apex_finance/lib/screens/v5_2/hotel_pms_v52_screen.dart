@@ -78,13 +78,13 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
           child: Padding(padding: const EdgeInsets.all(12), child: Row(children: [
             Container(width: 4, height: 56, color: b.status.color),
             const SizedBox(width: 12),
-            CircleAvatar(radius: 16, backgroundColor: _vipColor(b.tier).withOpacity(0.15), child: Icon(Icons.person, color: _vipColor(b.tier), size: 16)),
+            CircleAvatar(radius: 16, backgroundColor: _vipColor(b.tier).withValues(alpha: 0.15), child: Icon(Icons.person, color: _vipColor(b.tier), size: 16)),
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Text(b.id, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
                 const SizedBox(width: 8),
-                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _vipColor(b.tier).withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text(b.tier, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _vipColor(b.tier)))),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: _vipColor(b.tier).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)), child: Text(b.tier, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _vipColor(b.tier)))),
               ]),
               Text(b.guest, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
               Text(b.room, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
@@ -102,7 +102,7 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
             const SizedBox(width: 20),
             Text('${b.amount.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
             const SizedBox(width: 16),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: b.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(b.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: b.status.color))),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: b.status.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text(b.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: b.status.color))),
           ])),
         );
       },
@@ -122,14 +122,14 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
           margin: const EdgeInsets.only(left: 10),
           decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Icon(s.icon, size: 16, color: s.color),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(s.labelAr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: s.color)),
                 Text('${(total / 1000).toStringAsFixed(0)}K ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
             ])),
             ...items.map((b) => Container(
               margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
@@ -258,14 +258,14 @@ class _HotelPmsV52ScreenState extends State<HotelPmsV52Screen> {
 
   Widget _chartCard(String label, String value, String unit, Color color, String sub) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.2))),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.2))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: color.withOpacity(0.9))),
+          Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: color.withValues(alpha: 0.9))),
           const SizedBox(height: 6),
           Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
             Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: color)),
             const SizedBox(width: 4),
-            Text(unit, style: TextStyle(fontSize: 11, color: color.withOpacity(0.8))),
+            Text(unit, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.8))),
           ]),
           const SizedBox(height: 4),
           Text(sub, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),

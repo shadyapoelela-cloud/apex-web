@@ -81,7 +81,7 @@ class _SalesPipelineV52ScreenState extends State<SalesPipelineV52Screen> {
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
+                decoration: BoxDecoration(color: s.color.withValues(alpha: 0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
                 child: Row(children: [
                   Container(width: 4, height: 20, color: s.color),
                   const SizedBox(width: 8),
@@ -89,18 +89,18 @@ class _SalesPipelineV52ScreenState extends State<SalesPipelineV52Screen> {
                     Text(s.labelAr, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: s.color)),
                     Text('${(total / 1e6).toStringAsFixed(2)}M ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ])),
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
+                  Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
                 ]),
               ),
               ...items.map((d) => Container(
                     margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr), boxShadow: [BoxShadow(color: core_theme.AC.tp.withOpacity(0.03), blurRadius: 3, offset: const Offset(0, 1))]),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr), boxShadow: [BoxShadow(color: core_theme.AC.tp.withValues(alpha: 0.03), blurRadius: 3, offset: const Offset(0, 1))]),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [
                         Text(d.id, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
                         const Spacer(),
-                        if (d.daysStale > 30) Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.15), borderRadius: BorderRadius.circular(3)), child: Text('راكدة', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: core_theme.AC.err))),
+                        if (d.daysStale > 30) Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: core_theme.AC.err.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)), child: Text('راكدة', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: core_theme.AC.err))),
                       ]),
                       Text(d.title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800), maxLines: 2, overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 2),
@@ -109,11 +109,11 @@ class _SalesPipelineV52ScreenState extends State<SalesPipelineV52Screen> {
                       Row(children: [
                         Text('${(d.value / 1e3).toStringAsFixed(0)}K', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold)),
                         const Spacer(),
-                        Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: s.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)), child: Text('${d.probability}%', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: s.color))),
+                        Container(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)), child: Text('${d.probability}%', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: s.color))),
                       ]),
                       const SizedBox(height: 4),
                       Row(children: [
-                        CircleAvatar(radius: 9, backgroundColor: _navy.withOpacity(0.1), child: Text(d.owner[0], style: TextStyle(color: _navy, fontSize: 9, fontWeight: FontWeight.w800))),
+                        CircleAvatar(radius: 9, backgroundColor: _navy.withValues(alpha: 0.1), child: Text(d.owner[0], style: TextStyle(color: _navy, fontSize: 9, fontWeight: FontWeight.w800))),
                         const SizedBox(width: 4),
                         Expanded(child: Text(d.owner, style: TextStyle(fontSize: 9, color: core_theme.AC.ts), maxLines: 1, overflow: TextOverflow.ellipsis)),
                       ]),
@@ -164,11 +164,11 @@ class _SalesPipelineV52ScreenState extends State<SalesPipelineV52Screen> {
               ])),
               const SizedBox(width: 16),
               SizedBox(width: 100, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                CircleAvatar(radius: 12, backgroundColor: _gold.withOpacity(0.15), child: Text(d.owner[0], style: TextStyle(color: _gold, fontSize: 11, fontWeight: FontWeight.w800))),
+                CircleAvatar(radius: 12, backgroundColor: _gold.withValues(alpha: 0.15), child: Text(d.owner[0], style: TextStyle(color: _gold, fontSize: 11, fontWeight: FontWeight.w800))),
                 Text(d.owner, style: TextStyle(fontSize: 10, color: core_theme.AC.ts), maxLines: 1, overflow: TextOverflow.ellipsis),
               ])),
               const SizedBox(width: 16),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: d.stage.color.withOpacity(0.12), borderRadius: BorderRadius.circular(14)), child: Text(d.stage.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: d.stage.color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: d.stage.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(14)), child: Text(d.stage.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: d.stage.color))),
             ]),
           ),
         );

@@ -123,9 +123,9 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -161,7 +161,7 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: statusColor.withOpacity(0.3)),
+            border: Border.all(color: statusColor.withValues(alpha: 0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,7 +171,7 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: typeInfo.color.withOpacity(0.12),
+                      color: typeInfo.color.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(typeInfo.icon, color: typeInfo.color),
@@ -188,7 +188,7 @@ class _BankGuaranteesScreenState extends State<BankGuaranteesScreen>
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: typeInfo.color.withOpacity(0.12),
+                                color: typeInfo.color.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(3),
                               ),
                               child: Text(typeInfo.label,

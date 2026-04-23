@@ -83,7 +83,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: DropdownButton<String>(
@@ -150,7 +150,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +172,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: (favorable ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
+                    color: (favorable ? core_theme.AC.ok : core_theme.AC.err).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -282,7 +282,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
       ),
       child: Row(
         children: [
@@ -320,7 +320,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: (favorable ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
+                color: (favorable ? core_theme.AC.ok : core_theme.AC.err).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -357,7 +357,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: isGrand ? color.withOpacity(0.1) : core_theme.AC.navy3,
+        color: isGrand ? color.withValues(alpha: 0.1) : core_theme.AC.navy3,
         border: Border(top: BorderSide(color: core_theme.AC.bdr)),
       ),
       child: Row(
@@ -439,7 +439,7 @@ class _BudgetVsActualScreenState extends State<BudgetVsActualScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(icon, size: 16, color: color),

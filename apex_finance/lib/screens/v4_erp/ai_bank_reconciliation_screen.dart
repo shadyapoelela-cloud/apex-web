@@ -268,9 +268,9 @@ class _StatPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -329,10 +329,10 @@ class _SuggestionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
-            color: core_theme.AC.tp.withOpacity(0.03),
+            color: core_theme.AC.tp.withValues(alpha: 0.03),
             blurRadius: 6,
             offset: const Offset(0, 1),
           ),
@@ -377,7 +377,7 @@ class _SuggestionCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                             decoration: BoxDecoration(
-                              color: dirColor.withOpacity(0.15),
+                              color: dirColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -447,7 +447,7 @@ class _SuggestionCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        confidenceColor.withOpacity(0.8),
+                        confidenceColor.withValues(alpha: 0.8),
                         confidenceColor,
                       ],
                     ),
@@ -474,9 +474,9 @@ class _SuggestionCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: confidenceColor.withOpacity(0.12),
+                              color: confidenceColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: confidenceColor.withOpacity(0.3)),
+                              border: Border.all(color: confidenceColor.withValues(alpha: 0.3)),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -503,7 +503,7 @@ class _SuggestionCard extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: core_theme.AC.ok.withOpacity(0.12),
+                                color: core_theme.AC.ok.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Row(
@@ -526,7 +526,7 @@ class _SuggestionCard extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: core_theme.AC.warn.withOpacity(0.12),
+                                color: core_theme.AC.warn.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
@@ -584,7 +584,7 @@ class _SuggestionCard extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
-                                color: core_theme.AC.tp.withOpacity(0.04),
+                                color: core_theme.AC.tp.withValues(alpha: 0.04),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
@@ -607,10 +607,10 @@ class _SuggestionCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: core_theme.AC.tp.withOpacity(0.02),
+              color: core_theme.AC.tp.withValues(alpha: 0.02),
               borderRadius: const BorderRadius.vertical(bottom: Radius.circular(10)),
               border: Border(
-                top: BorderSide(color: core_theme.AC.tp.withOpacity(0.06)),
+                top: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.06)),
               ),
             ),
             child: Row(

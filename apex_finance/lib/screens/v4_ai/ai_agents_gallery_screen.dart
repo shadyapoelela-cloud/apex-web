@@ -46,7 +46,7 @@ class _AiAgentsGalleryScreenState extends State<AiAgentsGalleryScreen> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
                   child: const Icon(Icons.auto_awesome, color: Colors.white, size: 36),
                 ),
                 const SizedBox(width: 20),
@@ -70,7 +70,7 @@ class _AiAgentsGalleryScreenState extends State<AiAgentsGalleryScreen> {
                     const SizedBox(height: 4),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(4)),
+                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(4)),
                       child: Text('3 بانتظار الإعداد', style: TextStyle(color: Colors.white, fontSize: 10)),
                     ),
                   ],
@@ -131,7 +131,7 @@ class _AiAgentsGalleryScreenState extends State<AiAgentsGalleryScreen> {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.2))),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.2))),
         child: Row(
           children: [
             Icon(icon, color: color, size: 22),
@@ -159,7 +159,7 @@ class _AiAgentsGalleryScreenState extends State<AiAgentsGalleryScreen> {
         decoration: BoxDecoration(
           color: active ? core_theme.AC.purple : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: active ? core_theme.AC.purple : core_theme.AC.tp.withOpacity(0.1)),
+          border: Border.all(color: active ? core_theme.AC.purple : core_theme.AC.tp.withValues(alpha: 0.1)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -168,7 +168,7 @@ class _AiAgentsGalleryScreenState extends State<AiAgentsGalleryScreen> {
             const SizedBox(width: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-              decoration: BoxDecoration(color: (active ? Colors.white : core_theme.AC.purple).withOpacity(active ? 0.25 : 0.12), borderRadius: BorderRadius.circular(8)),
+              decoration: BoxDecoration(color: (active ? Colors.white : core_theme.AC.purple).withValues(alpha: active ? 0.25 : 0.12), borderRadius: BorderRadius.circular(8)),
               child: Text('$count', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: active ? Colors.white : core_theme.AC.purple)),
             ),
           ],
@@ -226,9 +226,9 @@ class _AgentCardState extends State<_AgentCard> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: _hover ? widget.agent.color.withOpacity(0.4) : core_theme.AC.tp.withOpacity(0.08), width: _hover ? 2 : 1),
+          border: Border.all(color: _hover ? widget.agent.color.withValues(alpha: 0.4) : core_theme.AC.tp.withValues(alpha: 0.08), width: _hover ? 2 : 1),
           boxShadow: _hover
-              ? [BoxShadow(color: widget.agent.color.withOpacity(0.2), blurRadius: 12, offset: const Offset(0, 4))]
+              ? [BoxShadow(color: widget.agent.color.withValues(alpha: 0.2), blurRadius: 12, offset: const Offset(0, 4))]
               : null,
         ),
         child: Column(
@@ -238,14 +238,14 @@ class _AgentCardState extends State<_AgentCard> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: widget.agent.color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: widget.agent.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                   child: Icon(widget.agent.icon, color: widget.agent.color, size: 24),
                 ),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: widget.agent.active ? core_theme.AC.ok.withOpacity(0.12) : core_theme.AC.tp.withOpacity(0.06),
+                    color: widget.agent.active ? core_theme.AC.ok.withValues(alpha: 0.12) : core_theme.AC.tp.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
@@ -344,11 +344,11 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
         // Search bar
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)))),
           child: Column(
             children: [
               Container(
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.1))),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1))),
                 child: TextField(
                   controller: TextEditingController(text: _query),
                   onChanged: (v) => setState(() => _query = v),
@@ -423,7 +423,7 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
         decoration: BoxDecoration(
           color: active ? core_theme.AC.info : Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: active ? core_theme.AC.info : core_theme.AC.tp.withOpacity(0.1)),
+          border: Border.all(color: active ? core_theme.AC.info : core_theme.AC.tp.withValues(alpha: 0.1)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -432,7 +432,7 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
             const SizedBox(width: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-              decoration: BoxDecoration(color: (active ? Colors.white : core_theme.AC.info).withOpacity(active ? 0.25 : 0.12), borderRadius: BorderRadius.circular(8)),
+              decoration: BoxDecoration(color: (active ? Colors.white : core_theme.AC.info).withValues(alpha: active ? 0.25 : 0.12), borderRadius: BorderRadius.circular(8)),
               child: Text('$count', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: active ? Colors.white : core_theme.AC.info)),
             ),
           ],
@@ -451,7 +451,7 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                 child: Text(title, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color)),
               ),
               const Spacer(),
@@ -460,7 +460,7 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
           ),
           const SizedBox(height: 6),
           Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               children: [
                 for (int i = 0; i < items.length; i++)
@@ -476,12 +476,12 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
   Widget _resultRow(_Result r, Color color, {required bool showDivider}) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(border: showDivider ? Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))) : null),
+      decoration: BoxDecoration(border: showDivider ? Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04))) : null),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
             child: Icon(_iconFor(r.type), color: color, size: 14),
           ),
           const SizedBox(width: 12),

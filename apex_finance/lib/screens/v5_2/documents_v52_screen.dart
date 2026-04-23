@@ -80,15 +80,15 @@ class _DocumentsV52ScreenState extends State<DocumentsV52Screen> {
           elevation: 0.5,
           child: ListTile(
             onTap: () {},
-            leading: Container(width: 44, height: 44, decoration: BoxDecoration(color: d.type.color.withOpacity(0.15), borderRadius: BorderRadius.circular(8)), child: Icon(d.type.icon, color: d.type.color)),
+            leading: Container(width: 44, height: 44, decoration: BoxDecoration(color: d.type.color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)), child: Icon(d.type.icon, color: d.type.color)),
             title: Row(children: [
               Expanded(child: Text(d.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
-              if (d.signed) Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.verified, size: 10, color: core_theme.AC.ok), SizedBox(width: 2), Text('موقّع', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: core_theme.AC.ok))])),
+              if (d.signed) Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.verified, size: 10, color: core_theme.AC.ok), SizedBox(width: 2), Text('موقّع', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: core_theme.AC.ok))])),
             ]),
             subtitle: Row(children: [
               Text(d.id, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
               const SizedBox(width: 8),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: d.category.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text(d.category.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: d.category.color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: d.category.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)), child: Text(d.category.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: d.category.color))),
               const SizedBox(width: 8),
               Text('${d.sizeMB >= 1 ? d.sizeMB.toStringAsFixed(1) + ' MB' : (d.sizeMB * 1000).toStringAsFixed(0) + ' KB'}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               const SizedBox(width: 8),
@@ -120,14 +120,14 @@ class _DocumentsV52ScreenState extends State<DocumentsV52Screen> {
           margin: const EdgeInsets.only(left: 10),
           decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: c.color.withValues(alpha: 0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Icon(c.icon, color: c.color, size: 18),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(c.labelAr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: c.color)),
                 Text('${totalSize.toStringAsFixed(1)} MB', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: c.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: c.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.color))),
             ])),
             ...items.take(4).map((d) => Container(
               margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),

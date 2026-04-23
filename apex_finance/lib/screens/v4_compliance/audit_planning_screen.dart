@@ -92,7 +92,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Row(
@@ -129,9 +129,9 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,7 +225,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: severity.withOpacity(0.3)),
+            border: Border.all(color: severity.withValues(alpha: 0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,7 +235,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: severity.withOpacity(0.15),
+                      color: severity.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(r.id, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: severity, fontFamily: 'monospace')),
@@ -290,9 +290,9 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -383,7 +383,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4A148C).withOpacity(0.1),
+                      color: const Color(0xFF4A148C).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text('${_materialityPct.toStringAsFixed(1)}%',
@@ -409,7 +409,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: core_theme.AC.gold.withOpacity(0.1),
+                      color: core_theme.AC.gold.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text('${_performanceThreshold.toStringAsFixed(0)}%',
@@ -501,7 +501,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: _phaseColor(p.status).withOpacity(0.3)),
+              border: Border.all(color: _phaseColor(p.status).withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -509,7 +509,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: _phaseColor(p.status).withOpacity(0.12),
+                    color: _phaseColor(p.status).withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
                   child: Center(child: Text('${p.number}', style: TextStyle(color: _phaseColor(p.status), fontWeight: FontWeight.w900, fontSize: 18))),
@@ -534,7 +534,7 @@ class _AuditPlanningScreenState extends State<AuditPlanningScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: _phaseColor(p.status).withOpacity(0.15),
+                        color: _phaseColor(p.status).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(p.status, style: TextStyle(fontSize: 11, color: _phaseColor(p.status), fontWeight: FontWeight.w800)),

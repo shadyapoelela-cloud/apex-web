@@ -244,8 +244,8 @@ class _EntityScopeSelectorState extends State<EntityScopeSelector> {
     final brightness = Theme.of(context).brightness;
     final isDark = brightness == Brightness.dark;
     final baseForeground = isDark ? Colors.white : core_theme.AC.tp;
-    final baseSubtle = isDark ? Colors.white.withOpacity(0.15) : core_theme.AC.tp.withOpacity(0.04);
-    final baseBorder = isDark ? Colors.white.withOpacity(0.3) : core_theme.AC.tp.withOpacity(0.12);
+    final baseSubtle = isDark ? Colors.white.withValues(alpha: 0.15) : core_theme.AC.tp.withValues(alpha: 0.04);
+    final baseBorder = isDark ? Colors.white.withValues(alpha: 0.3) : core_theme.AC.tp.withValues(alpha: 0.12);
 
     return InkWell(
       onTap: () => _openPopover(context),
@@ -254,7 +254,7 @@ class _EntityScopeSelectorState extends State<EntityScopeSelector> {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: consolidated
-              ? core_theme.AC.gold.withOpacity(0.12)
+              ? core_theme.AC.gold.withValues(alpha: 0.12)
               : baseSubtle,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
@@ -289,9 +289,9 @@ class _EntityScopeSelectorState extends State<EntityScopeSelector> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: core_theme.AC.warn.withOpacity(0.15),
+                  color: core_theme.AC.warn.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: core_theme.AC.warn.withOpacity(0.4)),
+                  border: Border.all(color: core_theme.AC.warn.withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   'FX→${ctrl.reportingCurrency}',
@@ -579,7 +579,7 @@ class _ScopePopoverState extends State<_ScopePopover> {
           top: 8,
           bottom: 8,
         ),
-        color: selected ? core_theme.AC.gold.withOpacity(0.08) : null,
+        color: selected ? core_theme.AC.gold.withValues(alpha: 0.08) : null,
         child: Row(
           children: [
             SizedBox(
@@ -634,7 +634,7 @@ class _ScopePopoverState extends State<_ScopePopover> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: _kindColor(e.kind).withOpacity(0.10),
+                color: _kindColor(e.kind).withValues(alpha: 0.10),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -719,7 +719,7 @@ class _ModeButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: active ? core_theme.AC.gold.withOpacity(0.12) : core_theme.AC.navy3,
+          color: active ? core_theme.AC.gold.withValues(alpha: 0.12) : core_theme.AC.navy3,
           border: Border.all(
             color: active ? core_theme.AC.gold : core_theme.AC.bdr,
             width: active ? 2 : 1,

@@ -124,7 +124,7 @@ class _DimensionsV52ScreenState extends State<DimensionsV52Screen> {
       width: 280,
       color: Colors.white,
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Container(padding: const EdgeInsets.all(14), color: _navy.withOpacity(0.04), child: Row(children: [
+        Container(padding: const EdgeInsets.all(14), color: _navy.withValues(alpha: 0.04), child: Row(children: [
           Icon(Icons.list_alt, color: _navy, size: 16),
           const SizedBox(width: 8),
           Text('الأبعاد المُعرّفة (${_dims.length})', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _navy)),
@@ -137,13 +137,13 @@ class _DimensionsV52ScreenState extends State<DimensionsV52Screen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: active ? d.color.withOpacity(0.06) : null,
+                color: active ? d.color.withValues(alpha: 0.06) : null,
                 border: BorderDirectional(end: BorderSide(color: active ? d.color : Colors.transparent, width: 3)),
               ),
               child: Row(children: [
                 Container(
                   width: 36, height: 36,
-                  decoration: BoxDecoration(color: d.color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: d.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
                   child: Icon(d.icon, color: d.color, size: 18),
                 ),
                 const SizedBox(width: 10),
@@ -173,7 +173,7 @@ class _DimensionsV52ScreenState extends State<DimensionsV52Screen> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: core_theme.AC.bdr))),
         child: Row(children: [
-          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: d.color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)), child: Icon(d.icon, color: d.color)),
+          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: d.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)), child: Icon(d.icon, color: d.color)),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(d.labelAr, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
@@ -243,7 +243,7 @@ class _DimensionsV52ScreenState extends State<DimensionsV52Screen> {
   Widget _statBadge(String text, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
       child: Text(text, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: color)),
     );
   }

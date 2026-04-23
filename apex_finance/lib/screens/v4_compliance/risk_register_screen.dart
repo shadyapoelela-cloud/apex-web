@@ -118,9 +118,9 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 3),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -210,7 +210,7 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: scoreColor.withOpacity(0.3), width: 1.5),
+        border: Border.all(color: scoreColor.withValues(alpha: 0.3), width: 1.5),
       ),
       child: Column(
         children: [
@@ -242,14 +242,14 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: _catColor(r.category).withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: _catColor(r.category).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                           child: Text(_catLabel(r.category),
                               style: TextStyle(fontSize: 10, color: _catColor(r.category), fontWeight: FontWeight.w800)),
                         ),
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: _strategyColor(r.strategy).withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: _strategyColor(r.strategy).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                           child: Text(_strategyLabel(r.strategy),
                               style: TextStyle(fontSize: 10, color: _strategyColor(r.strategy), fontWeight: FontWeight.w800)),
                         ),
@@ -387,7 +387,7 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
       height: 60,
       margin: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        color: cellColor.withOpacity(0.3 + (score / 25 * 0.5)),
+        color: cellColor.withValues(alpha: 0.3 + (score / 25 * 0.5)),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: cellColor, width: risksInCell.isNotEmpty ? 2 : 0),
       ),

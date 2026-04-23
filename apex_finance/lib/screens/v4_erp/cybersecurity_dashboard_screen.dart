@@ -121,7 +121,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
                       child: CircularProgressIndicator(
                         value: score / 100,
                         strokeWidth: 10,
-                        backgroundColor: Colors.white.withOpacity(0.2),
+                        backgroundColor: Colors.white.withValues(alpha: 0.2),
                         valueColor: const AlwaysStoppedAnimation(Color(0xFFFFD700)),
                       ),
                     ),
@@ -185,9 +185,9 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
         margin: const EdgeInsets.symmetric(horizontal: 3),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -241,9 +241,9 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: sevColor.withOpacity(0.05),
+        color: sevColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: sevColor.withOpacity(0.2)),
+        border: Border.all(color: sevColor.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -268,7 +268,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
                     const SizedBox(width: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+                      decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
                       child: Text(_statusLabel(i.status),
                           style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.w800)),
                     ),
@@ -427,9 +427,9 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: s.color.withOpacity(0.08),
+                    color: s.color.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: s.color.withOpacity(0.3)),
+                    border: Border.all(color: s.color.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
@@ -446,7 +446,7 @@ class _CybersecurityDashboardScreenState extends State<CybersecurityDashboardScr
                               children: [
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(color: s.color.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+                                  decoration: BoxDecoration(color: s.color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
                                   child: Text(s.status,
                                       style: TextStyle(fontSize: 10, color: s.color, fontWeight: FontWeight.w800)),
                                 ),

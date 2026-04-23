@@ -135,9 +135,9 @@ class _CapTableScreenState extends State<CapTableScreen>
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -218,7 +218,7 @@ class _CapTableScreenState extends State<CapTableScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
       ),
       child: Row(
         children: [
@@ -237,7 +237,7 @@ class _CapTableScreenState extends State<CapTableScreen>
             child: Container(
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: sh.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(color: sh.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
               child: Text(_typeLabel(sh.type),
                   style: TextStyle(fontSize: 10, color: sh.color, fontWeight: FontWeight.w800), textAlign: TextAlign.center),
             ),
@@ -400,14 +400,14 @@ class _CapTableScreenState extends State<CapTableScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: r.color.withOpacity(0.3), width: 2),
+        border: Border.all(color: r.color.withValues(alpha: 0.3), width: 2),
       ),
       child: Row(
         children: [
           Container(
             width: 56,
             height: 56,
-            decoration: BoxDecoration(color: r.color.withOpacity(0.12), shape: BoxShape.circle),
+            decoration: BoxDecoration(color: r.color.withValues(alpha: 0.12), shape: BoxShape.circle),
             child: Center(
               child: Text('${index + 1}',
                   style: TextStyle(color: r.color, fontSize: 22, fontWeight: FontWeight.w900)),
@@ -437,7 +437,7 @@ class _CapTableScreenState extends State<CapTableScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: core_theme.AC.ok.withOpacity(0.12),
+                      color: core_theme.AC.ok.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text('+${((multiplier - 1) * 100).toStringAsFixed(0)}%',
@@ -517,7 +517,7 @@ class _CapTableScreenState extends State<CapTableScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -529,7 +529,7 @@ class _CapTableScreenState extends State<CapTableScreen>
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
                 child: Text('احتفاظ ${s.retention.toStringAsFixed(1)}%',
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color)),
               ),

@@ -111,7 +111,7 @@ class PayrollRunV52Screen extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
           child: Row(children: [
-            CircleAvatar(backgroundColor: emps[i].$7.withOpacity(0.15), child: Text(emps[i].$2[0], style: TextStyle(color: emps[i].$7, fontWeight: FontWeight.w800))),
+            CircleAvatar(backgroundColor: emps[i].$7.withValues(alpha: 0.15), child: Text(emps[i].$2[0], style: TextStyle(color: emps[i].$7, fontWeight: FontWeight.w800))),
             const SizedBox(width: 12),
             Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(emps[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 10, color: core_theme.AC.ts)),
@@ -221,7 +221,7 @@ class PayrollRunV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: exc[i].$4.withOpacity(0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: exc[i].$4, width: 1.5)),
+        decoration: BoxDecoration(color: exc[i].$4.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: exc[i].$4, width: 1.5)),
         child: Row(children: [
           Icon(Icons.warning_amber, color: exc[i].$4, size: 28),
           const SizedBox(width: 12),
@@ -245,11 +245,11 @@ class PayrollRunV52Screen extends StatelessWidget {
 
   Widget _bigStat(String label, String value, String unit, Color color, IconData icon) => Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.2))),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.2))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [Icon(icon, color: color, size: 18), const SizedBox(width: 6), Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color.withOpacity(0.9)))]),
+          Row(children: [Icon(icon, color: color, size: 18), const SizedBox(width: 6), Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color.withValues(alpha: 0.9)))]),
           const SizedBox(height: 6),
-          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 4), Text(unit, style: TextStyle(fontSize: 11, color: color.withOpacity(0.8)))]),
+          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 4), Text(unit, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.8)))]),
         ]),
       );
 
@@ -263,7 +263,7 @@ class PayrollRunV52Screen extends StatelessWidget {
       ]));
 
   Widget _compRow(String name, double value, String pct, Color color) => Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Text(name, style: const TextStyle(fontSize: 12)), const Spacer(), Text('${value.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 8), SizedBox(width: 40, child: Text(pct, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color.withOpacity(0.8))))]),
+        Row(children: [Text(name, style: const TextStyle(fontSize: 12)), const Spacer(), Text('${value.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 8), SizedBox(width: 40, child: Text(pct, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color.withValues(alpha: 0.8))))]),
         const SizedBox(height: 2),
         ClipRRect(borderRadius: BorderRadius.circular(2), child: LinearProgressIndicator(value: double.parse(pct.replaceAll('%', '')) / 100, minHeight: 4, backgroundColor: core_theme.AC.bdr, color: color)),
       ]));

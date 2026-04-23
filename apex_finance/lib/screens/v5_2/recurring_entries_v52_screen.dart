@@ -82,7 +82,7 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
             const SizedBox(width: 12),
             Container(
               width: 40, height: 40,
-              decoration: BoxDecoration(color: r.freq.color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+              decoration: BoxDecoration(color: r.freq.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
               child: Icon(r.freq.icon, color: r.freq.color, size: 20),
             ),
             const SizedBox(width: 12),
@@ -90,7 +90,7 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
               Row(children: [
                 Text(r.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                 const SizedBox(width: 8),
-                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: r.freq.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text(r.freq.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: r.freq.color))),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: r.freq.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)), child: Text(r.freq.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: r.freq.color))),
               ]),
               Text(r.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
               Text('المسؤول: ${r.owner}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
@@ -120,7 +120,7 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
               ]),
             ]),
             const SizedBox(width: 20),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: r.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(r.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: r.status.color))),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: r.status.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text(r.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: r.status.color))),
             const SizedBox(width: 8),
             IconButton(
               icon: Icon(r.status == _S.active ? Icons.pause : Icons.play_arrow, size: 18, color: r.status == _S.active ? core_theme.AC.warn : core_theme.AC.ok),
@@ -149,7 +149,7 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
                 child: Row(children: [
                   Container(
                     width: 56, padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: r.freq.color.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                    decoration: BoxDecoration(color: r.freq.color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
                     child: Column(children: [
                       Text(r.nextRun.substring(8), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: r.freq.color)),
                       Text(r.nextRun.substring(5, 7), style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
@@ -159,7 +159,7 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(r.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                     Row(children: [
-                      Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: r.freq.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text(r.freq.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: r.freq.color))),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: r.freq.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)), child: Text(r.freq.labelAr, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: r.freq.color))),
                       const SizedBox(width: 6),
                       Text(r.owner, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                     ]),
@@ -187,7 +187,7 @@ class _RecurringEntriesV52ScreenState extends State<RecurringEntriesV52Screen> {
           final annualized = total * (f == _Freq.monthly ? 12 : f == _Freq.quarterly ? 4 : 1);
           return Padding(padding: const EdgeInsets.only(bottom: 14), child: Container(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: f.color.withOpacity(0.05), borderRadius: BorderRadius.circular(8), border: Border.all(color: f.color.withOpacity(0.3))),
+            decoration: BoxDecoration(color: f.color.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8), border: Border.all(color: f.color.withValues(alpha: 0.3))),
             child: Row(children: [
               Icon(f.icon, color: f.color, size: 28),
               const SizedBox(width: 12),

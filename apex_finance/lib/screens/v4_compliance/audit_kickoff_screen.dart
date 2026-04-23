@@ -144,7 +144,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: _roleColor(m.role).withOpacity(0.15),
+                  backgroundColor: _roleColor(m.role).withValues(alpha: 0.15),
                   radius: 22,
                   child: Icon(_roleIcon(m.role), color: _roleColor(m.role)),
                 ),
@@ -221,7 +221,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: core_theme.AC.warn.withOpacity(0.15),
+                      color: core_theme.AC.warn.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text('قادم بعد 3 أيام',
@@ -259,7 +259,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                   width: 60,
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4A148C).withOpacity(0.08),
+                    color: const Color(0xFF4A148C).withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(a.time,
@@ -381,7 +381,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: core_theme.AC.info.withOpacity(0.08),
+                    color: core_theme.AC.info.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(i.category, style: TextStyle(fontSize: 10, color: core_theme.AC.info)),
@@ -392,7 +392,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: _pblStatusColor(i.status).withOpacity(0.15),
+                    color: _pblStatusColor(i.status).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(i.status,
@@ -478,7 +478,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: (s.granted ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12),
+                    color: (s.granted ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(s.granted ? Icons.lock_open : Icons.lock_outline,
@@ -498,7 +498,7 @@ class _AuditKickoffScreenState extends State<AuditKickoffScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: (s.granted ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.15),
+                    color: (s.granted ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(s.granted ? 'ممنوح' : 'قيد المعالجة',

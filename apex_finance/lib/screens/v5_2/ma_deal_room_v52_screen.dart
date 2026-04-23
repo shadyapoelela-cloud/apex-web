@@ -180,7 +180,7 @@ class MaDealRoomV52Screen extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
         child: Row(children: [
-          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: folders[i].$4.withOpacity(0.15), borderRadius: BorderRadius.circular(6)), child: Icon(folders[i].$3, color: folders[i].$4)),
+          Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: folders[i].$4.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)), child: Icon(folders[i].$3, color: folders[i].$4)),
           const SizedBox(width: 12),
           Expanded(child: Text(folders[i].$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))),
           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10)), child: Text('${folders[i].$2} ملف', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700))),
@@ -207,10 +207,10 @@ class MaDealRoomV52Screen extends StatelessWidget {
         final q = questions[i];
         return Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: q.$4 ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.warn.withOpacity(0.3))),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: q.$4 ? core_theme.AC.ok.withValues(alpha: 0.3) : core_theme.AC.warn.withValues(alpha: 0.3))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
-              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(10)), child: Text(q.$1, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _navy))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: _navy.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10)), child: Text(q.$1, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _navy))),
               const Spacer(),
               if (q.$4) Row(children: [Icon(Icons.check_circle, color: core_theme.AC.ok, size: 16), SizedBox(width: 4), Text('مُجاب', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ok))])
               else Row(children: [Icon(Icons.pending, color: core_theme.AC.warn, size: 16), SizedBox(width: 4), Text('قيد الإجابة', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.warn))]),
@@ -219,7 +219,7 @@ class MaDealRoomV52Screen extends StatelessWidget {
             Text(q.$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
             if (q.$5 != null) ...[
               const SizedBox(height: 6),
-              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.05), borderRadius: BorderRadius.circular(6)), child: Text('الجواب: ${q.$5}', style: TextStyle(fontSize: 12, color: core_theme.AC.tp))),
+              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(6)), child: Text('الجواب: ${q.$5}', style: TextStyle(fontSize: 12, color: core_theme.AC.tp))),
             ],
             const SizedBox(height: 4),
             Text('مُوجّهة إلى: ${q.$3}', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
@@ -241,7 +241,7 @@ class MaDealRoomV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: flags[i].$4.withOpacity(0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: flags[i].$4, width: 1.5)),
+        decoration: BoxDecoration(color: flags[i].$4.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: flags[i].$4, width: 1.5)),
         child: Row(children: [
           Icon(Icons.flag, color: flags[i].$4, size: 28),
           const SizedBox(width: 12),
@@ -249,7 +249,7 @@ class MaDealRoomV52Screen extends StatelessWidget {
             Row(children: [
               Text(flags[i].$1, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: flags[i].$4, fontWeight: FontWeight.w800)),
               const SizedBox(width: 8),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: flags[i].$4.withOpacity(0.2), borderRadius: BorderRadius.circular(10)), child: Text('خطورة ${flags[i].$3}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: flags[i].$4))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: flags[i].$4.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(10)), child: Text('خطورة ${flags[i].$3}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: flags[i].$4))),
             ]),
             const SizedBox(height: 4),
             Text(flags[i].$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
@@ -264,7 +264,7 @@ class MaDealRoomV52Screen extends StatelessWidget {
   Widget _kv(String k, String v) => SizedBox(width: 220, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(k, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)), Text(v, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700))]));
 
   Widget _personRow(String name, String role, Color color) => Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [
-        CircleAvatar(radius: 12, backgroundColor: color.withOpacity(0.15), child: Text(name[0], style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w800))),
+        CircleAvatar(radius: 12, backgroundColor: color.withValues(alpha: 0.15), child: Text(name[0], style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w800))),
         const SizedBox(width: 10),
         Expanded(child: Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
         Text(role, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
@@ -291,13 +291,13 @@ class _Kpi extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.2))),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.2))),
         child: Row(children: [
           Icon(icon, color: color, size: 22),
           const SizedBox(width: 10),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(label, style: TextStyle(fontSize: 11, color: color.withOpacity(0.9))),
-            Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 4), Text(unit, style: TextStyle(fontSize: 10, color: color.withOpacity(0.8)))]),
+            Text(label, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.9))),
+            Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 4), Text(unit, style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.8)))]),
           ])),
         ]),
       );

@@ -185,7 +185,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: selected ? core_theme.AC.gold.withOpacity(0.1) : core_theme.AC.navy3,
+          color: selected ? core_theme.AC.gold.withValues(alpha: 0.1) : core_theme.AC.navy3,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: selected ? core_theme.AC.gold : core_theme.AC.bdr,
@@ -432,7 +432,7 @@ class _UaeCtScreenState extends State<UaeCtScreen>
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       decoration: BoxDecoration(
-        color: highlight ? core_theme.AC.gold.withOpacity(0.1) : null,
+        color: highlight ? core_theme.AC.gold.withValues(alpha: 0.1) : null,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(

@@ -114,9 +114,9 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: selected ? core_theme.AC.gold.withOpacity(0.12) : null,
+                      color: selected ? core_theme.AC.gold.withValues(alpha: 0.12) : null,
                       border: Border(
-                        bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)),
+                        bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5)),
                         right: BorderSide(
                           color: selected ? core_theme.AC.gold : Colors.transparent,
                           width: 3,
@@ -126,7 +126,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
                     child: Row(
                       children: [
                         CircleAvatar(
-                          backgroundColor: e.color.withOpacity(0.12),
+                          backgroundColor: e.color.withValues(alpha: 0.12),
                           radius: 16,
                           child: Text(e.name.substring(0, 1),
                               style: TextStyle(color: e.color, fontWeight: FontWeight.w900, fontSize: 13)),
@@ -152,7 +152,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                              decoration: BoxDecoration(color: e.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                              decoration: BoxDecoration(color: e.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                               child: Text(_tierLabel(e.tier),
                                   style: TextStyle(fontSize: 9, color: e.color, fontWeight: FontWeight.w800)),
                             ),
@@ -176,7 +176,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
       margin: const EdgeInsets.only(left: 10, top: 20, right: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [e.color, e.color.withOpacity(0.7)]),
+        gradient: LinearGradient(colors: [e.color, e.color.withValues(alpha: 0.7)]),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -303,7 +303,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: g.color.withOpacity(0.3)),
+            border: Border.all(color: g.color.withValues(alpha: 0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,7 +317,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: g.color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                    decoration: BoxDecoration(color: g.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
                     child: Text(_goalLabel(g.status),
                         style: TextStyle(fontSize: 11, color: g.color, fontWeight: FontWeight.w800)),
                   ),
@@ -375,7 +375,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor: core_theme.AC.gold.withOpacity(0.12),
+                backgroundColor: core_theme.AC.gold.withValues(alpha: 0.12),
                 child: Text(r.name.substring(0, 1),
                     style: TextStyle(color: core_theme.AC.gold, fontWeight: FontWeight.w900)),
               ),
@@ -451,9 +451,9 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: core_theme.AC.gold.withOpacity(0.08),
+            color: core_theme.AC.gold.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: core_theme.AC.gold.withOpacity(0.3)),
+            border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -497,7 +497,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -530,7 +530,7 @@ class _PerformanceReviewsScreenState extends State<PerformanceReviewsScreen>
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(color: core_theme.AC.gold.withOpacity(0.15), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: core_theme.AC.gold.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(4)),
             child: Text(category,
                 style: TextStyle(fontSize: 11, color: core_theme.AC.gold, fontWeight: FontWeight.w800)),
           ),

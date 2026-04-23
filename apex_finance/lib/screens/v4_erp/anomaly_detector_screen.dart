@@ -214,9 +214,9 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 3),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -246,7 +246,7 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? c : c.withOpacity(0.1),
+          color: selected ? c : c.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: c),
         ),
@@ -264,7 +264,7 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3), width: 2),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,15 +272,15 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.08),
+              color: color.withValues(alpha: 0.08),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-              border: Border(bottom: BorderSide(color: color.withOpacity(0.25))),
+              border: Border(bottom: BorderSide(color: color.withValues(alpha: 0.25))),
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
                   child: Icon(typeInfo.icon, color: color, size: 20),
                 ),
                 const SizedBox(width: 12),
@@ -345,9 +345,9 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.08),
+                          color: color.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: color.withOpacity(0.3)),
+                          border: Border.all(color: color.withValues(alpha: 0.3)),
                         ),
                         child: Text(s, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w700)),
                       ),
@@ -357,9 +357,9 @@ class _AnomalyDetectorScreenState extends State<AnomalyDetectorScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: core_theme.AC.gold.withOpacity(0.08),
+                    color: core_theme.AC.gold.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: core_theme.AC.gold.withOpacity(0.3)),
+                    border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [

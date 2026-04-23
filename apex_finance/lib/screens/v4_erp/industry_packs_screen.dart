@@ -48,15 +48,15 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
                 margin: const EdgeInsets.symmetric(vertical: 3),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: _selected == p.id ? p.color.withOpacity(0.1) : Colors.white,
+                  color: _selected == p.id ? p.color.withValues(alpha: 0.1) : Colors.white,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: _selected == p.id ? p.color : core_theme.AC.tp.withOpacity(0.06), width: _selected == p.id ? 2 : 1),
+                  border: Border.all(color: _selected == p.id ? p.color : core_theme.AC.tp.withValues(alpha: 0.06), width: _selected == p.id ? 2 : 1),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(color: p.color.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+                      decoration: BoxDecoration(color: p.color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
                       child: Icon(p.icon, color: p.color, size: 16),
                     ),
                     const SizedBox(width: 10),
@@ -95,14 +95,14 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [pack.color, pack.color.withOpacity(0.7)]),
+              gradient: LinearGradient(colors: [pack.color, pack.color.withValues(alpha: 0.7)]),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
                   child: Icon(pack.icon, color: Colors.white, size: 40),
                 ),
                 const SizedBox(width: 20),
@@ -127,7 +127,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(4)),
+                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(4)),
                       child: Text(pack.rating, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
                     ),
                   ],
@@ -168,7 +168,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -213,7 +213,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
           // Activate button
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: pack.color.withOpacity(0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: pack.color.withOpacity(0.2))),
+            decoration: BoxDecoration(color: pack.color.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: pack.color.withValues(alpha: 0.2))),
             child: Row(
               children: [
                 Icon(Icons.info_outline, color: pack.color, size: 20),
@@ -251,12 +251,12 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
   Widget _includedCard(String title, String detail, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
             child: Icon(icon, color: color, size: 18),
           ),
           const SizedBox(width: 10),
@@ -277,7 +277,7 @@ class _IndustryPacksScreenState extends State<IndustryPacksScreen> {
   Widget _kpiPreview(String label, String value, String unit, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: color.withOpacity(0.2))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -539,7 +539,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                   for (final s in ['بدء الاستخدام', 'ZATCA', 'الفواتير', 'الرواتب', 'المراجعة', 'الذكاء'])
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(14)),
+                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(14)),
                       child: Text(s, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
                     ),
                 ],
@@ -550,7 +550,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         // Tabs
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)))),
           child: Row(
             children: [
               _tabBtn(0, 'الأدلّة', Icons.menu_book),
@@ -628,13 +628,13 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   Widget _guideCard(String title, String desc, IconData icon, Color color, String meta) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
             child: Icon(icon, color: color, size: 24),
           ),
           const SizedBox(height: 12),
@@ -677,7 +677,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 ('تخصيص المنصّة (Studio)', '8:10', const Color(0xFFEC4899)),
               ])
                 Container(
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
                   child: Column(
                     children: [
                       Expanded(
@@ -686,7 +686,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                           child: Center(
                             child: Container(
                               padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
+                              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
                               child: const Icon(Icons.play_arrow, color: Colors.white, size: 28),
                             ),
                           ),
@@ -727,7 +727,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           ])
             Container(
               margin: const EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
               child: ExpansionTile(
                 title: Text(q.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                 children: [
@@ -786,18 +786,18 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: core_theme.AC.info)),
           const SizedBox(height: 8),
           Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               children: [
                 for (int i = 0; i < items.length; i++)
                   Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(border: i < items.length - 1 ? Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04))) : null),
+                    decoration: BoxDecoration(border: i < items.length - 1 ? Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04))) : null),
                     child: Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(4), border: Border.all(color: core_theme.AC.tp.withOpacity(0.1))),
+                          decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(4), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1))),
                           child: Text(items[i].$1, style: const TextStyle(fontFamily: 'monospace', fontSize: 11, fontWeight: FontWeight.w700)),
                         ),
                         const SizedBox(width: 12),
@@ -843,16 +843,16 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   Widget _contactCard(String title, String detail, IconData icon, Color color, String sla) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)), child: Icon(icon, color: color, size: 20)),
+          Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)), child: Icon(icon, color: color, size: 20)),
           const SizedBox(height: 10),
           Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
           Text(detail, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const Spacer(),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text('زمن الاستجابة: $sla', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: color))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)), child: Text('زمن الاستجابة: $sla', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: color))),
         ],
       ),
     );

@@ -258,9 +258,9 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: _navy.withOpacity(0.06),
+                    color: _navy.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: _navy.withOpacity(0.15)),
+                    border: Border.all(color: _navy.withValues(alpha: 0.15)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -325,7 +325,7 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: c.active
-                            ? (c.color ?? _gold).withOpacity(0.12)
+                            ? (c.color ?? _gold).withValues(alpha: 0.12)
                             : core_theme.AC.navy3,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
@@ -359,7 +359,7 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                               decoration: BoxDecoration(
-                                color: (c.color ?? _gold).withOpacity(0.2),
+                                color: (c.color ?? _gold).withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text('${c.count}',
@@ -408,7 +408,7 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
                       boxShadow: active
                           ? [
                               BoxShadow(
-                                color: core_theme.AC.tp.withOpacity(0.06),
+                                color: core_theme.AC.tp.withValues(alpha: 0.06),
                                 blurRadius: 3,
                                 offset: const Offset(0, 1),
                               ),

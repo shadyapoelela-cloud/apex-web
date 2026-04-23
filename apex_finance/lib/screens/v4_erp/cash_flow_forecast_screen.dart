@@ -121,7 +121,7 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? color.withOpacity(0.15) : Colors.white,
+          color: selected ? color.withValues(alpha: 0.15) : Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: selected ? color : core_theme.AC.td, width: selected ? 2 : 1),
         ),
@@ -159,9 +159,9 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -270,8 +270,8 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                  color: _selectedWeek == w ? core_theme.AC.gold.withOpacity(0.08) : null,
-                  border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+                  color: _selectedWeek == w ? core_theme.AC.gold.withValues(alpha: 0.08) : null,
+                  border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
                 ),
                 child: Row(
                   children: [

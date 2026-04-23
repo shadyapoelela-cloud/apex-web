@@ -25,7 +25,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
         Container(
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)))),
           child: Row(
             children: [
               _tabBtn(0, 'قائمة الدخل', Icons.trending_up),
@@ -58,7 +58,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
-        decoration: BoxDecoration(color: active ? const Color(0xFF1565C0).withOpacity(0.15) : null, borderRadius: BorderRadius.circular(6), border: active ? Border.all(color: const Color(0xFF1565C0).withOpacity(0.4)) : null),
+        decoration: BoxDecoration(color: active ? const Color(0xFF1565C0).withValues(alpha: 0.15) : null, borderRadius: BorderRadius.circular(6), border: active ? Border.all(color: const Color(0xFF1565C0).withValues(alpha: 0.4)) : null),
         child: Row(
           children: [
             Icon(icon, size: 14, color: active ? const Color(0xFF1565C0) : core_theme.AC.ts),
@@ -90,7 +90,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               children: [
                 _fsTitle('شركة الرياض للتجارة · Q1 2026'),
@@ -148,7 +148,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
                   child: Column(
                     children: [
                       _fsTitle('الموجودات (Assets)'),
@@ -174,7 +174,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
                   child: Column(
                     children: [
                       _fsTitle('المطلوبات وحقوق الملكية'),
@@ -200,7 +200,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
                       const SizedBox(height: 8),
                       _fsLine('مجموع المطلوبات + الملكية', 8_485_000, false, bold: true, big: true, highlight: core_theme.AC.ok),
                       const SizedBox(height: 4),
-                      Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.1), borderRadius: BorderRadius.circular(4)), child: Row(children: [Icon(Icons.check_circle, color: core_theme.AC.ok, size: 14), SizedBox(width: 6), Text('متوازن ✓', style: TextStyle(color: core_theme.AC.ok, fontWeight: FontWeight.w800, fontSize: 12))])),
+                      Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)), child: Row(children: [Icon(Icons.check_circle, color: core_theme.AC.ok, size: 14), SizedBox(width: 6), Text('متوازن ✓', style: TextStyle(color: core_theme.AC.ok, fontWeight: FontWeight.w800, fontSize: 12))])),
                     ],
                   ),
                 ),
@@ -224,7 +224,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               children: [
                 _fsTitle('النشاط التشغيلي (Operating)'),
@@ -268,7 +268,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
             child: Column(
               children: [
                 _equityHeader(),
@@ -276,7 +276,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
                 _equityRow('صافي الدخل', '—', '—', '820,950', '820,950'),
                 _equityRow('توزيعات أرباح', '—', '—', '(200,000)', '(200,000)'),
                 _equityRow('تخصيص احتياطي نظامي', '—', '82,000', '(82,000)', '—'),
-                Container(padding: const EdgeInsets.all(10), color: core_theme.AC.ok.withOpacity(0.06), child: _equityRow('الرصيد في 31 مارس 2026', '3,000,000', '762,000', '1,200,000', '4,962,000', bold: true)),
+                Container(padding: const EdgeInsets.all(10), color: core_theme.AC.ok.withValues(alpha: 0.06), child: _equityRow('الرصيد في 31 مارس 2026', '3,000,000', '762,000', '1,200,000', '4,962,000', bold: true)),
               ],
             ),
           ),
@@ -321,7 +321,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
   Widget _fsLine(String label, double? value, bool negative, {bool sub = false, bool bold = false, bool border = false, bool big = false, bool pct = false, Color? highlight}) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      decoration: border ? BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.1)))) : null,
+      decoration: border ? BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.1)))) : null,
       child: Row(
         children: [
           Text(label, style: TextStyle(fontSize: big ? 14 : sub ? 12 : 13, fontWeight: bold ? FontWeight.w900 : FontWeight.w500, color: highlight ?? (sub ? core_theme.AC.ts : core_theme.AC.tp))),
@@ -329,7 +329,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
           if (value != null)
             Container(
               padding: highlight != null ? const EdgeInsets.symmetric(horizontal: 8, vertical: 3) : null,
-              decoration: highlight != null ? BoxDecoration(color: highlight.withOpacity(0.1), borderRadius: BorderRadius.circular(3)) : null,
+              decoration: highlight != null ? BoxDecoration(color: highlight.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(3)) : null,
               child: Text(
                 pct ? '${value.toStringAsFixed(1)}%' : '${negative ? '(' : ''}${value.abs().toStringAsFixed(0)}${negative ? ')' : ''}',
                 style: TextStyle(fontSize: big ? 15 : 13, fontWeight: bold ? FontWeight.w900 : FontWeight.w700, color: highlight ?? core_theme.AC.tp, fontFamily: 'monospace'),
@@ -343,7 +343,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen> {
   Widget _equityHeader() {
     return Container(
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
+      decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)))),
       child: const Row(
         children: [
           Expanded(flex: 3, child: Text('البند', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800))),
@@ -482,7 +482,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 1),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        decoration: BoxDecoration(color: active ? core_theme.AC.gold.withOpacity(0.15) : null, borderRadius: BorderRadius.circular(4)),
+        decoration: BoxDecoration(color: active ? core_theme.AC.gold.withValues(alpha: 0.15) : null, borderRadius: BorderRadius.circular(4)),
         child: Row(
           children: [
             Text(code, style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: core_theme.AC.ts)),
@@ -500,7 +500,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08)))),
+          decoration: BoxDecoration(color: const Color(0xFFF9FAFB), border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08)))),
           child: Row(
             children: [
               Icon(Icons.account_balance, color: core_theme.AC.gold, size: 22),
@@ -526,7 +526,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
                   child: Column(
                     children: [
                       _field('رقم الحساب', '1100'),
@@ -546,7 +546,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
                 Text('آخر الحركات', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 8),
                 Container(
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withOpacity(0.08))),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08))),
                   child: Column(
                     children: [
                       for (final m in [
@@ -557,7 +557,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
                       ])
                         Container(
                           padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.04)))),
+                          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.04)))),
                           child: Row(
                             children: [
                               Text(m.$1, style: TextStyle(fontSize: 11, fontFamily: 'monospace', color: core_theme.AC.ts)),
@@ -565,7 +565,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
                               Text(m.$2, style: const TextStyle(fontSize: 11, fontFamily: 'monospace')),
                               const SizedBox(width: 12),
                               Expanded(child: Text(m.$3, style: const TextStyle(fontSize: 12))),
-                              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: (m.$5 == 'مدين' ? core_theme.AC.ok : const Color(0xFFB91C1C)).withOpacity(0.12), borderRadius: BorderRadius.circular(3)), child: Text(m.$5, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: m.$5 == 'مدين' ? core_theme.AC.ok : const Color(0xFFB91C1C)))),
+                              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: (m.$5 == 'مدين' ? core_theme.AC.ok : const Color(0xFFB91C1C)).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)), child: Text(m.$5, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: m.$5 == 'مدين' ? core_theme.AC.ok : const Color(0xFFB91C1C)))),
                               const SizedBox(width: 12),
                               Text('${m.$4 > 0 ? '+' : ''}${m.$4.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 13, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: m.$4 > 0 ? core_theme.AC.ok : const Color(0xFFB91C1C))),
                             ],
@@ -591,7 +591,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(color: highlight ? core_theme.AC.gold.withOpacity(0.1) : null, border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)), borderRadius: BorderRadius.circular(4)),
+              decoration: BoxDecoration(color: highlight ? core_theme.AC.gold.withValues(alpha: 0.1) : null, border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)), borderRadius: BorderRadius.circular(4)),
               child: Text(value, style: TextStyle(fontSize: 12, fontWeight: highlight ? FontWeight.w900 : FontWeight.w500, color: highlight ? core_theme.AC.gold : core_theme.AC.tp, fontFamily: highlight ? 'monospace' : null)),
             ),
           ),

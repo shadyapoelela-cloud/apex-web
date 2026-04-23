@@ -90,13 +90,13 @@ class AiReconciliationV52Screen extends StatelessWidget {
 
   Widget _typeRow(String nameAr, String nameEn, int count, double accuracy, IconData icon, Color color) {
     return Padding(padding: const EdgeInsets.symmetric(vertical: 6), child: Row(children: [
-      Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)), child: Icon(icon, color: color, size: 18)),
+      Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)), child: Icon(icon, color: color, size: 18)),
       const SizedBox(width: 12),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(nameAr, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
         Text('$nameEn · $count عملية', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
       ])),
-      Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text('${accuracy.toStringAsFixed(1)}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color))),
+      Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)), child: Text('${accuracy.toStringAsFixed(1)}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color))),
     ]));
   }
 
@@ -116,11 +116,11 @@ class AiReconciliationV52Screen extends StatelessWidget {
         final confidenceColor = items[i].$7 >= 0.8 ? core_theme.AC.ok : items[i].$7 >= 0.6 ? core_theme.AC.warn : core_theme.AC.err;
         return Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.warn.withOpacity(0.3))),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.warn.withValues(alpha: 0.3))),
           child: Row(children: [
             Container(
               width: 48, height: 48,
-              decoration: BoxDecoration(color: _purple.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+              decoration: BoxDecoration(color: _purple.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
               child: Icon(Icons.auto_awesome, color: _purple),
             ),
             const SizedBox(width: 12),
@@ -152,7 +152,7 @@ class AiReconciliationV52Screen extends StatelessWidget {
   Widget _matched() {
     return Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.check_circle, size: 64, color: core_theme.AC.ok.withOpacity(0.3)),
+        Icon(Icons.check_circle, size: 64, color: core_theme.AC.ok.withValues(alpha: 0.3)),
         const SizedBox(height: 12),
         Text('1,193 مطابقة تلقائية ناجحة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _navy)),
         Text('تم قبولها بثقة >95% بدون تدخل بشري', style: TextStyle(color: core_theme.AC.ts)),
@@ -174,7 +174,7 @@ class AiReconciliationV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.err, width: 1.5)),
+        decoration: BoxDecoration(color: core_theme.AC.err.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.err, width: 1.5)),
         child: Row(children: [
           Icon(Icons.error, color: core_theme.AC.err, size: 32),
           const SizedBox(width: 12),
@@ -209,7 +209,7 @@ class AiReconciliationV52Screen extends StatelessWidget {
         child: Row(children: [
           Container(
             width: 44, height: 44,
-            decoration: BoxDecoration(color: _gold.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: _gold.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
             child: Icon(Icons.rule, color: _gold),
           ),
           const SizedBox(width: 12),
@@ -242,11 +242,11 @@ class AiReconciliationV52Screen extends StatelessWidget {
 
   Widget _bigStat(String label, String value, String unit, Color color, IconData icon) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withOpacity(0.2))),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: color.withValues(alpha: 0.2))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [Icon(icon, color: color, size: 20), const SizedBox(width: 6), Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color.withOpacity(0.9)))]),
+          Row(children: [Icon(icon, color: color, size: 20), const SizedBox(width: 6), Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: color.withValues(alpha: 0.9)))]),
           const SizedBox(height: 8),
-          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [Text(value, style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 4), Text(unit, style: TextStyle(fontSize: 12, color: color.withOpacity(0.8)))]),
+          Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [Text(value, style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: color)), const SizedBox(width: 4), Text(unit, style: TextStyle(fontSize: 12, color: color.withValues(alpha: 0.8)))]),
         ]),
       );
 }

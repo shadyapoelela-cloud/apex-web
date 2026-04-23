@@ -95,7 +95,7 @@ class _InternalOrdersV52ScreenState extends State<InternalOrdersV52Screen> {
               Text('${(util * 100).toStringAsFixed(0)}%', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: util > 1.0 ? core_theme.AC.err : util > 0.9 ? core_theme.AC.warn : core_theme.AC.ok)),
             ])),
             const SizedBox(width: 16),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: o.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(o.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: o.status.color))),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: o.status.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text(o.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: o.status.color))),
           ])),
         );
       },
@@ -115,14 +115,14 @@ class _InternalOrdersV52ScreenState extends State<InternalOrdersV52Screen> {
           margin: const EdgeInsets.only(left: 10),
           decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Container(width: 8, height: 8, decoration: BoxDecoration(color: s.color, shape: BoxShape.circle)),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(s.labelAr, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: s.color)),
                 Text('${(total / 1000).toStringAsFixed(0)}K ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
             ])),
             ...items.map((o) {
               final util = o.budget > 0 ? (o.actual / o.budget).clamp(0.0, 2.0) : 0.0;
@@ -134,7 +134,7 @@ class _InternalOrdersV52ScreenState extends State<InternalOrdersV52Screen> {
                   Row(children: [
                     Text(o.id, style: TextStyle(fontFamily: 'monospace', fontSize: 9, color: core_theme.AC.ts)),
                     const Spacer(),
-                    Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(3)), child: Text(o.category, style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: _navy))),
+                    Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: _navy.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(3)), child: Text(o.category, style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: _navy))),
                   ]),
                   Text(o.title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800), maxLines: 2, overflow: TextOverflow.ellipsis),
                   Text(o.manager, style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
@@ -174,7 +174,7 @@ class _InternalOrdersV52ScreenState extends State<InternalOrdersV52Screen> {
             const SizedBox(height: 6),
             Row(children: [
               SizedBox(width: 80, child: Text('الميزانية', style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
-              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: 1.0, minHeight: 14, backgroundColor: core_theme.AC.navy3, color: _navy.withOpacity(0.5)))),
+              Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(3), child: LinearProgressIndicator(value: 1.0, minHeight: 14, backgroundColor: core_theme.AC.navy3, color: _navy.withValues(alpha: 0.5)))),
               const SizedBox(width: 10),
               Text('${(e.value.$1 / 1e6).toStringAsFixed(2)}M', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _navy)),
             ]),

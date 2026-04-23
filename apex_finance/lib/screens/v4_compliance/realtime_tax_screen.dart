@@ -107,7 +107,7 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.public, color: Colors.white, size: 28),
@@ -136,7 +136,7 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(
@@ -226,7 +226,7 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,7 +268,7 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +358,7 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,7 +381,7 @@ class _RealtimeTaxScreenState extends State<RealtimeTaxScreen> {
             },
             children: [
               TableRow(
-                decoration: BoxDecoration(color: core_theme.AC.tp.withOpacity(0.04)),
+                decoration: BoxDecoration(color: core_theme.AC.tp.withValues(alpha: 0.04)),
                 children: [
                   const _CompHeader(label: 'الميزة'),
                   _CompHeader(label: 'APEX', color: core_theme.AC.gold),
@@ -465,13 +465,13 @@ class _ScenarioRowState extends State<_ScenarioRow> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
             color: widget.isActive
-                ? core_theme.AC.gold.withOpacity(0.15)
+                ? core_theme.AC.gold.withValues(alpha: 0.15)
                 : _hover
-                    ? core_theme.AC.tp.withOpacity(0.03)
+                    ? core_theme.AC.tp.withValues(alpha: 0.03)
                     : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
             border: widget.isActive
-                ? Border.all(color: core_theme.AC.gold.withOpacity(0.4))
+                ? Border.all(color: core_theme.AC.gold.withValues(alpha: 0.4))
                 : null,
           ),
           child: Row(
@@ -548,10 +548,10 @@ class _CompCell extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: highlighted
           ? BoxDecoration(
-              color: core_theme.AC.gold.withOpacity(0.06),
+              color: core_theme.AC.gold.withValues(alpha: 0.06),
               border: Border(
-                left: BorderSide(color: core_theme.AC.gold.withOpacity(0.2)),
-                right: BorderSide(color: core_theme.AC.gold.withOpacity(0.2)),
+                left: BorderSide(color: core_theme.AC.gold.withValues(alpha: 0.2)),
+                right: BorderSide(color: core_theme.AC.gold.withValues(alpha: 0.2)),
               ),
             )
           : null,

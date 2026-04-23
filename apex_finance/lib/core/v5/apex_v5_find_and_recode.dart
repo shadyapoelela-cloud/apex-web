@@ -58,7 +58,7 @@ class ApexV5FindAndRecodeBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: core_theme.AC.tp.withOpacity(0.25),
+            color: core_theme.AC.tp.withValues(alpha: 0.25),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -91,7 +91,7 @@ class ApexV5FindAndRecodeBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
-          Container(height: 20, width: 1, color: Colors.white.withOpacity(0.2)),
+          Container(height: 20, width: 1, color: Colors.white.withValues(alpha: 0.2)),
           const SizedBox(width: 16),
           // Actions
           _BarAction(
@@ -155,7 +155,7 @@ class _BarActionState extends State<_BarAction> {
         ? core_theme.AC.gold
         : widget.destructive
             ? const Color(0xFFB91C1C)
-            : Colors.white.withOpacity(_hover ? 0.15 : 0.08);
+            : Colors.white.withValues(alpha: _hover ? 0.15 : 0.08);
     final fgColor = widget.primary || widget.destructive
         ? Colors.white
         : Colors.white;
@@ -274,7 +274,7 @@ class _ApexV5RecodeDialogState extends State<ApexV5RecodeDialog> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: core_theme.AC.gold.withOpacity(0.15),
+                    color: core_theme.AC.gold.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(Icons.swap_horiz, color: core_theme.AC.gold, size: 22),
@@ -339,7 +339,7 @@ class _ApexV5RecodeDialogState extends State<ApexV5RecodeDialog> {
               decoration: BoxDecoration(
                 color: const Color(0xFFFEF3C7),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: core_theme.AC.warn.withOpacity(0.3)),
+                border: Border.all(color: core_theme.AC.warn.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [

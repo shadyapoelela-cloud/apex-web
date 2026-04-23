@@ -60,7 +60,7 @@ class ApexV5ViewSwitcher extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         border: Border(
-          bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.06)),
+          bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.06)),
         ),
       ),
       child: Row(
@@ -119,13 +119,13 @@ class _ViewModeButtonState extends State<_ViewModeButton> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
             color: widget.isActive
-                ? core_theme.AC.gold.withOpacity(0.12)
+                ? core_theme.AC.gold.withValues(alpha: 0.12)
                 : _hover
-                    ? core_theme.AC.tp.withOpacity(0.04)
+                    ? core_theme.AC.tp.withValues(alpha: 0.04)
                     : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
             border: widget.isActive
-                ? Border.all(color: core_theme.AC.gold.withOpacity(0.4))
+                ? Border.all(color: core_theme.AC.gold.withValues(alpha: 0.4))
                 : null,
           ),
           child: Row(

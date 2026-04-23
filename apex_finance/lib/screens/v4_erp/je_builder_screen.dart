@@ -81,12 +81,12 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
           const SizedBox(height: 16),
           // Entry table
           Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withOpacity(0.08))),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black.withValues(alpha: 0.08))),
             child: Column(
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(color: const Color(0xFFF9FAFB), borderRadius: const BorderRadius.vertical(top: Radius.circular(10)), border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.06)))),
+                  decoration: BoxDecoration(color: const Color(0xFFF9FAFB), borderRadius: const BorderRadius.vertical(top: Radius.circular(10)), border: Border(bottom: BorderSide(color: Colors.black.withValues(alpha: 0.06)))),
                   child: const Row(
                     children: [
                       Expanded(flex: 3, child: Text('الحساب', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800))),
@@ -111,7 +111,7 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
                 // Totals
                 Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: _isBalanced ? const Color(0xFF059669).withOpacity(0.05) : const Color(0xFFB91C1C).withOpacity(0.05)),
+                  decoration: BoxDecoration(color: _isBalanced ? const Color(0xFF059669).withValues(alpha: 0.05) : const Color(0xFFB91C1C).withValues(alpha: 0.05)),
                   child: Row(
                     children: [
                       const Expanded(flex: 3, child: Text('الإجمالي', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800))),
@@ -189,7 +189,7 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          decoration: BoxDecoration(border: Border.all(color: Colors.black.withOpacity(0.15)), borderRadius: BorderRadius.circular(4), color: editable ? Colors.white : const Color(0xFFF9FAFB)),
+          decoration: BoxDecoration(border: Border.all(color: Colors.black.withValues(alpha: 0.15)), borderRadius: BorderRadius.circular(4), color: editable ? Colors.white : const Color(0xFFF9FAFB)),
           child: Text(value, style: const TextStyle(fontSize: 12, fontFamily: 'monospace')),
         ),
       ],
@@ -199,7 +199,7 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
   Widget _lineRow(int i) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.04)))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black.withValues(alpha: 0.04)))),
       child: Row(
         children: [
           Expanded(flex: 3, child: TextField(
@@ -301,7 +301,7 @@ class _PeriodCloseScreenState extends State<PeriodCloseScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          ClipRRect(borderRadius: BorderRadius.circular(6), child: LinearProgressIndicator(value: pct, minHeight: 10, backgroundColor: Colors.black.withOpacity(0.06), valueColor: const AlwaysStoppedAnimation(Color(0xFF4A148C)))),
+          ClipRRect(borderRadius: BorderRadius.circular(6), child: LinearProgressIndicator(value: pct, minHeight: 10, backgroundColor: Colors.black.withValues(alpha: 0.06), valueColor: const AlwaysStoppedAnimation(Color(0xFF4A148C)))),
           const SizedBox(height: 20),
           for (final s in _steps) _stepCard(s),
         ],
@@ -315,9 +315,9 @@ class _PeriodCloseScreenState extends State<PeriodCloseScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: s.active ? const Color(0xFF4A148C).withOpacity(0.06) : Colors.white,
+        color: s.active ? const Color(0xFF4A148C).withValues(alpha: 0.06) : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: s.active ? const Color(0xFF4A148C) : Colors.black.withOpacity(0.08), width: s.active ? 2 : 1),
+        border: Border.all(color: s.active ? const Color(0xFF4A148C) : Colors.black.withValues(alpha: 0.08), width: s.active ? 2 : 1),
       ),
       child: Row(
         children: [
@@ -325,7 +325,7 @@ class _PeriodCloseScreenState extends State<PeriodCloseScreen> {
             width: 36,
             height: 36,
             alignment: Alignment.center,
-            decoration: BoxDecoration(color: s.done ? const Color(0xFF059669) : s.active ? const Color(0xFF4A148C).withOpacity(0.15) : Colors.black.withOpacity(0.06), shape: BoxShape.circle),
+            decoration: BoxDecoration(color: s.done ? const Color(0xFF059669) : s.active ? const Color(0xFF4A148C).withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.06), shape: BoxShape.circle),
             child: s.done ? const Icon(Icons.check, color: Colors.white, size: 18) : Text(s.num, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: s.active ? const Color(0xFF4A148C) : Colors.black54)),
           ),
           const SizedBox(width: 14),

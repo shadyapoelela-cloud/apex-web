@@ -133,9 +133,9 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,7 +173,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: t.completed ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.info.withOpacity(0.3)),
+            border: Border.all(color: t.completed ? core_theme.AC.ok.withValues(alpha: 0.3) : core_theme.AC.info.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -181,7 +181,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: (t.completed ? core_theme.AC.ok : core_theme.AC.info).withOpacity(0.12),
+                  color: (t.completed ? core_theme.AC.ok : core_theme.AC.info).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(t.completed ? Icons.emoji_events : Icons.play_circle,
@@ -280,7 +280,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: catColor.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: catColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                 child: Text(c.category,
                     style: TextStyle(fontSize: 9, color: catColor, fontWeight: FontWeight.w800)),
               ),
@@ -288,7 +288,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
               if (c.mandatory)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                  decoration: BoxDecoration(color: core_theme.AC.err.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                   child: Text('إلزامي',
                       style: TextStyle(fontSize: 9, color: core_theme.AC.err, fontWeight: FontWeight.w800)),
                 ),
@@ -371,7 +371,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: core_theme.AC.err.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                  decoration: BoxDecoration(color: core_theme.AC.err.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                   child: Icon(Icons.priority_high, color: core_theme.AC.err),
                 ),
                 const SizedBox(width: 12),
@@ -437,7 +437,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: c.active
-                        ? [core_theme.AC.gold.withOpacity(0.1), const Color(0xFFE6C200).withOpacity(0.05)]
+                        ? [core_theme.AC.gold.withValues(alpha: 0.1), const Color(0xFFE6C200).withValues(alpha: 0.05)]
                         : [core_theme.AC.navy3, core_theme.AC.navy3],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -470,7 +470,7 @@ class _TrainingLmsScreenState extends State<TrainingLmsScreen>
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: (c.active ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
+                                  color: (c.active ? core_theme.AC.ok : core_theme.AC.err).withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(3),
                                 ),
                                 child: Text(c.status,

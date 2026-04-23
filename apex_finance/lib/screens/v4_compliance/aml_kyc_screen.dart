@@ -37,7 +37,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
-        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withOpacity(0.08))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.tp.withValues(alpha: 0.08))),
       ),
       child: Row(
         children: [
@@ -59,9 +59,9 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         margin: const EdgeInsets.only(right: 4),
         decoration: BoxDecoration(
-          color: active ? const Color(0xFFB91C1C).withOpacity(0.15) : null,
+          color: active ? const Color(0xFFB91C1C).withValues(alpha: 0.15) : null,
           borderRadius: BorderRadius.circular(6),
-          border: active ? Border.all(color: const Color(0xFFB91C1C).withOpacity(0.4)) : null,
+          border: active ? Border.all(color: const Color(0xFFB91C1C).withValues(alpha: 0.4)) : null,
         ),
         child: Row(
           children: [
@@ -144,7 +144,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
             ),
             child: Column(
               children: [
@@ -218,14 +218,14 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(
@@ -247,7 +247,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(status, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w700)),
@@ -297,7 +297,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -318,7 +318,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.12),
+                        color: color.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(3),
                       ),
                       child: Text(c.severity, style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w800)),
@@ -334,7 +334,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: core_theme.AC.tp.withOpacity(0.06),
+              color: core_theme.AC.tp.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(c.status, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
@@ -375,14 +375,14 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: rule.color.withOpacity(0.12),
+              color: rule.color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(Icons.shield, color: rule.color, size: 16),
@@ -412,9 +412,9 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFFB91C1C).withOpacity(0.05),
+              color: const Color(0xFFB91C1C).withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFB91C1C).withOpacity(0.2)),
+              border: Border.all(color: const Color(0xFFB91C1C).withValues(alpha: 0.2)),
             ),
             child: const Row(
               children: [
@@ -464,7 +464,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
       ),
       child: Row(
         children: [
@@ -478,7 +478,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.12),
+              color: statusColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(s.status, style: TextStyle(fontSize: 11, color: statusColor, fontWeight: FontWeight.w700)),
@@ -510,13 +510,13 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+                border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(color: w.color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+                    decoration: BoxDecoration(color: w.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
                     child: Icon(Icons.list_alt, color: w.color, size: 16),
                   ),
                   const SizedBox(width: 10),
@@ -532,7 +532,7 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: core_theme.AC.ok.withOpacity(0.12),
+                      color: core_theme.AC.ok.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Row(
@@ -560,9 +560,9 @@ class _AmlKycScreenState extends State<AmlKycScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: s.color.withOpacity(0.08),
+                color: s.color.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: s.color.withOpacity(0.2)),
+                border: Border.all(color: s.color.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [

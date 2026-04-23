@@ -97,7 +97,7 @@ class _CrmV52ScreenState extends State<CrmV52Screen> {
                   Text(l.close, style: const TextStyle(fontSize: 11)),
                 ]),
                 const SizedBox(width: 16),
-                Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: l.stage.color.withOpacity(0.12), borderRadius: BorderRadius.circular(14)), child: Text(l.stage.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: l.stage.color))),
+                Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: l.stage.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(14)), child: Text(l.stage.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: l.stage.color))),
               ],
             ),
           ),
@@ -125,12 +125,12 @@ class _CrmV52ScreenState extends State<CrmV52Screen> {
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: e.key.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
+                decoration: BoxDecoration(color: e.key.color.withValues(alpha: 0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
                 child: Row(children: [
                   Container(width: 8, height: 8, decoration: BoxDecoration(color: e.key.color, shape: BoxShape.circle)),
                   const SizedBox(width: 8),
                   Expanded(child: Text(e.key.labelAr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: e.key.color))),
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: e.key.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${e.value.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: e.key.color))),
+                  Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: e.key.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)), child: Text('${e.value.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: e.key.color))),
                 ]),
               ),
               Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), child: Text('${(total / 1000).toStringAsFixed(0)}K ر.س', style: TextStyle(fontSize: 11, color: core_theme.AC.ts))),
@@ -146,7 +146,7 @@ class _CrmV52ScreenState extends State<CrmV52Screen> {
                       Row(children: [
                         Text('${(l.value / 1000).toStringAsFixed(0)}K', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _gold)),
                         const Spacer(),
-                        Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: e.key.color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)), child: Text('${l.probability}%', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: e.key.color))),
+                        Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1), decoration: BoxDecoration(color: e.key.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)), child: Text('${l.probability}%', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: e.key.color))),
                       ]),
                     ]),
                   )),

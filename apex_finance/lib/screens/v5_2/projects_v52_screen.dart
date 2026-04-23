@@ -83,7 +83,7 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
                   Row(children: [
                     Text(p.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                     const SizedBox(width: 8),
-                    Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: p.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text(p.status.labelAr, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: p.status.color))),
+                    Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: p.status.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)), child: Text(p.status.labelAr, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: p.status.color))),
                   ]),
                   Text(p.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                   Text(p.client, style: TextStyle(fontSize: 12, color: core_theme.AC.ts)),
@@ -100,7 +100,7 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
                 Text('${(p.progress * 100).toInt()}%', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
                 const Spacer(),
                 Row(children: [
-                  CircleAvatar(radius: 10, backgroundColor: _gold.withOpacity(0.15), child: Text(p.pm[0], style: TextStyle(color: _gold, fontSize: 10, fontWeight: FontWeight.w800))),
+                  CircleAvatar(radius: 10, backgroundColor: _gold.withValues(alpha: 0.15), child: Text(p.pm[0], style: TextStyle(color: _gold, fontSize: 10, fontWeight: FontWeight.w800))),
                   const SizedBox(width: 4),
                   Text(p.pm, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
                 ]),
@@ -131,7 +131,7 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
+                decoration: BoxDecoration(color: s.color.withValues(alpha: 0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
                 child: Row(children: [
                   Icon(s.icon, size: 16, color: s.color),
                   const SizedBox(width: 8),
@@ -139,7 +139,7 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
                     Text(s.labelAr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: s.color)),
                     Text('${(total / 1e6).toStringAsFixed(1)}M ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
                   ])),
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
+                  Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
                 ]),
               ),
               ...items.map((p) => Container(
@@ -195,7 +195,7 @@ class _ProjectsV52ScreenState extends State<ProjectsV52Screen> {
                     child: Container(
                       height: 22,
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [p.status.color, p.status.color.withOpacity(0.7)]),
+                        gradient: LinearGradient(colors: [p.status.color, p.status.color.withValues(alpha: 0.7)]),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Center(child: Text('${(p.progress * 100).toInt()}%', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800))),

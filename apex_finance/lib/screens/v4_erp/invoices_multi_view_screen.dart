@@ -36,7 +36,7 @@ class InvoicesMultiViewScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: core_theme.AC.info.withOpacity(0.1),
+              color: core_theme.AC.info.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -130,7 +130,7 @@ class _ListView extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+          border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
         ),
         child: DataTable(
           headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),
@@ -151,7 +151,7 @@ class _ListView extends StatelessWidget {
               DataCell(Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -202,7 +202,7 @@ class _KanbanView extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFB),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.06)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,9 +210,9 @@ class _KanbanView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.08),
+              color: color.withValues(alpha: 0.08),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-              border: Border(bottom: BorderSide(color: color.withOpacity(0.25))),
+              border: Border(bottom: BorderSide(color: color.withValues(alpha: 0.25))),
             ),
             child: Row(
               children: [
@@ -226,7 +226,7 @@ class _KanbanView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
+                    color: color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -267,9 +267,9 @@ class _KanbanCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
         boxShadow: [
-          BoxShadow(color: core_theme.AC.tp.withOpacity(0.03), blurRadius: 4, offset: const Offset(0, 1)),
+          BoxShadow(color: core_theme.AC.tp.withValues(alpha: 0.03), blurRadius: 4, offset: const Offset(0, 1)),
         ],
       ),
       child: Column(
@@ -338,14 +338,14 @@ class _CalendarView extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+            border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
           ),
           child: Column(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: core_theme.AC.info.withOpacity(0.05),
+                  color: core_theme.AC.info.withValues(alpha: 0.05),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
                 ),
                 child: Row(
@@ -447,7 +447,7 @@ class _GalleryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,7 +457,7 @@ class _GalleryCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(Icons.receipt, color: color, size: 14),
@@ -492,7 +492,7 @@ class _GalleryCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -534,7 +534,7 @@ class _PivotView extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+            border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
           ),
           child: DataTable(
             headingRowColor: WidgetStateProperty.all(const Color(0xFFF9FAFB)),

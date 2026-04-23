@@ -96,7 +96,7 @@ class _VatReturnV52ScreenState extends State<VatReturnV52Screen> {
         width: 220,
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: selected ? _gold.withOpacity(0.06) : Colors.white,
+          color: selected ? _gold.withValues(alpha: 0.06) : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: selected ? _gold : core_theme.AC.bdr, width: selected ? 2 : 1),
         ),
@@ -104,7 +104,7 @@ class _VatReturnV52ScreenState extends State<VatReturnV52Screen> {
           Row(children: [
             Icon(Icons.event, color: selected ? _gold : core_theme.AC.ts, size: 20),
             const Spacer(),
-            if (current) Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: core_theme.AC.warn.withOpacity(0.12), borderRadius: BorderRadius.circular(4)), child: Text('الحالي', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: core_theme.AC.warn))),
+            if (current) Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: core_theme.AC.warn.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)), child: Text('الحالي', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: core_theme.AC.warn))),
           ]),
           const SizedBox(height: 8),
           Text(period, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: selected ? _navy : core_theme.AC.tp)),
@@ -131,7 +131,7 @@ class _VatReturnV52ScreenState extends State<VatReturnV52Screen> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.ok.withOpacity(0.3))),
+        decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.ok.withValues(alpha: 0.3))),
         child: Row(children: [
           Icon(Icons.check_circle, color: core_theme.AC.ok, size: 20),
           SizedBox(width: 10),
@@ -178,7 +178,7 @@ class _VatReturnV52ScreenState extends State<VatReturnV52Screen> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: _gold.withOpacity(0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: _gold)),
+        decoration: BoxDecoration(color: _gold.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: _gold)),
         child: Row(children: [
           Icon(Icons.arrow_circle_up, color: _gold, size: 28),
           const SizedBox(width: 12),
@@ -206,7 +206,7 @@ class _VatReturnV52ScreenState extends State<VatReturnV52Screen> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok)),
+        decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok)),
         child: Row(children: [
           Icon(Icons.arrow_circle_down, color: core_theme.AC.ok, size: 28),
           const SizedBox(width: 12),
@@ -263,7 +263,7 @@ class _VatReturnV52ScreenState extends State<VatReturnV52Screen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(gradient: LinearGradient(colors: [_gold.withOpacity(0.08), _navy.withOpacity(0.06)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _gold)),
+          decoration: BoxDecoration(gradient: LinearGradient(colors: [_gold.withValues(alpha: 0.08), _navy.withValues(alpha: 0.06)]), borderRadius: BorderRadius.circular(10), border: Border.all(color: _gold)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('ملخّص الإقرار الضريبي', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
             const SizedBox(height: 4),
@@ -279,7 +279,7 @@ class _VatReturnV52ScreenState extends State<VatReturnV52Screen> {
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: core_theme.AC.warn.withOpacity(0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.warn.withOpacity(0.3))),
+          decoration: BoxDecoration(color: core_theme.AC.warn.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.warn.withValues(alpha: 0.3))),
           child: Row(children: [
             Icon(Icons.info_outline, color: core_theme.AC.warn),
             SizedBox(width: 10),

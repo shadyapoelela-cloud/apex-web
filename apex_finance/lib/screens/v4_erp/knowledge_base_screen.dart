@@ -258,7 +258,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
         margin: const EdgeInsets.symmetric(vertical: 2),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? c.color.withOpacity(0.12) : null,
+          color: selected ? c.color.withValues(alpha: 0.12) : null,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -275,7 +275,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
               decoration: BoxDecoration(
-                color: c.color.withOpacity(0.12),
+                color: c.color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(3),
               ),
               child: Text('${c.count}',
@@ -380,7 +380,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(color: cat.color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+              decoration: BoxDecoration(color: cat.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
               child: Icon(cat.icon, color: cat.color),
             ),
             const SizedBox(width: 12),
@@ -394,7 +394,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(color: cat.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                        decoration: BoxDecoration(color: cat.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                         child: Text(cat.name,
                             style: TextStyle(fontSize: 10, color: cat.color, fontWeight: FontWeight.w700)),
                       ),
@@ -476,7 +476,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: cat.color.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                decoration: BoxDecoration(color: cat.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                 child: Text(cat.name, style: TextStyle(fontSize: 11, color: cat.color, fontWeight: FontWeight.w800)),
               ),
               const SizedBox(width: 8),

@@ -75,13 +75,13 @@ class _BudgetsV52ScreenState extends State<BudgetsV52Screen> {
             Row(children: [
               Container(width: 4, height: 40, color: b.status.color),
               const SizedBox(width: 12),
-              Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: _gold.withOpacity(0.12), borderRadius: BorderRadius.circular(8)), child: Icon(Icons.pie_chart, color: _gold)),
+              Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: _gold.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)), child: Icon(Icons.pie_chart, color: _gold)),
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
                   Text(b.id, style: TextStyle(fontFamily: 'monospace', fontSize: 11, color: core_theme.AC.ts)),
                   const SizedBox(width: 8),
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(4)), child: Text(b.type, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _navy))),
+                  Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _navy.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(4)), child: Text(b.type, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _navy))),
                 ]),
                 Text(b.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                 Text('${b.period} · المسؤول: ${b.owner}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
@@ -91,7 +91,7 @@ class _BudgetsV52ScreenState extends State<BudgetsV52Screen> {
                 Text('${(b.budget / 1e6).toStringAsFixed(2)}M ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
               ]),
               const SizedBox(width: 16),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: b.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(b.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: b.status.color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: b.status.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text(b.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: b.status.color))),
             ]),
             if (b.status != _St.draft) ...[
               const SizedBox(height: 10),
@@ -126,14 +126,14 @@ class _BudgetsV52ScreenState extends State<BudgetsV52Screen> {
           margin: const EdgeInsets.only(left: 10),
           decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: _gold.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: _gold.withValues(alpha: 0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Icon(Icons.pie_chart, color: _gold, size: 18),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(t, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _gold)),
                 Text('${(total / 1e6).toStringAsFixed(1)}M ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _gold.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _gold))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _gold.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _gold))),
             ])),
             ...items.map((b) {
               final util = b.budget > 0 ? (b.actual / b.budget * 100) : 0.0;

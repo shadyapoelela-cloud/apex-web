@@ -129,9 +129,9 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: selected ? core_theme.AC.gold.withOpacity(0.12) : null,
+                      color: selected ? core_theme.AC.gold.withValues(alpha: 0.12) : null,
                       border: Border(
-                        bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5)),
+                        bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5)),
                         right: BorderSide(
                           color: selected ? core_theme.AC.gold : Colors.transparent,
                           width: 3,
@@ -141,7 +141,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
                     child: Row(
                       children: [
                         CircleAvatar(
-                          backgroundColor: _tierColor(s.tier).withOpacity(0.15),
+                          backgroundColor: _tierColor(s.tier).withValues(alpha: 0.15),
                           child: Icon(Icons.business, color: _tierColor(s.tier), size: 18),
                         ),
                         const SizedBox(width: 10),
@@ -157,7 +157,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                                     decoration: BoxDecoration(
-                                      color: _tierColor(s.tier).withOpacity(0.12),
+                                      color: _tierColor(s.tier).withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(2),
                                     ),
                                     child: Text(s.tier,
@@ -261,9 +261,9 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -356,7 +356,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: (passed ? core_theme.AC.ok : core_theme.AC.err).withOpacity(0.12),
+              color: (passed ? core_theme.AC.ok : core_theme.AC.err).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(3),
             ),
             child: Text(passed ? 'مطابق' : 'منتهي',
@@ -407,7 +407,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.15),
+                  color: statusColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(o.status,
@@ -467,7 +467,7 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: core_theme.AC.ok.withOpacity(0.12),
+                    color: core_theme.AC.ok.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Icon(Icons.check_circle, color: core_theme.AC.ok, size: 16),
@@ -533,9 +533,9 @@ class _Supplier360ScreenState extends State<Supplier360Screen>
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

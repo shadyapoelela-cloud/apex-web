@@ -198,7 +198,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
       ),
       child: Row(
         children: [
@@ -224,7 +224,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: (isTaxable ? core_theme.AC.warn : core_theme.AC.ok).withOpacity(0.12),
+                color: (isTaxable ? core_theme.AC.warn : core_theme.AC.ok).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(3),
               ),
               child: Text(isTaxable ? 'خاضع' : 'قابل للخصم',
@@ -439,7 +439,7 @@ class _DeferredTaxScreenState extends State<DeferredTaxScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: core_theme.AC.gold.withOpacity(0.1),
+                  color: core_theme.AC.gold.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(

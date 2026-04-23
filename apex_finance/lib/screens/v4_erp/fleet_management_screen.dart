@@ -127,9 +127,9 @@ class _FleetManagementScreenState extends State<FleetManagementScreen>
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -165,13 +165,13 @@ class _FleetManagementScreenState extends State<FleetManagementScreen>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: statusColor.withOpacity(0.3)),
+            border: Border.all(color: statusColor.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: v.color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: v.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                 child: Icon(_typeIcon(v.type), color: v.color, size: 28),
               ),
               const SizedBox(width: 12),
@@ -186,7 +186,7 @@ class _FleetManagementScreenState extends State<FleetManagementScreen>
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+                          decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
                           child: Text(_statusLabel(v.status),
                               style: TextStyle(fontSize: 10, color: statusColor, fontWeight: FontWeight.w800)),
                         ),
@@ -322,7 +322,7 @@ class _FleetManagementScreenState extends State<FleetManagementScreen>
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: statusColor.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
             child: Icon(Icons.build, color: statusColor),
           ),
           const SizedBox(width: 12),
@@ -337,7 +337,7 @@ class _FleetManagementScreenState extends State<FleetManagementScreen>
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+                      decoration: BoxDecoration(color: core_theme.AC.info.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
                       child: Text(r.vehicleId,
                           style: TextStyle(fontSize: 10, color: core_theme.AC.info, fontWeight: FontWeight.w800)),
                     ),
@@ -365,7 +365,7 @@ class _FleetManagementScreenState extends State<FleetManagementScreen>
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: core_theme.AC.gold)),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: statusColor.withOpacity(0.15), borderRadius: BorderRadius.circular(3)),
+                  decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(3)),
                   child: Text(r.status, style: TextStyle(fontSize: 10, color: statusColor, fontWeight: FontWeight.w800)),
                 ),
               ],
@@ -460,9 +460,9 @@ class _FleetManagementScreenState extends State<FleetManagementScreen>
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

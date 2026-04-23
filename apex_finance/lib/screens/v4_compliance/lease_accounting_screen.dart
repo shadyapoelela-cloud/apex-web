@@ -124,9 +124,9 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
         margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -208,7 +208,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
         color: l.status == 'expired' ? core_theme.AC.navy3 : null,
       ),
       child: Row(
@@ -229,7 +229,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
             child: Container(
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: _typeColor(l.type).withOpacity(0.12), borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(color: _typeColor(l.type).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3)),
               child: Text(_typeLabel(l.type),
                   style: TextStyle(fontSize: 10, color: _typeColor(l.type), fontWeight: FontWeight.w800), textAlign: TextAlign.center),
             ),
@@ -287,7 +287,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: core_theme.AC.info.withOpacity(0.12), borderRadius: BorderRadius.circular(4)),
+                    decoration: BoxDecoration(color: core_theme.AC.info.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
                     child: Text('أول 12 شهر · مدة كلية ${lease.months}',
                         style: TextStyle(fontSize: 11, color: core_theme.AC.info, fontWeight: FontWeight.w800)),
                   ),
@@ -312,7 +312,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
+                    border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
                   ),
                   child: Row(
                     children: [
@@ -446,7 +446,7 @@ class _LeaseAccountingScreenState extends State<LeaseAccountingScreen>
           Container(
             padding: EdgeInsets.symmetric(vertical: 6, horizontal: l.isTotal ? 8 : 0),
             decoration: l.isTotal
-                ? BoxDecoration(color: core_theme.AC.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(4))
+                ? BoxDecoration(color: core_theme.AC.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4))
                 : null,
             child: Row(
               children: [

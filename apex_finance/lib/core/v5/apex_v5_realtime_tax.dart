@@ -343,7 +343,7 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.1)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -371,7 +371,7 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: core_theme.AC.tp.withOpacity(0.9),
+                      color: core_theme.AC.tp.withValues(alpha: 0.9),
                     ),
                   ),
                   Text(
@@ -384,7 +384,7 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: core_theme.AC.ok.withOpacity(0.12),
+                  color: core_theme.AC.ok.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
@@ -446,7 +446,7 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
             decoration: BoxDecoration(
               color: const Color(0xFFF9FAFB),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: core_theme.AC.tp.withOpacity(0.05)),
+              border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.05)),
             ),
             child: Column(
               children: [
@@ -534,9 +534,9 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: core_theme.AC.info.withOpacity(0.04),
+              color: core_theme.AC.info.withValues(alpha: 0.04),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: core_theme.AC.info.withOpacity(0.15)),
+              border: Border.all(color: core_theme.AC.info.withValues(alpha: 0.15)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -728,7 +728,7 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 10),
               height: 1,
-              color: core_theme.AC.tp.withOpacity(0.04),
+              color: core_theme.AC.tp.withValues(alpha: 0.04),
             ),
           ),
           Text(
@@ -749,9 +749,9 @@ class _ApexV5RealtimeTaxState extends State<ApexV5RealtimeTax> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

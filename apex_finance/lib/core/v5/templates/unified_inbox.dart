@@ -360,7 +360,7 @@ class _CatChip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: active ? color.withOpacity(0.15) : core_theme.AC.navy3,
+            color: active ? color.withValues(alpha: 0.15) : core_theme.AC.navy3,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: active ? color : core_theme.AC.bdr),
           ),
@@ -420,7 +420,7 @@ class _InboxItemTile extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundColor: item.category.color.withOpacity(0.15),
+              backgroundColor: item.category.color.withValues(alpha: 0.15),
               child: Icon(
                 item.iconOverride ?? item.category.icon,
                 size: 16,
@@ -454,7 +454,7 @@ class _InboxItemTile extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                           decoration: BoxDecoration(
-                            color: dueColor!.withOpacity(0.12),
+                            color: dueColor!.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: Text(dueText,

@@ -89,7 +89,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
             child: DropdownButton<String>(
               value: _period,
               dropdownColor: const Color(0xFF006064),
@@ -131,9 +131,9 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -231,8 +231,8 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withOpacity(0.5))),
-        color: _selectedCenter?.id == c.id ? const Color(0xFF006064).withOpacity(0.05) : null,
+        border: Border(bottom: BorderSide(color: core_theme.AC.bdr.withValues(alpha: 0.5))),
+        color: _selectedCenter?.id == c.id ? const Color(0xFF006064).withValues(alpha: 0.05) : null,
       ),
       child: Row(
         children: [
@@ -281,7 +281,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     margin: const EdgeInsets.only(left: 4),
                     decoration: BoxDecoration(
-                      color: (margin >= 20 ? core_theme.AC.ok : margin >= 0 ? core_theme.AC.warn : core_theme.AC.err).withOpacity(0.12),
+                      color: (margin >= 20 ? core_theme.AC.ok : margin >= 0 ? core_theme.AC.warn : core_theme.AC.err).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text('${margin.toStringAsFixed(1)}%',
@@ -325,9 +325,9 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: c.color.withOpacity(c.cost / maxCost * 0.5 + 0.1),
+                color: c.color.withValues(alpha: c.cost / maxCost * 0.5 + 0.1),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: c.color.withOpacity(0.4)),
+                border: Border.all(color: c.color.withValues(alpha: 0.4)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -440,7 +440,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: c.color.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: c.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
                 child: Icon(Icons.business, color: c.color),
               ),
               const SizedBox(width: 12),
@@ -484,7 +484,7 @@ class _CostCentersScreenState extends State<CostCentersScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(

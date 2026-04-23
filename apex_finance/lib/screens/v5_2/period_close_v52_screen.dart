@@ -111,7 +111,7 @@ class PeriodCloseV52Screen extends StatelessWidget {
           Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: done ? core_theme.AC.tp : core_theme.AC.ts)),
           Text('$date · $note', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
         ])),
-        if (done) Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text('✓ مكتمل', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ok))),
+        if (done) Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)), child: Text('✓ مكتمل', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: core_theme.AC.ok))),
       ]),
     );
   }
@@ -144,7 +144,7 @@ class PeriodCloseV52Screen extends StatelessWidget {
           Expanded(flex: 3, child: Text(tasks[i].$2, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, decoration: tasks[i].$4 ? TextDecoration.lineThrough : null, color: tasks[i].$4 ? core_theme.AC.ts : core_theme.AC.tp))),
           Text(tasks[i].$3, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           const SizedBox(width: 10),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _navy.withOpacity(0.08), borderRadius: BorderRadius.circular(8)), child: Text(tasks[i].$5, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _navy))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: _navy.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)), child: Text(tasks[i].$5, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: _navy))),
         ]),
       ),
     );
@@ -165,7 +165,7 @@ class PeriodCloseV52Screen extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 6),
       itemBuilder: (_, i) => Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: jes[i].$4 ? core_theme.AC.ok.withOpacity(0.3) : core_theme.AC.warn.withOpacity(0.3))),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: jes[i].$4 ? core_theme.AC.ok.withValues(alpha: 0.3) : core_theme.AC.warn.withValues(alpha: 0.3))),
         child: Row(children: [
           Icon(jes[i].$4 ? Icons.check_circle : Icons.pending, color: jes[i].$4 ? core_theme.AC.ok : core_theme.AC.warn),
           const SizedBox(width: 12),
@@ -175,7 +175,7 @@ class PeriodCloseV52Screen extends StatelessWidget {
           ])),
           Text('${jes[i].$3.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _gold)),
           const SizedBox(width: 12),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (jes[i].$4 ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text(jes[i].$4 ? 'مرحّل' : 'قيد الاعتماد', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: jes[i].$4 ? core_theme.AC.ok : core_theme.AC.warn))),
+          Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: (jes[i].$4 ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text(jes[i].$4 ? 'مرحّل' : 'قيد الاعتماد', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: jes[i].$4 ? core_theme.AC.ok : core_theme.AC.warn))),
         ]),
       ),
     );
@@ -212,7 +212,7 @@ class PeriodCloseV52Screen extends StatelessWidget {
                   Expanded(child: Text(r.$2.toStringAsFixed(0), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'), textAlign: TextAlign.end)),
                   Expanded(child: Text(r.$3.toStringAsFixed(0), style: const TextStyle(fontSize: 12, fontFamily: 'monospace'), textAlign: TextAlign.end)),
                   Expanded(child: Text(r.$4 == 0 ? '0' : r.$4.toString(), style: TextStyle(fontSize: 12, fontFamily: 'monospace', fontWeight: FontWeight.w800, color: r.$4 == 0 ? core_theme.AC.ok : core_theme.AC.err), textAlign: TextAlign.end)),
-                  SizedBox(width: 100, child: Align(alignment: Alignment.centerLeft, child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: (r.$5 ? core_theme.AC.ok : core_theme.AC.warn).withOpacity(0.12), borderRadius: BorderRadius.circular(10)), child: Text(r.$5 ? '✓ مطابق' : 'تسوية', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: r.$5 ? core_theme.AC.ok : core_theme.AC.warn))))),
+                  SizedBox(width: 100, child: Align(alignment: Alignment.centerLeft, child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: (r.$5 ? core_theme.AC.ok : core_theme.AC.warn).withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)), child: Text(r.$5 ? '✓ مطابق' : 'تسوية', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: r.$5 ? core_theme.AC.ok : core_theme.AC.warn))))),
                 ]),
               )),
         ]),
@@ -243,7 +243,7 @@ class PeriodCloseV52Screen extends StatelessWidget {
             Text(reports[i].$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
             Text(reports[i].$2, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
           ])),
-          if (reports[i].$3) Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: core_theme.AC.ok.withOpacity(0.12), borderRadius: BorderRadius.circular(12)), child: Text('جاهز', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ok)))
+          if (reports[i].$3) Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)), child: Text('جاهز', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: core_theme.AC.ok)))
           else OutlinedButton(onPressed: () {}, child: Text('توليد', style: TextStyle(fontSize: 11))),
           const SizedBox(width: 8),
           IconButton(icon: const Icon(Icons.download, size: 18), onPressed: () {}),
@@ -256,12 +256,12 @@ class PeriodCloseV52Screen extends StatelessWidget {
 
   Widget _stat(String label, String value, Color color, IconData icon) => Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: color.withOpacity(0.2))),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8), border: Border.all(color: color.withValues(alpha: 0.2))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
           Icon(icon, color: color, size: 22),
           const SizedBox(height: 4),
           Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: color)),
-          Text(label, style: TextStyle(fontSize: 11, color: color.withOpacity(0.9))),
+          Text(label, style: TextStyle(fontSize: 11, color: color.withValues(alpha: 0.9))),
         ]),
       );
 }

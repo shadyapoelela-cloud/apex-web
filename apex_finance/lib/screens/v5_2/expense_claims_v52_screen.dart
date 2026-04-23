@@ -75,7 +75,7 @@ class _ExpenseClaimsV52ScreenState extends State<ExpenseClaimsV52Screen> {
           child: Padding(padding: const EdgeInsets.all(12), child: Row(children: [
             Container(width: 4, height: 46, color: c.status.color),
             const SizedBox(width: 12),
-            CircleAvatar(radius: 16, backgroundColor: _gold.withOpacity(0.15), child: Text(c.employee[0], style: TextStyle(color: _gold, fontWeight: FontWeight.w800))),
+            CircleAvatar(radius: 16, backgroundColor: _gold.withValues(alpha: 0.15), child: Text(c.employee[0], style: TextStyle(color: _gold, fontWeight: FontWeight.w800))),
             const SizedBox(width: 12),
             Expanded(flex: 3, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
@@ -90,7 +90,7 @@ class _ExpenseClaimsV52ScreenState extends State<ExpenseClaimsV52Screen> {
             const SizedBox(width: 16),
             Text(c.date, style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
             const SizedBox(width: 16),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: c.status.color.withOpacity(0.12), borderRadius: BorderRadius.circular(14)), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(c.status.icon, size: 12, color: c.status.color), const SizedBox(width: 4), Text(c.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.status.color))])),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: c.status.color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(14)), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(c.status.icon, size: 12, color: c.status.color), const SizedBox(width: 4), Text(c.status.labelAr, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.status.color))])),
           ])),
         );
       },
@@ -110,14 +110,14 @@ class _ExpenseClaimsV52ScreenState extends State<ExpenseClaimsV52Screen> {
           margin: const EdgeInsets.only(left: 10),
           decoration: BoxDecoration(color: core_theme.AC.navy3, borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.bdr)),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withOpacity(0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.10), borderRadius: const BorderRadius.vertical(top: Radius.circular(10))), child: Row(children: [
               Icon(s.icon, size: 16, color: s.color),
               const SizedBox(width: 8),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(s.labelAr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: s.color)),
                 Text('${total.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
               ])),
-              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withOpacity(0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: s.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)), child: Text('${items.length}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: s.color))),
             ])),
             ...items.map((c) => Container(
               margin: const EdgeInsets.fromLTRB(8, 6, 8, 0),
@@ -125,7 +125,7 @@ class _ExpenseClaimsV52ScreenState extends State<ExpenseClaimsV52Screen> {
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: core_theme.AC.bdr)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  CircleAvatar(radius: 10, backgroundColor: _gold.withOpacity(0.15), child: Text(c.employee[0], style: TextStyle(color: _gold, fontSize: 10, fontWeight: FontWeight.w800))),
+                  CircleAvatar(radius: 10, backgroundColor: _gold.withValues(alpha: 0.15), child: Text(c.employee[0], style: TextStyle(color: _gold, fontSize: 10, fontWeight: FontWeight.w800))),
                   const SizedBox(width: 6),
                   Expanded(child: Text(c.employee, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 ]),

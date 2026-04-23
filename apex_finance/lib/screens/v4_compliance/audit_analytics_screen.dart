@@ -64,7 +64,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Icons.analytics, color: Colors.white, size: 28),
@@ -93,7 +93,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Row(
@@ -123,7 +123,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: const Color(0xFF4A148C).withOpacity(0.2),
+          color: const Color(0xFF4A148C).withValues(alpha: 0.2),
           style: BorderStyle.solid,
           width: 2,
         ),
@@ -133,7 +133,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A148C).withOpacity(0.08),
+              color: const Color(0xFF4A148C).withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.cloud_upload, size: 40, color: Color(0xFF4A148C)),
@@ -369,7 +369,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -455,13 +455,13 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: core_theme.AC.tp.withOpacity(0.08)),
+        border: Border.all(color: core_theme.AC.tp.withValues(alpha: 0.08)),
       ),
       child: ExpansionTile(
         leading: Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Icon(icon, color: color, size: 16),
@@ -471,7 +471,7 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
@@ -488,9 +488,9 @@ class _AuditAnalyticsScreenState extends State<AuditAnalyticsScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.04),
+                    color: color.withValues(alpha: 0.04),
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: color.withOpacity(0.15)),
+                    border: Border.all(color: color.withValues(alpha: 0.15)),
                   ),
                   child: Text(
                     detail,
@@ -570,9 +570,9 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
