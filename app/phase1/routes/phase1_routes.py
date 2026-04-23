@@ -136,7 +136,18 @@ async def login(req: LoginRequest, request: Request, response: Response):
     # HttpOnly so XSS cannot steal it. Over time the frontend can
     # drop localStorage.setItem('apex_token', …) and rely solely on
     # this cookie + credentials:'include' on fetch.
-    access_token = result.get("data", {}).get("access_token") or result.get("access_token")
+    #
+    # BUG fixed 2026-04-24: auth_service.login() returns the JWT at
+    # `result["tokens"]["access_token"]`, not under `data` or at the
+    # top level. The old lookup resolved to None so the set_cookie
+    # block was dead code — the HttpOnly auth path never actually
+    # worked. Check `tokens` first, then fall back to the old
+    # locations for compat with any other login callers.
+    access_token = (
+        result.get("tokens", {}).get("access_token")
+        or result.get("data", {}).get("access_token")
+        or result.get("access_token")
+    )
     if access_token:
         response.set_cookie(
             key="apex_token",
