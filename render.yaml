@@ -1,8 +1,16 @@
 services:
+  # ═══════════════════════════════════════════════════════════════
+  # PRODUCTION — apex-api
+  # Tracks `main` branch. Receives all merged PRs after staging
+  # verification.
+  # URL: https://apex-api-ootk.onrender.com
+  # ═══════════════════════════════════════════════════════════════
   - type: web
     name: apex-api
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    branch: main
+    autoDeploy: true
+    buildCommand: pip install -r requirements.txt && alembic upgrade head || true
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     preDeployCommand: python -c "from app.main import app; print('Pre-deploy check passed')"
@@ -21,10 +29,111 @@ services:
           property: connectionString
       - key: ANTHROPIC_API_KEY
         sync: false
+      - key: SENTRY_DSN
+        sync: false  # set via Render dashboard when the real DSN is ready
+      - key: SENTRY_ENVIRONMENT
+        value: "production"
+      - key: SENTRY_TRACES_SAMPLE_RATE
+        value: "0.05"
+      - key: LOG_FORMAT
+        value: "json"
+      - key: CSRF_ENABLED
+        value: "false"  # flip to "true" once frontend migrates to cookie auth
       - key: CORS_ORIGINS
         value: "https://shadyapoelela-cloud.github.io,https://apex-app.com"
+      - key: TENANT_STRICT
+        value: "true"
+      - key: AUDIT_LOG_ENABLED
+        value: "true"
+      - key: BACKUP_S3_BUCKET
+        sync: false  # set when S3 bucket provisioned
+      - key: BACKUP_S3_REGION
+        sync: false
+
+  # ═══════════════════════════════════════════════════════════════
+  # STAGING — apex-api-staging
+  # Tracks `staging` branch (create via: git checkout -b staging main).
+  # Isolated DB so migrations can be dry-run before prod.
+  # Workflow:
+  #   1. feature branch → merge to `staging`
+  #   2. deploy auto-fires; verify on apex-api-staging.onrender.com
+  #   3. merge staging → main → prod deploy
+  # Cost: free tier (same as prod); cold-start-tolerant.
+  # ═══════════════════════════════════════════════════════════════
+  - type: web
+    name: apex-api-staging
+    runtime: python
+    branch: staging
+    autoDeploy: true
+    buildCommand: pip install -r requirements.txt && alembic upgrade head || true
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: ENVIRONMENT
+        value: "staging"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: apex-db-staging
+          property: connectionString
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: SENTRY_ENVIRONMENT
+        value: "staging"
+      - key: SENTRY_TRACES_SAMPLE_RATE
+        value: "1.0"  # full tracing in staging for debugging
+      - key: LOG_FORMAT
+        value: "json"
+      - key: CSRF_ENABLED
+        value: "false"
+      - key: CORS_ORIGINS
+        value: "https://shadyapoelela-cloud.github.io,https://staging.apex-app.com,http://localhost:5000,http://localhost:8080"
+      - key: TENANT_STRICT
+        value: "true"
+
+  # ═══════════════════════════════════════════════════════════════
+  # BACKUP WORKER — apex-api-backup
+  # Cron-style: runs nightly DB backup; dumps to Render object storage
+  # or S3 if BACKUP_S3_BUCKET is configured.
+  # Schedule: 03:00 UTC (06:00 KSA) — off-peak.
+  # ═══════════════════════════════════════════════════════════════
+  - type: cron
+    name: apex-api-backup
+    runtime: python
+    branch: main
+    schedule: "0 3 * * *"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m app.ops.backup_db
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: ENVIRONMENT
+        value: "production"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: apex-db
+          property: connectionString
+      - key: BACKUP_S3_BUCKET
+        sync: false
+      - key: BACKUP_S3_REGION
+        sync: false
+      - key: BACKUP_RETENTION_DAYS
+        value: "30"
 
 databases:
+  # Production DB — apex-db
   - name: apex-db
     plan: free
     databaseName: apex_db
+
+  # Staging DB — apex-db-staging (isolated from prod data)
+  - name: apex-db-staging
+    plan: free
+    databaseName: apex_db_staging

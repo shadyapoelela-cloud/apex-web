@@ -5,7 +5,7 @@ Auth, Account Center, Subscriptions, Legal, Notifications.
 Per execution document section 12 + Zero-Ambiguity Pack section 14.
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Header, Request
+from fastapi import APIRouter, HTTPException, Depends, Header, Request, Response
 from pydantic import BaseModel, Field
 from typing import Optional
 import logging
@@ -121,7 +121,7 @@ async def register(req: RegisterRequest, request: Request):
 
 
 @router.post("/auth/login", tags=["Auth"])
-async def login(req: LoginRequest, request: Request):
+async def login(req: LoginRequest, request: Request, response: Response):
     result = auth_service.login(
         username_or_email=req.username_or_email,
         password=req.password,
@@ -130,11 +130,30 @@ async def login(req: LoginRequest, request: Request):
     )
     if not result["success"]:
         raise HTTPException(status_code=401, detail=result["error"])
+    # ── Set HttpOnly cookie alongside the JSON response ───────────
+    # Frontend can continue reading the token from the body for
+    # backwards compat, but browsers also store it securely as
+    # HttpOnly so XSS cannot steal it. Over time the frontend can
+    # drop localStorage.setItem('apex_token', …) and rely solely on
+    # this cookie + credentials:'include' on fetch.
+    access_token = result.get("data", {}).get("access_token") or result.get("access_token")
+    if access_token:
+        response.set_cookie(
+            key="apex_token",
+            value=access_token,
+            max_age=60 * 60 * 24,        # 24 hours (matches access-token TTL)
+            httponly=True,
+            secure=True,                  # HTTPS-only (Render always serves over TLS)
+            samesite="lax",               # blocks cross-site POST while allowing top-level navigations
+            path="/",
+        )
     return result
 
 
 @router.post("/auth/logout", tags=["Auth"])
-async def logout(authorization: Optional[str] = Header(None)):
+async def logout(response: Response, authorization: Optional[str] = Header(None)):
+    # Clear the HttpOnly cookie so the browser forgets us.
+    response.delete_cookie("apex_token", path="/")
     if authorization and authorization.startswith("Bearer "):
         token = authorization.split(" ", 1)[1]
         return auth_service.logout(token)

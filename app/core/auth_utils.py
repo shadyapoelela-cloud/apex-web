@@ -41,11 +41,27 @@ JWT_SECRET = _jwt_env
 JWT_ALGORITHM = "HS256"
 
 
-def extract_user_id(authorization: str = None) -> str:
-    """Extract user_id from JWT token in Authorization header."""
-    if not authorization:
+def extract_user_id(authorization: str = None, cookie_token: str = None) -> str:
+    """Extract user_id from JWT token.
+
+    Accepts the token from EITHER an `Authorization: Bearer …` header
+    (legacy API clients, mobile apps) OR an `apex_token` HttpOnly
+    cookie (new browser-based flow — safe against XSS token theft).
+
+    Routes that want cookie support simply pass `Cookie` dep:
+      async def my_route(
+          authorization: Optional[str] = Header(None),
+          apex_token: Optional[str] = Cookie(None),
+      ):
+          user_id = extract_user_id(authorization, apex_token)
+    """
+    token: str | None = None
+    if authorization:
+        token = authorization.replace("Bearer ", "").strip() or None
+    if not token and cookie_token:
+        token = cookie_token.strip() or None
+    if not token:
         raise HTTPException(status_code=401, detail="يجب تسجيل الدخول")
-    token = authorization.replace("Bearer ", "").strip()
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         return payload.get("sub") or payload.get("user_id")
