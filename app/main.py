@@ -2224,7 +2224,11 @@ async def change_password(body: ChangePasswordRequest, authorization: str = Head
 
 
 # --- Plans ---
-@app.get("/plans", tags=["Subscriptions"])
+# Legacy fallback stub — real handler lives in app/phase1/routes/phase1_routes.py
+# with proper subscription_service integration. Kept mounted for backward compat
+# but excluded from OpenAPI (Phase 1's handler wins the schema slot) so we don't
+# emit a "Duplicate Operation ID list_plans" warning on every openapi() call.
+@app.get("/plans", tags=["Subscriptions"], include_in_schema=False)
 async def list_plans():
     return {
         "success": True,
@@ -2391,7 +2395,10 @@ async def accept_legal(body: AcceptLegalRequest, authorization: str = Header(Non
 
 
 # --- Account Closure ---
-@app.post("/account/closure", tags=["Account"])
+# Legacy fallback stub — real auth-gated handler lives in
+# app/phase1/routes/phase1_routes.py. Same rationale as /plans above:
+# excluded from OpenAPI to avoid duplicate operation ID warnings.
+@app.post("/account/closure", tags=["Account"], include_in_schema=False)
 async def request_closure(body: AccountClosureRequest):
     closure_type = body.type
     return {
