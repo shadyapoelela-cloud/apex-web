@@ -81,12 +81,17 @@ def _has_index(table: str, index: str) -> bool:
 # ════════════════════════════════════════════════════════════════════
 def upgrade() -> None:
     # ── 1. clients.vat_registration_number unique partial index ────
-    # Skip entirely if `clients` doesn't yet exist. This migration can
-    # run against a fresh DB (CI test fixture) where app tables are
-    # created later via SQLAlchemy create_all(); in that path the
-    # index is irrelevant because there's nothing to index.
-    if _has_table("clients") and not _has_index(
-        "clients", "uq_clients_vat_not_null"
+    # Skip entirely if `clients` or the column doesn't yet exist. This
+    # migration can run against a fresh DB (CI test fixture) where app
+    # tables are created later via SQLAlchemy create_all(); it can also
+    # run against an older production DB that was bootstrapped before
+    # `vat_registration_number` was added to the Client model —
+    # `create_all()` never back-fills new columns. In both paths the
+    # index is irrelevant until the app code catches the schema up.
+    if (
+        _has_table("clients")
+        and _has_column("clients", "vat_registration_number")
+        and not _has_index("clients", "uq_clients_vat_not_null")
     ):
         if _is_postgres():
             op.execute(
@@ -106,8 +111,16 @@ def upgrade() -> None:
 
     # ── 2. JE balance CHECK ────────────────────────────────────────
     # Skip on SQLite (ALTER TABLE … ADD CONSTRAINT not supported without
-    # a table rewrite). Postgres only, and only if the table exists.
-    if _is_postgres() and _has_table("pilot_journal_entries"):
+    # a table rewrite). Postgres only, and only if both the table and the
+    # columns we reference already exist. Prod has cases of schema drift
+    # where create_all() ran at an old model revision — don't let this
+    # migration kill startup if the JE table predates total_debit/credit.
+    if (
+        _is_postgres()
+        and _has_table("pilot_journal_entries")
+        and _has_column("pilot_journal_entries", "total_debit")
+        and _has_column("pilot_journal_entries", "total_credit")
+    ):
         try:
             op.execute(
                 "ALTER TABLE pilot_journal_entries "
@@ -122,7 +135,12 @@ def upgrade() -> None:
             pass
 
     # ── 3. JE line debit XOR credit (exactly one must be > 0) ─────
-    if _is_postgres() and _has_table("pilot_journal_lines"):
+    if (
+        _is_postgres()
+        and _has_table("pilot_journal_lines")
+        and _has_column("pilot_journal_lines", "debit")
+        and _has_column("pilot_journal_lines", "credit")
+    ):
         try:
             op.execute(
                 "ALTER TABLE pilot_journal_lines "
