@@ -943,11 +943,34 @@ async def request_logging_middleware(request, call_next):
 @app.middleware("http")
 async def security_headers_middleware(request, call_next):
     response = await call_next(request)
+    # ── Core headers (safe on every environment) ─────────────────────
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Cache-Control"] = "no-store"
+    # ── Permissions-Policy — deny browser APIs this API never needs.
+    # Defence against compromised third-party resources attempting to
+    # enumerate/activate sensors on the user's device via an API page.
+    # Fully additive — no behaviour change for legitimate consumers.
+    response.headers["Permissions-Policy"] = (
+        "accelerometer=(), "
+        "camera=(), "
+        "geolocation=(), "
+        "gyroscope=(), "
+        "magnetometer=(), "
+        "microphone=(), "
+        "payment=(), "
+        "usb=()"
+    )
+    # ── HSTS — force HTTPS for one year, only on production deploys.
+    # Setting HSTS over plaintext HTTP (local dev) would teach
+    # browsers to never visit http://localhost again until the
+    # max-age expires — painful for anyone else using this box.
+    if IS_PRODUCTION:
+        response.headers["Strict-Transport-Security"] = (
+            "max-age=31536000; includeSubDomains"
+        )
     return response
 
 
