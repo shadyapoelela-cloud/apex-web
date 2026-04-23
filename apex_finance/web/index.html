@@ -58,21 +58,18 @@
     })();
   </script>
 
-  <!-- APEX Pre-redirect: skip login if token exists (v6.5.2) -->
+  <!-- APEX Pre-redirect (v6.5.3): auth-disabled build — no forced redirects.
+       The app's GoRouter already redirects /login → /app, so the old
+       JS-level hash override was silently discarding the user's target
+       route (e.g. #/clients → #/login → #/app). Now: only the "already
+       logged-in and sitting on /login" case still redirects to home. -->
   <script id="apex_pre_redirect">
     (function() {
       var token = localStorage.getItem('apex_token');
       var hash = window.location.hash || '';
-      // If user has token and is on login or root, redirect to #/home
       if (token && token.length > 10) {
-        if (!hash || hash === '#/' || hash === '#/login' || hash === '') {
+        if (hash === '#/login') {
           window.location.hash = '#/home';
-        }
-      }
-      // If no token and trying to access protected routes, redirect to login
-      if (!token || token.length < 10) {
-        if (hash && hash !== '#/' && hash !== '#/login') {
-          window.location.hash = '#/login';
         }
       }
     })();

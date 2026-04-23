@@ -225,6 +225,73 @@ class V5Launchpad extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 24),
+
+              // Quick shortcuts — direct access to standalone screens
+              // that aren't part of the service tree (Clients, Compliance
+              // Hub, etc.) so they're always one click away.
+              Text(
+                'اختصارات سريعة',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'الوصول المباشر للشاشات الأكثر استخداماً',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.black54,
+                    ),
+              ),
+              const SizedBox(height: 12),
+              LayoutBuilder(
+                builder: (ctx, constraints) {
+                  final cols = constraints.maxWidth > 1100
+                      ? 4
+                      : constraints.maxWidth > 700
+                          ? 2
+                          : 1;
+                  return GridView.count(
+                    shrinkWrap: true,
+                    crossAxisCount: cols,
+                    childAspectRatio: 2.8,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: const [
+                      _LaunchpadQuickCard(
+                        label: 'العملاء',
+                        sublabel: 'الشركات والمنشآت المنشأة',
+                        icon: Icons.people_rounded,
+                        route: '/clients',
+                        color: Color(0xFF0369A1),
+                      ),
+                      _LaunchpadQuickCard(
+                        label: 'مركز الامتثال',
+                        sublabel: 'ZATCA · IFRS · SOCPA',
+                        icon: Icons.shield_rounded,
+                        route: '/compliance',
+                        color: Color(0xFF15803D),
+                      ),
+                      _LaunchpadQuickCard(
+                        label: 'القوائم المالية',
+                        sublabel: 'TB · IS · BS · Cash Flow',
+                        icon: Icons.auto_graph_rounded,
+                        route: '/compliance/financial-statements',
+                        color: Color(0xFFB8860B),
+                      ),
+                      _LaunchpadQuickCard(
+                        label: 'قيود اليومية',
+                        sublabel: 'سجل وأرقام القيود',
+                        icon: Icons.edit_note_rounded,
+                        route: '/compliance/journal-entries',
+                        color: Color(0xFF722F37),
+                      ),
+                    ],
+                  );
+                },
+              ),
+
               const SizedBox(height: 32),
 
               // Services grid
@@ -549,6 +616,113 @@ class V5WorkspaceShell extends StatelessWidget {
           const Divider(height: 1),
           Expanded(child: ApexV5WorkspaceHome(workspace: workspace)),
         ],
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────
+// Launchpad quick-access card — direct link to a standalone screen
+// (Clients, Compliance Hub, etc.) that isn't part of the service tree.
+// ──────────────────────────────────────────────────────────────────────
+
+class _LaunchpadQuickCard extends StatefulWidget {
+  final String label;
+  final String sublabel;
+  final IconData icon;
+  final String route;
+  final Color color;
+
+  const _LaunchpadQuickCard({
+    required this.label,
+    required this.sublabel,
+    required this.icon,
+    required this.route,
+    required this.color,
+  });
+
+  @override
+  State<_LaunchpadQuickCard> createState() => _LaunchpadQuickCardState();
+}
+
+class _LaunchpadQuickCardState extends State<_LaunchpadQuickCard> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = widget.color;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: GestureDetector(
+        onTap: () => context.go(widget.route),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: _hover ? c.withValues(alpha: 0.10) : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: c.withValues(alpha: _hover ? 0.45 : 0.18),
+              width: _hover ? 1.5 : 1,
+            ),
+            boxShadow: _hover
+                ? [
+                    BoxShadow(
+                      color: c.withValues(alpha: 0.22),
+                      blurRadius: 14,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 6,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+          ),
+          child: Row(children: [
+            Container(
+              padding: const EdgeInsets.all(9),
+              decoration: BoxDecoration(
+                color: c.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(widget.icon, color: c, size: 22),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.label,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    widget.sublabel,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Colors.black54,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_back_rounded,
+                color: c.withValues(alpha: 0.7), size: 16),
+          ]),
+        ),
       ),
     );
   }

@@ -27,6 +27,7 @@ import 'package:go_router/go_router.dart';
 
 import '../theme.dart' as core_theme;
 import '../../providers/app_providers.dart';
+import '../../screens/extracted/client_screens.dart' show ClientListScreen;
 import 'apex_v5_action_dashboard.dart';
 import 'apex_v5_news_ticker.dart';
 import 'apex_v5_workspace_selector.dart';
@@ -192,6 +193,16 @@ class ApexV5ServiceShell extends ConsumerWidget {
     // Caller-provided builder
     if (chipBodyBuilder != null) {
       return chipBodyBuilder!(context, chip);
+    }
+
+    // Standalone screen wiring — known chips that link to existing
+    // standalone screens outside the V5 chip tree. Keeps a single
+    // source of truth for these screens instead of duplicating logic.
+    switch (chip.id) {
+      case 'crm':
+      case 'customers-360':
+        // إدارة العملاء / العميل 360 → الشاشة الموحّدة للعملاء
+        return const ClientListScreen();
     }
 
     // V4 sub-module reuse — if chip has sub-module, render existing tabs
