@@ -52,11 +52,20 @@ def test_rls_hook_sets_installed_flag_on_postgres_like_engine(monkeypatch):
 
 
 def test_rls_migration_reachable_from_head():
+    """RLS migration (d3a1e9b4f201) must remain reachable in the revision
+    graph. It doesn't have to BE the head — newer migrations can extend
+    the chain — but walking back from HEAD must traverse it."""
     from alembic.script import ScriptDirectory
     cfg = _alembic_cfg()
     script = ScriptDirectory.from_config(cfg)
     heads = set(script.get_heads())
-    assert "d3a1e9b4f201" in heads
+    reachable = set()
+    for head in heads:
+        for rev in script.walk_revisions("base", head):
+            reachable.add(rev.revision)
+    assert "d3a1e9b4f201" in reachable, (
+        f"d3a1e9b4f201 missing from revision chain; heads={heads}"
+    )
 
 
 def test_rls_migration_covers_q1_infra_tables():

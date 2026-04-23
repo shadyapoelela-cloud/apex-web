@@ -10,7 +10,12 @@ services:
     runtime: python
     branch: main
     autoDeploy: true
-    buildCommand: pip install -r requirements.txt && alembic upgrade head || true
+    # NOTE: Production DB was bootstrapped via SQLAlchemy create_all()
+    # (see CLAUDE.md). Running `alembic upgrade head` on it would try
+    # to re-create existing tables and fail. Migrations are kept for
+    # staging + new environments; prod skips them until we adopt a
+    # formal baseline (tracked in DEPLOYMENT.md §3.4).
+    buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     preDeployCommand: python -c "from app.main import app; print('Pre-deploy check passed')"
@@ -65,7 +70,8 @@ services:
     runtime: python
     branch: staging
     autoDeploy: true
-    buildCommand: pip install -r requirements.txt && alembic upgrade head || true
+    # Staging CAN safely run alembic (it starts with an empty DB).
+    buildCommand: pip install -r requirements.txt && alembic upgrade head
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:

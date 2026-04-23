@@ -48,7 +48,17 @@ def _is_postgres() -> bool:
     return bind.dialect.name == "postgresql"
 
 
+def _has_table(table: str) -> bool:
+    insp = sa.inspect(op.get_bind())
+    try:
+        return table in insp.get_table_names()
+    except Exception:
+        return False
+
+
 def _has_column(table: str, column: str) -> bool:
+    if not _has_table(table):
+        return False
     insp = sa.inspect(op.get_bind())
     try:
         return column in [c["name"] for c in insp.get_columns(table)]
@@ -57,6 +67,8 @@ def _has_column(table: str, column: str) -> bool:
 
 
 def _has_index(table: str, index: str) -> bool:
+    if not _has_table(table):
+        return False
     insp = sa.inspect(op.get_bind())
     try:
         return index in [i["name"] for i in insp.get_indexes(table)]
@@ -69,11 +81,13 @@ def _has_index(table: str, index: str) -> bool:
 # ════════════════════════════════════════════════════════════════════
 def upgrade() -> None:
     # ── 1. clients.vat_registration_number unique partial index ────
-    # Postgres: partial unique (WHERE vat_registration_number IS NOT NULL)
-    # SQLite:   same via plain unique on a view — but simpler to add
-    #           a conditional check via a unique index with sqlite
-    #           (SQLite ignores partial index predicates on older ver).
-    if not _has_index("clients", "uq_clients_vat_not_null"):
+    # Skip entirely if `clients` doesn't yet exist. This migration can
+    # run against a fresh DB (CI test fixture) where app tables are
+    # created later via SQLAlchemy create_all(); in that path the
+    # index is irrelevant because there's nothing to index.
+    if _has_table("clients") and not _has_index(
+        "clients", "uq_clients_vat_not_null"
+    ):
         if _is_postgres():
             op.execute(
                 "CREATE UNIQUE INDEX IF NOT EXISTS uq_clients_vat_not_null "
@@ -92,8 +106,8 @@ def upgrade() -> None:
 
     # ── 2. JE balance CHECK ────────────────────────────────────────
     # Skip on SQLite (ALTER TABLE … ADD CONSTRAINT not supported without
-    # a table rewrite). Postgres only.
-    if _is_postgres():
+    # a table rewrite). Postgres only, and only if the table exists.
+    if _is_postgres() and _has_table("pilot_journal_entries"):
         try:
             op.execute(
                 "ALTER TABLE pilot_journal_entries "
@@ -105,10 +119,10 @@ def upgrade() -> None:
                 "CHECK (ABS(COALESCE(total_debit,0) - COALESCE(total_credit,0)) < 0.01)"
             )
         except Exception:
-            # Non-fatal: table may not exist yet on fresh installs.
             pass
 
-        # ── 3. JE line debit XOR credit (exactly one must be > 0) ─
+    # ── 3. JE line debit XOR credit (exactly one must be > 0) ─────
+    if _is_postgres() and _has_table("pilot_journal_lines"):
         try:
             op.execute(
                 "ALTER TABLE pilot_journal_lines "
@@ -124,34 +138,35 @@ def upgrade() -> None:
             pass
 
     # ── 4. client_memberships audit columns ────────────────────────
-    if not _has_column("client_memberships", "revoked_at"):
-        op.add_column(
-            "client_memberships",
-            sa.Column("revoked_at", sa.DateTime(), nullable=True),
-        )
-    if not _has_column("client_memberships", "revoked_by"):
-        op.add_column(
-            "client_memberships",
-            sa.Column("revoked_by", sa.String(length=36), nullable=True),
-        )
-        # FK only on Postgres (SQLite requires table rewrite for FK add).
-        if _is_postgres():
-            try:
-                op.create_foreign_key(
-                    "fk_client_memberships_revoked_by_users",
-                    "client_memberships",
-                    "users",
-                    ["revoked_by"],
-                    ["id"],
-                    ondelete="SET NULL",
-                )
-            except Exception:
-                pass
-    if not _has_column("client_memberships", "revoke_reason"):
-        op.add_column(
-            "client_memberships",
-            sa.Column("revoke_reason", sa.String(length=200), nullable=True),
-        )
+    if _has_table("client_memberships"):
+        if not _has_column("client_memberships", "revoked_at"):
+            op.add_column(
+                "client_memberships",
+                sa.Column("revoked_at", sa.DateTime(), nullable=True),
+            )
+        if not _has_column("client_memberships", "revoked_by"):
+            op.add_column(
+                "client_memberships",
+                sa.Column("revoked_by", sa.String(length=36), nullable=True),
+            )
+            # FK only on Postgres (SQLite requires table rewrite for FK add).
+            if _is_postgres():
+                try:
+                    op.create_foreign_key(
+                        "fk_client_memberships_revoked_by_users",
+                        "client_memberships",
+                        "users",
+                        ["revoked_by"],
+                        ["id"],
+                        ondelete="SET NULL",
+                    )
+                except Exception:
+                    pass
+        if not _has_column("client_memberships", "revoke_reason"):
+            op.add_column(
+                "client_memberships",
+                sa.Column("revoke_reason", sa.String(length=200), nullable=True),
+            )
 
 
 # ════════════════════════════════════════════════════════════════════
