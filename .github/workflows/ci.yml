@@ -60,12 +60,18 @@ jobs:
           pip install pytest httpx pytest-cov alembic
 
       - name: Run tests with coverage
+        # NOTE on --cov-fail-under: measured at 60.9% locally on
+        # 2026-04-24 after fixing the 12 flake-by-state tests
+        # (commit 767d48e). Gate set at 55 to catch real regressions
+        # while leaving a ~6pp buffer for fluctuation from added
+        # routes/modules between coverage-adding test PRs. Raise it
+        # to ~58 once we formalise the sub-coverage per phase.
         run: |
           pytest tests/ -v \
             --cov=app \
             --cov-report=term-missing \
             --cov-report=html:coverage_html \
-            --cov-fail-under=10 \
+            --cov-fail-under=55 \
             --tb=short
 
       - name: Upload coverage report
