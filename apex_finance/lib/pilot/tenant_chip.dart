@@ -131,6 +131,12 @@ class _PickerDialogState extends State<_PickerDialog> {
     if (PilotSession.hasEntity) _loadBranches();
   }
 
+  @override
+  void dispose() {
+    _tidCtrl.dispose();
+    super.dispose();
+  }
+
   Future<void> _bindTenant() async {
     final id = _tidCtrl.text.trim();
     if (id.isEmpty) return;

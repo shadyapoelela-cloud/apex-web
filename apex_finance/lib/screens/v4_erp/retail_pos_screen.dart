@@ -1203,6 +1203,12 @@ class _PaymentDialogState extends State<_PaymentDialog> {
   }
 
   @override
+  void dispose() {
+    _amountCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final done = _paid >= widget.total - 0.01;
     return Directionality(

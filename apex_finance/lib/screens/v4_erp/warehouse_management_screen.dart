@@ -289,89 +289,94 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
   Future<void> _addWarehouse(String branchId) async {
     final codeCtrl = TextEditingController();
     final nameCtrl = TextEditingController();
-    String type = 'main';
-    bool isDefault = false;
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setS) => Directionality(
-          textDirection: TextDirection.rtl,
-          child: AlertDialog(
-            title: Text('مستودع جديد'),
-            content: SizedBox(
-              width: 400,
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                TextField(
-                  controller: codeCtrl,
-                  decoration: const InputDecoration(labelText: 'الكود *'),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: nameCtrl,
-                  decoration: const InputDecoration(labelText: 'الاسم *'),
-                ),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
-                  value: type,
-                  decoration: const InputDecoration(labelText: 'النوع'),
-                  items: const [
-                    DropdownMenuItem(value: 'main', child: Text('رئيسي')),
-                    DropdownMenuItem(
-                        value: 'stockroom', child: Text('مخزن خلفي')),
-                    DropdownMenuItem(
-                        value: 'central_dc', child: Text('مركز توزيع')),
-                    DropdownMenuItem(
-                        value: 'returns', child: Text('مرتجعات')),
-                  ],
-                  onChanged: (v) => setS(() => type = v!),
-                ),
-                CheckboxListTile(
-                  value: isDefault,
-                  title: Text('افتراضي'),
-                  onChanged: (v) => setS(() => isDefault = v ?? false),
-                ),
-              ]),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text('إلغاء')),
-              FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: _gold),
-                onPressed: () => Navigator.pop(ctx, true),
-                child: Text('إنشاء'),
+    try {
+      String type = 'main';
+      bool isDefault = false;
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => StatefulBuilder(
+          builder: (ctx, setS) => Directionality(
+            textDirection: TextDirection.rtl,
+            child: AlertDialog(
+              title: Text('مستودع جديد'),
+              content: SizedBox(
+                width: 400,
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  TextField(
+                    controller: codeCtrl,
+                    decoration: const InputDecoration(labelText: 'الكود *'),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: nameCtrl,
+                    decoration: const InputDecoration(labelText: 'الاسم *'),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: type,
+                    decoration: const InputDecoration(labelText: 'النوع'),
+                    items: const [
+                      DropdownMenuItem(value: 'main', child: Text('رئيسي')),
+                      DropdownMenuItem(
+                          value: 'stockroom', child: Text('مخزن خلفي')),
+                      DropdownMenuItem(
+                          value: 'central_dc', child: Text('مركز توزيع')),
+                      DropdownMenuItem(
+                          value: 'returns', child: Text('مرتجعات')),
+                    ],
+                    onChanged: (v) => setS(() => type = v!),
+                  ),
+                  CheckboxListTile(
+                    value: isDefault,
+                    title: Text('افتراضي'),
+                    onChanged: (v) => setS(() => isDefault = v ?? false),
+                  ),
+                ]),
               ),
-            ],
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text('إلغاء')),
+                FilledButton(
+                  style: FilledButton.styleFrom(backgroundColor: _gold),
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text('إنشاء'),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-    if (ok == true) {
-      final r = await _client.createWarehouse(branchId, {
-        'code': codeCtrl.text.trim(),
-        'name_ar': nameCtrl.text.trim(),
-        'type': type,
-        'is_default': isDefault,
-        'is_sellable_from': true,
-        'is_receivable_to': true,
-      });
-      if (r.success) {
-        await _load();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('تم إنشاء المستودع'),
-                backgroundColor: _ok),
-          );
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(r.error ?? 'فشل'), backgroundColor: _err),
-          );
+      );
+      if (ok == true) {
+        final r = await _client.createWarehouse(branchId, {
+          'code': codeCtrl.text.trim(),
+          'name_ar': nameCtrl.text.trim(),
+          'type': type,
+          'is_default': isDefault,
+          'is_sellable_from': true,
+          'is_receivable_to': true,
+        });
+        if (r.success) {
+          await _load();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text('تم إنشاء المستودع'),
+                  backgroundColor: _ok),
+            );
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(r.error ?? 'فشل'), backgroundColor: _err),
+            );
+          }
         }
       }
+    } finally {
+      codeCtrl.dispose();
+      nameCtrl.dispose();
     }
   }
 }
