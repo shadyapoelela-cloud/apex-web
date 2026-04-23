@@ -40,6 +40,25 @@ _ERROR_MESSAGES_AR = {
     503: "الخدمة غير متاحة حالياً",
 }
 
+# English equivalents — keep message_en strictly English even when the
+# HTTPException was raised with an Arabic `detail` (common pattern, e.g.
+# `raise HTTPException(401, Errors.INTERNAL)`). Without this, the Arabic
+# detail leaks into the message_en field and confuses non-Arabic
+# clients / docs / monitoring tools. Same status-code coverage as AR.
+_ERROR_MESSAGES_EN = {
+    400: "Bad request",
+    401: "Authentication required",
+    403: "Forbidden",
+    404: "Resource not found",
+    405: "Method not allowed",
+    409: "Conflict",
+    422: "Validation error",
+    429: "Too many requests — try again later",
+    500: "Internal server error",
+    502: "Bad gateway",
+    503: "Service unavailable",
+}
+
 _ERROR_CODES = {
     400: "BAD_REQUEST",
     401: "UNAUTHORIZED",
@@ -55,6 +74,14 @@ _ERROR_CODES = {
 }
 
 
+def _looks_like_arabic(text: str) -> bool:
+    """Heuristic: any character in the Arabic Unicode block (U+0600..U+06FF)
+    means the string isn't safe to place in the `message_en` field."""
+    if not text:
+        return False
+    return any("\u0600" <= ch <= "\u06ff" for ch in text)
+
+
 def _error_body(
     status_code: int,
     message_en: str,
@@ -62,7 +89,19 @@ def _error_body(
     request_id: str | None = None,
 ) -> dict:
     code = _ERROR_CODES.get(status_code, "ERROR")
+    # Keep the caller's original message for the backward-compat `detail`
+    # field — even if it's Arabic, consumers reading that field already
+    # expect the raw exception string.
+    original_message = message_en
     message_ar = _ERROR_MESSAGES_AR.get(status_code, message_en)
+    # If the caller passed an Arabic string (most likely from
+    # `raise HTTPException(401, Errors.X)`), substitute the English
+    # status-code default for `message_en` only. The original is
+    # preserved in `detail` / `message_ar` below.
+    if _looks_like_arabic(message_en):
+        message_en = _ERROR_MESSAGES_EN.get(
+            status_code, _ERROR_MESSAGES_EN[500]
+        )
     body: dict = {
         "success": False,
         "error": {
@@ -71,8 +110,10 @@ def _error_body(
             "message_en": message_en,
             "status_code": status_code,
         },
-        # Backward-compatible `detail` field (FastAPI / Pydantic convention)
-        "detail": details if details is not None else message_en,
+        # Backward-compatible `detail` field (FastAPI / Pydantic convention).
+        # Carries the ORIGINAL caller-supplied message (possibly Arabic), so
+        # nothing that already reads `detail` changes shape.
+        "detail": details if details is not None else original_message,
     }
     if details is not None:
         body["error"]["details"] = details
