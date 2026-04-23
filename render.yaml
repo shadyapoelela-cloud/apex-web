@@ -98,7 +98,13 @@ services:
       - key: LOG_FORMAT
         value: "json"
       - key: CSRF_ENABLED
-        value: "false"
+        # Enabled 2026-04-24 — the HttpOnly cookie flow that CSRF depends
+        # on was fixed in commit 851199d (login was setting dead-code
+        # cookies before). Staging runs with enforcement on so we can
+        # observe for a week before flipping prod. If a legitimate
+        # request path breaks, it surfaces here first (staging has
+        # SENTRY_TRACES_SAMPLE_RATE=1.0 so every trace is captured).
+        value: "true"
       - key: CORS_ORIGINS
         value: "https://shadyapoelela-cloud.github.io,https://staging.apex-app.com,http://localhost:5000,http://localhost:8080"
       - key: TENANT_STRICT
