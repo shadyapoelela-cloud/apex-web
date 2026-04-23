@@ -46,9 +46,23 @@
     html, body { margin: 0; padding: 0; height: 100%; background: #0A1628; }
   </style>
 
-  <!-- APEX: unregister stale service workers + purge caches on load (fix stale cache issues) -->
+  <!-- APEX SW/cache cleanup — build-id-gated.
+       Runs ONCE per deploy (when APEX_BUILD_ID changes), not on every page
+       load. The unconditional version was racing Flutter's own SW install,
+       causing a ~4s "prepareServiceWorker took more than 4000ms" timeout
+       and a blank screen on every visit. Bump APEX_BUILD_ID in CI to
+       trigger a one-shot purge on users' next load; thereafter Flutter's
+       own cache-busting via main.dart.js?v=... handles freshness. -->
   <script id="apex_sw_cleanup">
     (function() {
+      var APEX_BUILD_ID = '2026-04-23-b07050d';  // bump on each deploy
+      try {
+        if (localStorage.getItem('apex_sw_build_id') === APEX_BUILD_ID) {
+          return;  // already purged for this build — fast path
+        }
+        localStorage.setItem('apex_sw_build_id', APEX_BUILD_ID);
+      } catch (e) { /* localStorage unavailable — proceed with purge */ }
+      console.log('[APEX] New build detected, purging stale SW + caches:', APEX_BUILD_ID);
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(regs) {
           for (var r of regs) {
