@@ -151,6 +151,19 @@ class Client(Base):
     __table_args__ = (Index("ix_client_type_sector", "client_type_code", "sector"),)
 
 
+class ClientRole:
+    """Enum-like sentinel for `role_in_client` — avoids string typos.
+
+    Not using Python's Enum to keep DB column a String (backwards-compat
+    with existing rows). Validated at service-layer.
+    """
+    OWNER = "owner"
+    ADMIN = "admin"
+    MEMBER = "member"
+    VIEWER = "viewer"
+    ALL = (OWNER, ADMIN, MEMBER, VIEWER)
+
+
 class ClientMembership(Base):
     """Links users to client entities with specific roles."""
 
@@ -159,9 +172,13 @@ class ClientMembership(Base):
     id = Column(String(36), primary_key=True, default=gen_uuid)
     client_id = Column(String(36), ForeignKey("clients.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    role_in_client = Column(String(30), default="member")  # owner, admin, member, viewer
+    role_in_client = Column(String(30), default="member")  # owner, admin, member, viewer (see ClientRole)
     is_active = Column(Boolean, default=True)
     joined_at = Column(DateTime, default=utcnow, nullable=False)
+    # New: audit trail for membership revocation (who / when / why).
+    revoked_at = Column(DateTime, nullable=True)
+    revoked_by = Column(String(36), ForeignKey("users.id"), nullable=True)
+    revoke_reason = Column(String(200), nullable=True)
 
     client = relationship("Client", back_populates="memberships")
 

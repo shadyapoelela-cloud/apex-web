@@ -27,6 +27,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="APEX">
+  <!-- Theme colour matches APEX dark navy so the Edge / Chrome PWA
+       window-controls-overlay blends with the app's own top bar. -->
   <meta name="theme-color" content="#0A1628">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
@@ -36,6 +38,10 @@
   <title>APEX</title>
   <link rel="manifest" href="manifest.json">
 
+  <!-- When installed as PWA with window-controls-overlay, keep the
+       app's canvas clear of the OS title-bar area. The browser exposes
+       env(titlebar-area-*) vars; our Flutter top bar renders underneath
+       but we reserve the WCO area so window controls remain clickable. -->
   <style>
     html, body { margin: 0; padding: 0; height: 100%; background: #0A1628; }
   </style>

@@ -546,6 +546,39 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Observability bootstrap — Sentry + structured JSON logging.
+# No-op if SENTRY_DSN / LOG_FORMAT env vars are unset (safe default).
+# Must be called BEFORE any other middleware so exceptions in the stack
+# are captured.
+try:
+    from app.core.observability import init_sentry, configure_logging
+    configure_logging()
+    _sentry_on = init_sentry()
+    if _sentry_on:
+        logging.info("Sentry observability initialized")
+    else:
+        logging.info("Sentry disabled (no SENTRY_DSN)")
+except Exception as _e:
+    logging.warning(f"Observability bootstrap failed (non-fatal): {_e}")
+
+# CSRF protection — Double-submit cookie pattern for browser clients.
+# Enforced on state-changing methods (POST/PUT/PATCH/DELETE) when the
+# request originates from a cookie-authenticated session. Bearer-token
+# API clients (mobile, server-to-server) are exempt since they already
+# send a custom Authorization header (immune to CSRF).
+#
+# Off by default via CSRF_ENABLED env var; turn on when cookie auth is
+# live. Code-path is harmless while off.
+try:
+    if os.environ.get("CSRF_ENABLED", "false").lower() == "true":
+        from app.core.csrf_middleware import CSRFMiddleware  # type: ignore
+        app.add_middleware(CSRFMiddleware)
+        logging.info("CSRF middleware enabled (cookie double-submit)")
+    else:
+        logging.info("CSRF middleware disabled (CSRF_ENABLED!=true) — bearer-only mode")
+except Exception as _e:
+    logging.warning(f"CSRF middleware not registered: {_e}")
+
 # Unified error response shape ({success:false, error:{code, message_ar, ...}})
 try:
     from app.core.error_handlers import register_error_handlers

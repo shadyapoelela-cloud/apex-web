@@ -2665,8 +2665,8 @@ class _ChipSubItemState extends State<_ChipSubItem> {
             decoration: BoxDecoration(
               gradient: isActive
                   ? LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                      begin: AlignmentDirectional.topStart,
+                      end: AlignmentDirectional.bottomEnd,
                       colors: [
                         c.withValues(alpha: 0.22),
                         c.withValues(alpha: 0.10),

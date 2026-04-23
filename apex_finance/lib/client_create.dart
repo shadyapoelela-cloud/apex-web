@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'core/theme.dart';
+import 'core/auto_dispose_mixin.dart';
 
 class ClientCreateScreen2 extends StatefulWidget {
   const ClientCreateScreen2({super.key});
@@ -8,9 +9,10 @@ class ClientCreateScreen2 extends StatefulWidget {
   State<ClientCreateScreen2> createState() => _CCS2();
 }
 
-class _CCS2 extends State<ClientCreateScreen2> {
+class _CCS2 extends State<ClientCreateScreen2>
+    with AutoDisposeMixin<ClientCreateScreen2> {
   String? _sel;
-  final _nameC = TextEditingController();
+  late final _nameC = track(TextEditingController());
   bool _ld = false;
   String? _err;
 
@@ -30,8 +32,7 @@ class _CCS2 extends State<ClientCreateScreen2> {
     } catch (e) { setState(() { _err = e.toString(); _ld = false; }); }
   }
 
-  @override
-  void dispose() { _nameC.dispose(); super.dispose(); }
+  // AutoDisposeMixin handles _nameC disposal automatically.
 
   @override
   Widget build(BuildContext context) {

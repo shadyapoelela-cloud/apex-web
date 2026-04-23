@@ -224,12 +224,36 @@ class _HybridSidebarState extends State<HybridSidebar> {
           const SingleActivator(LogicalKeyboardKey.escape): () {
             if (_drawerOpen) _toggleDrawer();
           },
+          // Alt+1..9 to jump to the first 9 groups / sections (SAP Fiori
+          // style numeric shortcuts — WCAG 2.2 keyboard navigation).
+          const SingleActivator(LogicalKeyboardKey.digit1, alt: true): () =>
+              _jumpToGroup(0),
+          const SingleActivator(LogicalKeyboardKey.digit2, alt: true): () =>
+              _jumpToGroup(1),
+          const SingleActivator(LogicalKeyboardKey.digit3, alt: true): () =>
+              _jumpToGroup(2),
+          const SingleActivator(LogicalKeyboardKey.digit4, alt: true): () =>
+              _jumpToGroup(3),
+          const SingleActivator(LogicalKeyboardKey.digit5, alt: true): () =>
+              _jumpToGroup(4),
+          const SingleActivator(LogicalKeyboardKey.digit6, alt: true): () =>
+              _jumpToGroup(5),
+          const SingleActivator(LogicalKeyboardKey.digit7, alt: true): () =>
+              _jumpToGroup(6),
+          const SingleActivator(LogicalKeyboardKey.digit8, alt: true): () =>
+              _jumpToGroup(7),
+          const SingleActivator(LogicalKeyboardKey.digit9, alt: true): () =>
+              _jumpToGroup(8),
         },
         child: Focus(
           autofocus: true,
-          child: Scaffold(
-            backgroundColor: AC.navy,
-            body: Stack(children: [
+          child: Semantics(
+            label: 'الشريط الجانبي الرئيسي',
+            container: true,
+            explicitChildNodes: true,
+            child: Scaffold(
+              backgroundColor: AC.navy,
+              body: Stack(children: [
               // ── Main content (pushed by inline sidebar width) ─────
               PositionedDirectional(
                 start: inlineW,
@@ -297,11 +321,24 @@ class _HybridSidebarState extends State<HybridSidebar> {
                   ),
                 ),
               ),
-            ]),
+              ]),
+            ),
           ),
         ),
       );
     });
+  }
+
+  void _jumpToGroup(int index) {
+    if (index < 0 || index >= _groups.length) return;
+    final group = _groups[index];
+    if (group.items.isEmpty) return;
+    // Navigate to the group's first item.
+    final first = group.items.first;
+    if (_drawerOpen) _toggleDrawer();
+    try {
+      context.go(first.route);
+    } catch (_) {}
   }
 
   // ── Sidebar body (shared between rail / expanded / overlay) ─────────

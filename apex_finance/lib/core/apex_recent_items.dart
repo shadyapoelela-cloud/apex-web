@@ -36,7 +36,21 @@ class ApexRecentItem {
     required this.openedAt,
   });
 
-  IconData get icon => IconData(iconCodePoint, fontFamily: 'MaterialIcons');
+  /// Render the icon as a Text widget using the MaterialIcons font.
+  /// This avoids the non-const IconData() construction that breaks
+  /// Flutter tree-shake-icons in release builds.
+  Widget iconWidget({double size = 20, Color? color}) {
+    return Text(
+      String.fromCharCode(iconCodePoint),
+      style: TextStyle(
+        fontFamily: 'MaterialIcons',
+        fontSize: size,
+        color: color,
+        height: 1.0,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'route': route,
@@ -181,7 +195,7 @@ class ApexRecentRail extends StatelessWidget {
               horizontal: AppSpacing.md, vertical: AppSpacing.xs + 2),
           child: Row(
             children: [
-              Icon(it.icon, size: 16, color: AC.gold),
+              SizedBox(width: 16, height: 16, child: it.iconWidget(size: 16, color: AC.gold)),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(it.label,
@@ -209,7 +223,7 @@ class ApexRecentRail extends StatelessWidget {
           border: Border.all(color: AC.bdr),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(it.icon, size: 14, color: AC.gold),
+          SizedBox(width: 14, height: 14, child: it.iconWidget(size: 14, color: AC.gold)),
           const SizedBox(width: 6),
           Text(it.label,
               style: TextStyle(color: AC.tp, fontSize: AppFontSize.xs)),
