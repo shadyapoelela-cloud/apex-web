@@ -3,7 +3,7 @@ uvicorn[standard]>=0.24.0
 pydantic[email]>=2.0.0
 pandas>=2.1.0,<2.3
 openpyxl>=3.1.0
-python-multipart>=0.0.6
+python-multipart>=0.0.26  # CVE-2026-40347
 anthropic>=0.18.0
 openai>=1.12.0
 requests>=2.31.0
@@ -20,7 +20,17 @@ pyotp>=2.9.0
 qrcode[pil]>=7.4.0
 redis>=5.0.0
 sentry-sdk[fastapi]>=1.40.0
-python-json-logger>=2.0.7
+python-json-logger>=3.0.0  # .jsonlogger → .json rename; see observability.py
+
+# ── Transitive pins for known CVEs (2026-04-24 pip-audit) ─────────────
+# These are pulled in transitively (cryptography via google-auth +
+# pdfminer.six; lxml via python-docx; pillow via pdfplumber + reportlab)
+# but pip-audit flagged them with vulnerabilities at the versions we
+# currently resolve to. Pin the minimum safe version here so every
+# environment (CI, Render build, local venv) lands on a fixed release.
+cryptography>=46.0.7       # CVE-2026-39892
+lxml>=6.1.0                # CVE-2026-41066
+pillow>=12.2.0             # CVE-2026-40192
 
 # Optional: S3 storage backend (only needed if STORAGE_BACKEND=s3)
 # boto3>=1.34.0
