@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/theme.dart';
-import '../../widgets/hybrid_sidebar.dart';
 
 class ComplianceHubScreen extends StatefulWidget {
   const ComplianceHubScreen({super.key});
@@ -53,7 +52,8 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return HybridSidebar(child: Scaffold(
+    // Note: router auto-wraps /compliance/* with HybridSidebar — no self-wrap.
+    return Scaffold(
       backgroundColor: AC.navy,
       body: Column(children: [
         ApexStickyToolbar(
@@ -343,7 +343,7 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
         ),
       )),
       ]),
-    ));
+    );
   }
 
   Widget _statusBar() {

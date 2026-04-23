@@ -102,27 +102,42 @@ import '../screens/compliance/extras_tools_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'v4/v4_routes.dart';
 import 'v5/v5_routes.dart';
+import '../widgets/hybrid_sidebar.dart';
 
 final authRefresh = ValueNotifier<int>(0);
 
-/// Smooth page transition — fade + subtle slide
-CustomTransitionPage<void> _apexPage(Widget child, GoRouterState state) =>
-    CustomTransitionPage(
-      key: state.pageKey,
-      child: child,
-      transitionDuration: const Duration(milliseconds: 280),
-      reverseTransitionDuration: const Duration(milliseconds: 220),
-      transitionsBuilder: (ctx, animation, secondaryAnimation, child) {
-        final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
-        return FadeTransition(
-          opacity: curved,
-          child: SlideTransition(
-            position: Tween<Offset>(begin: const Offset(0.0, 0.02), end: Offset.zero).animate(curved),
-            child: child,
-          ),
-        );
-      },
-    );
+/// Routes that should be auto-wrapped with the unified [HybridSidebar]
+/// so every compliance screen shares the same 10-round-researched nav
+/// experience (journal-entries, ZATCA, ratios, etc.).
+bool _shouldWrapCompliance(GoRouterState state) {
+  final path = state.uri.path;
+  return path == '/compliance' || path.startsWith('/compliance/');
+}
+
+/// Smooth page transition — fade + subtle slide.
+/// Auto-wraps compliance routes with [HybridSidebar] for a consistent
+/// left navigation + theme-aware colors + active-stripe indicator.
+CustomTransitionPage<void> _apexPage(Widget child, GoRouterState state) {
+  final wrapped = _shouldWrapCompliance(state)
+      ? HybridSidebar(child: child)
+      : child;
+  return CustomTransitionPage(
+    key: state.pageKey,
+    child: wrapped,
+    transitionDuration: const Duration(milliseconds: 280),
+    reverseTransitionDuration: const Duration(milliseconds: 220),
+    transitionsBuilder: (ctx, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+      return FadeTransition(
+        opacity: curved,
+        child: SlideTransition(
+          position: Tween<Offset>(begin: const Offset(0.0, 0.02), end: Offset.zero).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
+}
 
 final appRouter = GoRouter(
   refreshListenable: authRefresh,

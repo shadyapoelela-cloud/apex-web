@@ -512,6 +512,65 @@ class AC {
 
   /// Stronger focus ring for keyboard navigation (WCAG 2.2 compliant).
   static Color get focusRingStrong => _current.primary.withValues(alpha: 0.55);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // Sidebar tokens — theme-harmonized across all 12 themes
+  // Derived from primary + surfaces so each family has matching accents.
+  // Research synthesis: SAP Fiori 3 · Linear · Notion · Fluent 2 · Material 3
+  // ═══════════════════════════════════════════════════════════════════
+
+  /// Sidebar base background — one step deeper than card surface,
+  /// tinted with a whisper of primary so each theme feels cohesive.
+  static Color get sidebarBg => Color.alphaBlend(
+        _current.primary.withValues(alpha: _current.isDark ? 0.04 : 0.025),
+        _current.bg2,
+      );
+
+  /// Elevated sidebar surface (expanded panels, active groups).
+  static Color get sidebarBgElevated => Color.alphaBlend(
+        _current.primary.withValues(alpha: _current.isDark ? 0.06 : 0.035),
+        _current.bg3,
+      );
+
+  /// Sidebar header — branded gradient top-strip (Linear / Notion style).
+  static LinearGradient get sidebarHeaderGradient => LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          _current.primary.withValues(alpha: _current.isDark ? 0.12 : 0.08),
+          _current.primary.withValues(alpha: 0.02),
+        ],
+      );
+
+  /// Selected item bg — subtle primary tint (Fiori 3 / Linear pattern).
+  static Color get sidebarItemSelectedBg =>
+      _current.primary.withValues(alpha: _current.isDark ? 0.14 : 0.10);
+
+  /// Hover state — soft neutral overlay.
+  static Color get sidebarItemHoverBg => _current.isDark
+      ? Colors.white.withValues(alpha: 0.04)
+      : Colors.black.withValues(alpha: 0.035);
+
+  /// 3px leading stripe — marks the active route (SAP Fiori / Linear).
+  static Color get sidebarActiveStripe => _current.primary;
+
+  /// Group header color — primary-tinted but softer than item text.
+  static Color get sidebarGroupFg => _current.primary;
+
+  /// Item label color (default).
+  static Color get sidebarItemFg => _current.textPrimary;
+
+  /// Item label color (dim).
+  static Color get sidebarItemDim => _current.textSecondary;
+
+  /// Border / divider for the sidebar column.
+  static Color get sidebarBorder =>
+      _current.primary.withValues(alpha: _current.isDark ? 0.14 : 0.10);
+
+  /// Scrim for overlay sidebar on narrow screens.
+  static Color get sidebarScrim => _current.isDark
+      ? Colors.black.withValues(alpha: 0.55)
+      : Colors.black.withValues(alpha: 0.35);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
