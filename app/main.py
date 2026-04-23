@@ -1070,6 +1070,15 @@ try:
 except Exception as e:
     logging.error(f"TOTP routes not mounted: {e}", exc_info=True)
 
+# ── Email verification (send token, verify token, status probe)
+try:
+    from app.phase1.routes.email_verify_routes import router as email_verify_router
+
+    app.include_router(email_verify_router)
+    logging.info("Email verification routes mounted (/auth/email/*)")
+except Exception as e:
+    logging.error(f"Email verification routes not mounted: {e}", exc_info=True)
+
 # ── ZATCA CSID (cert lifecycle: register/revoke/expiry tracking)
 try:
     from app.core.zatca_csid_routes import router as zatca_csid_router

@@ -104,6 +104,7 @@ import 'v4/v4_routes.dart';
 import 'v5/v5_routes.dart';
 import '../widgets/hybrid_sidebar.dart';
 import '../screens/settings/entity_setup_screen.dart';
+import '../screens/account/mfa_screen.dart';
 
 final authRefresh = ValueNotifier<int>(0);
 
@@ -424,6 +425,10 @@ final appRouter = GoRouter(
     GoRoute(path: '/password/change', pageBuilder: (c, s) => _apexPage(const ChangePasswordScreen(), s)),
     GoRoute(path: '/account/close', pageBuilder: (c, s) => _apexPage(const CloseAccountScreen(), s)),
     GoRoute(path: '/account/sessions', pageBuilder: (c, s) => _apexPage(const SessionsScreen(), s)),
+    GoRoute(
+      path: '/account/mfa',
+      pageBuilder: (c, s) => _apexPage(const MfaScreen(), s),
+    ),
     GoRoute(path: '/account/activity', pageBuilder: (c, s) => _apexPage(const ActivityHistoryScreen(), s)),
 
     // Subscription

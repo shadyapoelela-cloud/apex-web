@@ -21,6 +21,38 @@ class ApiService {
   static Future<ApiResult> forgotPassword(String email) => _post('/auth/forgot-password', {'email':email});
   static Future<ApiResult> changePassword({required String current, required String newPw, required String confirm}) => _put('/users/me/security/password', {'current_password':current,'new_password':newPw,'confirm_password':confirm});
 
+  // ── 2FA / TOTP (wire-up for the existing backend TOTP service) ──
+  /// Generate a fresh TOTP secret + recovery codes. User must scan QR
+  /// (or enter secret manually) and then call [totpVerify] with a code
+  /// from their authenticator app to activate 2FA.
+  static Future<ApiResult> totpSetup() => _post('/auth/totp/setup', const {});
+
+  /// Verify a 6-digit TOTP code (or 8-char recovery code). First
+  /// successful call activates 2FA for this user.
+  static Future<ApiResult> totpVerify(String code) =>
+      _post('/auth/totp/verify', {'code': code});
+
+  /// Disable 2FA after proving knowledge of a current code or recovery
+  /// code. Clears the encrypted secret.
+  static Future<ApiResult> totpDisable(String code) =>
+      _post('/auth/totp/disable', {'code': code});
+
+  /// Lightweight status probe — returns {enabled, enabled_at}.
+  static Future<ApiResult> totpStatus() => _get('/auth/totp/status');
+
+  // ── Email verification ──
+  /// Send a verification email with a one-time token (24h TTL).
+  /// Returns {sent: true, expires_in_hours: 24}.
+  static Future<ApiResult> sendEmailVerification() =>
+      _post('/auth/email/send-verification', const {});
+
+  /// Consume the token from the email and flip email_verified=true.
+  static Future<ApiResult> verifyEmail(String token) =>
+      _post('/auth/email/verify', {'token': token});
+
+  /// Status probe — {email, verified}.
+  static Future<ApiResult> emailStatus() => _get('/auth/email/status');
+
   // ── Account ──
   static Future<ApiResult> getProfile() => _get('/users/me');
   static Future<ApiResult> updateProfile(Map b) => _put('/users/me/profile', b);
