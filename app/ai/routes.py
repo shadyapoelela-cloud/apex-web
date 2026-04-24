@@ -319,65 +319,304 @@ def list_period_closes(
 
 @router.post("/onboarding/complete")
 def onboarding_complete(payload: dict[str, Any] = Body(...)):
-    """Complete the onboarding wizard — create Tenant + primary Entity
-    + seed the selected industry CoA template. Returns the created ids."""
+    """Complete onboarding end-to-end:
+    1. Create Tenant + primary Entity
+    2. Seed the industry-specific CoA (via gl_engine + template)
+    3. Seed 12 monthly fiscal periods for current year
+    """
     try:
+        from datetime import date, datetime, timezone, timedelta
         from app.phase1.models.platform_models import SessionLocal, gen_uuid
-        from app.pilot.models import Tenant, Entity
+        from app.pilot.models import (
+            Tenant, Entity, GLAccount, FiscalPeriod, PeriodStatus,
+        )
         from app.core.coa_industry_templates import get_template
 
         name = str(payload.get("company_name", "")).strip()
         country = str(payload.get("country", "sa"))
         vat = str(payload.get("vat_number", "")).strip() or None
         industry_id = str(payload.get("industry", "")).strip()
+        email = str(payload.get("email", "")).strip() or f"owner@{name.lower().replace(' ', '-')[:30] or 'example'}.local"
 
         if not name:
             raise HTTPException(status_code=400, detail="company_name required")
 
+        ccy = {"sa": "SAR", "ae": "AED", "eg": "EGP", "om": "OMR", "bh": "BHD"}.get(country, "SAR")
+        import re
+        slug_base = re.sub(r"[^a-z0-9-]", "", name.lower().replace(" ", "-"))[:50] or "tenant"
+
         db = SessionLocal()
+        accounts_created = 0
+        periods_created = 0
         try:
+            # 1. Tenant
+            slug = slug_base
+            i = 1
+            while db.query(Tenant).filter(Tenant.slug == slug).first() is not None:
+                slug = f"{slug_base}-{i}"
+                i += 1
+
             tenant = Tenant(
                 id=gen_uuid(),
-                name=name,
-                slug=name.lower().replace(" ", "-")[:60],
-                status="active",
-                tier="free",
+                slug=slug,
+                legal_name_ar=name,
+                primary_vat_number=vat,
+                primary_country=country.upper(),
+                primary_email=email,
+                status="trial",
+                tier="starter",
             )
             db.add(tenant)
             db.flush()
 
+            # 2. Entity
             entity = Entity(
                 id=gen_uuid(),
                 tenant_id=tenant.id,
-                name=name,
-                code=name[:10].upper().replace(" ", ""),
+                code=(name[:10].upper().replace(" ", "-") or "ENT-001"),
+                name_ar=name,
                 type="company",
                 status="active",
                 country=country.upper(),
                 vat_number=vat,
-                functional_currency="SAR" if country == "sa" else ("AED" if country == "ae" else "EGP"),
+                functional_currency=ccy,
+                fiscal_year_start_month=1,
             )
             db.add(entity)
+            db.flush()
+
+            # 3. Seed Chart of Accounts
+            try:
+                from app.pilot.services.gl_engine import DEFAULT_COA
+                code_to_id: dict[str, str] = {}
+                for acct in DEFAULT_COA:
+                    parent_id = code_to_id.get(acct.get("parent")) if acct.get("parent") else None
+                    row = GLAccount(
+                        id=gen_uuid(),
+                        tenant_id=tenant.id,
+                        entity_id=entity.id,
+                        parent_account_id=parent_id,
+                        code=acct["code"],
+                        name_ar=acct["name_ar"],
+                        name_en=acct.get("name_en"),
+                        category=acct["category"],
+                        subcategory=acct.get("subcategory"),
+                        type=acct.get("type", "detail"),
+                        normal_balance=acct["normal_balance"],
+                        level=acct.get("level", 1),
+                        is_control=acct.get("is_control", False),
+                    )
+                    db.add(row)
+                    db.flush()
+                    code_to_id[acct["code"]] = row.id
+                    accounts_created += 1
+
+                # Industry overlay
+                if industry_id:
+                    tpl = get_template(industry_id)
+                    if tpl:
+                        for acct in tpl["accounts"]:
+                            if acct["code"] in code_to_id:
+                                continue
+                            parent_id = code_to_id.get(acct.get("parent")) if acct.get("parent") else None
+                            row = GLAccount(
+                                id=gen_uuid(),
+                                tenant_id=tenant.id,
+                                entity_id=entity.id,
+                                parent_account_id=parent_id,
+                                code=acct["code"],
+                                name_ar=acct["name_ar"],
+                                name_en=acct.get("name_en"),
+                                category=acct["category"],
+                                subcategory=acct.get("subcategory"),
+                                type=acct.get("type", "detail"),
+                                normal_balance=acct["normal_balance"],
+                                level=acct.get("level", 3),
+                                is_control=acct.get("is_control", False),
+                            )
+                            db.add(row)
+                            db.flush()
+                            code_to_id[acct["code"]] = row.id
+                            accounts_created += 1
+            except Exception as coa_err:
+                import logging
+                logging.warning(f"COA seed skipped: {coa_err}")
+
+            # 4. Fiscal periods
+            try:
+                year = date.today().year
+                months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+                          'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+                for m in range(1, 13):
+                    start = date(year, m, 1)
+                    end = date(year, 12, 31) if m == 12 else (date(year, m + 1, 1) - timedelta(days=1))
+                    db.add(FiscalPeriod(
+                        id=gen_uuid(),
+                        tenant_id=tenant.id,
+                        entity_id=entity.id,
+                        code=f"{year}-{m:02d}",
+                        name_ar=f"{months[m-1]} {year}",
+                        year=year,
+                        month=m,
+                        start_date=start,
+                        end_date=end,
+                        status=PeriodStatus.open.value,
+                    ))
+                    periods_created += 1
+            except Exception as fp_err:
+                import logging
+                logging.warning(f"Fiscal period seed skipped: {fp_err}")
+
             db.commit()
-            result = {
-                "tenant_id": tenant.id,
-                "entity_id": entity.id,
-                "industry_applied": False,
+            return {
+                "success": True,
+                "data": {
+                    "tenant_id": tenant.id,
+                    "tenant_slug": tenant.slug,
+                    "entity_id": entity.id,
+                    "industry": industry_id or None,
+                    "accounts_created": accounts_created,
+                    "periods_created": periods_created,
+                    "functional_currency": ccy,
+                },
             }
-
-            # Seed the COA template if one was selected.
-            if industry_id:
-                tpl = get_template(industry_id)
-                if tpl:
-                    result["industry_applied"] = True
-                    result["accounts_seeded"] = len(tpl["accounts"])
-
-            return {"success": True, "data": result}
         finally:
             db.close()
     except HTTPException:
         raise
     except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/onboarding/seed-demo")
+def onboarding_seed_demo(payload: dict[str, Any] = Body(...)):
+    """Seed a demo company with sample customers + 3 demo journal
+    entries (opening capital + revenue + expense) so the user sees
+    a fully populated system on day 1."""
+    try:
+        from datetime import date, datetime, timezone
+        from decimal import Decimal
+        from app.phase1.models.platform_models import SessionLocal, gen_uuid
+        from app.pilot.models import (
+            Customer, Entity, FiscalPeriod, GLAccount,
+            JournalEntry, JournalEntryKind, JournalEntryStatus,
+            JournalLine, PeriodStatus,
+        )
+
+        tenant_id = str(payload.get("tenant_id", "")).strip()
+        entity_id = str(payload.get("entity_id", "")).strip()
+        if not tenant_id or not entity_id:
+            raise HTTPException(status_code=400, detail="tenant_id + entity_id required")
+
+        db = SessionLocal()
+        customers_created = 0
+        jes_created = 0
+        try:
+            entity = db.query(Entity).filter(Entity.id == entity_id).first()
+            if entity is None:
+                raise HTTPException(status_code=404, detail="entity not found")
+
+            sample_customers = [
+                ("CUST-0001", "شركة الرياض للمقاولات", "300111111300003", "0501234567"),
+                ("CUST-0002", "مؤسسة الخليج التجارية", "300222222300003", "0502345678"),
+                ("CUST-0003", "مجموعة أرامكو للخدمات", "300333333300003", "0503456789"),
+                ("CUST-0004", "شركة جدة للتطوير", "300444444300003", "0504567890"),
+                ("CUST-0005", "شركة الدمام للصناعة", "300555555300003", "0505678901"),
+            ]
+            for code, name_ar, vat, phone in sample_customers:
+                exists = db.query(Customer).filter(
+                    Customer.tenant_id == tenant_id, Customer.code == code,
+                ).first()
+                if exists is None:
+                    db.add(Customer(
+                        id=gen_uuid(), tenant_id=tenant_id, code=code,
+                        name_ar=name_ar, kind="company",
+                        phone=phone, vat_number=vat,
+                        currency=entity.functional_currency,
+                    ))
+                    customers_created += 1
+
+            period = db.query(FiscalPeriod).filter(
+                FiscalPeriod.entity_id == entity_id,
+                FiscalPeriod.status == PeriodStatus.open.value,
+            ).order_by(FiscalPeriod.start_date).first()
+
+            if period is not None:
+                cash = db.query(GLAccount).filter(
+                    GLAccount.entity_id == entity_id, GLAccount.code == "1120",
+                ).first()
+                capital = db.query(GLAccount).filter(
+                    GLAccount.entity_id == entity_id, GLAccount.category == "equity",
+                    GLAccount.type == "detail",
+                ).first()
+                revenue = db.query(GLAccount).filter(
+                    GLAccount.entity_id == entity_id, GLAccount.category == "revenue",
+                    GLAccount.type == "detail",
+                ).first()
+                expense = db.query(GLAccount).filter(
+                    GLAccount.entity_id == entity_id, GLAccount.category == "expense",
+                    GLAccount.type == "detail",
+                ).first()
+
+                demos = [
+                    ("JE-DEMO-001", "رأس المال الافتتاحي", JournalEntryKind.opening.value,
+                     Decimal("1000000"), cash, capital, "إيداع نقدي", "رأس المال"),
+                    ("JE-DEMO-002", "إيراد مبيعات نقدية", JournalEntryKind.manual.value,
+                     Decimal("50000"), cash, revenue, "قبض نقدي", "مبيعات"),
+                    ("JE-DEMO-003", "مصاريف تشغيلية",  JournalEntryKind.manual.value,
+                     Decimal("15000"), expense, cash, "مصاريف", "دفع"),
+                ]
+                for num, memo, kind, amount, dr_acc, cr_acc, dr_desc, cr_desc in demos:
+                    if not (dr_acc and cr_acc):
+                        continue
+                    je = JournalEntry(
+                        id=gen_uuid(), tenant_id=tenant_id, entity_id=entity_id,
+                        fiscal_period_id=period.id,
+                        je_number=num, kind=kind,
+                        status=JournalEntryStatus.posted.value,
+                        memo_ar=memo,
+                        je_date=period.start_date, posting_date=period.start_date,
+                        currency=entity.functional_currency,
+                        total_debit=amount, total_credit=amount,
+                        posted_at=datetime.now(timezone.utc),
+                    )
+                    db.add(je)
+                    db.flush()
+                    db.add(JournalLine(
+                        id=gen_uuid(), tenant_id=tenant_id, journal_entry_id=je.id,
+                        line_number=1, account_id=dr_acc.id,
+                        currency=entity.functional_currency,
+                        debit_amount=amount, credit_amount=0,
+                        functional_debit=amount, functional_credit=0,
+                        description=dr_desc,
+                    ))
+                    db.add(JournalLine(
+                        id=gen_uuid(), tenant_id=tenant_id, journal_entry_id=je.id,
+                        line_number=2, account_id=cr_acc.id,
+                        currency=entity.functional_currency,
+                        debit_amount=0, credit_amount=amount,
+                        functional_debit=0, functional_credit=amount,
+                        description=cr_desc,
+                    ))
+                    jes_created += 1
+
+            db.commit()
+            return {
+                "success": True,
+                "data": {
+                    "customers_created": customers_created,
+                    "journal_entries_created": jes_created,
+                },
+            }
+        finally:
+            db.close()
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 

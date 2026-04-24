@@ -161,6 +161,30 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       icon: Icons.lock_clock,
       onRun: (_) => go('/operations/period-close'),
     ),
+    ApexCommand(
+      id: 'nav_pos_sessions',
+      label: 'جلسات نقاط البيع',
+      subtitle: 'فتح / قفل / Z-report',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.point_of_sale,
+      onRun: (_) => go('/operations/pos-sessions'),
+    ),
+    ApexCommand(
+      id: 'nav_purchase_cycle',
+      label: 'دورة المشتريات الكاملة',
+      subtitle: 'PO → GRN → PI → سند صرف',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.shopping_cart,
+      onRun: (_) => go('/operations/purchase-cycle'),
+    ),
+    ApexCommand(
+      id: 'nav_consolidation_ui',
+      label: 'توحيد الكيانات — Consolidation',
+      subtitle: 'موازين متعدّدة الكيانات → ميزان موحّد',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.account_tree,
+      onRun: (_) => go('/operations/consolidation-ui'),
+    ),
 
     // ── Navigation ──
     ApexCommand.navigation(

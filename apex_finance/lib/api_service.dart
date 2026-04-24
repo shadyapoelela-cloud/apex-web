@@ -526,6 +526,19 @@ class ApiService {
   // ── Onboarding ──
   static Future<ApiResult> onboardingComplete(Map<String, dynamic> body) =>
       _post('/api/v1/ai/onboarding/complete', body);
+  static Future<ApiResult> onboardingSeedDemo(String tenantId, String entityId) =>
+      _post('/api/v1/ai/onboarding/seed-demo', {'tenant_id': tenantId, 'entity_id': entityId});
+
+  // ── Consolidation (POST ACDOCA-style multi-entity TBs) ──
+  // Already declared above as aiConsolidate.
+
+  // ── POS (more methods) ──
+  static Future<ApiResult> pilotListBranches(String tenantId) =>
+      _get('/api/v1/pilot/tenants/$tenantId/branches');
+  static Future<ApiResult> pilotEntityBranches(String entityId) =>
+      _get('/api/v1/pilot/entities/$entityId/branches');
+  static Future<ApiResult> pilotGoodsReceiptCreate(Map<String, dynamic> body) =>
+      _post('/api/v1/pilot/goods-receipts', body);
 
   // ── SAP Universal Journal ──
   static Future<ApiResult> universalJournalQuery(Map<String, dynamic> filters) =>
