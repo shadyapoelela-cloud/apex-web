@@ -575,12 +575,11 @@ def onboarding_seed_demo(payload: dict[str, Any] = Body(...)):
                         id=gen_uuid(), tenant_id=tenant_id, entity_id=entity_id,
                         fiscal_period_id=period.id,
                         je_number=num, kind=kind,
-                        status=JournalEntryStatus.posted.value,
+                        status=JournalEntryStatus.draft.value,    # posted below via post_journal_entry
                         memo_ar=memo,
-                        je_date=period.start_date, posting_date=period.start_date,
+                        je_date=period.start_date,
                         currency=entity.functional_currency,
                         total_debit=amount, total_credit=amount,
-                        posted_at=datetime.now(timezone.utc),
                     )
                     db.add(je)
                     db.flush()
@@ -600,6 +599,14 @@ def onboarding_seed_demo(payload: dict[str, Any] = Body(...)):
                         functional_debit=0, functional_credit=amount,
                         description=cr_desc,
                     ))
+                    # Actually post to GL (creates GLPosting rows).
+                    try:
+                        from app.pilot.services.gl_engine import post_journal_entry
+                        db.flush()   # make sure JE+lines are persisted before posting
+                        post_journal_entry(db, je.id)
+                    except Exception as _pe:
+                        import logging
+                        logging.warning(f"demo post_journal_entry failed: {_pe}")
                     jes_created += 1
 
             db.commit()

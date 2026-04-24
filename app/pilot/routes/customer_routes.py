@@ -393,17 +393,15 @@ def _post_sales_invoice_je(db: Session, inv: SalesInvoice, customer: Customer) -
         fiscal_period_id=period.id,
         je_number=f"SI-{inv.invoice_number}",
         kind=JournalEntryKind.manual.value,
-        status=JournalEntryStatus.posted.value,
+        status=JournalEntryStatus.draft.value,      # post below via post_journal_entry()
         source_type="sales_invoice",
         source_id=inv.id,
         source_reference=inv.invoice_number,
         memo_ar=f"فاتورة بيع {inv.invoice_number} — {customer.name_ar}",
         je_date=inv.issue_date,
-        posting_date=inv.issue_date,
         currency=inv.currency,
         total_debit=inv.total,
         total_credit=inv.total,
-        posted_at=datetime.now(timezone.utc),
     )
     db.add(je)
     db.flush()
@@ -586,6 +584,14 @@ def issue_sales_invoice(invoice_id: str = Path(...)):
             raise HTTPException(status_code=404, detail="customer not found")
 
         je = _post_sales_invoice_je(db, inv, customer)
+        # Actually post to GL (creates GLPosting rows from JournalLine rows)
+        try:
+            from app.pilot.services.gl_engine import post_journal_entry
+            post_journal_entry(db, je.id)
+        except Exception as e:
+            # If posting fails, roll the invoice back to draft.
+            db.rollback()
+            raise HTTPException(status_code=409, detail=f"GL posting failed: {e}")
         inv.journal_entry_id = je.id
         inv.status = SalesInvoiceStatus.issued.value
         inv.issued_at = datetime.now(timezone.utc)
