@@ -439,6 +439,63 @@ def comparative_report(
         raise HTTPException(400, str(e))
 
 
+@router.get("/_debug/entities/{entity_id}/posting-counts")
+def debug_posting_counts(entity_id: str, db: Session = Depends(get_db)):
+    """DIAGNOSTIC — raw counts of JEs, lines, postings for an entity.
+
+    Helps catch silent GL-posting failures (e.g., JE.status='posted' but no
+    GLPosting rows). Not for production UI.
+    """
+    from sqlalchemy import func as sqlfunc
+    je_total = db.query(JournalEntry).filter(JournalEntry.entity_id == entity_id).count()
+    je_posted = db.query(JournalEntry).filter(
+        JournalEntry.entity_id == entity_id,
+        JournalEntry.status == JournalEntryStatus.posted.value,
+    ).count()
+    posting_count = db.query(GLPosting).filter(GLPosting.entity_id == entity_id).count()
+    posting_sum = db.query(
+        sqlfunc.coalesce(sqlfunc.sum(GLPosting.debit_amount), 0).label("d"),
+        sqlfunc.coalesce(sqlfunc.sum(GLPosting.credit_amount), 0).label("c"),
+    ).filter(GLPosting.entity_id == entity_id).first()
+    # Sample: what distinct entity_ids exist on postings? (helps spot mis-assignment)
+    distinct_entities = [
+        r[0] for r in db.query(GLPosting.entity_id).distinct().limit(20).all()
+    ]
+    # Latest JE details
+    latest_je = db.query(JournalEntry).filter(
+        JournalEntry.entity_id == entity_id
+    ).order_by(JournalEntry.created_at.desc()).first()
+    latest_je_info = None
+    if latest_je:
+        line_count = db.query(JournalLine).filter(
+            JournalLine.journal_entry_id == latest_je.id
+        ).count()
+        post_count = db.query(GLPosting).filter(
+            GLPosting.journal_entry_id == latest_je.id
+        ).count()
+        latest_je_info = {
+            "id": latest_je.id,
+            "je_number": latest_je.je_number,
+            "status": latest_je.status,
+            "posted_at": latest_je.posted_at.isoformat() if latest_je.posted_at else None,
+            "posting_date": latest_je.posting_date.isoformat() if latest_je.posting_date else None,
+            "total_debit": float(latest_je.total_debit or 0),
+            "fiscal_period_id": latest_je.fiscal_period_id,
+            "line_count": line_count,
+            "gl_posting_count": post_count,
+        }
+    return {
+        "entity_id": entity_id,
+        "je_total": je_total,
+        "je_posted": je_posted,
+        "gl_posting_count": posting_count,
+        "gl_posting_sum_debit": float(posting_sum[0] or 0),
+        "gl_posting_sum_credit": float(posting_sum[1] or 0),
+        "distinct_entity_ids_on_postings": distinct_entities,
+        "latest_je": latest_je_info,
+    }
+
+
 @router.get("/accounts/{account_id}/ledger")
 def account_ledger(
     account_id: str,
