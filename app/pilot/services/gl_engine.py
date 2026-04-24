@@ -467,7 +467,14 @@ def post_journal_entry(db: Session, je_id: str) -> JournalEntry:
     if je.total_debit != je.total_credit:
         raise ValueError("القيد غير متوازن — لا يمكن ترحيله")
 
+    # Session uses autoflush=False — explicitly flush so pending JournalLine
+    # rows added by the caller (e.g. sales invoice flow) become visible to
+    # this query. Without this, lines=[] silently → 0 GLPostings created
+    # → JE.status='posted' but Trial Balance is empty.
+    db.flush()
     lines = db.query(JournalLine).filter(JournalLine.journal_entry_id == je.id).all()
+    if not lines:
+        raise ValueError(f"JE {je.je_number} has no lines — cannot post")
     now = datetime.now(timezone.utc)
 
     for line in lines:
