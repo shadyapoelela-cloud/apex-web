@@ -467,6 +467,40 @@ class ApiService {
     return _get('/api/v1/pilot/entities/$entityId/reports/trial-balance$qs');
   }
 
+  // ── Pilot: Purchase cycle ──
+  static Future<ApiResult> pilotListPOs(String entityId, {int limit=100}) =>
+      _get('/api/v1/pilot/entities/$entityId/purchase-orders?limit=$limit');
+  static Future<ApiResult> pilotCreatePO(Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/purchase-orders', payload);
+  static Future<ApiResult> pilotApprovePO(String poId) =>
+      _post('/api/v1/pilot/purchase-orders/$poId/approve', {});
+  static Future<ApiResult> pilotIssuePO(String poId) =>
+      _post('/api/v1/pilot/purchase-orders/$poId/issue', {});
+  static Future<ApiResult> pilotPOReceipts(String poId) =>
+      _get('/api/v1/pilot/purchase-orders/$poId/receipts');
+  static Future<ApiResult> pilotListPurchaseInvoices(String entityId, {int limit=100}) =>
+      _get('/api/v1/pilot/entities/$entityId/purchase-invoices?limit=$limit');
+  static Future<ApiResult> pilotPostPurchaseInvoice(String piId) =>
+      _post('/api/v1/pilot/purchase-invoices/$piId/post', {});
+  static Future<ApiResult> pilotCreateVendorPayment(Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/vendor-payments', payload);
+
+  // ── Pilot: POS ──
+  static Future<ApiResult> pilotListPosSessions(String branchId, {int limit=50}) =>
+      _get('/api/v1/pilot/branches/$branchId/pos-sessions?limit=$limit');
+  static Future<ApiResult> pilotCreatePosSession(String branchId, Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/branches/$branchId/pos-sessions', payload);
+  static Future<ApiResult> pilotClosePosSession(String sessionId, Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/pos-sessions/$sessionId/close', payload);
+  static Future<ApiResult> pilotZReport(String sessionId) =>
+      _get('/api/v1/pilot/pos-sessions/$sessionId/z-report');
+  static Future<ApiResult> pilotListPosTransactions(String sessionId) =>
+      _get('/api/v1/pilot/pos-sessions/$sessionId/transactions');
+  static Future<ApiResult> pilotPostPosToGL(String posTxnId) =>
+      _post('/api/v1/pilot/pos-transactions/$posTxnId/post-to-gl', {});
+
+  // Financial Statements endpoints are declared below (fsTrialBalance / fsIncomeStatement / fsBalanceSheet) — reused.
+
   // ── HR: Employees (existing) ──
   static Future<ApiResult> hrListEmployees({int limit=100}) => _get('/api/v1/employees?limit=$limit');
   static Future<ApiResult> hrCreateEmployee(Map<String, dynamic> payload) => _post('/api/v1/employees', payload);

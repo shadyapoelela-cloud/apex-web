@@ -113,6 +113,30 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       icon: Icons.business_center,
       onRun: (_) => go('/operations/hub'),
     ),
+    ApexCommand(
+      id: 'nav_je_creator',
+      label: 'إنشاء قيد يومية',
+      subtitle: 'نموذج إدخال قيد مع فحص توازن Dr=Cr',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.edit_note,
+      onRun: (_) => go('/operations/je-creator'),
+    ),
+    ApexCommand(
+      id: 'nav_fs_formatted',
+      label: 'قائمة الدخل + قائمة المركز المالي',
+      subtitle: 'تقارير مُنسّقة من الميزان مباشرة',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.assessment_outlined,
+      onRun: (_) => go('/operations/financial-statements'),
+    ),
+    ApexCommand(
+      id: 'nav_fin_analysis',
+      label: 'التحليل المالي — النسب الرئيسية',
+      subtitle: 'Current · Quick · ROE · ROA · Debt-to-Equity',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.insights,
+      onRun: (_) => go('/operations/financial-analysis'),
+    ),
 
     // ── Navigation ──
     ApexCommand.navigation(

@@ -357,6 +357,31 @@ class V5Launchpad extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.edit_note,
+                    label: 'قيد يومية جديد',
+                    subtitle: 'إدخال يدوي + توازن',
+                    onTap: () => context.push('/operations/je-creator'),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.assessment_outlined,
+                    label: 'القوائم المالية',
+                    subtitle: 'P&L + BS من الميزان',
+                    onTap: () => context.push('/operations/financial-statements'),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.insights,
+                    label: 'النسب المالية',
+                    subtitle: 'Current · Quick · ROE · Debt',
+                    onTap: () => context.push('/operations/financial-analysis'),
+                  )),
+                ],
+              ),
+              const SizedBox(height: 10),
               InkWell(
                 onTap: () => context.push('/operations/hub'),
                 borderRadius: BorderRadius.circular(14),

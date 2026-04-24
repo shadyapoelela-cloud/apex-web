@@ -48,6 +48,9 @@ import '../screens/compliance/multi_currency_screen.dart';
 import '../screens/onboarding/onboarding_wizard_screen.dart' as onboarding_ai;
 import '../screens/admin/audit_chain_viewer_screen.dart';
 import '../screens/operations/financial_ops_hub_screen.dart';
+import '../screens/operations/je_creator_screen.dart';
+import '../screens/operations/financial_statements_formatted_screen.dart';
+import '../screens/operations/financial_analysis_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -495,6 +498,9 @@ final appRouter = GoRouter(
     GoRoute(path: '/onboarding/wizard', pageBuilder: (c, s) => _apexPage(const onboarding_ai.OnboardingWizardScreen(), s)),
     GoRoute(path: '/admin/audit-chain', pageBuilder: (c, s) => _apexPage(const AuditChainViewerScreen(), s)),
     GoRoute(path: '/operations/hub', pageBuilder: (c, s) => _apexPage(const FinancialOpsHubScreen(), s)),
+    GoRoute(path: '/operations/je-creator', pageBuilder: (c, s) => _apexPage(const JeCreatorScreen(), s)),
+    GoRoute(path: '/operations/financial-statements', pageBuilder: (c, s) => _apexPage(const FinancialStatementsFormattedScreen(), s)),
+    GoRoute(path: '/operations/financial-analysis', pageBuilder: (c, s) => _apexPage(const FinancialAnalysisScreen(), s)),
 
     // ─── COA Workflow ───
     GoRoute(path: '/upload', pageBuilder: (c, s) => _apexPage(const UploadScreen(), s)),
