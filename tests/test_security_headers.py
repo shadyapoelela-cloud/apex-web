@@ -64,6 +64,46 @@ def test_permissions_policy_denies_sensors(client: TestClient) -> None:
         )
 
 
+def test_csp_is_strict_on_api_endpoints(client: TestClient) -> None:
+    """Plain API responses (JSON) must get the locked-down CSP —
+    default-src 'none' + frame-ancestors 'none' + form-action 'none'.
+    This is the narrowest CSP that still allows Swagger UI to fetch
+    /openapi.json (via connect-src 'self')."""
+    r = client.get("/health")
+    csp = r.headers.get("Content-Security-Policy", "")
+    assert csp, "API responses must carry a Content-Security-Policy header"
+    for expected in (
+        "default-src 'none'",
+        "frame-ancestors 'none'",
+        "base-uri 'none'",
+        "form-action 'none'",
+    ):
+        assert expected in csp, (
+            f"API CSP missing directive {expected!r} — got {csp!r}"
+        )
+
+
+def test_csp_allows_swagger_ui_on_docs(client: TestClient) -> None:
+    """/docs + /redoc load Swagger UI / ReDoc from jsdelivr — the
+    strict API CSP would block those. A docs-specific CSP opens up
+    script-src and style-src to self + the CDN, nothing wider."""
+    r = client.get("/docs")
+    # 200 or 307 redirect both acceptable — we only care about the header.
+    csp = r.headers.get("Content-Security-Policy", "")
+    assert csp, "/docs must carry a CSP (not blanket-disabled)"
+    # Must allow the CDN for scripts + styles.
+    assert "cdn.jsdelivr.net" in csp, (
+        f"/docs CSP must allow jsdelivr so Swagger UI actually renders; "
+        f"got {csp!r}"
+    )
+    # Must NOT still be the API default-src 'none' — that would
+    # block Swagger UI entirely.
+    assert "default-src 'none'" not in csp, (
+        "/docs must not inherit the API's default-src 'none' or "
+        "Swagger UI is blank"
+    )
+
+
 def test_hsts_not_set_in_non_production(client: TestClient) -> None:
     """HSTS teaches browsers to refuse HTTP for the host for a year.
     Setting it in dev over http://localhost bricks the dev loop for

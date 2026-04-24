@@ -974,6 +974,36 @@ async def security_headers_middleware(request, call_next):
         "payment=(), "
         "usb=()"
     )
+    # ── Content-Security-Policy — per-path carve-out.
+    # API endpoints (everything except /docs, /redoc, /openapi.json)
+    # serve pure JSON and have no HTML injection surface. Lock them
+    # down with a default-src 'none' baseline. /docs + /redoc load
+    # Swagger UI / ReDoc bundles from jsdelivr, so they need script-
+    # src + style-src + img-src allowlists for that CDN.
+    path = request.url.path
+    if path.startswith(("/docs", "/redoc")):
+        # Swagger UI / ReDoc need inline styles + scripts + fonts
+        # from jsdelivr. This is the narrowest CSP that lets both
+        # render correctly.
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "img-src 'self' data: https://fastapi.tiangolo.com; "
+            "font-src 'self' https://cdn.jsdelivr.net; "
+            "connect-src 'self'"
+        )
+    else:
+        # JSON API — no scripts, no styles, no images, no frames.
+        # The one thing we allow is connect-src 'self' so the /openapi.json
+        # fetch from our own /docs works.
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'none'; "
+            "frame-ancestors 'none'; "
+            "base-uri 'none'; "
+            "form-action 'none'; "
+            "connect-src 'self'"
+        )
     # ── HSTS — force HTTPS for one year, only on production deploys.
     # Setting HSTS over plaintext HTTP (local dev) would teach
     # browsers to never visit http://localhost again until the
