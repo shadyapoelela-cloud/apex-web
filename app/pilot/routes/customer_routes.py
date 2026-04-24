@@ -584,7 +584,11 @@ def issue_sales_invoice(invoice_id: str = Path(...)):
             raise HTTPException(status_code=404, detail="customer not found")
 
         je = _post_sales_invoice_je(db, inv, customer)
-        # Actually post to GL (creates GLPosting rows from JournalLine rows)
+        # Actually post to GL (creates GLPosting rows from JournalLine rows).
+        # Explicit flush so post_journal_entry sees the in-flight JournalLines
+        # — SessionLocal is autoflush=False, so the lines query would otherwise
+        # silently return [] and 0 GLPostings would be created.
+        db.flush()
         try:
             from app.pilot.services.gl_engine import post_journal_entry
             post_journal_entry(db, je.id)
