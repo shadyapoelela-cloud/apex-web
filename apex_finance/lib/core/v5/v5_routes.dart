@@ -12,6 +12,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../apex_ask_panel.dart';
+import '../apex_news_ticker.dart';
 import '../theme.dart' as core_theme;
 import 'package:go_router/go_router.dart';
 
@@ -125,6 +126,7 @@ class V5Launchpad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: const ApexNewsTicker(),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'v5_ask_apex',
         onPressed: () => openApexAskPanel(context),
@@ -326,6 +328,31 @@ class V5Launchpad extends StatelessWidget {
                     label: 'توحيد الكيانات',
                     subtitle: 'Consolidation · FX · IC',
                     onTap: () => context.push('/compliance/audit-workflow-ai'),
+                  )),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.trending_down,
+                    label: 'إهلاك الأصول',
+                    subtitle: 'IAS 16 — SL · DB · DDB',
+                    onTap: () => context.push('/compliance/depreciation-ai'),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.currency_exchange,
+                    label: 'عملات متعددة',
+                    subtitle: 'مراكز · FX · تعرّض',
+                    onTap: () => context.push('/compliance/multi-currency'),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.rocket_launch_outlined,
+                    label: 'معالج التهيئة',
+                    subtitle: 'إعداد شركة + قالب COA',
+                    onTap: () => context.push('/onboarding/wizard'),
                   )),
                 ],
               ),

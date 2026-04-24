@@ -235,6 +235,98 @@ def reject_ai_suggestion(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ── Regulatory news feed ─────────────────────────────────
+
+
+@router.get("/regulatory-news")
+def list_regulatory_news(
+    jurisdiction: Optional[str] = Query(None),
+    only_future: bool = Query(False),
+    limit: int = Query(20, ge=1, le=100),
+):
+    try:
+        from app.core.regulatory_news import list_news
+        return {"success": True, "data": list_news(
+            jurisdiction=jurisdiction, only_future=only_future, limit=limit,
+        )}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/regulatory-news/{item_id}")
+def get_regulatory_news(item_id: str):
+    from app.core.regulatory_news import get_news
+    item = get_news(item_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail="news item not found")
+    return {"success": True, "data": item}
+
+
+# ── Fixed-asset depreciation (IAS 16) ────────────────────
+
+
+@router.post("/fixed-assets/schedule")
+def build_depreciation_schedule(payload: dict[str, Any] = Body(...)):
+    """Generate a depreciation schedule. Method is 'straight_line' (default),
+    'declining_balance', 'double_declining', or 'units_of_production'.
+    """
+    method = str(payload.get("method", "straight_line")).lower()
+    try:
+        from app.core import fixed_assets as fa
+        if method == "straight_line":
+            r = fa.straight_line(
+                cost=float(payload["cost"]),
+                salvage=float(payload.get("salvage", 0)),
+                useful_life_periods=int(payload["useful_life_periods"]),
+            )
+        elif method == "declining_balance":
+            r = fa.declining_balance(
+                cost=float(payload["cost"]),
+                salvage=float(payload.get("salvage", 0)),
+                useful_life_periods=int(payload["useful_life_periods"]),
+                rate_pct=payload.get("rate_pct"),
+            )
+        elif method == "double_declining":
+            r = fa.double_declining(
+                cost=float(payload["cost"]),
+                salvage=float(payload.get("salvage", 0)),
+                useful_life_periods=int(payload["useful_life_periods"]),
+            )
+        elif method == "units_of_production":
+            r = fa.units_of_production(
+                cost=float(payload["cost"]),
+                salvage=float(payload.get("salvage", 0)),
+                total_units_lifetime=float(payload["total_units_lifetime"]),
+                units_per_period=list(payload.get("units_per_period", [])),
+            )
+        else:
+            raise HTTPException(status_code=400, detail=f"unknown method: {method}")
+        return {"success": True, "data": r}
+    except KeyError as ke:
+        raise HTTPException(status_code=400, detail=f"missing field: {ke}")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── Multi-currency dashboard ─────────────────────────────
+
+
+@router.get("/multi-currency/dashboard")
+def multi_currency_dashboard(
+    display_currency: str = Query("SAR"),
+    tenant_id: Optional[str] = Query(None),
+):
+    try:
+        from app.core.multi_currency import dashboard
+        return {"success": True, "data": dashboard(
+            display_currency=display_currency, tenant_id=tenant_id,
+        )}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ── Audit workflow — Benford / JE sample / workpapers ────
 
 

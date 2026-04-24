@@ -187,6 +187,34 @@ def _execute_send_reminder(row: AiSuggestion) -> ExecutionResult:
     body = bodies.get(tone, bodies["gentle"])
     title = "تذكير بدفع فاتورة" if not invoice_id else f"تذكير بفاتورة {invoice_id}"
 
+    # WhatsApp channel takes precedence when requested AND phone is available.
+    phone = after.get("phone") or after.get("recipient_phone")
+    if channel == "whatsapp" and phone:
+        try:
+            from app.integrations.whatsapp.client import send_template_message
+            wa = send_template_message(
+                to=str(phone),
+                template_name="payment_reminder",
+                language_code="ar",
+                components=[{
+                    "type": "body",
+                    "parameters": [
+                        {"type": "text", "text": client_name or "عميل"},
+                        {"type": "text", "text": str(invoice_id or "—")},
+                        {"type": "text", "text": body},
+                    ],
+                }],
+            )
+            if wa.success:
+                return ExecutionResult(
+                    suggestion_id=row.id, ok=True, status=STATUS_EXECUTED,
+                    detail=f"WhatsApp reminder dispatched (backend={wa.backend})",
+                    output={"backend": wa.backend, "message_id": getattr(wa, "message_id", None)},
+                )
+            logger.warning("WhatsApp send failed, falling back to notification: %s", wa.error)
+        except Exception as e:
+            logger.warning("WhatsApp channel error on %s: %s — falling back to notification", row.id, e)
+
     # notifications_bridge.notify is async — execute it synchronously via a
     # fresh event loop so this worker stays sync for CI simplicity.
     try:

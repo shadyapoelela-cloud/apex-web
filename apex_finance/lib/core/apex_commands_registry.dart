@@ -73,6 +73,30 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       icon: Icons.mosque_outlined,
       onRun: (_) => go('/compliance/islamic-finance'),
     ),
+    ApexCommand(
+      id: 'nav_depreciation_ai',
+      label: 'جدول إهلاك الأصول (IAS 16)',
+      subtitle: 'خط مستقيم · رصيد متناقص · Double-Declining',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.trending_down,
+      onRun: (_) => go('/compliance/depreciation-ai'),
+    ),
+    ApexCommand(
+      id: 'nav_multi_currency',
+      label: 'لوحة العملات المتعددة',
+      subtitle: 'مراكز بالعملة الأصلية + التعرّض للصرف الأجنبي',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.currency_exchange,
+      onRun: (_) => go('/compliance/multi-currency'),
+    ),
+    ApexCommand(
+      id: 'nav_onboarding',
+      label: 'معالج تهيئة الحساب',
+      subtitle: 'إعداد الشركة + قالب COA صناعي',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.rocket_launch_outlined,
+      onRun: (_) => go('/onboarding/wizard'),
+    ),
 
     // ── Navigation ──
     ApexCommand.navigation(

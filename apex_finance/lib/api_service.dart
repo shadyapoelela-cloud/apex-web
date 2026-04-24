@@ -413,6 +413,21 @@ class ApiService {
   static Future<ApiResult> aiExecuteSuggestion(String id) =>
       _post('/api/v1/ai/suggestions/$id/execute', {});
 
+  // ── Regulatory news ──
+  static Future<ApiResult> aiRegulatoryNews({String? jurisdiction, bool onlyFuture=false, int limit=20}) {
+    final qs = <String>['limit=$limit', 'only_future=$onlyFuture'];
+    if (jurisdiction != null) qs.add('jurisdiction=${Uri.encodeQueryComponent(jurisdiction)}');
+    return _get('/api/v1/ai/regulatory-news?${qs.join('&')}');
+  }
+
+  // ── Fixed-asset depreciation ──
+  static Future<ApiResult> aiDepreciationSchedule(Map<String, dynamic> payload) =>
+      _post('/api/v1/ai/fixed-assets/schedule', payload);
+
+  // ── Multi-currency dashboard ──
+  static Future<ApiResult> aiMultiCurrencyDashboard({String displayCurrency='SAR'}) =>
+      _get('/api/v1/ai/multi-currency/dashboard?display_currency=$displayCurrency');
+
   // ── Audit workflow ──
   static Future<ApiResult> aiBenford({List<double>? amounts, String? startDate, String? endDate}) =>
       _post('/api/v1/ai/audit/benford', {
