@@ -197,13 +197,17 @@ def list_tenants(
     raises at startup if ADMIN_SECRET is missing in production.)
     """
     import os
+    import secrets as _secrets
     required = os.environ.get("ADMIN_SECRET")
     if not required:
         raise HTTPException(
             status_code=500,
             detail="ADMIN_SECRET not configured on server",
         )
-    if admin_secret != required:
+    # Constant-time compare — plain `!=` leaks the secret bytes via
+    # response-time side channels to any attacker who can replay the
+    # endpoint enough times.
+    if not admin_secret or not _secrets.compare_digest(admin_secret, required):
         raise HTTPException(status_code=401, detail="admin secret required")
 
     q = db.query(Tenant)

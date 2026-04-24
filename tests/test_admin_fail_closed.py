@@ -100,3 +100,49 @@ def test_list_tenants_fail_closed_when_secret_unset(monkeypatch) -> None:
     assert r.status_code != 200, (
         f"tenant list returned 200 despite unset ADMIN_SECRET — fail-open bug"
     )
+
+
+# ══════════════════════════════════════════════════════════════════════
+# Timing-attack regression: admin secret checks must use
+# secrets.compare_digest, not bare ==/!=.
+# ══════════════════════════════════════════════════════════════════════
+def test_verify_admin_uses_constant_time_compare() -> None:
+    """Regression for 2026-04-24 audit: bare `token != ADMIN_SECRET`
+    short-circuits on first differing byte, leaking the secret
+    byte-by-byte under timing analysis. Source of _verify_admin
+    must reference secrets.compare_digest; if someone ever rewrites
+    it back to `!=` this test flags it.
+
+    We could mock sleep + measure wall-clock to empirically detect
+    short-circuit, but that's flaky — source inspection is cheap
+    and reliable."""
+    import pathlib
+    src = pathlib.Path(__file__).parent.parent / "app" / "main.py"
+    text = src.read_text(encoding="utf-8")
+    # Extract _verify_admin body
+    start = text.index("def _verify_admin(")
+    # Find end of function (next def at same or lower indent)
+    body = text[start:start + 2000]
+    assert "compare_digest" in body, (
+        "_verify_admin must use secrets.compare_digest for constant-time "
+        "comparison — bare `!=` on ADMIN_SECRET is a timing-side-channel "
+        "leak. Check that the import + comparison are both present."
+    )
+
+
+def test_list_tenants_uses_constant_time_compare() -> None:
+    """Same regression for app/pilot/routes/pilot_routes.py::list_tenants —
+    we fixed the inline comparison there too."""
+    import pathlib
+    src = (
+        pathlib.Path(__file__).parent.parent
+        / "app" / "pilot" / "routes" / "pilot_routes.py"
+    )
+    text = src.read_text(encoding="utf-8")
+    # Locate list_tenants definition
+    start = text.index("def list_tenants(")
+    body = text[start:start + 2000]
+    assert "compare_digest" in body, (
+        "list_tenants must use secrets.compare_digest for the ADMIN_SECRET "
+        "comparison — plain `!=` leaks the secret under timing analysis."
+    )

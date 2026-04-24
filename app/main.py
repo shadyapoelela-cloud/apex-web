@@ -77,14 +77,25 @@ def _verify_admin(secret: str = None, x_admin_secret: str = Header(None, alias="
     """Verify admin secret.
     Header 'X-Admin-Secret' is the preferred and only secure transport.
     Query-parameter 'secret' is accepted in DEV ONLY for backward compatibility
-    (it leaks into server access logs and is refused in production)."""
+    (it leaks into server access logs and is refused in production).
+
+    Uses secrets.compare_digest to avoid timing-side-channel leakage — plain
+    `!=` on strings short-circuits on the first differing byte, letting an
+    attacker recover the secret character-by-character by measuring
+    response time over enough samples.
+    """
+    import secrets as _secrets
     if IS_PRODUCTION and secret and not x_admin_secret:
         raise HTTPException(
             403,
             "Admin secret via query parameter is forbidden in production — use X-Admin-Secret header.",
         )
     token = x_admin_secret or secret
-    if not token or token != ADMIN_SECRET:
+    # Fail closed: if ADMIN_SECRET isn't configured, refuse everything.
+    # Dev/staging drift safety — prod already crashes at startup.
+    if not ADMIN_SECRET:
+        raise HTTPException(500, "ADMIN_SECRET not configured on server")
+    if not token or not _secrets.compare_digest(token, ADMIN_SECRET):
         raise HTTPException(403, "Invalid admin secret")
     if secret and not x_admin_secret:
         logging.warning(
