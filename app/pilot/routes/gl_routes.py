@@ -485,6 +485,7 @@ def debug_posting_counts(entity_id: str, db: Session = Depends(get_db)):
             "gl_posting_count": post_count,
         }
     return {
+        "_deploy_marker": "v3-flush-fix",
         "entity_id": entity_id,
         "je_total": je_total,
         "je_posted": je_posted,
