@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../apex_ask_panel.dart';
 import '../theme.dart' as core_theme;
 import 'package:go_router/go_router.dart';
 
@@ -124,6 +125,14 @@ class V5Launchpad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'v5_ask_apex',
+        onPressed: () => openApexAskPanel(context),
+        backgroundColor: core_theme.AC.gold,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.auto_awesome),
+        label: const Text('اسأل أبكس', style: TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700)),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32),
@@ -161,6 +170,113 @@ class V5Launchpad extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const Spacer(),
+                  IconButton(
+                    tooltip: 'اسأل أبكس (Ctrl+/)',
+                    onPressed: () => openApexAskPanel(context),
+                    icon: Icon(Icons.auto_awesome, color: core_theme.AC.gold, size: 28),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // ── Ask APEX banner — the signature AI entry point ──
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [core_theme.AC.gold, const Color(0xFF7C3AED)],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: core_theme.AC.gold.withValues(alpha: 0.3),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.25),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
+                    ),
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'اسأل أبكس — Copilot ذكاء اصطناعي',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'Tajawal',
+                            ),
+                          ),
+                          SizedBox(height: 3),
+                          Text(
+                            'جرّب: "كم صرفنا على التسويق؟" · "قائمة الدخل" · "توقّع السيولة 3 أشهر"',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                              fontFamily: 'Tajawal',
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    FilledButton.icon(
+                      onPressed: () => openApexAskPanel(context),
+                      icon: const Icon(Icons.auto_awesome, size: 16),
+                      label: const Text(
+                        'ابدأ الآن',
+                        style: TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700),
+                      ),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: core_theme.AC.gold,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // ── AI quick links (3 cards) ──
+              Row(
+                children: [
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.hub_outlined,
+                    label: 'مركز AI',
+                    subtitle: 'الاستهلاك والنشاط',
+                    onTap: () => context.push('/admin/ai-console'),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.inbox_outlined,
+                    label: 'صندوق الاقتراحات',
+                    subtitle: 'اعتماد / رفض',
+                    onTap: () => context.push('/admin/ai-suggestions'),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.event_note_outlined,
+                    label: 'التقويم الضريبي',
+                    subtitle: 'VAT · زكاة · ZATCA',
+                    onTap: () => context.push('/compliance/tax-timeline'),
+                  )),
                 ],
               ),
               const SizedBox(height: 20),
@@ -575,6 +691,69 @@ class _WorkspaceCardState extends State<_WorkspaceCard> {
               Icon(Icons.arrow_back, size: 14, color: Colors.black38),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// Helper: AI quick-link tile used on V5Launchpad
+// ──────────────────────────────────────────────────────────────────────
+
+class _AiQuickLink extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _AiQuickLink({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: core_theme.AC.gold.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.4)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: core_theme.AC.gold, size: 22),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Tajawal',
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: Colors.black.withValues(alpha: 0.55),
+                      fontFamily: 'Tajawal',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

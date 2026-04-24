@@ -8,6 +8,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'apex_ask_panel.dart';
 import 'apex_command_palette.dart';
 
 /// Builds the list of commands available everywhere in the app.
@@ -15,6 +16,40 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
   void go(String path) => GoRouter.of(context).go(path);
 
   return [
+    // ── Ask APEX (top of list — the highest-leverage AI surface) ──
+    ApexCommand.action(
+      id: 'ask_apex',
+      label: 'اسأل أبكس',
+      subtitle: 'سؤال طبيعي للمساعد الذكي حول دفاترك',
+      icon: Icons.auto_awesome,
+      shortcut: 'CTRL /',
+      onRun: (ctx) => openApexAskPanel(ctx),
+    ),
+    ApexCommand(
+      id: 'nav_ai_console',
+      label: 'مركز الذكاء الاصطناعي',
+      subtitle: 'الاستهلاك والنشاط الأخير واختصارات الاعتماد',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.hub_outlined,
+      onRun: (_) => go('/admin/ai-console'),
+    ),
+    ApexCommand(
+      id: 'nav_ai_inbox',
+      label: 'صندوق اقتراحات الذكاء الاصطناعي',
+      subtitle: 'مراجعة والموافقة على ما يقترحه الـ Copilot',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.inbox_outlined,
+      onRun: (_) => go('/admin/ai-suggestions'),
+    ),
+    ApexCommand(
+      id: 'nav_tax_timeline',
+      label: 'التقويم الضريبي',
+      subtitle: 'الاستحقاقات القادمة (VAT / زكاة / ضريبة الشركات / ZATCA)',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.event_note_outlined,
+      onRun: (_) => go('/compliance/tax-timeline'),
+    ),
+
     // ── Navigation ──
     ApexCommand.navigation(
       id: 'nav_home',

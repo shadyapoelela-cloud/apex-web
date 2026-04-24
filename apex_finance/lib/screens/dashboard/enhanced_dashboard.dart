@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
+import '../../core/apex_ask_panel.dart';
 import '../../core/theme.dart';
 import '../../core/ui_components.dart';
 import '../compliance/compliance_health_widget.dart';
@@ -95,6 +96,8 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
                         icon: Icons.dashboard_rounded,
                       ),
                       const SizedBox(height: 16),
+                      _buildAIHighlightBanner(context),
+                      const SizedBox(height: 16),
                       _buildNoticeBanners(),
                       const SizedBox(height: 16),
                       // Compliance posture + quick links (Sprint 4)
@@ -160,6 +163,100 @@ class _EnhancedDashboardState extends State<EnhancedDashboard> {
           ],
         );
       },
+    );
+  }
+
+  // ════════════════════════════════════════
+  // AI HIGHLIGHT BANNER (new — surfaces the Copilot agent)
+  // ════════════════════════════════════════
+  Widget _buildAIHighlightBanner(BuildContext ctx) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            AC.gold.withValues(alpha: 0.18),
+            AC.gold.withValues(alpha: 0.05),
+            AC.navy2,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AC.gold.withValues(alpha: 0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: AC.gold.withValues(alpha: 0.1),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AC.gold.withValues(alpha: 0.18),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.auto_awesome, color: AC.gold, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'اسأل أبكس — مساعد ذكي على دفاترك',
+                  style: TextStyle(
+                    color: AC.tp,
+                    fontFamily: 'Tajawal',
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  'جرّب: "كم صرفنا على التسويق؟"، "توقّع السيولة 3 أشهر"، "قائمة الدخل لهذا الشهر"',
+                  style: TextStyle(
+                    color: AC.ts,
+                    fontFamily: 'Tajawal',
+                    fontSize: 12,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          Wrap(
+            direction: Axis.vertical,
+            spacing: 6,
+            children: [
+              FilledButton.icon(
+                onPressed: () => openApexAskPanel(ctx),
+                icon: const Icon(Icons.auto_awesome, size: 16),
+                label: const Text('اسأل الآن', style: TextStyle(fontFamily: 'Tajawal', fontSize: 12)),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AC.gold,
+                  foregroundColor: AC.btnFg,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                ),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => GoRouter.of(ctx).push('/admin/ai-console'),
+                icon: Icon(Icons.hub_outlined, size: 14, color: AC.gold),
+                label: Text('المركز', style: TextStyle(color: AC.gold, fontFamily: 'Tajawal', fontSize: 11)),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: AC.gold.withValues(alpha: 0.5)),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

@@ -37,6 +37,9 @@ import '../screens/notifications/notification_detail_screen.dart';
 import '../main.dart' show MainNav, RegScreen, UpgradePlanScreen, KnowledgeFeedbackScreen, NewServiceRequestScreen;
 import '../screens/account/account_sub_screens.dart' show EditProfileScreen, ChangePasswordScreen, CloseAccountScreen, SessionsScreen;
 import '../screens/admin/admin_sub_screens.dart' show ReviewerConsoleScreen, ProviderVerificationScreen, ProviderDocumentUploadScreen, ProviderComplianceScreen, PolicyManagementScreen, ActivityHistoryScreen, AuditLogScreen, KnowledgeDeveloperConsole, TaskTypesBrowserScreen;
+import '../screens/admin/ai_suggestions_inbox_screen.dart';
+import '../screens/admin/ai_console_screen.dart';
+import '../screens/compliance/tax_timeline_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -473,6 +476,9 @@ final appRouter = GoRouter(
     GoRoute(path: '/financial-ops', pageBuilder: (c, s) => _apexPage(const FinancialOpsScreen(), s)),
     GoRoute(path: '/copilot', pageBuilder: (c, s) => _apexPage(const CopilotScreen(), s)),
     GoRoute(path: '/admin/audit', pageBuilder: (c, s) => _apexPage(const AuditLogScreen(), s)),
+    GoRoute(path: '/admin/ai-suggestions', pageBuilder: (c, s) => _apexPage(const AiSuggestionsInboxScreen(), s)),
+    GoRoute(path: '/admin/ai-console', pageBuilder: (c, s) => _apexPage(const AiConsoleScreen(), s)),
+    GoRoute(path: '/compliance/tax-timeline', pageBuilder: (c, s) => _apexPage(const TaxTimelineScreen(), s)),
 
     // ─── COA Workflow ───
     GoRoute(path: '/upload', pageBuilder: (c, s) => _apexPage(const UploadScreen(), s)),

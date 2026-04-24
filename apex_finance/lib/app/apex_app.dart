@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../core/apex_ask_panel.dart';
 import '../core/apex_command_palette.dart';
 import '../core/apex_commands_registry.dart';
 import '../core/router.dart';
@@ -84,6 +85,12 @@ class ApexApp extends ConsumerWidget {
                 () => _openPalette(context),
             const SingleActivator(LogicalKeyboardKey.keyK, meta: true):
                 () => _openPalette(context),
+            // Ctrl+/ (and ⌘+/) jumps directly into "Ask APEX" — skipping
+            // the palette so a one-press question is the primary AI UX.
+            const SingleActivator(LogicalKeyboardKey.slash, control: true):
+                () => openApexAskPanel(context),
+            const SingleActivator(LogicalKeyboardKey.slash, meta: true):
+                () => openApexAskPanel(context),
           };
           for (var i = 0; i < digitKeys.length; i++) {
             final n = i + 1;

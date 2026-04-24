@@ -368,6 +368,69 @@ class ApiService {
   static Future<ApiResult> copilotDetectIntent(String message) => _post('/copilot/detect-intent', {'message':message});
   static Future<ApiResult> copilotCloseSession(String sessionId) => _post('/copilot/sessions/$sessionId/close', {});
 
+  // ── Ask APEX — agent with tool-use over the books ──
+  /// Natural-language question answered by the Copilot agent.
+  /// Wraps POST /api/v1/ai/ask. `history` is an optional list of
+  /// prior {"role": "...", "content": "..."} maps for multi-turn.
+  static Future<ApiResult> aiAsk(String query, {List<Map<String,dynamic>>? history, int maxTurns=5}) =>
+      _post('/api/v1/ai/ask', {'query':query, if(history!=null)'history':history, 'max_turns':maxTurns});
+
+  /// Claude token + cost summary for the calling tenant in the current month.
+  /// Wraps GET /api/v1/ai/usage.
+  static Future<ApiResult> aiUsage({String? tenantId, String? since}) {
+    final qs = <String>[];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (since != null) qs.add('since=${Uri.encodeQueryComponent(since)}');
+    final suffix = qs.isEmpty ? '' : '?${qs.join('&')}';
+    return _get('/api/v1/ai/usage$suffix');
+  }
+
+  /// List AI suggestions — the pending-approval inbox.
+  /// Wraps GET /api/v1/ai/suggestions.
+  static Future<ApiResult> aiListSuggestions({String? status, String? source, int limit=50}) {
+    final qs = <String>['limit=$limit'];
+    if (status != null) qs.add('status=${Uri.encodeQueryComponent(status)}');
+    if (source != null) qs.add('source=${Uri.encodeQueryComponent(source)}');
+    return _get('/api/v1/ai/suggestions?${qs.join('&')}');
+  }
+
+  /// Fetch one AiSuggestion by id.
+  static Future<ApiResult> aiGetSuggestion(String id) =>
+      _get('/api/v1/ai/suggestions/$id');
+
+  /// Human approves an AI suggestion — flips NEEDS_APPROVAL → APPROVED.
+  static Future<ApiResult> aiApproveSuggestion(String id, {String? userId}) =>
+      _post('/api/v1/ai/suggestions/$id/approve', {if(userId!=null)'user_id':userId});
+
+  /// Human rejects an AI suggestion.
+  static Future<ApiResult> aiRejectSuggestion(String id, {String? userId, String? reason}) =>
+      _post('/api/v1/ai/suggestions/$id/reject', {
+        if(userId!=null)'user_id':userId,
+        if(reason!=null)'reason':reason,
+      });
+
+  /// Execute an approved suggestion (advances status → executed/failed).
+  static Future<ApiResult> aiExecuteSuggestion(String id) =>
+      _post('/api/v1/ai/suggestions/$id/execute', {});
+
+  /// Upcoming tax / compliance obligations for the next N days.
+  static Future<ApiResult> aiTaxTimeline({
+    int horizonDays = 120,
+    String country = 'sa',
+    String vatCadence = 'monthly',
+    String? fiscalYearEnd,
+    String? csidExpiresAt,
+  }) {
+    final qs = <String>[
+      'horizon_days=$horizonDays',
+      'country=${Uri.encodeQueryComponent(country)}',
+      'vat_cadence=${Uri.encodeQueryComponent(vatCadence)}',
+    ];
+    if (fiscalYearEnd != null) qs.add('fiscal_year_end=${Uri.encodeQueryComponent(fiscalYearEnd)}');
+    if (csidExpiresAt != null) qs.add('zatca_csid_expires_at=${Uri.encodeQueryComponent(csidExpiresAt)}');
+    return _get('/api/v1/ai/tax-timeline?${qs.join('&')}');
+  }
+
     // ── Helpers (use _httpClient so HttpOnly cookies ride along) ──
   static Future<ApiResult> _get(String path) async {
     try { final res=await _httpClient.get(Uri.parse('$_base$path'),headers:_h); if(res.statusCode==200)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}

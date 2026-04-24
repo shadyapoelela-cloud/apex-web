@@ -8,6 +8,7 @@ import 'core/session.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:html' as html;
+import 'core/apex_ask_panel.dart' show openApexAskPanel;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'providers/app_providers.dart';
@@ -430,6 +431,22 @@ class _MainNavS extends ConsumerState<MainNav> {
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               decoration: BoxDecoration(color: AC.navy3.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10)),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
+            // ── اسأل أبكس — AI agent sidebar (Ctrl+/ shortcut) ──
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AC.gold.withValues(alpha: 0.22), AC.gold.withValues(alpha: 0.08)],
+                ),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AC.gold.withValues(alpha: 0.45)),
+              ),
+              child: ApexIconButton(
+                icon: Icons.auto_awesome,
+                tooltip: 'اسأل أبكس (Ctrl+/)',
+                onPressed: () => openApexAskPanel(context),
+              ),
+            ),
             ApexIconButton(icon: Icons.search, tooltip: 'البحث في المنصة', onPressed: () {
               showSearch(context: context, delegate: ApexSearch());
             }),
@@ -598,6 +615,19 @@ class _MainNavS extends ConsumerState<MainNav> {
           _drawerItem(Icons.workspace_premium, 'الأهلية الترخيصية', () { _comingSoon(); }),
           _drawerItem(Icons.volunteer_activism, 'الدعم والحوافز', () { _comingSoon(); }),
           _drawerItem(Icons.gavel_rounded, 'المراجعة المحاسبية والقانونية', () { context.push('/audit-workflow'); setState(() => _dr = false); }),
+          ],
+        ),
+        // ── الذكاء الاصطناعي — new AI surfaces ──
+        ExpansionTile(
+          trailing: Icon(Icons.expand_more, color: AC.ts, size: 18),
+          tilePadding: EdgeInsets.symmetric(horizontal: 16),
+          initiallyExpanded: true,
+          title: Text('الذكاء الاصطناعي', textAlign: TextAlign.right, style: TextStyle(color: AC.gold, fontSize: 12, fontWeight: FontWeight.w700)),
+          children: [
+          _drawerItem(Icons.auto_awesome, 'اسأل أبكس', () { openApexAskPanel(context); setState(() => _dr = false); }, isGold: true),
+          _drawerItem(Icons.hub_outlined, 'مركز الذكاء الاصطناعي', () { context.push('/admin/ai-console'); setState(() => _dr = false); }),
+          _drawerItem(Icons.inbox_outlined, 'صندوق الاقتراحات', () { context.push('/admin/ai-suggestions'); setState(() => _dr = false); }),
+          _drawerItem(Icons.event_note_outlined, 'التقويم الضريبي', () { context.push('/compliance/tax-timeline'); setState(() => _dr = false); }),
           ],
         ),
         ExpansionTile(
