@@ -173,6 +173,21 @@ async def register(req: RegisterRequest, request: Request, response: Response):
             samesite="lax",
             path="/",
         )
+    # Also set the refresh token as an HttpOnly cookie on /auth/refresh
+    # path only — narrower scope than apex_token (which every endpoint
+    # reads). Using path=/auth means refresh never leaks on /clients
+    # etc., shrinking the XSS/CSRF exposure window.
+    refresh_token = result.get("tokens", {}).get("refresh_token")
+    if refresh_token:
+        response.set_cookie(
+            key="apex_refresh",
+            value=refresh_token,
+            max_age=60 * 60 * 24 * 30,  # 30 days — matches REFRESH_TOKEN_EXPIRE_DAYS
+            httponly=True,
+            secure=_IS_PRODUCTION,
+            samesite="lax",
+            path="/auth",
+        )
     return result
 
 
@@ -214,17 +229,108 @@ async def login(req: LoginRequest, request: Request, response: Response):
             samesite="lax",               # blocks cross-site POST while allowing top-level navigations
             path="/",
         )
+    # Refresh token on a narrower /auth path — same rationale as the
+    # register endpoint: the long-lived refresh token is never sent
+    # on /clients or /pilot/* requests, shrinking CSRF + log-leak
+    # exposure. Lives 30 days to match REFRESH_TOKEN_EXPIRE_DAYS.
+    refresh_token = result.get("tokens", {}).get("refresh_token")
+    if refresh_token:
+        response.set_cookie(
+            key="apex_refresh",
+            value=refresh_token,
+            max_age=60 * 60 * 24 * 30,
+            httponly=True,
+            secure=_IS_PRODUCTION,
+            samesite="lax",
+            path="/auth",
+        )
+    return result
+
+
+class RefreshTokenRequest(BaseModel):
+    # Body is optional — the token can also ride on the apex_refresh cookie
+    # set at login/register time. Required field would break browser-only
+    # clients that rely on cookies.
+    refresh_token: Optional[str] = None
+
+
+@router.post("/auth/refresh", tags=["Auth"])
+async def refresh_access_token(
+    req: RefreshTokenRequest,
+    response: Response,
+    apex_refresh: Optional[str] = Cookie(None),
+):
+    """Exchange a valid refresh token for a new access token.
+
+    Accepts the refresh token from the request body (``refresh_token`` field)
+    OR the ``apex_refresh`` HttpOnly cookie. Header takes no refresh — unlike
+    access tokens, refresh tokens should never travel in Authorization
+    (they live longer, and Authorization is often logged).
+
+    On success, mints a fresh access token AND updates the HttpOnly
+    ``apex_token`` cookie so cookie-auth clients don't have to read the
+    response body. The refresh token itself is NOT rotated in this
+    cut — follow-up commit can add rotation once token revocation lists
+    are in place to prevent replay.
+    """
+    token = (req.refresh_token or "").strip() or (apex_refresh or "").strip() or None
+    if not token:
+        raise HTTPException(status_code=400, detail="refresh_token required")
+
+    result = auth_service.refresh_access_token(token)
+    if not result.get("success"):
+        # 401 rather than 400 — it's an auth failure (bad/expired/revoked).
+        raise HTTPException(status_code=401, detail=result.get("error", "refresh failed"))
+
+    new_access = result.get("access_token")
+    if new_access:
+        response.set_cookie(
+            key="apex_token",
+            value=new_access,
+            max_age=60 * 60 * 24,
+            httponly=True,
+            secure=_IS_PRODUCTION,
+            samesite="lax",
+            path="/",
+        )
     return result
 
 
 @router.post("/auth/logout", tags=["Auth"])
-async def logout(response: Response, authorization: Optional[str] = Header(None)):
-    # Clear the HttpOnly cookie so the browser forgets us.
+async def logout(
+    response: Response,
+    authorization: Optional[str] = Header(None),
+    apex_token: Optional[str] = Cookie(None),
+):
+    """Revoke the current session and clear the auth cookies.
+
+    BUG fixed 2026-04-24: this route used to call
+    ``auth_service.logout(token)`` — but the service signature is
+    ``logout(self, user_id, token="", session_id="")``. Passing the
+    JWT as ``user_id`` meant the session-revocation query
+    ``WHERE user_id = <JWT>`` matched zero rows, so logout silently
+    did nothing. Users who "logged out" stayed logged in server-side;
+    a refresh-token replay after logout still worked. Now we decode
+    the token, extract the real user_id, and pass it positionally.
+    """
+    # Clear BOTH HttpOnly cookies so the browser forgets us.
     response.delete_cookie("apex_token", path="/")
+    response.delete_cookie("apex_refresh", path="/auth")
+    # Resolve the actual user from whatever credential the client sent.
+    token: Optional[str] = None
     if authorization and authorization.startswith("Bearer "):
-        token = authorization.split(" ", 1)[1]
-        return auth_service.logout(token)
-    return {"success": True}
+        token = authorization.split(" ", 1)[1].strip() or None
+    if not token and isinstance(apex_token, str) and apex_token:
+        token = apex_token.strip() or None
+    if not token:
+        # No credentials → nothing server-side to revoke, cookies are
+        # already cleared above.
+        return {"success": True}
+    payload = decode_token(token)
+    user_id = payload.get("sub") if isinstance(payload, dict) else None
+    if not user_id:
+        return {"success": True}
+    return auth_service.logout(user_id, token=token)
 
 
 @router.post("/auth/logout-all", tags=["Auth"])

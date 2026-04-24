@@ -446,6 +446,101 @@ class AuthService:
         finally:
             db.close()
 
+    def refresh_access_token(self, refresh_token: str) -> dict:
+        """Exchange a valid refresh token for a fresh access token.
+
+        Verifies the refresh token is well-formed + not expired, then
+        confirms it still maps to an active UserSession (so logout /
+        logout-all revoke the refresh path too). Issues a new short-
+        lived access token with the user's CURRENT roles (not the
+        roles at login time — role changes propagate on next refresh).
+
+        Returns:
+            ``{"success": True, "access_token": "...", "user_id": "..."}``
+              on success, or ``{"success": False, "error": "..."}`` on
+              any of: missing token, malformed JWT, wrong type,
+              expired, revoked session, or deleted user.
+        """
+        if not refresh_token:
+            return {"success": False, "error": "missing refresh token"}
+        payload = decode_token(refresh_token)
+        if not payload or payload.get("error"):
+            return {"success": False, "error": "invalid or expired refresh token"}
+        if payload.get("type") != "refresh":
+            return {"success": False, "error": "not a refresh token"}
+        user_id = payload.get("sub")
+        if not user_id:
+            return {"success": False, "error": "refresh token missing subject"}
+
+        token_hash = hashlib.sha256(refresh_token.encode()).hexdigest()
+        db = SessionLocal()
+        try:
+            session = (
+                db.query(UserSession)
+                .filter(
+                    UserSession.user_id == user_id,
+                    UserSession.refresh_token_hash == token_hash,
+                    UserSession.is_active == True,  # noqa: E712 — SQLAlchemy truth
+                )
+                .first()
+            )
+            if not session:
+                # Either logged out, logged-out-all, or the refresh
+                # token was never issued through /auth/login (tampered).
+                return {
+                    "success": False,
+                    "error": "session revoked or refresh token not recognised",
+                }
+
+            user = db.query(User).filter(User.id == user_id).first()
+            if not user or user.status != "active":
+                return {
+                    "success": False,
+                    "error": "user inactive or deleted",
+                }
+
+            # Re-read roles at refresh time — promotions / revocations
+            # apply on next refresh (~15 minutes from any role change).
+            roles = [
+                r.code
+                for r in db.query(Role.code)
+                .join(UserRole, UserRole.role_id == Role.id)
+                .filter(UserRole.user_id == user.id)
+                .all()
+            ]
+
+            new_access = create_access_token(user.id, user.username, roles)
+            # Refresh the session access-token hash too so the "is this
+            # access token alive" check (used by logout(token=)) stays
+            # coherent.
+            session.token_hash = hashlib.sha256(new_access.encode()).hexdigest()
+            session.expires_at = datetime.now(timezone.utc) + timedelta(
+                minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+            )
+
+            db.add(
+                UserSecurityEvent(
+                    id=gen_uuid(),
+                    user_id=user.id,
+                    event_type="token_refresh",
+                )
+            )
+            db.commit()
+
+            return {
+                "success": True,
+                "access_token": new_access,
+                "user_id": user.id,
+                "username": user.username,
+                "roles": roles,
+            }
+        except Exception:
+            db.rollback()
+            logging.error("Refresh token exchange failed", exc_info=True)
+            return {"success": False, "error": Errors.INTERNAL}
+        finally:
+            db.close()
+
     def forgot_password(self, email: str) -> dict:
         db = SessionLocal()
         try:
