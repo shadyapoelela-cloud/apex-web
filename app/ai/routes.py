@@ -235,6 +235,76 @@ def reject_ai_suggestion(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ── Industry-specific COA templates ──────────────────────
+
+
+@router.get("/coa-templates")
+def list_coa_templates():
+    """Return industry COA templates for the onboarding picker."""
+    try:
+        from app.core.coa_industry_templates import list_templates
+        return {"success": True, "data": list_templates()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/coa-templates/{template_id}")
+def get_coa_template(template_id: str):
+    """Return one template with its full account list."""
+    try:
+        from app.core.coa_industry_templates import get_template
+        tpl = get_template(template_id)
+        if tpl is None:
+            raise HTTPException(status_code=404, detail="template not found")
+        return {"success": True, "data": tpl}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── Bank reconciliation — AI-assisted matching ────────────
+
+
+@router.get("/bank-rec/suggestions/{txn_id}")
+def get_bank_rec_suggestions(
+    txn_id: str,
+    limit: int = Query(5, ge=1, le=20),
+    min_confidence: float = Query(0.30, ge=0.0, le=1.0),
+):
+    """Return candidate journal entries that likely match a bank txn."""
+    try:
+        from app.core.bank_reconciliation_ai import suggest_matches_for_transaction
+        items = suggest_matches_for_transaction(
+            txn_id=txn_id, limit=limit, min_confidence=min_confidence,
+        )
+        return {"success": True, "data": items, "count": len(items)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/bank-rec/auto-match")
+def run_auto_match(
+    limit: int = Query(100, ge=1, le=500),
+    confidence_floor: float = Query(0.95, ge=0.7, le=1.0),
+    tenant_id: Optional[str] = Query(None),
+):
+    """Batch-apply high-confidence matches. Used by the "Auto-match
+    overnight" scheduler + the "Match all" button on the bank-rec UI."""
+    try:
+        from app.core.bank_reconciliation_ai import auto_match_all
+        return {
+            "success": True,
+            "data": auto_match_all(
+                tenant_id=tenant_id,
+                confidence_floor=confidence_floor,
+                limit=limit,
+            ),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ── Tax timeline — upcoming obligations ───────────────────
 
 

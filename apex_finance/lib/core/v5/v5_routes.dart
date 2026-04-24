@@ -279,6 +279,31 @@ class V5Launchpad extends StatelessWidget {
                   )),
                 ],
               ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.compare_arrows,
+                    label: 'تسوية بنكية بـ AI',
+                    subtitle: 'مطابقة تلقائية للحركات',
+                    onTap: () => context.push('/compliance/bank-rec-ai'),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.receipt_long,
+                    label: 'فاتورة جديدة',
+                    subtitle: 'ZATCA-compliant',
+                    onTap: () => context.push('/compliance/zatca-invoice'),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.analytics_outlined,
+                    label: 'قائمة الدخل',
+                    subtitle: 'P&L / ميزان / ميزانية',
+                    onTap: () => context.push('/financial-ops'),
+                  )),
+                ],
+              ),
               const SizedBox(height: 20),
 
               // Showcase CTA banner

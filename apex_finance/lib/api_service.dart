@@ -413,6 +413,33 @@ class ApiService {
   static Future<ApiResult> aiExecuteSuggestion(String id) =>
       _post('/api/v1/ai/suggestions/$id/execute', {});
 
+  /// List industry-specific COA templates.
+  static Future<ApiResult> aiListCoaTemplates() =>
+      _get('/api/v1/ai/coa-templates');
+
+  /// Fetch one COA template with its full account list.
+  static Future<ApiResult> aiGetCoaTemplate(String id) =>
+      _get('/api/v1/ai/coa-templates/$id');
+
+  /// Candidate matches for a bank-feed transaction (AI-assisted rec).
+  static Future<ApiResult> aiBankRecSuggestions(String txnId, {int limit=5, double minConfidence=0.30}) =>
+      _get('/api/v1/ai/bank-rec/suggestions/$txnId?limit=$limit&min_confidence=$minConfidence');
+
+  /// Batch-auto-apply high-confidence bank matches.
+  static Future<ApiResult> aiBankRecAutoMatch({int limit=100, double confidenceFloor=0.95}) =>
+      _post('/api/v1/ai/bank-rec/auto-match?limit=$limit&confidence_floor=$confidenceFloor', {});
+
+  /// List unreconciled bank transactions.
+  static Future<ApiResult> listBankTransactions({bool unreconciledOnly=true, int limit=200}) =>
+      _get('/api/v1/bank-feeds/transactions?unreconciled_only=$unreconciledOnly&limit=$limit');
+
+  /// Mark a bank txn as reconciled against a journal entry or invoice.
+  static Future<ApiResult> markBankTxnReconciled(String txnId, {required String entityType, required String entityId}) =>
+      _post('/api/v1/bank-feeds/transactions/$txnId/reconcile', {
+        'entity_type': entityType,
+        'entity_id': entityId,
+      });
+
   /// Upcoming tax / compliance obligations for the next N days.
   static Future<ApiResult> aiTaxTimeline({
     int horizonDays = 120,

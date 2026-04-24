@@ -49,6 +49,14 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       icon: Icons.event_note_outlined,
       onRun: (_) => go('/compliance/tax-timeline'),
     ),
+    ApexCommand(
+      id: 'nav_bank_rec_ai',
+      label: 'التسوية البنكية بالذكاء الاصطناعي',
+      subtitle: 'مطابقة حركات البنك بقيود اليومية تلقائياً',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.compare_arrows,
+      onRun: (_) => go('/compliance/bank-rec-ai'),
+    ),
 
     // ── Navigation ──
     ApexCommand.navigation(

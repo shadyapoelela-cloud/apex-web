@@ -44,7 +44,7 @@ def test_executor_rejects_non_approved_rows():
 
 def test_executor_happy_path_create_invoice():
     from app.ai.approval_executor import execute_suggestion
-    sid = _make_suggestion("create_invoice", {"client_name": "شركة X", "draft_id": "d2"})
+    sid = _make_suggestion("create_invoice", {"client_name": "شركة X", "draft_id": "d2", "description": "استشارات", "subtotal": 1000, "vat_rate": 15})
     _approve(sid)
     result = execute_suggestion(sid)
     assert result.ok is True
@@ -72,7 +72,7 @@ def test_executor_returns_error_on_unknown_action():
 def test_executor_is_idempotent_on_terminal_state():
     """Running the executor twice on the same row should not double-execute."""
     from app.ai.approval_executor import execute_suggestion
-    sid = _make_suggestion("create_invoice", {"client_name": "Y", "draft_id": "d3"})
+    sid = _make_suggestion("create_invoice", {"client_name": "Y", "draft_id": "d3", "description": "خدمة", "subtotal": 500, "vat_rate": 15})
     _approve(sid)
     first = execute_suggestion(sid)
     second = execute_suggestion(sid)
@@ -86,8 +86,8 @@ def test_executor_is_idempotent_on_terminal_state():
 def test_execute_all_approved_returns_counters():
     from app.ai.approval_executor import execute_all_approved
     # Seed two approved rows.
-    s1 = _make_suggestion("create_invoice", {"client_name": "A", "draft_id": "d-a"})
-    s2 = _make_suggestion("create_invoice", {"client_name": "B", "draft_id": "d-b"})
+    s1 = _make_suggestion("create_invoice", {"client_name": "A", "draft_id": "d-a", "description": "X", "subtotal": 200, "vat_rate": 15})
+    s2 = _make_suggestion("create_invoice", {"client_name": "B", "draft_id": "d-b", "description": "Y", "subtotal": 300, "vat_rate": 15})
     _approve(s1)
     _approve(s2)
 
