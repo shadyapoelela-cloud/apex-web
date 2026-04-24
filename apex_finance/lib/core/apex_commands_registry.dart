@@ -145,6 +145,14 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       icon: Icons.insights,
       onRun: (_) => go('/compliance/ratios'),
     ),
+    ApexCommand(
+      id: 'nav_universal_journal',
+      label: 'السجل الموحّد (SAP ACDOCA + Odoo multi-view)',
+      subtitle: 'كل الحركات المالية · List / Kanban / Pivot · دفاتر متوازية',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.hub,
+      onRun: (_) => go('/operations/universal-journal'),
+    ),
 
     // ── Navigation ──
     ApexCommand.navigation(

@@ -382,6 +382,55 @@ class V5Launchpad extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
+              // SAP + Odoo highlight card
+              InkWell(
+                onTap: () => context.push('/operations/universal-journal'),
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  margin: const EdgeInsets.only(bottom: 10),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [const Color(0xFF1E3A5F), const Color(0xFF7C3AED).withValues(alpha: 0.5)],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.5)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(9),
+                        decoration: BoxDecoration(color: core_theme.AC.gold.withValues(alpha: 0.25), shape: BoxShape.circle),
+                        child: const Icon(Icons.hub, color: Colors.white, size: 22),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'السجل الموحّد — SAP ACDOCA + Odoo Multi-view',
+                              style: TextStyle(
+                                color: Colors.white, fontSize: 14,
+                                fontWeight: FontWeight.w800, fontFamily: 'Tajawal',
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'عرض موحّد لكل الحركات — List / Kanban / Pivot — بدقة SAP وسهولة Odoo',
+                              style: TextStyle(
+                                color: Colors.white70, fontSize: 11,
+                                fontFamily: 'Tajawal',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_back_ios, color: Colors.white70, size: 14),
+                    ],
+                  ),
+                ),
+              ),
               InkWell(
                 onTap: () => context.push('/financial-ops'),
                 borderRadius: BorderRadius.circular(14),

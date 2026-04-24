@@ -252,6 +252,47 @@ def reject_ai_suggestion(
 # ── Audit hash-chain integrity ───────────────────────────
 
 
+# ── SAP-style Universal Journal ──────────────────────────
+
+
+@router.post("/universal-journal/query")
+def universal_journal_query(payload: dict[str, Any] = Body(...)):
+    """Pull ACDOCA-style rows — one flat view over all finance postings."""
+    try:
+        from app.core.universal_journal import query_universal_journal
+        from datetime import date as _date
+        sd = payload.get("start_date")
+        ed = payload.get("end_date")
+        rows = query_universal_journal(
+            tenant_id=payload.get("tenant_id"),
+            entity_id=payload.get("entity_id"),
+            start_date=_date.fromisoformat(sd) if sd else None,
+            end_date=_date.fromisoformat(ed) if ed else None,
+            account_codes=payload.get("account_codes"),
+            account_categories=payload.get("account_categories"),
+            source_types=payload.get("source_types"),
+            status=payload.get("status", "posted"),
+            ledger_id=payload.get("ledger_id", "L1"),
+            partner_id=payload.get("partner_id"),
+            dimension_filters=payload.get("dimension_filters"),
+            limit=int(payload.get("limit", 500)),
+            offset=int(payload.get("offset", 0)),
+        )
+        return {"success": True, "data": rows, "count": len(rows)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/universal-journal/document-flow/{source_type}/{source_id}")
+def universal_journal_document_flow(source_type: str, source_id: str):
+    """SAP-pattern bidirectional document flow."""
+    try:
+        from app.core.universal_journal import document_flow
+        return {"success": True, "data": document_flow(source_type, source_id)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/audit/chain/verify")
 def verify_audit_chain_endpoint(limit: int = Query(1000, ge=1, le=50_000)):
     """Walk the audit_trail hash chain and verify each row's hash.

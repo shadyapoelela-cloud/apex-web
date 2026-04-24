@@ -505,6 +505,12 @@ class ApiService {
   static Future<ApiResult> hrListEmployees({int limit=100}) => _get('/api/v1/employees?limit=$limit');
   static Future<ApiResult> hrCreateEmployee(Map<String, dynamic> payload) => _post('/api/v1/employees', payload);
 
+  // ── SAP Universal Journal ──
+  static Future<ApiResult> universalJournalQuery(Map<String, dynamic> filters) =>
+      _post('/api/v1/ai/universal-journal/query', filters);
+  static Future<ApiResult> documentFlow(String sourceType, String sourceId) =>
+      _get('/api/v1/ai/universal-journal/document-flow/$sourceType/$sourceId');
+
   // ── Audit hash-chain ──
   static Future<ApiResult> aiVerifyAuditChain({int limit=1000}) =>
       _get('/api/v1/ai/audit/chain/verify?limit=$limit');
