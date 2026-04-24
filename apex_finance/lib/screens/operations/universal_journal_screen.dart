@@ -16,6 +16,9 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api_service.dart';
+import '../../core/apex_dimensions_editor.dart';
+import '../../core/apex_document_chatter.dart';
+import '../../core/apex_document_flow.dart';
 import '../../core/apex_multi_view_host.dart';
 import '../../core/theme.dart';
 
@@ -88,6 +91,8 @@ class _UniversalJournalScreenState extends State<UniversalJournalScreen> {
     };
   }
 
+  Map<String, dynamic>? _focusedRow;    // row selected for chatter context
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -99,27 +104,42 @@ class _UniversalJournalScreenState extends State<UniversalJournalScreen> {
           title: const Text('السجل الموحّد — Universal Journal (ACDOCA)',
               style: TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700)),
         ),
-        body: Column(
+        body: Row(
           children: [
-            _filterBar(),
-            if (!_loading && _error == null && _rows.isNotEmpty) _smartButtons(),
             Expanded(
-              child: _loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _error != null
-                      ? Center(child: Text(_error!, style: TextStyle(color: AC.err, fontFamily: 'Tajawal')))
-                      : _rows.isEmpty
-                          ? _empty()
-                          : ApexMultiViewHost<Map<String, dynamic>>(
-                              screenKey: 'universal_journal',
-                              items: _rows,
-                              modes: const [ApexViewMode.list, ApexViewMode.kanban, ApexViewMode.pivot],
-                              initialMode: ApexViewMode.list,
-                              listBuilder: (items) => _ListView(rows: items),
-                              kanbanBuilder: (items) => _KanbanView(rows: items),
-                              pivotBuilder: (items) => _PivotView(rows: items),
-                            ),
+              child: Column(
+                children: [
+                  _filterBar(),
+                  if (!_loading && _error == null && _rows.isNotEmpty) _smartButtons(),
+                  Expanded(
+                    child: _loading
+                        ? const Center(child: CircularProgressIndicator())
+                        : _error != null
+                            ? Center(child: Text(_error!, style: TextStyle(color: AC.err, fontFamily: 'Tajawal')))
+                            : _rows.isEmpty
+                                ? _empty()
+                                : ApexMultiViewHost<Map<String, dynamic>>(
+                                    screenKey: 'universal_journal',
+                                    items: _rows,
+                                    modes: const [ApexViewMode.list, ApexViewMode.kanban, ApexViewMode.pivot],
+                                    initialMode: ApexViewMode.list,
+                                    listBuilder: (items) => _ListView(
+                                      rows: items,
+                                      onFocus: (r) => setState(() => _focusedRow = r),
+                                    ),
+                                    kanbanBuilder: (items) => _KanbanView(rows: items),
+                                    pivotBuilder: (items) => _PivotView(rows: items),
+                                  ),
+                  ),
+                ],
+              ),
             ),
+            // SAP-style right-side activity log — collapses to a thin bar
+            if (_focusedRow != null)
+              ApexDocumentChatterPanel(
+                entityType: 'journal_entry',
+                entityId: _focusedRow!['journal_entry_id'] as String,
+              ),
           ],
         ),
       ),
@@ -228,7 +248,8 @@ class _UniversalJournalScreenState extends State<UniversalJournalScreen> {
 
 class _ListView extends StatelessWidget {
   final List<Map<String, dynamic>> rows;
-  const _ListView({required this.rows});
+  final void Function(Map<String, dynamic>)? onFocus;
+  const _ListView({required this.rows, this.onFocus});
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
@@ -239,38 +260,59 @@ class _ListView extends StatelessWidget {
         final r = rows[i];
         final d = (r['debit_amount'] ?? 0) as num;
         final c = (r['credit_amount'] ?? 0) as num;
-        return Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: AC.navy2, borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AC.gold.withValues(alpha: 0.12)),
-          ),
-          child: Row(
-            children: [
-              SizedBox(width: 80, child: Text('${r['je_number']}',
-                  style: TextStyle(color: AC.gold, fontFamily: 'monospace', fontSize: 11))),
-              SizedBox(width: 80, child: Text('${r['account_code']}',
-                  style: TextStyle(color: AC.ts, fontFamily: 'monospace', fontSize: 11))),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        final dims = r['dimensions'] as Map?;
+        return InkWell(
+          onTap: () => onFocus?.call(r),
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AC.navy2, borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AC.gold.withValues(alpha: 0.12)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
                   children: [
-                    Text('${r['account_name']}',
-                        maxLines: 1, overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: AC.tp, fontFamily: 'Tajawal', fontSize: 12.5)),
-                    Text('${r['je_date']} · ${r['source_type'] ?? 'manual'} · ${r['ledger_id']}',
-                        style: TextStyle(color: AC.td, fontFamily: 'Tajawal', fontSize: 10.5)),
+                    SizedBox(width: 80, child: Text('${r['je_number']}',
+                        style: TextStyle(color: AC.gold, fontFamily: 'monospace', fontSize: 11))),
+                    SizedBox(width: 80, child: Text('${r['account_code']}',
+                        style: TextStyle(color: AC.ts, fontFamily: 'monospace', fontSize: 11))),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${r['account_name']}',
+                              maxLines: 1, overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: AC.tp, fontFamily: 'Tajawal', fontSize: 12.5)),
+                          Text('${r['je_date']} · ${r['source_type'] ?? 'manual'} · ${r['ledger_id']}',
+                              style: TextStyle(color: AC.td, fontFamily: 'Tajawal', fontSize: 10.5)),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 90, child: Text(d > 0 ? d.toStringAsFixed(2) : '—',
+                        textAlign: TextAlign.end,
+                        style: TextStyle(color: AC.ok, fontFamily: 'monospace', fontSize: 12))),
+                    const SizedBox(width: 8),
+                    SizedBox(width: 90, child: Text(c > 0 ? c.toStringAsFixed(2) : '—',
+                        textAlign: TextAlign.end,
+                        style: TextStyle(color: AC.err, fontFamily: 'monospace', fontSize: 12))),
+                    // SAP document-flow button
+                    ApexDocumentFlowButton(
+                      sourceType: (r['source_type'] ?? 'journal_entry') as String,
+                      sourceId: (r['source_id'] ?? r['journal_entry_id']) as String,
+                      labelAr: 'المسار',
+                    ),
                   ],
                 ),
-              ),
-              SizedBox(width: 90, child: Text(d > 0 ? '${d.toStringAsFixed(2)}' : '—',
-                  textAlign: TextAlign.end,
-                  style: TextStyle(color: AC.ok, fontFamily: 'monospace', fontSize: 12))),
-              const SizedBox(width: 8),
-              SizedBox(width: 90, child: Text(c > 0 ? '${c.toStringAsFixed(2)}' : '—',
-                  textAlign: TextAlign.end,
-                  style: TextStyle(color: AC.err, fontFamily: 'monospace', fontSize: 12))),
-            ],
+                // Line-level dimensions as read-only pills (Intacct pattern)
+                if (dims != null && dims.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6, right: 80),
+                    child: ApexDimensionsPills(dimensions: dims.cast<String, dynamic>()),
+                  ),
+              ],
+            ),
           ),
         );
       },
