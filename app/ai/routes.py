@@ -87,6 +87,20 @@ def ask_apex(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"agent unavailable: {e}")
 
+    # Soft-enforce per-tier quota — deny if monthly calls/cost exhausted.
+    try:
+        from app.core.ai_rate_limits import check_quota
+        from app.core.tenant_guard import current_tenant
+        qd = check_quota(current_tenant())
+        if not qd.allowed:
+            return {
+                "success": False,
+                "error": qd.reason or "quota exhausted",
+                "data": {"answer": "", "tool_calls": [], "model": "", "quota": qd.to_dict()},
+            }
+    except Exception:
+        pass
+
     result = run_agent(
         user_query=query,
         conversation_history=history,
@@ -231,6 +245,52 @@ def reject_ai_suggestion(
         return {"success": True, "data": {"id": suggestion_id, "verdict": verdict.value}}
     except LookupError:
         raise HTTPException(status_code=404, detail="suggestion not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── Audit hash-chain integrity ───────────────────────────
+
+
+@router.get("/audit/chain/verify")
+def verify_audit_chain_endpoint(limit: int = Query(1000, ge=1, le=50_000)):
+    """Walk the audit_trail hash chain and verify each row's hash.
+    Returns {ok, verified, first_mismatch}."""
+    try:
+        from app.core.compliance_service import verify_audit_chain
+        return {"success": True, "data": verify_audit_chain(limit=limit)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/audit/chain/events")
+def list_audit_events(limit: int = Query(50, ge=1, le=500)):
+    """Return the latest audit events with hash + prev_hash for the UI."""
+    try:
+        from app.phase1.models.platform_models import SessionLocal
+        from app.core.compliance_models import AuditTrail
+        db = SessionLocal()
+        try:
+            rows = (
+                db.query(AuditTrail)
+                .order_by(AuditTrail.created_at.desc())
+                .limit(limit)
+                .all()
+            )
+            data = [{
+                "id": r.id,
+                "action": r.action,
+                "entity_type": r.entity_type,
+                "entity_id": r.entity_id,
+                "actor_user_id": r.actor_user_id,
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+                "prev_hash": r.prev_hash,
+                "this_hash": r.this_hash,
+                "chain_seq": r.chain_seq,
+            } for r in rows]
+            return {"success": True, "data": data, "count": len(data)}
+        finally:
+            db.close()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

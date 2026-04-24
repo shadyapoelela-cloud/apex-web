@@ -413,6 +413,12 @@ class ApiService {
   static Future<ApiResult> aiExecuteSuggestion(String id) =>
       _post('/api/v1/ai/suggestions/$id/execute', {});
 
+  // ── Audit hash-chain ──
+  static Future<ApiResult> aiVerifyAuditChain({int limit=1000}) =>
+      _get('/api/v1/ai/audit/chain/verify?limit=$limit');
+  static Future<ApiResult> aiListAuditEvents({int limit=50}) =>
+      _get('/api/v1/ai/audit/chain/events?limit=$limit');
+
   // ── Regulatory news ──
   static Future<ApiResult> aiRegulatoryNews({String? jurisdiction, bool onlyFuture=false, int limit=20}) {
     final qs = <String>['limit=$limit', 'only_future=$onlyFuture'];

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-TextTheme apexTextTheme(TextTheme base) => GoogleFonts.tajawalTextTheme(base);
+// ── Font policy ─────────────────────────────────────────────────────
+// Default text theme uses IBM Plex Sans Arabic for new/default widgets,
+// giving tabular numerals + sharper finance typography. Screens that
+// explicitly specify `fontFamily: 'Tajawal'` keep their legacy look —
+// swap them opportunistically as screens are touched.
+TextTheme apexTextTheme(TextTheme base) => GoogleFonts.ibmPlexSansArabicTextTheme(base);
 
 /// Theme preset definition
 class ApexTheme {

@@ -97,6 +97,14 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       icon: Icons.rocket_launch_outlined,
       onRun: (_) => go('/onboarding/wizard'),
     ),
+    ApexCommand(
+      id: 'nav_audit_chain',
+      label: 'سجل التدقيق — السلسلة المشفّرة',
+      subtitle: 'Tamper-evident SHA-256 chain verifier',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.link,
+      onRun: (_) => go('/admin/audit-chain'),
+    ),
 
     // ── Navigation ──
     ApexCommand.navigation(

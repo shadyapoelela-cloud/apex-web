@@ -251,9 +251,37 @@ def _execute_send_reminder(row: AiSuggestion) -> ExecutionResult:
         )
 
 
+def _execute_ap_approval(row: AiSuggestion) -> ExecutionResult:
+    """Handler for AP-agent approval suggestions.
+
+    Bridges the AiSuggestion approval signal to the AP invoice state
+    machine — flips APInvoice.status to APPROVED so the pipeline can
+    schedule payment.
+    """
+    try:
+        from app.features.ap_agent.suggestion_bridge import on_suggestion_approved
+        r = on_suggestion_approved(row.id)
+        if r.get("ok"):
+            return ExecutionResult(
+                suggestion_id=row.id, ok=True, status=STATUS_EXECUTED,
+                detail=f"AP invoice {r.get('ap_invoice_id')} moved to APPROVED",
+                output=r,
+            )
+        return ExecutionResult(
+            suggestion_id=row.id, ok=False, status=STATUS_FAILED,
+            detail=r.get("detail", "AP approval bridge failed"),
+        )
+    except Exception as e:
+        return ExecutionResult(
+            suggestion_id=row.id, ok=False, status=STATUS_FAILED,
+            detail=f"AP bridge error: {e.__class__.__name__}",
+        )
+
+
 _HANDLERS = {
     "create_invoice": _execute_create_invoice,
     "send_reminder": _execute_send_reminder,
+    "ap_invoice_approval": _execute_ap_approval,
 }
 
 
