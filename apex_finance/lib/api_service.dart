@@ -505,6 +505,28 @@ class ApiService {
   static Future<ApiResult> hrListEmployees({int limit=100}) => _get('/api/v1/employees?limit=$limit');
   static Future<ApiResult> hrCreateEmployee(Map<String, dynamic> payload) => _post('/api/v1/employees', payload);
 
+  // ── Period close checklist ──
+  static Future<ApiResult> periodCloseStart(Map<String, dynamic> body) =>
+      _post('/api/v1/ai/period-close/start', body);
+  static Future<ApiResult> periodCloseList({String? tenantId, String? entityId}) {
+    final qs = <String>[];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (entityId != null) qs.add('entity_id=${Uri.encodeQueryComponent(entityId)}');
+    final suffix = qs.isEmpty ? '' : '?${qs.join('&')}';
+    return _get('/api/v1/ai/period-close$suffix');
+  }
+  static Future<ApiResult> periodCloseGet(String id) =>
+      _get('/api/v1/ai/period-close/$id');
+  static Future<ApiResult> periodCloseCompleteTask(String taskId, {String? userId, String? notes}) =>
+      _post('/api/v1/ai/period-close/tasks/$taskId/complete', {
+        if (userId != null) 'user_id': userId,
+        if (notes != null) 'notes': notes,
+      });
+
+  // ── Onboarding ──
+  static Future<ApiResult> onboardingComplete(Map<String, dynamic> body) =>
+      _post('/api/v1/ai/onboarding/complete', body);
+
   // ── SAP Universal Journal ──
   static Future<ApiResult> universalJournalQuery(Map<String, dynamic> filters) =>
       _post('/api/v1/ai/universal-journal/query', filters);

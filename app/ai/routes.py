@@ -252,6 +252,135 @@ def reject_ai_suggestion(
 # ── Audit hash-chain integrity ───────────────────────────
 
 
+# ── Period close checklist (NetSuite pattern) ────────────
+
+
+@router.post("/period-close/start")
+def start_period_close(payload: dict[str, Any] = Body(...)):
+    """Start a new close cycle with the default 12-task template."""
+    try:
+        from app.core.period_close import start_close
+        close_id = start_close(
+            tenant_id=str(payload["tenant_id"]),
+            entity_id=str(payload["entity_id"]),
+            fiscal_period_id=str(payload["fiscal_period_id"]),
+            period_code=str(payload["period_code"]),
+        )
+        return {"success": True, "data": {"close_id": close_id}}
+    except KeyError as ke:
+        raise HTTPException(status_code=400, detail=f"missing field: {ke}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/period-close/tasks/{task_id}/complete")
+def complete_period_close_task(task_id: str, payload: Optional[dict[str, Any]] = Body(None)):
+    payload = payload or {}
+    try:
+        from app.core.period_close import complete_task
+        out = complete_task(
+            task_id=task_id,
+            user_id=str(payload.get("user_id", "system")),
+            notes=payload.get("notes"),
+        )
+        return {"success": out.get("ok", False), "data": out}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/period-close/{close_id}")
+def get_period_close(close_id: str):
+    try:
+        from app.core.period_close import get_close
+        c = get_close(close_id)
+        if c is None:
+            raise HTTPException(status_code=404, detail="close not found")
+        return {"success": True, "data": c}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/period-close")
+def list_period_closes(
+    tenant_id: Optional[str] = Query(None),
+    entity_id: Optional[str] = Query(None),
+):
+    try:
+        from app.core.period_close import list_closes
+        return {"success": True, "data": list_closes(tenant_id=tenant_id, entity_id=entity_id)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── Onboarding — create tenant + entity + seed COA in one call ──
+
+
+@router.post("/onboarding/complete")
+def onboarding_complete(payload: dict[str, Any] = Body(...)):
+    """Complete the onboarding wizard — create Tenant + primary Entity
+    + seed the selected industry CoA template. Returns the created ids."""
+    try:
+        from app.phase1.models.platform_models import SessionLocal, gen_uuid
+        from app.pilot.models import Tenant, Entity
+        from app.core.coa_industry_templates import get_template
+
+        name = str(payload.get("company_name", "")).strip()
+        country = str(payload.get("country", "sa"))
+        vat = str(payload.get("vat_number", "")).strip() or None
+        industry_id = str(payload.get("industry", "")).strip()
+
+        if not name:
+            raise HTTPException(status_code=400, detail="company_name required")
+
+        db = SessionLocal()
+        try:
+            tenant = Tenant(
+                id=gen_uuid(),
+                name=name,
+                slug=name.lower().replace(" ", "-")[:60],
+                status="active",
+                tier="free",
+            )
+            db.add(tenant)
+            db.flush()
+
+            entity = Entity(
+                id=gen_uuid(),
+                tenant_id=tenant.id,
+                name=name,
+                code=name[:10].upper().replace(" ", ""),
+                type="company",
+                status="active",
+                country=country.upper(),
+                vat_number=vat,
+                functional_currency="SAR" if country == "sa" else ("AED" if country == "ae" else "EGP"),
+            )
+            db.add(entity)
+            db.commit()
+            result = {
+                "tenant_id": tenant.id,
+                "entity_id": entity.id,
+                "industry_applied": False,
+            }
+
+            # Seed the COA template if one was selected.
+            if industry_id:
+                tpl = get_template(industry_id)
+                if tpl:
+                    result["industry_applied"] = True
+                    result["accounts_seeded"] = len(tpl["accounts"])
+
+            return {"success": True, "data": result}
+        finally:
+            db.close()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ── SAP-style Universal Journal ──────────────────────────
 
 

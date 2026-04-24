@@ -54,6 +54,7 @@ import '../screens/admin/audit_chain_viewer_screen.dart';
 // import '../screens/operations/financial_statements_formatted_screen.dart';
 // import '../screens/operations/financial_analysis_screen.dart';
 import '../screens/operations/universal_journal_screen.dart';
+import '../screens/operations/period_close_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -508,6 +509,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/operations/financial-statements', redirect: (c, s) => '/compliance/financial-statements'),
     GoRoute(path: '/operations/financial-analysis', redirect: (c, s) => '/compliance/ratios'),
     GoRoute(path: '/operations/universal-journal', pageBuilder: (c, s) => _apexPage(const UniversalJournalScreen(), s)),
+    GoRoute(path: '/operations/period-close', pageBuilder: (c, s) => _apexPage(const PeriodCloseScreen(), s)),
 
     // ─── COA Workflow ───
     GoRoute(path: '/upload', pageBuilder: (c, s) => _apexPage(const UploadScreen(), s)),

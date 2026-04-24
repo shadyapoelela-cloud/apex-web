@@ -137,6 +137,7 @@ for _mod in [
     "app.core.auto_log",
     "app.integrations.zatca.retry_queue",
     "app.core.ai_usage_log",
+    "app.core.period_close",
 ]:
     try:
         __import__(_mod)

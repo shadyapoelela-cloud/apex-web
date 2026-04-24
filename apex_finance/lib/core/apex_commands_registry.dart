@@ -153,6 +153,14 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       icon: Icons.hub,
       onRun: (_) => go('/operations/universal-journal'),
     ),
+    ApexCommand(
+      id: 'nav_period_close',
+      label: 'إقفال الفترة المحاسبية (NetSuite-pattern)',
+      subtitle: '12 مهمة متسلسلة + تبعيات + توقيع اعتماد',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.lock_clock,
+      onRun: (_) => go('/operations/period-close'),
+    ),
 
     // ── Navigation ──
     ApexCommand.navigation(

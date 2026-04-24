@@ -39,8 +39,35 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
     });
   }
 
+  bool _submitting = false;
+  Map<String, dynamic>? _submissionResult;
+
   void _next() => setState(() => _step++);
   void _back() => setState(() => _step--);
+
+  Future<void> _submit() async {
+    setState(() => _submitting = true);
+    final res = await ApiService.onboardingComplete({
+      'company_name': _companyName.text.trim(),
+      'vat_number': _vatNumber.text.trim(),
+      'country': _country,
+      'industry': _industry,
+    });
+    if (!mounted) return;
+    setState(() {
+      _submitting = false;
+      if (res.success && res.data != null) {
+        _submissionResult = (res.data['data'] as Map).cast<String, dynamic>();
+      }
+    });
+    if (res.success) {
+      _next();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(res.error ?? 'فشل إنشاء الحساب')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -217,13 +244,18 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
   }
 
   Widget _doneStep() {
+    final tid = _submissionResult?['tenant_id'];
+    final eid = _submissionResult?['entity_id'];
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(Icons.check_circle, color: AC.ok, size: 64),
         const SizedBox(height: 14),
-        Text('تم إعداد حسابك', style: TextStyle(color: AC.tp, fontFamily: 'Tajawal', fontSize: 20, fontWeight: FontWeight.w800)),
+        Text('تم إنشاء الحساب', style: TextStyle(color: AC.tp, fontFamily: 'Tajawal', fontSize: 20, fontWeight: FontWeight.w800)),
         const SizedBox(height: 6),
+        if (tid != null) Text('Tenant: $tid', style: TextStyle(color: AC.ts, fontFamily: 'monospace', fontSize: 11)),
+        if (eid != null) Text('Entity: $eid', style: TextStyle(color: AC.ts, fontFamily: 'monospace', fontSize: 11)),
+        const SizedBox(height: 8),
         Text('ابدأ بإصدار أول فاتورة أو استيراد دفاتر سابقة.',
             style: TextStyle(color: AC.ts, fontFamily: 'Tajawal', fontSize: 13)),
         const SizedBox(height: 20),
@@ -253,13 +285,15 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
         const Spacer(),
         if (_step < 3)
           FilledButton(
-            onPressed: canNext ? _next : null,
+            onPressed: canNext && !_submitting ? (_step == 2 ? _submit : _next) : null,
             style: FilledButton.styleFrom(
               backgroundColor: AC.gold,
               foregroundColor: AC.btnFg,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
-            child: Text(_step == 2 ? 'إنهاء' : 'التالي', style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700)),
+            child: _submitting
+                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : Text(_step == 2 ? 'إنشاء الحساب' : 'التالي', style: const TextStyle(fontFamily: 'Tajawal', fontWeight: FontWeight.w700)),
           ),
       ],
     );
