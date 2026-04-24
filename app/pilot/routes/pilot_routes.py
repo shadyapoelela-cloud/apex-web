@@ -186,10 +186,24 @@ def list_tenants(
     db: Session = Depends(get_db),
     admin_secret: Optional[str] = Header(None, alias="X-Admin-Secret"),
 ):
-    """List tenants (admin only). Requires X-Admin-Secret header in production."""
+    """List tenants (admin only). Requires X-Admin-Secret header.
+
+    Fail-closed: if ADMIN_SECRET is unset on the server, the endpoint
+    refuses every request instead of silently opening to the world.
+    The previous inline check `if required and admin_secret != required:`
+    skipped the comparison entirely when `required` was None, which
+    meant any dev/staging environment missing the env var exposed
+    the full tenant list publicly. (Prod was safe because main.py:58
+    raises at startup if ADMIN_SECRET is missing in production.)
+    """
     import os
     required = os.environ.get("ADMIN_SECRET")
-    if required and admin_secret != required:
+    if not required:
+        raise HTTPException(
+            status_code=500,
+            detail="ADMIN_SECRET not configured on server",
+        )
+    if admin_secret != required:
         raise HTTPException(status_code=401, detail="admin secret required")
 
     q = db.query(Tenant)

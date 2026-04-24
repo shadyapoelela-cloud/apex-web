@@ -1432,11 +1432,16 @@ except Exception as e:
 
 @app.post("/admin/pilot/seed-permissions")
 def admin_seed_permissions(x_admin_secret: str = Header(None, alias="X-Admin-Secret")):
-    """Seed the system-wide permissions master list (idempotent). Admin-only."""
-    import os
-    required = os.environ.get("ADMIN_SECRET")
-    if required and x_admin_secret != required:
-        raise HTTPException(status_code=401, detail="admin secret required")
+    """Seed the system-wide permissions master list (idempotent). Admin-only.
+
+    Uses the shared _verify_admin helper (fail-closed). The previous
+    inline check `if required and x_admin_secret != required:` failed
+    OPEN when ADMIN_SECRET was unset — a staging/dev environment with
+    a forgotten env var would silently expose this endpoint to the
+    internet. Production is already fail-closed at startup (main.py:58
+    raises if ADMIN_SECRET is missing) but non-prod was drifted.
+    """
+    _verify_admin(None, x_admin_secret)
     if not HAS_PILOT:
         raise HTTPException(status_code=503, detail="pilot module not loaded")
     from app.pilot.services.seed import seed_permissions
