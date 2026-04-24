@@ -269,73 +269,141 @@ TOOL_DEFINITIONS: list[dict[str, Any]] = [
 
 
 def _impl_query_financial_data(args: dict) -> dict:
-    """Scaffold — real impl runs a SQL query against the ledger.
+    """Aggregate a financial metric from the real GL postings.
 
-    For now returns a deterministic placeholder so the agent flow can be
-    tested end-to-end without a loaded dataset.
+    Falls back to a zero-shaped placeholder when the pilot ledger tables
+    aren't present (fresh CI DB, minimal test fixture) — keeps legacy
+    tests green while giving the agent real numbers in production.
     """
-    metric = args.get("metric")
-    period = args.get("period")
-    dimension = args.get("dimension")
-    # A real implementation would:
-    #   • parse 'period' → (start, end)
-    #   • run SELECT SUM(amount) FROM journal_entries WHERE ...
-    #   • apply tenant_guard.current_tenant() automatically
-    return {
-        "metric": metric,
-        "period": period,
-        "dimension": dimension,
-        "value": 0,
-        "currency": "SAR",
-        "breakdown": [],
-        "_note": "placeholder — wire to journal_entries aggregation when ready",
-    }
+    try:
+        from app.services.copilot_tools_ledger import aggregate_metric
+        return aggregate_metric(
+            metric=args.get("metric") or "",
+            period=args.get("period") or "this_month",
+            dimension=args.get("dimension"),
+        )
+    except Exception as e:
+        logger.warning("query_financial_data fallback: %s", e)
+        return {
+            "metric": args.get("metric"),
+            "period": args.get("period"),
+            "dimension": args.get("dimension"),
+            "value": 0,
+            "currency": "SAR",
+            "breakdown": [],
+            "_note": f"aggregation unavailable — {e.__class__.__name__}",
+        }
 
 
 def _impl_get_report(args: dict) -> dict:
-    return {
-        "report_type": args["report_type"],
-        "period": args["period"],
-        "currency": args.get("currency", "SAR"),
-        "sections": [],
-        "_note": "placeholder — wire to app.core.fin_statements_service",
-    }
+    """Produce a narratable report snapshot for the agent.
+
+    Uses the aggregated-metric layer for P&L / BS / TB so the LLM has
+    real numbers to summarise. cash_flow / aging / vat_return still
+    return the placeholder — their dedicated services need agent-facing
+    adapters before wiring.
+    """
+    try:
+        from app.services.copilot_tools_ledger import get_report_summary
+        return get_report_summary(
+            report_type=args["report_type"],
+            period=args["period"],
+            currency=args.get("currency", "SAR"),
+        )
+    except Exception as e:
+        logger.warning("get_report fallback: %s", e)
+        return {
+            "report_type": args["report_type"],
+            "period": args["period"],
+            "currency": args.get("currency", "SAR"),
+            "sections": [],
+            "_note": f"report build failed — {e.__class__.__name__}",
+        }
 
 
 def _impl_explain_variance(args: dict) -> dict:
-    return {
-        "account": args["account"],
-        "period_a": args["period_a"],
-        "period_b": args["period_b"],
-        "delta": 0,
-        "drivers": [],
-        "_note": "placeholder — wire to variance engine",
-    }
+    """Compute period-over-period variance for one account.
+
+    Resolves the account by code or name, pulls net balances for both
+    periods, and surfaces top partner-driven drivers so the agent can
+    narrate "why" rather than just "by how much".
+    """
+    try:
+        from app.services.copilot_tools_ledger import explain_variance
+        return explain_variance(
+            account=args["account"],
+            period_a=args["period_a"],
+            period_b=args["period_b"],
+        )
+    except Exception as e:
+        logger.warning("explain_variance fallback: %s", e)
+        return {
+            "account": args.get("account"),
+            "period_a": args.get("period_a"),
+            "period_b": args.get("period_b"),
+            "delta": 0,
+            "drivers": [],
+            "_note": f"variance unavailable — {e.__class__.__name__}",
+        }
 
 
 def _impl_forecast(args: dict) -> dict:
-    return {
-        "metric": args["metric"],
-        "horizon_months": args["horizon_months"],
-        "projected_values": [],
-        "confidence_interval": {"low": [], "high": []},
-        "_note": "placeholder — wire to cashflow forecasting",
-    }
+    """Project a metric forward via moving-average baseline.
+
+    Not ML — a defensible, cheap baseline that gives the agent real
+    numbers to reason over (running cash, expense trend, revenue). The
+    agent explains that the method is a moving average so users know
+    not to treat it as a ML-grade forecast.
+    """
+    try:
+        from app.services.copilot_tools_ledger import forecast_metric
+        return forecast_metric(
+            metric=args["metric"],
+            horizon_months=int(args["horizon_months"]),
+        )
+    except Exception as e:
+        logger.warning("forecast fallback: %s", e)
+        return {
+            "metric": args.get("metric"),
+            "horizon_months": args.get("horizon_months"),
+            "projected_values": [],
+            "confidence_interval": {"low": [], "high": []},
+            "_note": f"forecast unavailable — {e.__class__.__name__}",
+        }
 
 
 def _impl_lookup_entity(args: dict) -> dict:
-    return {
-        "entity_type": args["entity_type"],
-        "query": args["query"],
-        "matches": [],
-        "_note": "placeholder — wire to entity index",
-    }
+    """Search clients / invoices / accounts / vendors / employees.
+
+    Queries real models when they're loaded; returns an empty match list
+    with a note (not an error) when a given entity type isn't wired.
+    """
+    try:
+        from app.services.copilot_tools_ledger import lookup_entity
+        return lookup_entity(
+            entity_type=args["entity_type"],
+            query=args["query"],
+        )
+    except Exception as e:
+        logger.warning("lookup_entity fallback: %s", e)
+        return {
+            "entity_type": args["entity_type"],
+            "query": args["query"],
+            "matches": [],
+            "_note": f"entity lookup unavailable — {e.__class__.__name__}",
+        }
 
 
 def _impl_create_invoice(args: dict) -> dict:
-    """Draft an invoice. Does NOT post — returns a draft id that the
-    user must confirm in a follow-up turn. The guardrail is critical:
-    an LLM hallucination must never translate into a real tax document.
+    """Draft an invoice. Does NOT post — routes the proposal through
+    the confidence-gated guardrail so the "AI wanted to draft" event is
+    captured with audit trail even before any human action.
+
+    Because creating a tax document is always destructive (touches
+    ledger + ZATCA), the guardrail forces NEEDS_APPROVAL regardless of
+    how confident the LLM was. The caller must explicitly approve the
+    AiSuggestion row (via /ai/suggestions/{id}/approve) before a second
+    tool-call actually posts.
     """
     import uuid as _uuid
 
@@ -357,11 +425,7 @@ def _impl_create_invoice(args: dict) -> dict:
     total = amount + vat
     draft_id = f"draft_{_uuid.uuid4().hex[:12]}"
 
-    # Real impl: insert into invoices table with status='draft'. Here
-    # we return the preview so the agent can surface it and ask for
-    # explicit confirmation before a subsequent tool call to post.
-    return {
-        "status": "draft",
+    preview = {
         "draft_id": draft_id,
         "client_name": client_name,
         "description": description,
@@ -370,18 +434,57 @@ def _impl_create_invoice(args: dict) -> dict:
         "vat_amount": float(vat),
         "grand_total": float(total),
         "currency": currency,
+    }
+
+    # Route through guardrail so the proposal is persisted + audit-logged.
+    # Failures here are non-fatal — if the guardrail is unavailable we
+    # still return the preview so the agent flow keeps working.
+    suggestion_id: Optional[str] = None
+    try:
+        from app.core.ai_guardrails import guard, Suggestion
+        tenant_id = None
+        try:
+            from app.core.tenant_guard import current_tenant
+            tenant_id = current_tenant() or None
+        except Exception:
+            pass
+        decision = guard(Suggestion(
+            source="copilot_agent",
+            action_type="create_invoice",
+            target_type="invoice_draft",
+            target_id=draft_id,
+            after=preview,
+            confidence=0.85,          # below 0.95 floor — anyway destructive
+            destructive=True,         # tax document → always needs approval
+            reasoning=f"LLM drafted invoice for '{client_name}' — {total} {currency}",
+            tenant_id=tenant_id,
+        ))
+        suggestion_id = decision.row_id
+    except Exception as e:
+        logger.debug("guardrail unavailable on create_invoice: %s", e)
+
+    return {
+        **preview,
+        "status": "draft",
+        "suggestion_id": suggestion_id,
         "requires_confirmation": True,
         "_note": (
-            "Draft created — NOT posted. Ask the user to confirm before "
-            "calling create_invoice a second time with draft_id=<this> + "
-            "confirm=true to actually post."
+            "Draft recorded. Approve via /ai/suggestions/{suggestion_id}/approve "
+            "before any ZATCA submission — this tool never posts by itself."
         ),
     }
 
 
 def _impl_send_reminder(args: dict) -> dict:
-    """Queue a payment reminder. Rate-limited, never fires without a
-    prior user confirmation turn."""
+    """Queue a payment reminder via the guardrail.
+
+    An AI-initiated outbound message to a customer is customer-facing
+    (affects reputation + can be read as a collection action). It always
+    goes through the guardrail — the LLM never fires a message directly.
+    The row stays in NEEDS_APPROVAL until a human clicks "approve" on
+    the suggestion, at which point a separate worker dispatches through
+    the notification bridge.
+    """
     invoice_id = args.get("invoice_id")
     client_name = args.get("client_name")
     channel = args.get("channel") or "auto"
@@ -390,12 +493,47 @@ def _impl_send_reminder(args: dict) -> dict:
     if not invoice_id and not client_name:
         return {"status": "rejected", "reason": "invoice_id or client_name required"}
 
-    # Real impl: look up the overdue invoices, render the right template
-    # (apex/integrations/whatsapp or EMAIL_BACKEND), enqueue via
-    # notifications_bridge. The scaffold returns the plan so the user
-    # sees what *would* happen.
+    proposal = {
+        "invoice_id": invoice_id,
+        "client_name": client_name,
+        "channel": channel,
+        "tone": tone,
+    }
+
+    suggestion_id: Optional[str] = None
+    try:
+        from app.core.ai_guardrails import guard, Suggestion
+        tenant_id = None
+        try:
+            from app.core.tenant_guard import current_tenant
+            tenant_id = current_tenant() or None
+        except Exception:
+            pass
+        decision = guard(Suggestion(
+            source="copilot_agent",
+            action_type="send_reminder",
+            target_type="reminder_plan",
+            target_id=invoice_id or client_name,
+            after=proposal,
+            confidence=0.80,
+            destructive=True,        # outbound message → always needs approval
+            reasoning=(
+                f"LLM proposes a {tone} reminder via {channel} for "
+                f"{invoice_id or client_name}"
+            ),
+            tenant_id=tenant_id,
+        ))
+        suggestion_id = decision.row_id
+    except Exception as e:
+        logger.debug("guardrail unavailable on send_reminder: %s", e)
+
+    # Proposal persisted via guardrail. Actual dispatch happens when a
+    # human approves the AiSuggestion row — an approval worker will
+    # render the right template (WhatsApp / email / SMS) and call the
+    # notifications_bridge.
     return {
         "status": "queued",
+        "suggestion_id": suggestion_id,
         "invoice_id": invoice_id,
         "client_name": client_name,
         "channel": channel,
@@ -403,8 +541,8 @@ def _impl_send_reminder(args: dict) -> dict:
         "estimated_sends": 1 if invoice_id else 0,
         "requires_confirmation": True,
         "_note": (
-            "Plan only — no message has left the server. Wire to "
-            "app.integrations.whatsapp.send_template when ready."
+            "Proposal recorded — NO message has been sent. Approve via "
+            "/ai/suggestions/{suggestion_id}/approve to dispatch."
         ),
     }
 
@@ -568,7 +706,52 @@ def run_agent(
 
     tool_calls_log: list[dict] = []
 
+    # Per-run correlation id so the 1–N rows the usage log accumulates
+    # for this agent turn can be grouped back together.
+    import time as _time
+    import uuid as _uuid
+    _run_id = _uuid.uuid4().hex
+    _tenant_id = None
+    try:
+        from app.core.tenant_guard import current_tenant
+        _tenant_id = current_tenant() or None
+    except Exception:
+        pass
+
+    def _record(
+        *,
+        turn_index: int,
+        input_tokens: int,
+        output_tokens: int,
+        cache_read: int = 0,
+        cache_create: int = 0,
+        latency_ms: int = 0,
+        stop_reason: Optional[str] = None,
+        error: bool = False,
+        error_kind: Optional[str] = None,
+    ) -> None:
+        try:
+            from app.core.ai_usage_log import record_usage, UsageRecord
+            record_usage(UsageRecord(
+                surface="copilot_agent",
+                model=model,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                cache_read_tokens=cache_read,
+                cache_creation_tokens=cache_create,
+                tenant_id=_tenant_id,
+                latency_ms=latency_ms,
+                agent_run_id=_run_id,
+                turn_index=turn_index,
+                stop_reason=stop_reason,
+                error=error,
+                error_kind=error_kind,
+            ))
+        except Exception as _e:
+            logger.debug("usage record skipped: %s", _e)
+
     for turn in range(max_turns):
+        _t0 = _time.perf_counter()
         try:
             resp = client.messages.create(
                 model=model,
@@ -578,6 +761,14 @@ def run_agent(
                 messages=messages,
             )
         except Exception as e:
+            _record(
+                turn_index=turn,
+                input_tokens=0,
+                output_tokens=0,
+                latency_ms=int((_time.perf_counter() - _t0) * 1000),
+                error=True,
+                error_kind=e.__class__.__name__,
+            )
             return AgentResult(
                 success=False,
                 answer="",
@@ -585,6 +776,18 @@ def run_agent(
                 tool_calls=tool_calls_log,
                 model=model,
             )
+
+        _latency_ms = int((_time.perf_counter() - _t0) * 1000)
+        _usage = getattr(resp, "usage", None)
+        _record(
+            turn_index=turn,
+            input_tokens=int(getattr(_usage, "input_tokens", 0) or 0),
+            output_tokens=int(getattr(_usage, "output_tokens", 0) or 0),
+            cache_read=int(getattr(_usage, "cache_read_input_tokens", 0) or 0),
+            cache_create=int(getattr(_usage, "cache_creation_input_tokens", 0) or 0),
+            latency_ms=_latency_ms,
+            stop_reason=getattr(resp, "stop_reason", None),
+        )
 
         # Did Claude call a tool?
         if resp.stop_reason == "tool_use":

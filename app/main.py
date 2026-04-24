@@ -136,6 +136,7 @@ for _mod in [
     "app.core.activity_log",
     "app.core.auto_log",
     "app.integrations.zatca.retry_queue",
+    "app.core.ai_usage_log",
 ]:
     try:
         __import__(_mod)
@@ -540,14 +541,31 @@ async def lifespan(app):
     except Exception as _e:
         logging.warning(f"Proactive AI scheduler not armed: {_e}")
 
+    # AI approval-drain scheduler — opt-in via AI_DRAIN_APPROVED_ENABLED=true.
+    # Drains the approved-but-not-executed AiSuggestion queue every 5 min.
+    _stop_drain = None
+    try:
+        from app.ai.scheduler import (
+            start_drain_scheduler,
+            stop_drain_scheduler as _stop_drain,
+        )
+        start_drain_scheduler()
+    except Exception as _e:
+        logging.warning(f"AI approval-drain scheduler not armed: {_e}")
+
     yield
 
-    # Clean shutdown of the scheduler task if it was armed.
+    # Clean shutdown of the scheduler tasks if they were armed.
     if _stop_ai is not None:
         try:
             await _stop_ai()
         except Exception as _e:
             logging.debug(f"Scheduler shutdown: {_e}")
+    if _stop_drain is not None:
+        try:
+            await _stop_drain()
+        except Exception as _e:
+            logging.debug(f"Drain scheduler shutdown: {_e}")
 
 
 app = FastAPI(
@@ -589,6 +607,16 @@ try:
         logging.info("CSRF middleware disabled (CSRF_ENABLED!=true) — bearer-only mode")
 except Exception as _e:
     logging.warning(f"CSRF middleware not registered: {_e}")
+
+# Idempotency middleware — replays cached response for duplicate
+# Idempotency-Key headers on mutating requests. No-op for requests
+# without the header, so existing clients are unaffected.
+try:
+    from app.core.idempotency import IdempotencyMiddleware
+    app.add_middleware(IdempotencyMiddleware)
+    logging.info("Idempotency middleware registered")
+except Exception as _e:
+    logging.warning(f"Idempotency middleware not registered: {_e}")
 
 # Unified error response shape ({success:false, error:{code, message_ar, ...}})
 try:

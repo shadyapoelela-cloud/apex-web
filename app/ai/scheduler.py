@@ -37,10 +37,14 @@ logger = logging.getLogger(__name__)
 _ENV_ENABLED = "PROACTIVE_AI_ENABLED"
 _ENV_INTERVAL = "AI_SCAN_INTERVAL_SECONDS"
 _ENV_WARMUP = "AI_SCAN_WARMUP_SECONDS"
+_ENV_DRAIN_ENABLED = "AI_DRAIN_APPROVED_ENABLED"
+_ENV_DRAIN_INTERVAL = "AI_DRAIN_APPROVED_INTERVAL_SECONDS"
 _DEFAULT_INTERVAL = 6 * 60 * 60   # 6 hours
 _DEFAULT_WARMUP = 60              # 1 minute
+_DEFAULT_DRAIN_INTERVAL = 5 * 60  # 5 minutes
 
 _task: Optional[asyncio.Task] = None
+_drain_task: Optional[asyncio.Task] = None
 
 
 def _enabled() -> bool:
@@ -126,3 +130,83 @@ async def stop_proactive_scheduler() -> None:
     except (asyncio.CancelledError, Exception):  # noqa: BLE001
         pass
     _task = None
+
+
+# ── Approved-suggestion drain ──────────────────────────────
+
+
+def _drain_enabled() -> bool:
+    return os.environ.get(_ENV_DRAIN_ENABLED, "").lower() in ("true", "1", "yes")
+
+
+def _drain_interval_seconds() -> int:
+    try:
+        return max(30, int(os.environ.get(_ENV_DRAIN_INTERVAL, _DEFAULT_DRAIN_INTERVAL)))
+    except ValueError:
+        return _DEFAULT_DRAIN_INTERVAL
+
+
+async def _drain_loop() -> None:
+    """Drains the approved-but-not-executed AiSuggestion queue.
+
+    Decouples human approval (cheap, idempotent) from domain execution
+    (expensive, side-effectful). A fast cadence (5 min default) keeps
+    the UX feeling "live" without pounding the DB.
+    """
+    from app.ai.approval_executor import execute_all_approved
+
+    interval = _drain_interval_seconds()
+    logger.info(
+        "AI approval-drain scheduler armed — every %ss",
+        interval,
+    )
+    # Smaller warmup so approved rows seeded at startup execute quickly.
+    await asyncio.sleep(min(_warmup_seconds(), 30))
+
+    while True:
+        try:
+            out = execute_all_approved(limit=50)
+            if out.get("considered", 0) > 0:
+                logger.info(
+                    "AI approval-drain: considered=%d executed=%d failed=%d",
+                    out.get("considered", 0),
+                    out.get("executed", 0),
+                    out.get("failed", 0),
+                )
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            logger.error("AI approval-drain errored: %s", e, exc_info=True)
+        jitter = random.uniform(0, min(30, interval * 0.1))
+        await asyncio.sleep(interval + jitter)
+
+
+def start_drain_scheduler() -> bool:
+    """Arm the approved-suggestion drain task."""
+    global _drain_task
+    if not _drain_enabled():
+        logger.info("AI approval-drain disabled — set %s=true to arm it",
+                    _ENV_DRAIN_ENABLED)
+        return False
+    if _drain_task is not None and not _drain_task.done():
+        logger.info("AI approval-drain already running")
+        return True
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        logger.info("No event loop — drain scheduler will be started by lifespan()")
+        return False
+    _drain_task = loop.create_task(_drain_loop(), name="apex-ai-approval-drain")
+    return True
+
+
+async def stop_drain_scheduler() -> None:
+    global _drain_task
+    if _drain_task is None:
+        return
+    _drain_task.cancel()
+    try:
+        await _drain_task
+    except (asyncio.CancelledError, Exception):  # noqa: BLE001
+        pass
+    _drain_task = None
