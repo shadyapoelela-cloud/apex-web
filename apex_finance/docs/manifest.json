@@ -1,13 +1,27 @@
 {
-    "name": "apex_finance",
-    "short_name": "apex_finance",
+    "name": "APEX — منصّة المحاسبة والامتثال",
+    "short_name": "APEX",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "display_override": [
+        "window-controls-overlay",
+        "standalone",
+        "minimal-ui",
+        "browser"
+    ],
+    "background_color": "#0A1628",
+    "theme_color": "#0A1628",
+    "description": "APEX — منصّة العمليات والامتثال والاستشارات المالية",
+    "orientation": "any",
     "prefer_related_applications": false,
+    "lang": "ar",
+    "dir": "rtl",
+    "scope": "./",
+    "categories": [
+        "business",
+        "finance",
+        "productivity"
+    ],
     "icons": [
         {
             "src": "icons/Icon-192.png",
