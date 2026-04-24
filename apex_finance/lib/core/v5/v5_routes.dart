@@ -304,6 +304,31 @@ class V5Launchpad extends StatelessWidget {
                   )),
                 ],
               ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.fact_check_outlined,
+                    label: 'ورشة المراجعة',
+                    subtitle: 'Benford · عينة قيود · Workpapers',
+                    onTap: () => context.push('/compliance/audit-workflow-ai'),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.mosque_outlined,
+                    label: 'منتجات إسلامية',
+                    subtitle: 'مرابحة · إجارة · زكاة',
+                    onTap: () => context.push('/compliance/islamic-finance'),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _AiQuickLink(
+                    icon: Icons.account_tree_outlined,
+                    label: 'توحيد الكيانات',
+                    subtitle: 'Consolidation · FX · IC',
+                    onTap: () => context.push('/compliance/audit-workflow-ai'),
+                  )),
+                ],
+              ),
               const SizedBox(height: 20),
 
               // Showcase CTA banner

@@ -413,6 +413,48 @@ class ApiService {
   static Future<ApiResult> aiExecuteSuggestion(String id) =>
       _post('/api/v1/ai/suggestions/$id/execute', {});
 
+  // ── Audit workflow ──
+  static Future<ApiResult> aiBenford({List<double>? amounts, String? startDate, String? endDate}) =>
+      _post('/api/v1/ai/audit/benford', {
+        if (amounts != null) 'amounts': amounts,
+        if (startDate != null) 'start_date': startDate,
+        if (endDate != null) 'end_date': endDate,
+      });
+  static Future<ApiResult> aiJeSample({String? startDate, String? endDate, int sampleSize=25, double thresholdAmount=10000}) =>
+      _post('/api/v1/ai/audit/je-sample', {
+        if (startDate != null) 'start_date': startDate,
+        if (endDate != null) 'end_date': endDate,
+        'sample_size': sampleSize,
+        'threshold_amount': thresholdAmount,
+      });
+  static Future<ApiResult> aiListWorkpapers() => _get('/api/v1/ai/audit/workpapers');
+  static Future<ApiResult> aiGetWorkpaper(String id) => _get('/api/v1/ai/audit/workpapers/$id');
+
+  // ── Consolidation ──
+  static Future<ApiResult> aiConsolidate(Map<String, dynamic> payload) =>
+      _post('/api/v1/ai/consolidation', payload);
+
+  // ── Islamic finance ──
+  static Future<ApiResult> aiMurabaha({required double costPrice, required double sellingPrice, required String startDate, required int installments, int periodDays=30}) =>
+      _post('/api/v1/ai/islamic/murabaha', {
+        'cost_price': costPrice,
+        'selling_price': sellingPrice,
+        'start_date': startDate,
+        'installments': installments,
+        'period_days': periodDays,
+      });
+  static Future<ApiResult> aiIjarah({required double rentalPerPeriod, required int periods, required String startDate, int periodDays=30, double assetValue=0, int usefulLifePeriods=0}) =>
+      _post('/api/v1/ai/islamic/ijarah', {
+        'rental_per_period': rentalPerPeriod,
+        'periods': periods,
+        'start_date': startDate,
+        'period_days': periodDays,
+        'asset_value': assetValue,
+        'useful_life_periods': usefulLifePeriods,
+      });
+  static Future<ApiResult> aiZakah(Map<String, dynamic> inputs) =>
+      _post('/api/v1/ai/islamic/zakah', inputs);
+
   /// List industry-specific COA templates.
   static Future<ApiResult> aiListCoaTemplates() =>
       _get('/api/v1/ai/coa-templates');

@@ -41,6 +41,8 @@ import '../screens/admin/ai_suggestions_inbox_screen.dart';
 import '../screens/admin/ai_console_screen.dart';
 import '../screens/compliance/tax_timeline_screen.dart';
 import '../screens/compliance/bank_rec_ai_screen.dart';
+import '../screens/compliance/audit_workflow_screen.dart' show AiAuditWorkflowScreen;
+import '../screens/compliance/islamic_finance_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -481,6 +483,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/admin/ai-console', pageBuilder: (c, s) => _apexPage(const AiConsoleScreen(), s)),
     GoRoute(path: '/compliance/tax-timeline', pageBuilder: (c, s) => _apexPage(const TaxTimelineScreen(), s)),
     GoRoute(path: '/compliance/bank-rec-ai', pageBuilder: (c, s) => _apexPage(const BankRecAiScreen(), s)),
+    GoRoute(path: '/compliance/audit-workflow-ai', pageBuilder: (c, s) => _apexPage(const AiAuditWorkflowScreen(), s)),
+    GoRoute(path: '/compliance/islamic-finance', pageBuilder: (c, s) => _apexPage(const IslamicFinanceScreen(), s)),
 
     // ─── COA Workflow ───
     GoRoute(path: '/upload', pageBuilder: (c, s) => _apexPage(const UploadScreen(), s)),

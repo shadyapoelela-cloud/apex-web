@@ -235,6 +235,150 @@ def reject_ai_suggestion(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ── Audit workflow — Benford / JE sample / workpapers ────
+
+
+@router.post("/audit/benford")
+def audit_benford(payload: dict[str, Any] = Body(...)):
+    """Run Benford's Law test on a list of amounts or on the tenant's ledger.
+
+    Body:
+      { "amounts": [1234.5, 5678.9, ...] }   — explicit amounts
+      OR
+      { "start_date": "2026-01-01", "end_date": "2026-12-31" }
+         — pull from journal lines in window
+    """
+    try:
+        from app.core.audit_workflow import benford_analyze, benford_on_journal_entries
+        amounts = payload.get("amounts")
+        if isinstance(amounts, list) and amounts:
+            return {"success": True, "data": benford_analyze(amounts).to_dict()}
+        from datetime import date as _date
+        sd = payload.get("start_date")
+        ed = payload.get("end_date")
+        result = benford_on_journal_entries(
+            start_date=_date.fromisoformat(sd) if sd else None,
+            end_date=_date.fromisoformat(ed) if ed else None,
+        )
+        return {"success": True, "data": result.to_dict()}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/audit/je-sample")
+def audit_je_sample(payload: dict[str, Any] = Body(...)):
+    """Pull a deterministic JE sample for walkthrough testing."""
+    try:
+        from app.core.audit_workflow import sample_journal_entries
+        from datetime import date as _date
+        sd = payload.get("start_date")
+        ed = payload.get("end_date")
+        rows = sample_journal_entries(
+            start_date=_date.fromisoformat(sd) if sd else None,
+            end_date=_date.fromisoformat(ed) if ed else None,
+            sample_size=int(payload.get("sample_size", 25)),
+            threshold_amount=float(payload.get("threshold_amount", 10_000)),
+            seed=str(payload.get("seed", "apex-audit-2026")),
+        )
+        return {"success": True, "data": rows, "count": len(rows)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/audit/workpapers")
+def list_audit_workpapers():
+    from app.core.audit_workflow import list_workpapers
+    return {"success": True, "data": list_workpapers()}
+
+
+@router.get("/audit/workpapers/{template_id}")
+def get_audit_workpaper(template_id: str):
+    from app.core.audit_workflow import get_workpaper
+    tpl = get_workpaper(template_id)
+    if tpl is None:
+        raise HTTPException(status_code=404, detail="workpaper not found")
+    return {"success": True, "data": tpl}
+
+
+# ── Multi-entity consolidation ───────────────────────────
+
+
+@router.post("/consolidation")
+def run_consolidation(payload: dict[str, Any] = Body(...)):
+    """Produce a consolidated TB from N entity TBs.
+
+    Request shape (see app/core/consolidation.py docstring for full form):
+      {
+        "group_name": "APEX Group",
+        "period_label": "FY 2025",
+        "functional_currency": "SAR",
+        "entities": [ {entity_id, currency, fx_rate_*, lines: [...]}, ... ]
+      }
+    """
+    try:
+        from app.core.consolidation import consolidate_from_dicts
+        return {"success": True, "data": consolidate_from_dicts(payload)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ── Islamic finance (AAOIFI-aligned) ──────────────────────
+
+
+@router.post("/islamic/murabaha")
+def islamic_murabaha(payload: dict[str, Any] = Body(...)):
+    try:
+        from app.core.islamic_finance import murabaha_schedule
+        return {"success": True, "data": murabaha_schedule(
+            cost_price=float(payload["cost_price"]),
+            selling_price=float(payload["selling_price"]),
+            start_date=str(payload["start_date"]),
+            installments=int(payload["installments"]),
+            period_days=int(payload.get("period_days", 30)),
+        )}
+    except KeyError as ke:
+        raise HTTPException(status_code=400, detail=f"missing field: {ke}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/islamic/ijarah")
+def islamic_ijarah(payload: dict[str, Any] = Body(...)):
+    try:
+        from app.core.islamic_finance import ijarah_schedule
+        return {"success": True, "data": ijarah_schedule(
+            rental_per_period=float(payload["rental_per_period"]),
+            periods=int(payload["periods"]),
+            start_date=str(payload["start_date"]),
+            period_days=int(payload.get("period_days", 30)),
+            asset_value=float(payload.get("asset_value", 0)),
+            useful_life_periods=int(payload.get("useful_life_periods", 0)),
+        )}
+    except KeyError as ke:
+        raise HTTPException(status_code=400, detail=f"missing field: {ke}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/islamic/zakah")
+def islamic_zakah(payload: dict[str, Any] = Body(...)):
+    try:
+        from app.core.islamic_finance import zakah_base
+        return {"success": True, "data": zakah_base(
+            current_assets=float(payload.get("current_assets", 0)),
+            investments_for_trade=float(payload.get("investments_for_trade", 0)),
+            fixed_assets_net=float(payload.get("fixed_assets_net", 0)),
+            intangibles=float(payload.get("intangibles", 0)),
+            current_liabilities=float(payload.get("current_liabilities", 0)),
+            long_term_liabilities_due_within_year=float(
+                payload.get("long_term_liabilities_due_within_year", 0)
+            ),
+            tax_rate_pct=float(payload.get("tax_rate_pct", 2.5)),
+        )}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ── Industry-specific COA templates ──────────────────────
 
 

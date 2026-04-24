@@ -57,6 +57,22 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       icon: Icons.compare_arrows,
       onRun: (_) => go('/compliance/bank-rec-ai'),
     ),
+    ApexCommand(
+      id: 'nav_audit_workflow',
+      label: 'ورشة المراجعة (Benford / عينة قيود / أوراق عمل)',
+      subtitle: 'أدوات مراجعة SOX / ISA 240 / IFRS 15',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.fact_check_outlined,
+      onRun: (_) => go('/compliance/audit-workflow-ai'),
+    ),
+    ApexCommand(
+      id: 'nav_islamic_finance',
+      label: 'المنتجات الإسلامية (مرابحة / إجارة / زكاة)',
+      subtitle: 'AAOIFI-aligned — FAS 28 / 32',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.mosque_outlined,
+      onRun: (_) => go('/compliance/islamic-finance'),
+    ),
 
     // ── Navigation ──
     ApexCommand.navigation(
