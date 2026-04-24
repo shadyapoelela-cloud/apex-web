@@ -70,10 +70,13 @@ def test_login_sets_apex_token_cookie(client) -> None:
 
 
 def test_login_cookie_carries_security_flags(client) -> None:
-    """The Set-Cookie header must include HttpOnly + Secure + SameSite.
-    Without HttpOnly, XSS can steal the token; without Secure, a
-    downgrade attack can; without SameSite=lax|strict, CSRF is
-    cross-site-trivial."""
+    """The Set-Cookie header must include HttpOnly + SameSite in every
+    environment. Secure is asserted separately (prod-only) — it's
+    gated by ENVIRONMENT because TestClient speaks plaintext HTTP
+    and a Secure cookie would silently not round-trip, masking cookie
+    bugs. HttpOnly defends against XSS; SameSite=lax blocks trivial
+    CSRF."""
+    import os as _os
     username, password = _unique_credentials()
     _register_and_login(client, username, password)
 
@@ -87,17 +90,23 @@ def test_login_cookie_carries_security_flags(client) -> None:
     assert "apex_token=" in set_cookie, f"no apex_token in Set-Cookie: {set_cookie!r}"
     lowered = set_cookie.lower()
     assert "httponly" in lowered, "apex_token cookie must be HttpOnly (XSS defence)"
-    assert "secure" in lowered, "apex_token cookie must be Secure (downgrade defence)"
     assert "samesite=" in lowered, "apex_token cookie must carry SameSite"
+    # Secure only in production — gating it on ENVIRONMENT lets local/CI
+    # tests over HTTP still exercise the full cookie round-trip.
+    if _os.environ.get("ENVIRONMENT", "").lower() in ("production", "prod"):
+        assert "secure" in lowered, "production: apex_token cookie must be Secure"
 
 
 def test_cookie_only_authenticates_protected_endpoint(client) -> None:
     """After login, a protected endpoint must accept the cookie
     as the sole credential (no Authorization header).
 
-    ``/auth/me`` is the canonical protected endpoint — if it works
-    cookie-only, any handler that uses the same ``get_current_user``
-    dependency does too."""
+    ``/users/me`` uses Depends(get_current_user) — the canonical
+    dependency. If cookie auth works for it, it works for every
+    endpoint that uses the same dependency. The previous version of
+    this test hit a non-existent ``/auth/me`` path and counted the
+    404 as a success; strengthened to assert 200 + actual user
+    payload."""
     username, password = _unique_credentials()
     _register_and_login(client, username, password)
 
@@ -110,16 +119,26 @@ def test_cookie_only_authenticates_protected_endpoint(client) -> None:
     assert "apex_token" in login.cookies
 
     # Hit a protected endpoint WITHOUT an Authorization header.
-    # We rely on the cookie jar. If extract_user_id() didn't read
+    # We rely on the cookie jar. If get_current_user didn't read
     # the cookie, this would 401.
-    me = client.get("/auth/me")
-    # 200 = full cookie acceptance. 404 = endpoint unmounted (unlikely
-    # but we don't want to hard-fail if the route name ever moves —
-    # accept 200/404 but explicitly refuse 401).
-    assert me.status_code != 401, (
-        f"cookie-only auth failed: /auth/me → 401. "
-        f"extract_user_id might not be reading the cookie. "
-        f"Response: {me.text[:300]}"
+    me = client.get("/users/me")
+    assert me.status_code == 200, (
+        f"cookie-only auth failed: /users/me → {me.status_code}. "
+        f"get_current_user might not be reading the apex_token cookie. "
+        f"Response: {me.text[:400]}"
+    )
+    # Response should describe *our* user, not a stale one.
+    body = me.json()
+    # Either {"username": "..."} or {"data": {"username": "..."}} —
+    # account_service.get_profile shape varies by phase. Accept both.
+    username_in_body = (
+        body.get("username")
+        or body.get("data", {}).get("username")
+        or body.get("user", {}).get("username")
+    )
+    assert username_in_body == username, (
+        f"cookie-auth returned profile for a different user: "
+        f"expected {username!r}, got {username_in_body!r}"
     )
 
 
@@ -147,8 +166,10 @@ def test_register_also_sets_the_cookie(client) -> None:
     set_cookie = r.headers.get("set-cookie", "")
     lowered = set_cookie.lower()
     assert "httponly" in lowered
-    assert "secure" in lowered
     assert "samesite=" in lowered
+    import os as _os
+    if _os.environ.get("ENVIRONMENT", "").lower() in ("production", "prod"):
+        assert "secure" in lowered
 
 
 def test_logout_clears_the_cookie(client) -> None:

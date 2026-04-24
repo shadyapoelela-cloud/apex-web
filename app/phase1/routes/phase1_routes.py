@@ -5,7 +5,8 @@ Auth, Account Center, Subscriptions, Legal, Notifications.
 Per execution document section 12 + Zero-Ambiguity Pack section 14.
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Header, Request, Response
+import os
+from fastapi import APIRouter, Cookie, HTTPException, Depends, Header, Request, Response
 from pydantic import BaseModel, Field
 from typing import Optional
 import logging
@@ -15,15 +16,48 @@ from app.phase1.services.account_service import AccountService
 from app.phase1.services.subscription_service import SubscriptionService, EntitlementEngine
 from app.phase1.services.legal_service import LegalService
 
+# ``Secure`` cookies are HTTPS-only; setting them in dev/test (plain HTTP)
+# means the browser never sends them back, which silently breaks the
+# cookie-auth path. Match the HSTS gating pattern in app/main.py.
+_IS_PRODUCTION = os.environ.get("ENVIRONMENT", "development").lower() in ("production", "prod")
+
 # ═══════════════════════════════════════════════════════════════
 # Dependency: Current User from JWT
 # ═══════════════════════════════════════════════════════════════
 
 
-async def get_current_user(authorization: Optional[str] = Header(None)) -> dict:
-    if not authorization or not authorization.startswith("Bearer "):
+async def get_current_user(
+    authorization: Optional[str] = Header(None),
+    apex_token: Optional[str] = Cookie(None),
+) -> dict:
+    """Resolve the caller's JWT from EITHER the ``Authorization: Bearer``
+    header OR the ``apex_token`` HttpOnly cookie.
+
+    The header path is the legacy default (mobile apps, curl clients,
+    server-to-server). The cookie path is the new browser-default after
+    commits 851199d + a5dad69 which fixed login/register to actually
+    set the cookie. Without this Cookie parameter, every endpoint that
+    uses this dependency was header-only — which meant the HttpOnly
+    cookie path was end-to-end broken from API entry to handler,
+    regardless of what login did on the way out.
+
+    Header wins if both are supplied — preserves existing behaviour
+    for anyone currently sending both.
+    """
+    token: Optional[str] = None
+    if authorization and isinstance(authorization, str) and authorization.startswith("Bearer "):
+        token = authorization.split(" ", 1)[1].strip() or None
+    # When called via FastAPI's dependency injection, apex_token is a
+    # str|None. When invoked directly from main.py (two legacy call
+    # sites, see app/main.py:~2236 and ~2410), only `authorization`
+    # is passed and apex_token falls back to its declared default —
+    # which resolves to the Cookie() dependency *object*, not None.
+    # Guard with isinstance so the direct-call path doesn't crash
+    # with "'Cookie' object has no attribute 'strip'".
+    if not token and isinstance(apex_token, str) and apex_token:
+        token = apex_token.strip() or None
+    if not token:
         raise HTTPException(status_code=401, detail="غير مصرّح — يرجى تسجيل الدخول")
-    token = authorization.split(" ", 1)[1]
     payload = decode_token(token)
     if not payload or payload.get("type") != "access":
         raise HTTPException(status_code=401, detail="الجلسة منتهية — يرجى إعادة الدخول")
@@ -135,7 +169,7 @@ async def register(req: RegisterRequest, request: Request, response: Response):
             value=access_token,
             max_age=60 * 60 * 24,
             httponly=True,
-            secure=True,
+            secure=_IS_PRODUCTION,  # HTTPS-only in prod; allow HTTP in dev/test
             samesite="lax",
             path="/",
         )
@@ -176,7 +210,7 @@ async def login(req: LoginRequest, request: Request, response: Response):
             value=access_token,
             max_age=60 * 60 * 24,        # 24 hours (matches access-token TTL)
             httponly=True,
-            secure=True,                  # HTTPS-only (Render always serves over TLS)
+            secure=_IS_PRODUCTION,        # HTTPS-only in prod; dev/test uses HTTP
             samesite="lax",               # blocks cross-site POST while allowing top-level navigations
             path="/",
         )
