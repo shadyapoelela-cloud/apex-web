@@ -120,9 +120,19 @@ def init_sentry(dsn: Optional[str] = None) -> bool:
 
     dsn = dsn or os.environ.get("SENTRY_DSN")
     if not dsn:
-        logging.getLogger(__name__).info(
-            "Sentry disabled — SENTRY_DSN not set."
-        )
+        # In production, running blind is a real operational gap — we
+        # won't see crashes, 500s, or unhandled exceptions until a user
+        # complains. Log WARNING so the line is visible in Render's
+        # default log view. Dev/test just gets INFO (expected).
+        msg = "Sentry disabled — SENTRY_DSN not set."
+        if _IS_PRODUCTION:
+            logging.getLogger(__name__).warning(
+                "⚠ PRODUCTION WITHOUT SENTRY: %s Configure SENTRY_DSN in "
+                "the Render dashboard to start capturing errors.",
+                msg,
+            )
+        else:
+            logging.getLogger(__name__).info(msg)
         return False
 
     try:

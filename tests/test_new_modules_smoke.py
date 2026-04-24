@@ -207,6 +207,31 @@ def test_observability_sentry_skips_without_dsn(monkeypatch) -> None:
     assert result is False
 
 
+def test_observability_sentry_warns_loudly_in_prod(monkeypatch, caplog) -> None:
+    """Production without SENTRY_DSN is a real operational gap — running
+    blind means crashes land in the void. The warning must be at WARNING
+    level so it surfaces in Render's default log view, not hide as INFO.
+    Regression for app/core/observability.py — if someone later downgrades
+    the message back to INFO, this test flags it."""
+    import logging as _logging
+    from app.core import observability
+
+    monkeypatch.setenv("SENTRY_DSN", "")
+    monkeypatch.setattr(observability, "_sentry_initialized", False)
+    monkeypatch.setattr(observability, "_IS_PRODUCTION", True)
+
+    with caplog.at_level(_logging.WARNING, logger="app.core.observability"):
+        result = observability.init_sentry()
+    assert result is False
+    # At least one WARNING-level record mentioning the gap must exist.
+    warnings = [r for r in caplog.records if r.levelno >= _logging.WARNING]
+    joined = " ".join(r.getMessage() for r in warnings)
+    assert "SENTRY_DSN" in joined or "Sentry" in joined, (
+        f"prod-without-Sentry must log a WARNING; got records: "
+        f"{[r.levelname + ':' + r.getMessage()[:80] for r in caplog.records]}"
+    )
+
+
 def test_observability_configure_logging_idempotent() -> None:
     from app.core.observability import configure_logging
 
