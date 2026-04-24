@@ -413,6 +413,64 @@ class ApiService {
   static Future<ApiResult> aiExecuteSuggestion(String id) =>
       _post('/api/v1/ai/suggestions/$id/execute', {});
 
+  // ── Pilot: Customers + Sales Invoices ──
+  static Future<ApiResult> pilotListCustomers(String tenantId, {String? search, int limit=100}) {
+    final qs = <String>['limit=$limit'];
+    if (search != null && search.isNotEmpty) qs.add('search=${Uri.encodeQueryComponent(search)}');
+    return _get('/api/v1/pilot/tenants/$tenantId/customers?${qs.join('&')}');
+  }
+  static Future<ApiResult> pilotCreateCustomer(String tenantId, Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/tenants/$tenantId/customers', payload);
+  static Future<ApiResult> pilotGetCustomer(String id) =>
+      _get('/api/v1/pilot/customers/$id');
+  static Future<ApiResult> pilotUpdateCustomer(String id, Map<String, dynamic> patch) =>
+      _patch('/api/v1/pilot/customers/$id', patch);
+  static Future<ApiResult> pilotCustomerLedger(String id) =>
+      _get('/api/v1/pilot/customers/$id/ledger');
+  static Future<ApiResult> pilotCreateSalesInvoice(Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/sales-invoices', payload);
+  static Future<ApiResult> pilotIssueSalesInvoice(String id) =>
+      _post('/api/v1/pilot/sales-invoices/$id/issue', {});
+  static Future<ApiResult> pilotListSalesInvoices(String entityId, {String? status, int limit=100}) {
+    final qs = <String>['limit=$limit'];
+    if (status != null) qs.add('status=${Uri.encodeQueryComponent(status)}');
+    return _get('/api/v1/pilot/entities/$entityId/sales-invoices?${qs.join('&')}');
+  }
+  static Future<ApiResult> pilotRecordCustomerPayment(String invoiceId, Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/sales-invoices/$invoiceId/payment', payload);
+
+  // ── Pilot: Vendors (existing) ──
+  static Future<ApiResult> pilotListVendors(String tenantId, {int limit=100}) =>
+      _get('/api/v1/pilot/tenants/$tenantId/vendors?limit=$limit');
+  static Future<ApiResult> pilotCreateVendor(String tenantId, Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/tenants/$tenantId/vendors', payload);
+
+  // ── Pilot: Products (existing) ──
+  static Future<ApiResult> pilotListProducts(String tenantId, {int limit=100}) =>
+      _get('/api/v1/pilot/tenants/$tenantId/products?limit=$limit');
+  static Future<ApiResult> pilotCreateProduct(String tenantId, Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/tenants/$tenantId/products', payload);
+
+  // ── Pilot: Journal Entries (existing) ──
+  static Future<ApiResult> pilotListJournalEntries(String entityId, {int limit=100}) =>
+      _get('/api/v1/pilot/entities/$entityId/journal-entries?limit=$limit');
+  static Future<ApiResult> pilotCreateJournalEntry(Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/journal-entries', payload);
+  static Future<ApiResult> pilotPostJournalEntry(String jeId) =>
+      _post('/api/v1/pilot/journal-entries/$jeId/post', {});
+  static Future<ApiResult> pilotGetJournalEntry(String jeId) =>
+      _get('/api/v1/pilot/journal-entries/$jeId');
+
+  // ── Pilot: Trial Balance (existing) ──
+  static Future<ApiResult> pilotTrialBalance(String entityId, {String? asOfDate}) {
+    final qs = asOfDate != null ? '?as_of_date=$asOfDate' : '';
+    return _get('/api/v1/pilot/entities/$entityId/reports/trial-balance$qs');
+  }
+
+  // ── HR: Employees (existing) ──
+  static Future<ApiResult> hrListEmployees({int limit=100}) => _get('/api/v1/employees?limit=$limit');
+  static Future<ApiResult> hrCreateEmployee(Map<String, dynamic> payload) => _post('/api/v1/employees', payload);
+
   // ── Audit hash-chain ──
   static Future<ApiResult> aiVerifyAuditChain({int limit=1000}) =>
       _get('/api/v1/ai/audit/chain/verify?limit=$limit');

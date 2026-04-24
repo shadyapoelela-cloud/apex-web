@@ -34,6 +34,11 @@ from .gl import (
     JournalLine,
     GLPosting,
 )
+from .customer import (
+    Customer, CustomerKind, CustomerPaymentTerms,
+    SalesInvoice, SalesInvoiceStatus, SalesInvoiceLine,
+    CustomerPayment,
+)
 from .compliance import (
     ZatcaOnboarding, ZatcaInvoiceSubmission,
     ZatcaEnvironment, ZatcaInvoiceKind, ZatcaSubmissionStatus,

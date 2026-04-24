@@ -105,6 +105,14 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       icon: Icons.link,
       onRun: (_) => go('/admin/audit-chain'),
     ),
+    ApexCommand(
+      id: 'nav_ops_hub',
+      label: 'مركز العمليات المالية',
+      subtitle: 'عملاء · موردين · أصناف · قيود · فواتير · ميزان مراجعة',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.business_center,
+      onRun: (_) => go('/operations/hub'),
+    ),
 
     // ── Navigation ──
     ApexCommand.navigation(

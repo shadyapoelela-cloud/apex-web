@@ -356,6 +356,61 @@ class V5Launchpad extends StatelessWidget {
                   )),
                 ],
               ),
+              const SizedBox(height: 10),
+              InkWell(
+                onTap: () => context.push('/operations/hub'),
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [core_theme.AC.gold.withValues(alpha: 0.2), const Color(0xFF7C3AED).withValues(alpha: 0.15)],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: core_theme.AC.gold.withValues(alpha: 0.5)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: core_theme.AC.gold.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.business_center, color: core_theme.AC.gold, size: 24),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'مركز العمليات المالية',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                fontFamily: 'Tajawal',
+                                color: core_theme.AC.tp,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'عملاء · موردين · موظفين · أصناف · قيود يومية · فواتير بيع · ميزان المراجعة — كلها في مكان واحد',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'Tajawal',
+                                color: core_theme.AC.ts,
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(Icons.arrow_back_ios, color: core_theme.AC.gold, size: 16),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 20),
 
               // Showcase CTA banner
