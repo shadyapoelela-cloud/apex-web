@@ -28,6 +28,8 @@ import 'package:go_router/go_router.dart';
 import '../theme.dart' as core_theme;
 import '../../providers/app_providers.dart';
 import '../../screens/extracted/client_screens.dart' show ClientListScreen;
+import '../../screens/operations/sales_invoices_screen.dart'
+    show SalesInvoicesScreen;
 import '../../screens/settings/entity_setup_screen.dart'
     show EntitySetupScreen;
 import 'apex_v5_action_dashboard.dart';
@@ -255,6 +257,9 @@ class ApexV5ServiceShell extends ConsumerWidget {
       case 'customers-360':
         // إدارة العملاء / العميل 360 → الشاشة الموحّدة للعملاء
         return const ClientListScreen();
+      case 'sales-invoices':
+        // فواتير المبيعات — شاشة كاملة بأشرطة فلترة/تجميع/استيراد/تقارير
+        return const SalesInvoicesScreen();
       case 'entity-setup':
       case 'onboarding':
         // إعداد الكيانات/الشركات/الفروع + رحلة الإعداد (موحّدتان)
