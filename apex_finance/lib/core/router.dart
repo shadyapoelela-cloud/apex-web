@@ -85,6 +85,9 @@ import '../screens/accounting/bank_rec_v2_screen.dart';
 import '../screens/reports/reports_hub_screen.dart';
 import '../screens/compliance/zatca_invoice_viewer_screen.dart';
 import '../screens/hr/payroll_run_screen.dart';
+import '../screens/operations/inventory_v2_screen.dart';
+import '../screens/operations/fixed_assets_v2_screen.dart';
+import '../screens/analytics/budget_variance_v2_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -630,6 +633,9 @@ final appRouter = GoRouter(
       ),
     ),
     GoRoute(path: '/hr/payroll-run', pageBuilder: (c, s) => _apexPage(const PayrollRunScreen(), s)),
+    GoRoute(path: '/operations/inventory-v2', pageBuilder: (c, s) => _apexPage(const InventoryV2Screen(), s)),
+    GoRoute(path: '/operations/fixed-assets-v2', pageBuilder: (c, s) => _apexPage(const FixedAssetsV2Screen(), s)),
+    GoRoute(path: '/analytics/budget-variance-v2', pageBuilder: (c, s) => _apexPage(const BudgetVarianceV2Screen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(
