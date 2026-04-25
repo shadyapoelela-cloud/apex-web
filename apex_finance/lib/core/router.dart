@@ -103,6 +103,8 @@ import '../screens/knowledge/knowledge_search_v2_screen.dart';
 import '../screens/sales/quotes_list_screen.dart';
 import '../screens/sales/credit_memos_screen.dart';
 import '../screens/hr/expense_reports_screen.dart';
+import '../screens/analytics/cost_variance_v2_screen.dart';
+import '../screens/compliance/wht_v2_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -666,6 +668,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/sales/quotes', pageBuilder: (c, s) => _apexPage(const QuotesListScreen(), s)),
     GoRoute(path: '/sales/memos', pageBuilder: (c, s) => _apexPage(const CreditMemosScreen(), s)),
     GoRoute(path: '/hr/expense-reports', pageBuilder: (c, s) => _apexPage(const ExpenseReportsScreen(), s)),
+    GoRoute(path: '/analytics/cost-variance-v2', pageBuilder: (c, s) => _apexPage(const CostVarianceV2Screen(), s)),
+    GoRoute(path: '/compliance/wht-v2', pageBuilder: (c, s) => _apexPage(const WhtV2Screen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(

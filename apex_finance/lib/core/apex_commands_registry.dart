@@ -179,6 +179,22 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/accounting/coa-v2'),
     ),
     ApexCommand(
+      id: 'nav_cost_variance_v2',
+      label: 'تحليل انحراف التكاليف',
+      subtitle: 'Material / Labour / Overhead variance',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.precision_manufacturing,
+      onRun: (_) => go('/analytics/cost-variance-v2'),
+    ),
+    ApexCommand(
+      id: 'nav_wht_v2',
+      label: 'استقطاع المصدر (WHT)',
+      subtitle: '5/15/20% حسب نوع الدفعة + إقرار شهري',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.percent,
+      onRun: (_) => go('/compliance/wht-v2'),
+    ),
+    ApexCommand(
       id: 'nav_quotes',
       label: 'عروض الأسعار',
       subtitle: 'Quote pipeline + conversion tracking',
