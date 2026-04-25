@@ -96,6 +96,8 @@ import '../screens/compliance/consolidation_v2_screen.dart';
 import '../screens/admin/ai_suggestions_queue_v2_screen.dart';
 import '../screens/analytics/investment_portfolio_v2_screen.dart';
 import '../screens/analytics/project_profitability_screen.dart';
+import '../screens/settings/bank_feed_setup_screen.dart';
+import '../screens/compliance/activity_log_v2_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -652,6 +654,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/admin/ai-suggestions-v2', pageBuilder: (c, s) => _apexPage(const AiSuggestionsQueueV2Screen(), s)),
     GoRoute(path: '/analytics/investment-portfolio-v2', pageBuilder: (c, s) => _apexPage(const InvestmentPortfolioV2Screen(), s)),
     GoRoute(path: '/analytics/project-profitability', pageBuilder: (c, s) => _apexPage(const ProjectProfitabilityScreen(), s)),
+    GoRoute(path: '/settings/bank-feeds', pageBuilder: (c, s) => _apexPage(const BankFeedSetupScreen(), s)),
+    GoRoute(path: '/compliance/activity-log-v2', pageBuilder: (c, s) => _apexPage(const ActivityLogV2Screen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(

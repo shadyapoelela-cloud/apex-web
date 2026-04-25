@@ -179,6 +179,22 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/accounting/coa-v2'),
     ),
     ApexCommand(
+      id: 'nav_bank_feeds_setup',
+      label: 'ربط البنوك',
+      subtitle: '11 بنك سعودي عبر Lean / Tarabut (SAMA Open Banking)',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.account_balance,
+      onRun: (_) => go('/settings/bank-feeds'),
+    ),
+    ApexCommand(
+      id: 'nav_activity_log_v2',
+      label: 'سجل النشاط',
+      subtitle: 'Hash-Chain audit trail بـ filters',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.history,
+      onRun: (_) => go('/compliance/activity-log-v2'),
+    ),
+    ApexCommand(
       id: 'nav_investment_v2',
       label: 'المحفظة الاستثمارية',
       subtitle: 'أسهم + صناديق + سندات + عقارات + حصص',
