@@ -27,12 +27,14 @@ import 'v5_wired_screens.dart';
 
 /// List of routes to be spread into the top-level GoRouter.routes.
 List<RouteBase> v5Routes() => [
-      // Phase 27: redirect to clean /services entry instead of cluttered /app launchpad
+      // Phase 27.4: kill the cluttered V5 Launchpad — every entry routes to /services
       GoRoute(path: '/', redirect: (ctx, state) => '/services'),
       GoRoute(path: '/login', redirect: (ctx, state) => '/services'),
       GoRoute(path: '/home', redirect: (ctx, state) => '/services'),
+      GoRoute(path: '/app', redirect: (ctx, state) => '/services'),
+      // V5 Launchpad still reachable for archaeology at /app/legacy
       GoRoute(
-        path: '/app',
+        path: '/app/legacy',
         builder: (ctx, state) => const V5Launchpad(),
       ),
       GoRoute(
