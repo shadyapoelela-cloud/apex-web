@@ -137,60 +137,32 @@ class ApexV5ServiceShell extends ConsumerWidget {
             // Inline: always a compact 64px rail (persistent quick-nav).
             // Expanded: floats as drawer over content + scrim.
             Expanded(
+              // Sidebar is always INLINE — collapses/expands in place and
+              // the body area auto-grows/shrinks via Expanded. No overlay,
+              // no scrim, no dual-layer. The toggle (طيّ/توسيع) at the
+              // bottom of the sidebar is the only collapse control.
               child: isAppsHub || isNarrow
                   ? Column(children: [Expanded(child: _buildBody(context))])
                   : ValueListenableBuilder<bool>(
                       valueListenable: SidebarPrefs.collapsed,
-                      builder: (_, collapsed, __) => Stack(children: [
-                        // Inline layer: always-rail + body + right rail.
-                        Row(children: [
-                          _Sidebar(
+                      builder: (_, collapsed, __) => Row(children: [
+                        AnimatedContainer(
+                          duration: core_theme.DS.motionMed,
+                          curve: Curves.easeInOutCubic,
+                          width: collapsed ? 64 : 264,
+                          child: _Sidebar(
                             service: service,
                             activeMainId: mainModule?.id ?? '',
-                            isCollapsed: true, // inline is ALWAYS rail
+                            isCollapsed: collapsed,
                           ),
+                        ),
+                        VerticalDivider(
+                            width: 1, color: core_theme.AC.sidebarBorder),
+                        Expanded(child: _buildBody(context)),
+                        if (!isMedium)
                           VerticalDivider(
-                              width: 1,
-                              color: core_theme.AC.sidebarBorder),
-                          Expanded(child: _buildBody(context)),
-                          if (!isMedium)
-                            VerticalDivider(
-                                width: 1,
-                                color: core_theme.AC.sidebarBorder),
-                          if (!isMedium) const _QuickAccessRail(),
-                        ]),
-                        // Overlay layer: only when user expanded.
-                        if (!collapsed) ...[
-                          // Scrim — click to close, covers everything
-                          // except the rail itself so rail stays clickable.
-                          PositionedDirectional(
-                            start: 64, end: 0, top: 0, bottom: 0,
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: () =>
-                                  SidebarPrefs.collapsed.value = true,
-                              child: AnimatedContainer(
-                                duration: core_theme.DS.motionMed,
-                                color: core_theme.AC.sidebarScrim,
-                              ),
-                            ),
-                          ),
-                          // Expanded drawer slides over content.
-                          PositionedDirectional(
-                            start: 64, top: 0, bottom: 0,
-                            width: 264,
-                            child: Material(
-                              elevation: 16,
-                              color: core_theme.AC.sidebarBg,
-                              shadowColor: core_theme.AC.overlay,
-                              child: _Sidebar(
-                                service: service,
-                                activeMainId: mainModule?.id ?? '',
-                                isCollapsed: false, // overlay = expanded
-                              ),
-                            ),
-                          ),
-                        ],
+                              width: 1, color: core_theme.AC.sidebarBorder),
+                        if (!isMedium) const _QuickAccessRail(),
                       ]),
                     ),
             ),
