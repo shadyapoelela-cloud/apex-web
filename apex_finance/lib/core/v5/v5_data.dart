@@ -486,15 +486,17 @@ List<V5Service> v5Services = [
             widgets: _financeDashboardWidgets,
           ),
 
-          // ━━━ Entity Setup (first, foundational) ━━━
-          const V5Chip(id: 'entity-setup', labelAr: 'إعداد الكيانات والشركات والفروع', labelEn: 'Entity / Company / Branch Setup', icon: Icons.corporate_fare_rounded, phase: ChipPhase.setup),
+          // ━━━ المرحلة 1 — تأسيس الكيان (Foundation) ━━━
+          const V5Chip(id: 'entity-setup', labelAr: 'إعداد الكيانات والشركات والفروع', labelEn: 'Entity / Company / Branch Setup', icon: Icons.corporate_fare_rounded, phase: ChipPhase.setup, setupGroup: 'foundation'),
 
-          // ━━━ Master Data (5) ━━━
-          const V5Chip(id: 'coa-editor', labelAr: 'دليل الحسابات', labelEn: 'Chart of Accounts', icon: Icons.account_tree, phase: ChipPhase.setup),
-          const V5Chip(id: 'cost-centers', labelAr: 'مراكز التكلفة', labelEn: 'Cost Centers', icon: Icons.pie_chart, phase: ChipPhase.setup),
-          const V5Chip(id: 'profit-centers', labelAr: 'مراكز الربحية', labelEn: 'Profit Centers', icon: Icons.donut_small, phase: ChipPhase.setup),
-          const V5Chip(id: 'internal-orders', labelAr: 'الأوامر الداخلية', labelEn: 'Internal Orders', icon: Icons.assignment_turned_in, phase: ChipPhase.setup),
-          const V5Chip(id: 'dimensions', labelAr: 'الأبعاد المحاسبية', labelEn: 'Accounting Dimensions', icon: Icons.view_in_ar, phase: ChipPhase.setup),
+          // ━━━ المرحلة 2 — الهيكل المحاسبي (Backbone) ━━━
+          const V5Chip(id: 'coa-editor', labelAr: 'دليل الحسابات', labelEn: 'Chart of Accounts', icon: Icons.account_tree, phase: ChipPhase.setup, setupGroup: 'backbone'),
+
+          // ━━━ المرحلة 3 — الأبعاد التحليلية (Dimensions) ━━━
+          const V5Chip(id: 'cost-centers', labelAr: 'مراكز التكلفة', labelEn: 'Cost Centers', icon: Icons.pie_chart, phase: ChipPhase.setup, setupGroup: 'dimensions'),
+          const V5Chip(id: 'profit-centers', labelAr: 'مراكز الربحية', labelEn: 'Profit Centers', icon: Icons.donut_small, phase: ChipPhase.setup, setupGroup: 'dimensions'),
+          const V5Chip(id: 'internal-orders', labelAr: 'الأوامر الداخلية', labelEn: 'Internal Orders', icon: Icons.assignment_turned_in, phase: ChipPhase.setup, setupGroup: 'dimensions'),
+          const V5Chip(id: 'dimensions', labelAr: 'الأبعاد المحاسبية', labelEn: 'Accounting Dimensions', icon: Icons.view_in_ar, phase: ChipPhase.setup, setupGroup: 'dimensions'),
 
           // ━━━ Transactions (5) ━━━
           _chipFromV4('erp', 'gl', labelOverrideAr: 'الأستاذ الشامل'),
@@ -517,11 +519,15 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'scenarios', labelAr: 'سيناريوهات What-If', labelEn: 'What-If Scenarios', icon: Icons.insights, phase: ChipPhase.report),
           const V5Chip(id: 'breakeven', labelAr: 'نقطة التعادل', labelEn: 'Break-Even', icon: Icons.balance, phase: ChipPhase.report),
 
-          // ━━━ Setup (4) ━━━
-          const V5Chip(id: 'documents', labelAr: 'خزانة الوثائق', labelEn: 'Document Vault', icon: Icons.folder_shared, phase: ChipPhase.setup),
-          const V5Chip(id: 'integrations', labelAr: 'التكاملات API', labelEn: 'Integrations Hub', icon: Icons.hub, phase: ChipPhase.setup),
-          const V5Chip(id: 'onboarding', labelAr: 'رحلة الإعداد', labelEn: 'Onboarding', icon: Icons.auto_awesome, phase: ChipPhase.setup),
-          const V5Chip(id: 'advanced-settings', labelAr: 'إعدادات متقدّمة', labelEn: 'Advanced Settings', icon: Icons.settings_applications, phase: ChipPhase.setup),
+          // ━━━ المرحلة 4 — المستندات (Documents) ━━━
+          const V5Chip(id: 'documents', labelAr: 'خزانة الوثائق', labelEn: 'Document Vault', icon: Icons.folder_shared, phase: ChipPhase.setup, setupGroup: 'documents'),
+
+          // ━━━ المرحلة 6 — التكاملات (Integrations) ━━━
+          const V5Chip(id: 'integrations', labelAr: 'التكاملات API', labelEn: 'Integrations Hub', icon: Icons.hub, phase: ChipPhase.setup, setupGroup: 'integrations'),
+
+          // ━━━ المرحلة 7 — الإطلاق (Go-Live) ━━━
+          const V5Chip(id: 'onboarding', labelAr: 'رحلة الإعداد', labelEn: 'Onboarding', icon: Icons.auto_awesome, phase: ChipPhase.setup, setupGroup: 'golive'),
+          const V5Chip(id: 'advanced-settings', labelAr: 'إعدادات متقدّمة', labelEn: 'Advanced Settings', icon: Icons.settings_applications, phase: ChipPhase.setup, setupGroup: 'golive'),
         ],
       ),
 

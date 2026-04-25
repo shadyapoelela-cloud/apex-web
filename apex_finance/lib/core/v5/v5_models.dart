@@ -116,6 +116,18 @@ class V5Chip {
   /// visual dividers and phase headers.
   final ChipPhase? phase;
 
+  /// Setup sub-grouping (only meaningful when phase == Setup).
+  /// Maps to the 7-phase accountant onboarding journey used by SAP /
+  /// Oracle / NetSuite / D365. Values:
+  ///   foundation   — Entity, fiscal calendar, currencies, tax registration
+  ///   backbone     — Chart of Accounts, sub-ledgers, bank accounts, tax codes
+  ///   dimensions   — Cost centers, profit centers, internal orders, segments
+  ///   documents    — Document types, numbering, templates, approval workflow
+  ///   operations   — Auto-posting, recurring, period-close, FX revaluation
+  ///   integrations — Bank feeds, ZATCA, payment gateways, APIs, import/export
+  ///   golive       — Opening balances, pre-go-live checklist, onboarding
+  final String? setupGroup;
+
   const V5Chip({
     required this.id,
     required this.labelAr,
@@ -126,6 +138,7 @@ class V5Chip {
     this.dashboardWidgets,
     this.requiredCapability,
     this.phase,
+    this.setupGroup,
   });
 
   /// Convenience: build from existing V4SubModule.

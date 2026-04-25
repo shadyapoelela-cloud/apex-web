@@ -2022,17 +2022,64 @@ class _Sidebar extends StatelessWidget {
         widgets.add(_phaseHeader(phase));
       }
       firstPhase = false;
-      for (final c in chips) {
-        widgets.add(_ChipSubItem(
-          chip: c,
-          moduleId: m.id,
-          serviceColor: core_theme.AC.gold,
-          isActive: currentPath.endsWith('/${c.id}'),
-          isCollapsed: isCollapsed,
-        ));
+      // Setup phase gets a sub-grouping (foundation/backbone/dimensions/...)
+      // following the global accountant onboarding journey.
+      if (phase == ChipPhase.setup && !isCollapsed) {
+        String? lastGroup;
+        for (final c in chips) {
+          final g = c.setupGroup;
+          if (g != null && g != lastGroup) {
+            widgets.add(_setupGroupHeader(g));
+            lastGroup = g;
+          }
+          widgets.add(_ChipSubItem(
+            chip: c,
+            moduleId: m.id,
+            serviceColor: core_theme.AC.gold,
+            isActive: currentPath.endsWith('/${c.id}'),
+            isCollapsed: isCollapsed,
+          ));
+        }
+      } else {
+        for (final c in chips) {
+          widgets.add(_ChipSubItem(
+            chip: c,
+            moduleId: m.id,
+            serviceColor: core_theme.AC.gold,
+            isActive: currentPath.endsWith('/${c.id}'),
+            isCollapsed: isCollapsed,
+          ));
+        }
       }
     }
     return widgets;
+  }
+
+  Widget _setupGroupHeader(String groupId) {
+    final (label, icon, color) = switch (groupId) {
+      'foundation'   => ('١ — تأسيس الكيان',     Icons.foundation,     const Color(0xFF4CAF50)),
+      'backbone'     => ('٢ — الهيكل المحاسبي',  Icons.account_tree,   const Color(0xFF9C27B0)),
+      'dimensions'   => ('٣ — الأبعاد التحليلية', Icons.view_in_ar,     const Color(0xFF2196F3)),
+      'documents'    => ('٤ — المستندات',         Icons.description,    const Color(0xFFFFC107)),
+      'operations'   => ('٥ — قواعد التشغيل',     Icons.settings_applications, const Color(0xFFFF5722)),
+      'integrations' => ('٦ — التكاملات',         Icons.hub,            const Color(0xFF00BCD4)),
+      'golive'       => ('٧ — الإطلاق',           Icons.rocket_launch,  const Color(0xFFE91E63)),
+      _              => (groupId, Icons.label, core_theme.AC.gold),
+    };
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(20, 10, 20, 4),
+      child: Row(children: [
+        Icon(icon, size: 10, color: color.withValues(alpha: 0.8)),
+        const SizedBox(width: 5),
+        Text(label,
+            style: TextStyle(
+              fontSize: 9.5,
+              fontWeight: FontWeight.w800,
+              color: color,
+              letterSpacing: 0.4,
+            )),
+      ]),
+    );
   }
 
   Widget _collapsedPhaseDivider() {
