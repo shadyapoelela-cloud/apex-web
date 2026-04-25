@@ -67,6 +67,9 @@ import '../screens/operations/vendor_360_screen.dart';
 import '../screens/operations/receipt_capture_screen.dart';
 import '../screens/settings/unified_settings_screen.dart';
 import '../screens/operations/customers_list_screen.dart';
+import '../screens/operations/vendors_list_screen.dart';
+import '../screens/operations/invoices_list_screen.dart';
+import '../screens/operations/ar_aging_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -574,6 +577,9 @@ final appRouter = GoRouter(
     GoRoute(path: '/receipt/capture', pageBuilder: (c, s) => _apexPage(const ReceiptCaptureScreen(), s)),
     GoRoute(path: '/settings/unified', pageBuilder: (c, s) => _apexPage(const UnifiedSettingsScreen(), s)),
     GoRoute(path: '/sales/customers', pageBuilder: (c, s) => _apexPage(const CustomersListScreen(), s)),
+    GoRoute(path: '/sales/invoices', pageBuilder: (c, s) => _apexPage(const InvoicesListScreen(), s)),
+    GoRoute(path: '/sales/aging', pageBuilder: (c, s) => _apexPage(const ArAgingScreen(), s)),
+    GoRoute(path: '/purchase/vendors', pageBuilder: (c, s) => _apexPage(const VendorsListScreen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(
