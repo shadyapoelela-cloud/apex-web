@@ -128,6 +128,7 @@ import 'package:file_picker/file_picker.dart';
 import 'v4/v4_routes.dart';
 import 'v5/v5_routes.dart';
 import '../widgets/hybrid_sidebar.dart';
+import 'apex_bottom_nav.dart';
 import '../screens/settings/entity_setup_screen.dart';
 import '../screens/account/mfa_screen.dart';
 
@@ -144,10 +145,22 @@ bool _shouldWrapCompliance(GoRouterState state) {
 /// Smooth page transition — fade + subtle slide.
 /// Auto-wraps compliance routes with [HybridSidebar] for a consistent
 /// left navigation + theme-aware colors + active-stripe indicator.
+/// Routes that get the mobile bottom navigation wrapped around them.
+/// (The widget self-hides on tablet/desktop breakpoints.)
+bool _shouldShowBottomNav(GoRouterState state) {
+  final p = state.uri.path;
+  if (p == '/login' || p == '/register' || p.startsWith('/forgot-password')) return false;
+  if (p == '/onboarding' || p.startsWith('/onboarding/')) return false;
+  return true;
+}
+
 CustomTransitionPage<void> _apexPage(Widget child, GoRouterState state) {
-  final wrapped = _shouldWrapCompliance(state)
+  Widget wrapped = _shouldWrapCompliance(state)
       ? HybridSidebar(child: child)
       : child;
+  if (_shouldShowBottomNav(state)) {
+    wrapped = ApexBottomNav(currentPath: state.uri.path, child: wrapped);
+  }
   return CustomTransitionPage(
     key: state.pageKey,
     child: wrapped,

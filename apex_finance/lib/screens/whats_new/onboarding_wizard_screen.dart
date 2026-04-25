@@ -55,12 +55,14 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
   // Step 5: first invoice
   final _invoiceAmountCtrl = TextEditingController();
 
+  // Trimmed to 3 steps (Linear/Stripe pattern, gap analysis P1 #5).
+  // Steps 4 & 5 (first client + first invoice) moved to the Today
+  // dashboard's Express Invoice — the user can issue from the home
+  // screen with the demo customer the seed-demo created.
   final List<_WizardStep> _steps = const [
     _WizardStep(title: 'بيانات الشركة', icon: Icons.business),
     _WizardStep(title: 'اختر قطاعك', icon: Icons.apps),
-    _WizardStep(title: 'دليل الحسابات', icon: Icons.account_tree),
-    _WizardStep(title: 'أول عميل', icon: Icons.person_add_alt),
-    _WizardStep(title: 'أول فاتورة', icon: Icons.receipt),
+    _WizardStep(title: 'تأكيد', icon: Icons.check_circle_outline),
   ];
 
   @override
@@ -275,11 +277,72 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
     return switch (_step) {
       0 => _stepCompany(),
       1 => _stepIndustry(),
-      2 => _stepCoa(),
-      3 => _stepFirstClient(),
-      _ => _stepFirstInvoice(),
+      _ => _stepConfirm(),
     };
   }
+
+  Widget _stepConfirm() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _stepIntro(
+        'تأكيد الإعداد',
+        'سننشئ كيانك المحاسبي مع شجرة حسابات SOCPA و12 فترة مالية مفتوحة، ونحمّل بيانات تجريبية لتبدأ فوراً.',
+      ),
+      const SizedBox(height: AppSpacing.xl),
+      _confirmRow(Icons.business, 'اسم الشركة',
+          _companyCtrl.text.trim().isEmpty ? '—' : _companyCtrl.text.trim()),
+      _confirmRow(Icons.apps, 'القطاع', _industryLabel(_industry)),
+      _confirmRow(Icons.account_tree, 'دليل الحسابات',
+          'SOCPA — 38 حساب أساسي'),
+      _confirmRow(Icons.calendar_month, 'الفترات المالية',
+          '12 فترة شهرية لـ ${DateTime.now().year}'),
+      _confirmRow(Icons.people, 'بيانات تجريبية',
+          '5 عملاء + 3 قيود افتتاحية'),
+      const SizedBox(height: AppSpacing.lg),
+      Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AC.gold.withValues(alpha: 0.08),
+          border: Border.all(color: AC.gold.withValues(alpha: 0.4)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(children: [
+          Icon(Icons.bolt, color: AC.gold, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'بعد الإعداد ستهبط على لوحة "اليوم" حيث يمكنك إصدار أول فاتورة في أقل من دقيقة.',
+              style: TextStyle(color: AC.tp, fontSize: 12.5),
+            ),
+          ),
+        ]),
+      ),
+    ]);
+  }
+
+  String _industryLabel(String code) => switch (code) {
+        'services' => 'خدمات واستشارات',
+        'fnb_retail' => 'مطاعم وتجزئة',
+        'construction' => 'مقاولات',
+        'medical' => 'عيادات طبية',
+        'logistics' => 'نقل ولوجستيات',
+        _ => code,
+      };
+
+  Widget _confirmRow(IconData icon, String label, String value) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(children: [
+          Icon(icon, color: AC.gold, size: 18),
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 130,
+            child: Text(label, style: TextStyle(color: AC.ts, fontSize: 12)),
+          ),
+          Expanded(
+            child: Text(value,
+                style: TextStyle(color: AC.tp, fontSize: 13, fontWeight: FontWeight.w600)),
+          ),
+        ]),
+      );
 
   Widget _stepCompany() {
     return Column(

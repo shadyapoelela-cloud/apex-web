@@ -90,6 +90,43 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
     _fetchAiPulse();
   }
 
+  Future<void> _confirmResetDemo() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        backgroundColor: AC.navy2,
+        title: Text('إعادة تحميل البيانات التجريبية؟',
+            style: TextStyle(color: AC.gold, fontSize: 15)),
+        content: Text(
+          'سيتم إنشاء 5 عملاء تجريبيين و3 قيود يومية إضافية لكيانك. لن تُحذف بياناتك الحالية.',
+          style: TextStyle(color: AC.tp, fontSize: 12.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(c, false),
+            child: Text('إلغاء', style: TextStyle(color: AC.ts)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(c, true),
+            style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy),
+            child: const Text('تأكيد'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    final tenantId = S.savedTenantId;
+    final entityId = S.savedEntityId;
+    if (tenantId == null || entityId == null) return;
+    final res = await ApiService.aiOnboardingSeedDemo(tenantId: tenantId, entityId: entityId);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: res.success ? AC.ok : AC.err,
+      content: Text(res.success ? 'تم تحميل بيانات تجريبية إضافية' : 'فشل: ${res.error ?? '-'}'),
+    ));
+    if (res.success) _loadAll();
+  }
+
   Future<void> _expressIssue() async {
     final tenantId = S.savedTenantId;
     final entityId = S.savedEntityId;
@@ -230,6 +267,34 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
           IconButton(
             icon: Icon(Icons.refresh, color: AC.gold),
             onPressed: _loading ? null : _loadAll,
+          ),
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, color: AC.gold),
+            color: AC.navy2,
+            onSelected: (v) {
+              if (v == 'reset') _confirmResetDemo();
+              if (v == 'switch') context.go('/onboarding');
+            },
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                value: 'reset',
+                child: Row(children: [
+                  Icon(Icons.refresh, color: AC.warn, size: 16),
+                  const SizedBox(width: 8),
+                  Text('إعادة تحميل البيانات التجريبية',
+                      style: TextStyle(color: AC.tp, fontSize: 12)),
+                ]),
+              ),
+              PopupMenuItem(
+                value: 'switch',
+                child: Row(children: [
+                  Icon(Icons.swap_horiz, color: AC.gold, size: 16),
+                  const SizedBox(width: 8),
+                  Text('إنشاء كيان جديد',
+                      style: TextStyle(color: AC.tp, fontSize: 12)),
+                ]),
+              ),
+            ],
           ),
         ],
       ),

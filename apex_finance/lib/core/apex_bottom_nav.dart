@@ -31,10 +31,10 @@ class ApexBottomNav extends StatelessWidget {
   });
 
   static const _items = [
-    _NavItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'الرئيسية', path: '/home'),
-    _NavItem(icon: Icons.account_balance_wallet_outlined, activeIcon: Icons.account_balance_wallet, label: 'المحاسبة', path: '/compliance'),
-    _NavItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'المبيعات', path: '/compliance/zatca-invoice'),
-    _NavItem(icon: Icons.auto_awesome_outlined, activeIcon: Icons.auto_awesome, label: 'المساعد', path: '/copilot'),
+    _NavItem(icon: Icons.dashboard_outlined, activeIcon: Icons.dashboard, label: 'اليوم', path: '/today'),
+    _NavItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'المبيعات', path: '/operations/live-sales-cycle'),
+    _NavItem(icon: Icons.assessment_outlined, activeIcon: Icons.assessment, label: 'القوائم', path: '/compliance/financial-statements'),
+    _NavItem(icon: Icons.auto_awesome_outlined, activeIcon: Icons.auto_awesome, label: 'كوبايلوت', path: '/copilot'),
     _NavItem(icon: Icons.more_horiz, activeIcon: Icons.more_horiz, label: 'المزيد', path: '__more__'),
   ];
 
