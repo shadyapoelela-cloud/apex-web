@@ -461,11 +461,59 @@ class ApiService {
   static Future<ApiResult> pilotGetJournalEntry(String jeId) =>
       _get('/api/v1/pilot/journal-entries/$jeId');
 
-  // ── Pilot: Trial Balance (existing) ──
-  static Future<ApiResult> pilotTrialBalance(String entityId, {String? asOfDate}) {
-    final qs = asOfDate != null ? '?as_of_date=$asOfDate' : '';
-    return _get('/api/v1/pilot/entities/$entityId/reports/trial-balance$qs');
+  // ── Pilot: Reports — TB / IS / BS / Cash Flow ──
+  // Note: gl_routes uses prefix '/pilot' (no /api/v1) — different from customer_routes.
+  static Future<ApiResult> pilotTrialBalance(String entityId, {String? asOf, bool includeZero = false}) {
+    final params = <String>[];
+    if (asOf != null) params.add('as_of=$asOf');
+    if (includeZero) params.add('include_zero=true');
+    final qs = params.isEmpty ? '' : '?${params.join('&')}';
+    return _get('/pilot/entities/$entityId/reports/trial-balance$qs');
   }
+  static Future<ApiResult> pilotIncomeStatement(String entityId, {required String startDate, required String endDate}) =>
+      _get('/pilot/entities/$entityId/reports/income-statement?start_date=$startDate&end_date=$endDate');
+  static Future<ApiResult> pilotBalanceSheet(String entityId, {String? asOf}) {
+    final qs = asOf != null ? '?as_of=$asOf' : '';
+    return _get('/pilot/entities/$entityId/reports/balance-sheet$qs');
+  }
+  static Future<ApiResult> pilotCashFlow(String entityId, {required String startDate, required String endDate}) =>
+      _get('/pilot/entities/$entityId/reports/cash-flow?start_date=$startDate&end_date=$endDate');
+  static Future<ApiResult> pilotAccountLedger(String accountId, {String? startDate, String? endDate, int limit = 500}) {
+    final params = <String>['limit=$limit'];
+    if (startDate != null) params.add('start_date=$startDate');
+    if (endDate != null) params.add('end_date=$endDate');
+    return _get('/pilot/accounts/$accountId/ledger?${params.join('&')}');
+  }
+
+  // ── Pilot: Chart of Accounts ──
+  static Future<ApiResult> pilotListAccounts(String entityId, {String? category, String? type}) {
+    final params = <String>[];
+    if (category != null) params.add('category=$category');
+    if (type != null) params.add('type=$type');
+    final qs = params.isEmpty ? '' : '?${params.join('&')}';
+    return _get('/pilot/entities/$entityId/accounts$qs');
+  }
+  static Future<ApiResult> pilotSeedCoa(String entityId) =>
+      _post('/pilot/entities/$entityId/coa/seed', {});
+  static Future<ApiResult> pilotSeedFiscalPeriods(String entityId, {required int year}) =>
+      _post('/pilot/entities/$entityId/fiscal-periods/seed', {'year': year});
+
+  // ── AI Onboarding (one-call tenant + entity + COA + periods) ──
+  static Future<ApiResult> aiOnboardingComplete({
+    required String companyName,
+    String country = 'sa',
+    String? vatNumber,
+    String? industry,
+    String? email,
+  }) => _post('/api/v1/ai/onboarding/complete', {
+        'company_name': companyName,
+        'country': country,
+        if (vatNumber != null) 'vat_number': vatNumber,
+        if (industry != null) 'industry': industry,
+        if (email != null) 'email': email,
+      });
+  static Future<ApiResult> aiOnboardingSeedDemo({required String tenantId, required String entityId}) =>
+      _post('/api/v1/ai/onboarding/seed-demo', {'tenant_id': tenantId, 'entity_id': entityId});
 
   // ── Pilot: Purchase cycle ──
   static Future<ApiResult> pilotListPOs(String entityId, {int limit=100}) =>

@@ -16,10 +16,12 @@ library;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../api_service.dart';
 import '../../core/apex_form_field.dart';
 import '../../core/apex_responsive.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/design_tokens.dart';
+import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/validators_ui.dart';
 
@@ -32,6 +34,8 @@ class OnboardingWizardScreen extends StatefulWidget {
 
 class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
   int _step = 0;
+  bool _submitting = false;
+  String? _resultMessage;
 
   // Step 1: company
   final _companyCtrl = TextEditingController();
@@ -70,19 +74,77 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
     super.dispose();
   }
 
-  void _next() {
+  Future<void> _next() async {
     if (_step < _steps.length - 1) {
       setState(() => _step++);
-    } else {
-      // Finished!
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('تم إعداد الحساب بنجاح 🎉'),
-          backgroundColor: AC.ok,
-        ),
-      );
-      context.go('/whats-new');
+      return;
     }
+    // Final step — call backend to provision tenant + entity + COA + periods.
+    if (_submitting) return;
+    setState(() {
+      _submitting = true;
+      _resultMessage = 'جارٍ إنشاء الكيان وإعداد دليل الحسابات…';
+    });
+
+    final companyName = _companyCtrl.text.trim().isEmpty
+        ? 'شركتي'
+        : _companyCtrl.text.trim();
+    final res = await ApiService.aiOnboardingComplete(
+      companyName: companyName,
+      country: 'sa',
+      vatNumber: _vatCtrl.text.trim().isEmpty ? null : _vatCtrl.text.trim(),
+      industry: _industry,
+    );
+    if (!mounted) return;
+    if (!res.success) {
+      setState(() {
+        _submitting = false;
+        _resultMessage = 'فشل الإنشاء: ${res.error ?? 'خطأ غير معروف'}';
+      });
+      return;
+    }
+    final data = (res.data is Map<String, dynamic>)
+        ? (res.data as Map)['data'] as Map?
+        : null;
+    final tenantId = data?['tenant_id'] as String?;
+    final entityId = data?['entity_id'] as String?;
+    final accountsCreated = data?['accounts_created'] ?? 0;
+    final periodsCreated = data?['periods_created'] ?? 0;
+
+    if (tenantId == null || entityId == null) {
+      setState(() {
+        _submitting = false;
+        _resultMessage = 'استجابة غير متوقعة من الخادم';
+      });
+      return;
+    }
+    S.setActiveScope(tenant: tenantId, entity: entityId);
+
+    setState(() {
+      _resultMessage = 'تم إنشاء الكيان · $accountsCreated حساب · $periodsCreated فترة. جارٍ تحميل بيانات تجريبية…';
+    });
+    // Optional: seed demo data so the user lands on a populated dashboard.
+    final seed = await ApiService.aiOnboardingSeedDemo(
+      tenantId: tenantId,
+      entityId: entityId,
+    );
+    if (!mounted) return;
+    if (seed.success) {
+      final seedData = (seed.data is Map<String, dynamic>)
+          ? (seed.data as Map)['data'] as Map?
+          : null;
+      final cust = seedData?['customers_created'] ?? 0;
+      final jes = seedData?['journal_entries_created'] ?? 0;
+      _resultMessage = 'تم! $cust عملاء + $jes قيود تجريبية جاهزة';
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_resultMessage ?? 'تم الإعداد بنجاح 🎉'),
+        backgroundColor: AC.ok,
+      ),
+    );
+    context.go('/compliance/fin-statements');
   }
 
   void _back() {
@@ -480,27 +542,48 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
   }
 
   Widget _navButtons() {
+    final isLast = _step == _steps.length - 1;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: AC.navy2,
         border: Border(top: BorderSide(color: AC.navy4)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          if (_step > 0)
-            OutlinedButton.icon(
-              icon: const Icon(Icons.arrow_forward),
-              label: const Text('السابق'),
-              onPressed: _back,
+          if (_resultMessage != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+              child: Text(
+                _resultMessage!,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AC.gold, fontSize: 12.5),
+              ),
             ),
-          const Spacer(),
-          ElevatedButton.icon(
-            icon: Icon(_step == _steps.length - 1
-                ? Icons.check
-                : Icons.arrow_back),
-            label: Text(_step == _steps.length - 1 ? 'إنهاء' : 'التالي'),
-            onPressed: _next,
+          Row(
+            children: [
+              if (_step > 0)
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.arrow_forward),
+                  label: const Text('السابق'),
+                  onPressed: _submitting ? null : _back,
+                ),
+              const Spacer(),
+              ElevatedButton.icon(
+                icon: _submitting
+                    ? const SizedBox(
+                        width: 16, height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : Icon(isLast ? Icons.check : Icons.arrow_back),
+                label: Text(_submitting
+                    ? 'جارٍ الإعداد…'
+                    : (isLast ? 'إنهاء وإنشاء الحساب' : 'التالي')),
+                onPressed: _submitting ? null : _next,
+              ),
+            ],
           ),
         ],
       ),

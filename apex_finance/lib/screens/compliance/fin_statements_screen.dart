@@ -10,6 +10,7 @@ library;
 import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/apex_app_bar.dart';
+import '../../core/session.dart';
 import '../../core/theme.dart';
 
 class FinStatementsScreen extends StatefulWidget {
@@ -93,6 +94,97 @@ class _FinStatementsScreenState extends State<FinStatementsScreen>
     }).toList(),
   };
 
+  /// Pull TB + IS + BS directly from the active entity (not from manual input).
+  /// Uses S.savedEntityId set during onboarding.
+  Future<void> _generateFromLiveEntity() async {
+    final entityId = S.savedEntityId;
+    if (entityId == null || entityId.isEmpty) {
+      setState(() => _error = 'لا يوجد كيان نشط — أكمل التسجيل أولاً');
+      return;
+    }
+    setState(() {
+      _loading = true; _error = null;
+      _tbResult = null; _isResult = null; _bsResult = null; _closeResult = null;
+    });
+    try {
+      final today = DateTime.now();
+      final asOf = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+      final yearStart = '${today.year}-01-01';
+      final results = await Future.wait([
+        ApiService.pilotTrialBalance(entityId, asOf: asOf, includeZero: false),
+        ApiService.pilotIncomeStatement(entityId, startDate: yearStart, endDate: asOf),
+        ApiService.pilotBalanceSheet(entityId, asOf: asOf),
+      ]);
+      if (!mounted) return;
+      for (final r in results) {
+        if (!r.success) {
+          setState(() => _error = r.error ?? 'فشل الاتصال');
+          break;
+        }
+      }
+      // Normalize pilot response shape → existing UI shape (keys differ).
+      setState(() {
+        if (results[0].success && results[0].data is Map) {
+          final src = results[0].data as Map;
+          _tbResult = {
+            'total_debits': src['total_debit'],
+            'total_credits': src['total_credit'],
+            'is_balanced': src['balanced'] == true,
+            'difference': '0',
+            'warnings': const [],
+            'rows': src['rows'],
+          };
+        }
+        if (results[1].success && results[1].data is Map) {
+          final src = results[1].data as Map;
+          final rev = (src['revenue_total'] as num?)?.toDouble() ?? 0;
+          final exp = (src['expense_total'] as num?)?.toDouble() ?? 0;
+          final ni = (src['net_income'] as num?)?.toDouble() ?? 0;
+          final margin = rev > 0 ? (ni / rev * 100).toStringAsFixed(1) : '0';
+          final revBy = (src['revenue_by_subcat'] as Map?) ?? {};
+          final expBy = (src['expense_by_subcat'] as Map?) ?? {};
+          _isResult = {
+            'currency': 'SAR',
+            'total_revenue': rev.toStringAsFixed(2),
+            'total_expenses': exp.toStringAsFixed(2),
+            'net_income': ni.toStringAsFixed(2),
+            'margin_pct': margin,
+            'revenue_lines': revBy.entries.map((e) => {
+              'account_name': e.key, 'amount': (e.value as num).toStringAsFixed(2),
+            }).toList(),
+            'expense_lines': expBy.entries.map((e) => {
+              'account_name': e.key, 'amount': (e.value as num).toStringAsFixed(2),
+            }).toList(),
+          };
+        }
+        if (results[2].success && results[2].data is Map) {
+          final src = results[2].data as Map;
+          final assets = (src['assets'] as num?)?.toDouble() ?? 0;
+          final liab = (src['liabilities'] as num?)?.toDouble() ?? 0;
+          final eq = (src['total_equity'] as num?)?.toDouble() ?? 0;
+          final ce = (src['current_earnings'] as num?)?.toDouble() ?? 0;
+          final base = (src['equity'] as num?)?.toDouble() ?? 0;
+          _bsResult = {
+            'currency': 'SAR',
+            'is_balanced': src['balanced'] == true,
+            'total_assets': assets.toStringAsFixed(2),
+            'total_liabilities_equity': (liab + eq).toStringAsFixed(2),
+            'difference': (src['difference'] ?? 0).toString(),
+            'assets': [{'account_name': 'إجمالي الأصول', 'amount': assets.toStringAsFixed(2)}],
+            'liabilities': liab > 0 ? [{'account_name': 'إجمالي الخصوم', 'amount': liab.toStringAsFixed(2)}] : <Map>[],
+            'equity': [
+              {'account_name': 'رأس المال + حقوق الملكية', 'amount': base.toStringAsFixed(2)},
+              if (ce != 0) {'account_name': 'الأرباح المُحتجزة (الفترة الحالية)', 'amount': ce.toStringAsFixed(2)},
+            ],
+          };
+        }
+      });
+    } catch (e) {
+      if (mounted) setState(() => _error = 'خطأ: $e');
+    }
+    if (mounted) setState(() => _loading = false);
+  }
+
   Future<void> _generate() async {
     setState(() {
       _loading = true; _error = null;
@@ -163,6 +255,39 @@ class _FinStatementsScreenState extends State<FinStatementsScreen>
   Widget _tbInputTab() => SingleChildScrollView(
     padding: const EdgeInsets.all(16),
     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      // Live mode: pull from active entity (set during onboarding).
+      if (S.savedEntityId != null) Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AC.gold.withValues(alpha: 0.10),
+          border: Border.all(color: AC.gold.withValues(alpha: 0.40)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(children: [
+          Icon(Icons.bolt, color: AC.gold),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('وضع البيانات الحقيقية',
+                    style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.w700)),
+                Text('اسحب القوائم مباشرة من حسابك (TB + IS + BS)',
+                    style: TextStyle(color: AC.ts, fontSize: 11)),
+              ],
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: _loading ? null : _generateFromLiveEntity,
+            icon: _loading
+                ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : const Icon(Icons.cloud_download, size: 16),
+            label: const Text('تحميل الآن'),
+            style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy),
+          ),
+        ]),
+      ),
       _sectionTitle('معلومات المنشأة'),
       Row(children: [
         Expanded(child: _strField(_entityName, 'الاسم', Icons.business)),

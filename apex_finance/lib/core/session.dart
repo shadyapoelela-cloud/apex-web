@@ -3,6 +3,15 @@ import 'dart:html' as html;
 
 class S {
   static String? _token, uid, uname, dname, plan, email;
+  static String? tenantId, entityId;
+  static String? get savedTenantId => tenantId ?? html.window.localStorage['apex_tenant_id'];
+  static String? get savedEntityId => entityId ?? html.window.localStorage['apex_entity_id'];
+  static void setActiveScope({required String tenant, required String entity}) {
+    tenantId = tenant;
+    entityId = entity;
+    html.window.localStorage['apex_tenant_id'] = tenant;
+    html.window.localStorage['apex_entity_id'] = entity;
+  }
   static String? get token {
     _token ??= html.window.localStorage['apex_token'];
     return (_token != null && _token!.isNotEmpty) ? _token : null;
@@ -19,10 +28,11 @@ class S {
   static String get liveToken => html.window.localStorage['apex_token'] ?? '';
   static void clear() {
     token=null; uid=null; uname=null; dname=null; plan=null; email=null; roles=[];
+    tenantId=null; entityId=null;
     final st = html.window.localStorage;
     st.remove('apex_token'); st.remove('apex_uid'); st.remove('apex_uname');
     st.remove('apex_dname'); st.remove('apex_plan'); st.remove('apex_email');
-    st.remove('apex_roles');
+    st.remove('apex_roles'); st.remove('apex_tenant_id'); st.remove('apex_entity_id');
   }
   static String planAr() {
     const m = {'free':'مجاني','pro':'احترافي','business':'أعمال','expert':'خبير','enterprise':'مؤسسي'};
