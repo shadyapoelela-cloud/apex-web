@@ -267,6 +267,11 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
         title: Text('اليوم — APEX', style: TextStyle(color: AC.gold)),
         actions: [
           IconButton(
+            icon: Icon(Icons.apps, color: AC.gold),
+            tooltip: 'كل التطبيقات (Launchpad)',
+            onPressed: () => context.go('/launchpad'),
+          ),
+          IconButton(
             icon: Icon(Icons.refresh, color: AC.gold),
             onPressed: _loading ? null : _loadAll,
           ),

@@ -27,6 +27,15 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
     ),
     // ── New IA primary destinations (blueprint v1.0) ──
     ApexCommand(
+      id: 'nav_launchpad',
+      label: 'Launchpad — كل التطبيقات',
+      subtitle: '11 خدمة + ~60 تطبيق + كل المسارات Canonical',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.apps,
+      shortcut: 'G L',
+      onRun: (_) => go('/launchpad'),
+    ),
+    ApexCommand(
       id: 'nav_today',
       label: 'اليوم — لوحة المؤشرات',
       subtitle: 'النقد + الذمم + AI Pulse + فاتورة سريعة',

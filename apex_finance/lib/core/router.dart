@@ -60,6 +60,7 @@ import '../screens/operations/purchase_cycle_screen.dart';
 import '../screens/operations/consolidation_ui_screen.dart';
 import '../screens/operations/live_sales_cycle_screen.dart';
 import '../screens/home/today_dashboard_screen.dart';
+import '../screens/home/apex_launchpad_screen.dart';
 import '../screens/operations/customer_360_screen.dart';
 import '../screens/compliance/journal_entry_detail_screen.dart' as je_detail_v2;
 import '../screens/audit/audit_engagement_workspace_screen.dart';
@@ -251,6 +252,10 @@ final appRouter = GoRouter(
     GoRoute(path: '/setup', redirect: (c, s) => '/settings/entities'),
     GoRoute(path: '/reports', pageBuilder: (c, s) => _apexPage(const ReportsHubScreen(), s)),
     GoRoute(path: '/today', pageBuilder: (c, s) => _apexPage(const TodayDashboardScreen(), s)),
+    GoRoute(path: '/launchpad', pageBuilder: (c, s) => _apexPage(const ApexLaunchpadScreen(), s)),
+    GoRoute(path: '/apps', redirect: (c, s) => '/launchpad'),
+    GoRoute(path: '/services', redirect: (c, s) => '/launchpad'),
+    GoRoute(path: '/all', redirect: (c, s) => '/launchpad'),
 
     // ── V5.1 shell (16-app ERP + Cmd+K palette + Entity Scope) ──
     // Registered FIRST so /app/* routes win over legacy paths.
