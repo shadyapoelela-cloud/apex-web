@@ -83,6 +83,8 @@ import '../screens/accounting/coa_tree_v2_screen.dart';
 import '../screens/hr/employees_list_screen.dart';
 import '../screens/accounting/bank_rec_v2_screen.dart';
 import '../screens/reports/reports_hub_screen.dart';
+import '../screens/compliance/zatca_invoice_viewer_screen.dart';
+import '../screens/hr/payroll_run_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -620,6 +622,14 @@ final appRouter = GoRouter(
     GoRoute(path: '/accounting/bank-rec-v2', pageBuilder: (c, s) => _apexPage(const BankRecV2Screen(), s)),
     GoRoute(path: '/reports', pageBuilder: (c, s) => _apexPage(const ReportsHubScreen(), s)),
     GoRoute(path: '/reports/hub', redirect: (c, s) => '/reports'),
+    GoRoute(
+      path: '/compliance/zatca-invoice/:id',
+      pageBuilder: (c, s) => _apexPage(
+        ZatcaInvoiceViewerScreen(invoiceId: s.pathParameters['id']!),
+        s,
+      ),
+    ),
+    GoRoute(path: '/hr/payroll-run', pageBuilder: (c, s) => _apexPage(const PayrollRunScreen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(

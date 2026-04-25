@@ -179,6 +179,14 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/accounting/coa-v2'),
     ),
     ApexCommand(
+      id: 'nav_payroll_run',
+      label: 'تشغيل الرواتب',
+      subtitle: 'GOSI 22% سعودي / 2% مقيم + Saudization',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.payments,
+      onRun: (_) => go('/hr/payroll-run'),
+    ),
+    ApexCommand(
       id: 'nav_hr_employees',
       label: 'الموظفون + Saudization',
       subtitle: 'قائمة الموظفين مع نسبة السعودة',
