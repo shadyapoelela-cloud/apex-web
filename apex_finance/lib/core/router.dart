@@ -76,6 +76,8 @@ import '../screens/notifications/notifications_panel_screen.dart';
 import '../screens/operations/pos_quick_sale_screen.dart';
 import '../screens/operations/customer_payment_screen.dart';
 import '../screens/analytics/cash_flow_forecast_screen.dart';
+import '../screens/operations/vendor_payment_screen.dart';
+import '../screens/compliance/tax_calendar_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -598,6 +600,14 @@ final appRouter = GoRouter(
       ),
     ),
     GoRoute(path: '/analytics/cash-flow-forecast', pageBuilder: (c, s) => _apexPage(const CashFlowForecastScreen(), s)),
+    GoRoute(
+      path: '/purchase/payment/:billId',
+      pageBuilder: (c, s) => _apexPage(
+        VendorPaymentScreen(billId: s.pathParameters['billId']!),
+        s,
+      ),
+    ),
+    GoRoute(path: '/compliance/tax-calendar', pageBuilder: (c, s) => _apexPage(const TaxCalendarScreen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(

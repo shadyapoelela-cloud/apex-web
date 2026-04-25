@@ -146,6 +146,14 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/purchase/aging'),
     ),
     ApexCommand(
+      id: 'nav_tax_calendar_v2',
+      label: 'التقويم الضريبي السعودي',
+      subtitle: 'VAT + زكاة + GOSI + ZATCA + سعودة',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.event_outlined,
+      onRun: (_) => go('/compliance/tax-calendar'),
+    ),
+    ApexCommand(
       id: 'nav_cashflow_forecast',
       label: 'توقع التدفق النقدي',
       subtitle: 'إسقاط 90 يوماً + شهور التشغيل + سيناريوهات AI',
