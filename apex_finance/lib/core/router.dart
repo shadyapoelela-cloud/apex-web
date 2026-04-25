@@ -64,6 +64,7 @@ import '../screens/operations/customer_360_screen.dart';
 import '../screens/compliance/journal_entry_detail_screen.dart' as je_detail_v2;
 import '../screens/audit/audit_engagement_workspace_screen.dart';
 import '../screens/operations/vendor_360_screen.dart';
+import '../screens/operations/receipt_capture_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -568,6 +569,7 @@ final appRouter = GoRouter(
         s,
       ),
     ),
+    GoRoute(path: '/receipt/capture', pageBuilder: (c, s) => _apexPage(const ReceiptCaptureScreen(), s)),
     GoRoute(
       path: '/compliance/journal-entry/:id',
       pageBuilder: (c, s) => _apexPage(
