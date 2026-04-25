@@ -11,6 +11,7 @@ import '../../core/apex_list_shell.dart';
 import '../../core/apex_whatsapp_share.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class InvoicesListScreen extends StatefulWidget {
   const InvoicesListScreen({super.key});
@@ -118,6 +119,12 @@ class _InvoicesListScreenState extends State<InvoicesListScreen> {
       loading: _loading,
       error: _error,
       onRefresh: _load,
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('أعمار AR', '/sales/aging', Icons.timeline),
+        ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
+        ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+        ApexChipLink('التقويم الضريبي', '/compliance/tax-calendar', Icons.event),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.receipt_long_outlined,
         title: 'لا توجد فواتير',

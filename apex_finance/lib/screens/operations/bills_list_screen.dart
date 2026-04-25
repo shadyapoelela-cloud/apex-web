@@ -10,6 +10,7 @@ import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class BillsListScreen extends StatefulWidget {
   const BillsListScreen({super.key});
@@ -116,6 +117,12 @@ class _BillsListScreenState extends State<BillsListScreen> {
       loading: _loading,
       error: _error,
       onRefresh: _load,
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('أعمار AP', '/purchase/aging', Icons.timeline),
+        ApexChipLink('استقطاع المصدر WHT', '/compliance/wht-v2', Icons.percent),
+        ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
+        ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.receipt_outlined,
         title: 'لا توجد فواتير شراء',

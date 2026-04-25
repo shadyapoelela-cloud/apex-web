@@ -10,6 +10,7 @@ import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class VendorsListScreen extends StatefulWidget {
   const VendorsListScreen({super.key});
@@ -81,6 +82,11 @@ class _VendorsListScreenState extends State<VendorsListScreen> {
       loading: _loading,
       error: _error,
       onRefresh: _load,
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
+        ApexChipLink('أعمار AP', '/purchase/aging', Icons.timeline),
+        ApexChipLink('استقطاع المصدر WHT', '/compliance/wht-v2', Icons.percent),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.local_shipping_outlined,
         title: 'لا يوجد موردون بعد',

@@ -10,6 +10,7 @@ import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class JeListScreen extends StatefulWidget {
   const JeListScreen({super.key});
@@ -101,6 +102,12 @@ class _JeListScreenState extends State<JeListScreen> {
       loading: _loading,
       error: _error,
       onRefresh: _load,
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+        ApexChipLink('شجرة الحسابات', '/accounting/coa-v2', Icons.account_tree),
+        ApexChipLink('إقفال الفترة', '/operations/period-close', Icons.lock_clock),
+        ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.book_outlined,
         title: 'لا توجد قيود يومية',
