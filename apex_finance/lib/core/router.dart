@@ -105,6 +105,9 @@ import '../screens/sales/credit_memos_screen.dart';
 import '../screens/hr/expense_reports_screen.dart';
 import '../screens/analytics/cost_variance_v2_screen.dart';
 import '../screens/compliance/wht_v2_screen.dart';
+import '../screens/hr/timesheet_screen.dart';
+import '../screens/operations/petty_cash_screen.dart';
+import '../screens/operations/stock_card_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -670,6 +673,13 @@ final appRouter = GoRouter(
     GoRoute(path: '/hr/expense-reports', pageBuilder: (c, s) => _apexPage(const ExpenseReportsScreen(), s)),
     GoRoute(path: '/analytics/cost-variance-v2', pageBuilder: (c, s) => _apexPage(const CostVarianceV2Screen(), s)),
     GoRoute(path: '/compliance/wht-v2', pageBuilder: (c, s) => _apexPage(const WhtV2Screen(), s)),
+    GoRoute(path: '/hr/timesheet', pageBuilder: (c, s) => _apexPage(const TimesheetScreen(), s)),
+    GoRoute(path: '/operations/petty-cash', pageBuilder: (c, s) => _apexPage(const PettyCashScreen(), s)),
+    GoRoute(path: '/operations/stock-card', pageBuilder: (c, s) => _apexPage(const StockCardScreen(), s)),
+    GoRoute(
+      path: '/operations/stock-card/:sku',
+      pageBuilder: (c, s) => _apexPage(StockCardScreen(sku: s.pathParameters['sku']!), s),
+    ),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(
