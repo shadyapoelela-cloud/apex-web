@@ -179,6 +179,15 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/accounting/coa-v2'),
     ),
     ApexCommand(
+      id: 'nav_approvals_inbox',
+      label: 'صندوق الموافقات',
+      subtitle: 'multi-step approval queue',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.inbox,
+      shortcut: 'CTRL A',
+      onRun: (_) => go('/workflow/approvals'),
+    ),
+    ApexCommand(
       id: 'nav_timesheet',
       label: 'سجل ساعات العمل',
       subtitle: 'Weekly timesheet مع approval workflow',
