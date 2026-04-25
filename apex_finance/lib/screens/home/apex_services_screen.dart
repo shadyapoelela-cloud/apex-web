@@ -224,6 +224,9 @@ class ApexServicesScreen extends StatelessWidget {
 
   Widget _serviceTile(BuildContext context, _Service s) {
     final color = Color(s.color);
+    // Pick a text color with strong contrast against either light or dark
+    // theme — the previous tile relied on AC.tp + AC.navy2 gradient which
+    // washed out in the light theme. A solid dark navy panel works in both.
     return InkWell(
       onTap: () => context.go(s.route),
       borderRadius: BorderRadius.circular(14),
@@ -231,11 +234,18 @@ class ApexServicesScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              colors: [color.withValues(alpha: 0.18), AC.navy2],
+              colors: [color.withValues(alpha: 0.95), color.withValues(alpha: 0.65)],
               begin: Alignment.topRight,
               end: Alignment.bottomLeft),
-          border: Border.all(color: color.withValues(alpha: 0.4), width: 1.5),
+          border: Border.all(color: color, width: 2),
           borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.30),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,22 +254,22 @@ class ApexServicesScreen extends StatelessWidget {
               Container(
                 width: 48, height: 48,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.25),
-                  border: Border.all(color: color),
+                  color: Colors.white.withValues(alpha: 0.25),
+                  border: Border.all(color: Colors.white, width: 1.5),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(s.icon, color: color, size: 24),
+                child: Icon(s.icon, color: Colors.white, size: 24),
               ),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.20),
+                  color: Colors.white.withValues(alpha: 0.25),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text('${s.appCount}',
-                    style: TextStyle(
-                        color: color,
+                    style: const TextStyle(
+                        color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
                         fontFamily: 'monospace')),
@@ -267,11 +277,15 @@ class ApexServicesScreen extends StatelessWidget {
             ]),
             const Spacer(),
             Text(s.title,
-                style: TextStyle(
-                    color: AC.tp, fontSize: 15, fontWeight: FontWeight.w800)),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    shadows: [Shadow(color: Colors.black38, blurRadius: 2)])),
             const SizedBox(height: 2),
             Text(s.subtitle,
-                style: TextStyle(color: AC.ts, fontSize: 11),
+                style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.92), fontSize: 11.5),
                 maxLines: 2, overflow: TextOverflow.ellipsis),
           ],
         ),
