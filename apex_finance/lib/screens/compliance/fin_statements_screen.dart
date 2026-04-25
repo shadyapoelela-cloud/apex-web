@@ -12,6 +12,7 @@ import '../../api_service.dart';
 import '../../core/apex_app_bar.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import 'account_ledger_screen.dart';
 
 class FinStatementsScreen extends StatefulWidget {
   const FinStatementsScreen({super.key});
@@ -320,8 +321,79 @@ class _FinStatementsScreenState extends State<FinStatementsScreen>
         label: const Text('توليد القوائم المالية'))),
       const SizedBox(height: 16),
       if (_tbResult != null) _tbSummaryCard(_tbResult!),
+      // Live mode row drill-down — only when pulled from the entity.
+      if (_tbResult != null && (_tbResult!['rows'] is List)) ...[
+        const SizedBox(height: 12),
+        _liveTbRowsTable(_tbResult!['rows'] as List),
+      ],
     ]),
   );
+
+  /// Renders the live-entity TB rows as a clickable list. Each row drills
+  /// into the account ledger.
+  Widget _liveTbRowsTable(List rows) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AC.navy2,
+        border: Border.all(color: AC.bdr),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: AC.navy3,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+          ),
+          child: Row(children: [
+            Icon(Icons.account_tree, color: AC.gold, size: 16),
+            const SizedBox(width: 8),
+            Text('حسابات الكيان (اضغط للتفاصيل)',
+                style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.w700)),
+          ]),
+        ),
+        ...rows.map((r) {
+          final m = r as Map;
+          final balance = double.tryParse('${m['balance']}') ?? 0;
+          final isDr = m['normal_balance'] == 'debit';
+          return InkWell(
+            onTap: () {
+              final accountId = m['account_id'] as String?;
+              if (accountId == null) return;
+              Navigator.push(context, MaterialPageRoute(
+                builder: (_) => AccountLedgerScreen(
+                  accountId: accountId,
+                  accountCode: m['code'] as String?,
+                  accountName: m['name_ar'] as String?,
+                ),
+              ));
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: AC.bdr.withValues(alpha: 0.5))),
+              ),
+              child: Row(children: [
+                SizedBox(
+                  width: 60,
+                  child: Text('${m['code'] ?? ''}',
+                      style: TextStyle(color: AC.gold, fontSize: 11.5, fontFamily: 'monospace')),
+                ),
+                Expanded(child: Text('${m['name_ar'] ?? '-'}',
+                    style: TextStyle(color: AC.tp, fontSize: 12))),
+                Text(balance.toStringAsFixed(2),
+                    style: TextStyle(
+                        color: isDr ? AC.ok : AC.warn,
+                        fontFamily: 'monospace', fontSize: 12, fontWeight: FontWeight.w700)),
+                const SizedBox(width: 6),
+                Icon(Icons.chevron_left, color: AC.ts, size: 14),
+              ]),
+            ),
+          );
+        }),
+      ]),
+    );
+  }
 
   Widget _tbRow(int i, _TBRowCtl r) => Container(
     margin: const EdgeInsets.only(bottom: 6),
