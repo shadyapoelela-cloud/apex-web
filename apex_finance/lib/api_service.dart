@@ -484,6 +484,8 @@ class ApiService {
     if (endDate != null) params.add('end_date=$endDate');
     return _get('/pilot/accounts/$accountId/ledger?${params.join('&')}');
   }
+  static Future<ApiResult> pilotJournalEntryDetail(String jeId) =>
+      _get('/pilot/journal-entries/$jeId');
 
   // ── Pilot: Chart of Accounts ──
   static Future<ApiResult> pilotListAccounts(String entityId, {String? category, String? type}) {

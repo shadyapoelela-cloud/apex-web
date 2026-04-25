@@ -469,11 +469,21 @@ class _LiveSalesCycleScreenState extends State<LiveSalesCycleScreen> {
               child: OutlinedButton.icon(
                 onPressed: () => context.go('/compliance/financial-statements'),
                 icon: Icon(Icons.assessment, color: AC.gold, size: 16),
-                label: Text('شاهد التأثير في ميزان المراجعة',
-                    style: TextStyle(color: AC.gold)),
+                label: Text('ميزان المراجعة',
+                    style: TextStyle(color: AC.gold, fontSize: 11.5)),
                 style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold)),
               ),
             ),
+            const SizedBox(width: 8),
+            if (_lastJeId != null)
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => context.go('/compliance/journal-entry/$_lastJeId'),
+                  icon: const Icon(Icons.receipt, size: 16),
+                  label: const Text('عرض القيد', style: TextStyle(fontSize: 11.5)),
+                  style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy),
+                ),
+              ),
           ]),
         ]),
       );

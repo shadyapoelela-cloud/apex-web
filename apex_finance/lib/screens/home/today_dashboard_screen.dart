@@ -31,8 +31,23 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
   Map<String, dynamic>? _bs;
   Map<String, dynamic>? _is;
   List<Map<String, dynamic>> _invoices = [];
+  List<Map<String, dynamic>> _customers = [];
   String? _aiPulseRemote;
   bool _aiPulseLoading = false;
+
+  // Express Invoice
+  final _expressAmountCtrl = TextEditingController(text: '5000');
+  bool _expressSubmitting = false;
+  String? get _firstCustomerId =>
+      _customers.isEmpty ? null : _customers.first['id'] as String?;
+  String? get _firstCustomerName =>
+      _customers.isEmpty ? null : _customers.first['name_ar'] as String?;
+
+  @override
+  void dispose() {
+    _expressAmountCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -51,11 +66,13 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
     final today = DateTime.now();
     String fmt(DateTime d) =>
         '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    final tenantId = S.savedTenantId ?? '';
     final results = await Future.wait([
       ApiService.pilotBalanceSheet(entityId, asOf: fmt(today)),
       ApiService.pilotIncomeStatement(entityId,
           startDate: '${today.year}-01-01', endDate: fmt(today)),
       ApiService.pilotListSalesInvoices(entityId, limit: 50),
+      ApiService.pilotListCustomers(tenantId),
     ]);
     if (!mounted) return;
     setState(() {
@@ -65,9 +82,79 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
       if (results[2].success && results[2].data is List) {
         _invoices = (results[2].data as List).cast<Map<String, dynamic>>();
       }
+      if (results[3].success && results[3].data is List) {
+        _customers = (results[3].data as List).cast<Map<String, dynamic>>();
+      }
     });
     // Fire-and-forget: ask Claude for an Arabic 1-line variance commentary.
     _fetchAiPulse();
+  }
+
+  Future<void> _expressIssue() async {
+    final tenantId = S.savedTenantId;
+    final entityId = S.savedEntityId;
+    final custId = _firstCustomerId;
+    if (tenantId == null || entityId == null || custId == null) return;
+    final amount = double.tryParse(_expressAmountCtrl.text.trim());
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('المبلغ غير صحيح')));
+      return;
+    }
+    setState(() => _expressSubmitting = true);
+    final today = DateTime.now();
+    final due = today.add(const Duration(days: 30));
+    String fmt(DateTime d) =>
+        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    final create = await ApiService.pilotCreateSalesInvoice({
+      'tenant_id': tenantId,
+      'entity_id': entityId,
+      'customer_id': custId,
+      'issue_date': fmt(today),
+      'due_date': fmt(due),
+      'currency': 'SAR',
+      'lines': [
+        {'description': 'فاتورة سريعة', 'quantity': 1, 'unit_price': amount, 'vat_rate': 15},
+      ],
+    });
+    if (!mounted) return;
+    if (!create.success) {
+      setState(() => _expressSubmitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.err,
+        content: Text('فشل: ${create.error ?? '-'}'),
+      ));
+      return;
+    }
+    final invId = (create.data as Map?)?['id'] as String?;
+    if (invId == null) {
+      setState(() => _expressSubmitting = false);
+      return;
+    }
+    final issue = await ApiService.pilotIssueSalesInvoice(invId);
+    if (!mounted) return;
+    setState(() => _expressSubmitting = false);
+    if (!issue.success) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.err,
+        content: Text('الإصدار فشل: ${issue.error ?? '-'}'),
+      ));
+      return;
+    }
+    final jeId = (issue.data as Map?)?['journal_entry_id'] as String?;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AC.ok,
+      content: Text('تمت الفاتورة! JE: ${jeId?.substring(0, 8) ?? ""}…'),
+      action: jeId == null
+          ? null
+          : SnackBarAction(
+              label: 'عرض',
+              textColor: AC.navy,
+              onPressed: () => context.go('/compliance/journal-entry/$jeId'),
+            ),
+    ));
+    _expressAmountCtrl.clear();
+    _loadAll();
   }
 
   /// Calls /api/v1/ai/ask with a structured prompt feeding the live KPIs.
@@ -158,6 +245,8 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
                   const SizedBox(height: 16),
                   _kpiGrid(),
                   const SizedBox(height: 16),
+                  _expressInvoiceCard(),
+                  const SizedBox(height: 12),
                   _quickActions(),
                   const SizedBox(height: 16),
                   _recentInvoices(),
@@ -277,6 +366,71 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
       children: cards,
+    );
+  }
+
+  /// Express Invoice — one-line quick create on the home screen.
+  /// Picks the first customer; user just types amount + tap.
+  /// Goal: ≤90s from login to first invoice (FreshBooks benchmark).
+  Widget _expressInvoiceCard() {
+    final hasCustomer = _firstCustomerId != null;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AC.navy2,
+        border: Border.all(color: AC.gold.withValues(alpha: 0.4)),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          Icon(Icons.flash_on, color: AC.gold, size: 18),
+          const SizedBox(width: 8),
+          Text('فاتورة سريعة',
+              style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.w800)),
+          const Spacer(),
+          if (_firstCustomerName != null)
+            Text(_firstCustomerName!,
+                style: TextStyle(color: AC.ts, fontSize: 11)),
+        ]),
+        const SizedBox(height: 8),
+        Row(children: [
+          Expanded(
+            child: TextField(
+              controller: _expressAmountCtrl,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              style: TextStyle(color: AC.tp, fontSize: 14),
+              decoration: InputDecoration(
+                labelText: 'المبلغ (قبل VAT)',
+                labelStyle: TextStyle(color: AC.ts, fontSize: 11),
+                isDense: true,
+                filled: true,
+                fillColor: AC.navy3,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton.icon(
+            onPressed: !hasCustomer || _expressSubmitting ? null : _expressIssue,
+            icon: _expressSubmitting
+                ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : const Icon(Icons.send, size: 16),
+            label: Text(_expressSubmitting ? '…' : 'أصدر'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AC.gold, foregroundColor: AC.navy,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            ),
+          ),
+        ]),
+        if (!hasCustomer) Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: Text('لا يوجد عملاء — أضف أحدهم من شاشة دورة المبيعات',
+              style: TextStyle(color: AC.warn, fontSize: 10.5)),
+        ),
+      ]),
     );
   }
 

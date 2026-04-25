@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../api_service.dart';
 import '../../core/theme.dart';
@@ -135,40 +136,47 @@ class _AccountLedgerScreenState extends State<AccountLedgerScreen> {
                     Divider(color: AC.bdr.withValues(alpha: 0.5), height: 1),
                 itemBuilder: (_, i) {
                   final r = rows[i] as Map;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
-                    child: Row(children: [
-                      SizedBox(
-                          width: 90,
-                          child: Text('${r['posting_date'] ?? '-'}',
-                              style: _cell())),
-                      SizedBox(
-                          width: 100,
-                          child: Text('${r['je_number'] ?? '-'}',
-                              style: _cell(color: AC.gold))),
-                      Expanded(
-                          child: Text('${r['description'] ?? r['memo'] ?? '-'}',
-                              style: _cell(),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis)),
-                      SizedBox(
-                          width: 100,
-                          child: Text(_fmt(r['debit_amount']),
-                              style: _cell(color: AC.ok),
-                              textAlign: TextAlign.left)),
-                      SizedBox(
-                          width: 100,
-                          child: Text(_fmt(r['credit_amount']),
-                              style: _cell(color: AC.warn),
-                              textAlign: TextAlign.left)),
-                      SizedBox(
-                          width: 110,
-                          child: Text(_fmt(r['running_balance']),
-                              style: _cell(
-                                  color: AC.gold, weight: FontWeight.w700),
-                              textAlign: TextAlign.left)),
-                    ]),
+                  final jeId = r['journal_entry_id'] as String?;
+                  return InkWell(
+                    onTap: jeId == null
+                        ? null
+                        : () => context.go('/compliance/journal-entry/$jeId'),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      child: Row(children: [
+                        SizedBox(
+                            width: 90,
+                            child: Text('${r['posting_date'] ?? '-'}',
+                                style: _cell())),
+                        SizedBox(
+                            width: 100,
+                            child: Text('${r['je_number'] ?? '-'}',
+                                style: _cell(color: AC.gold))),
+                        Expanded(
+                            child: Text('${r['description'] ?? r['memo'] ?? '-'}',
+                                style: _cell(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis)),
+                        SizedBox(
+                            width: 100,
+                            child: Text(_fmt(r['debit_amount']),
+                                style: _cell(color: AC.ok),
+                                textAlign: TextAlign.left)),
+                        SizedBox(
+                            width: 100,
+                            child: Text(_fmt(r['credit_amount']),
+                                style: _cell(color: AC.warn),
+                                textAlign: TextAlign.left)),
+                        SizedBox(
+                            width: 110,
+                            child: Text(_fmt(r['running_balance']),
+                                style: _cell(
+                                    color: AC.gold, weight: FontWeight.w700),
+                                textAlign: TextAlign.left)),
+                        if (jeId != null) Icon(Icons.chevron_left, color: AC.ts, size: 12),
+                      ]),
+                    ),
                   );
                 },
               ),
