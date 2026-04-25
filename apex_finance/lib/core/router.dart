@@ -61,6 +61,7 @@ import '../screens/operations/consolidation_ui_screen.dart';
 import '../screens/operations/live_sales_cycle_screen.dart';
 import '../screens/home/today_dashboard_screen.dart';
 import '../screens/home/apex_launchpad_screen.dart';
+import '../screens/home/apex_service_hub_screen.dart';
 import '../screens/operations/customer_360_screen.dart';
 import '../screens/compliance/journal_entry_detail_screen.dart' as je_detail_v2;
 import '../screens/audit/audit_engagement_workspace_screen.dart';
@@ -240,15 +241,26 @@ final appRouter = GoRouter(
   initialLocation: '/app',
   // redirect: disabled for now - auth handled in login screen,
     routes: [
-    // ── New IA aliases (Blueprint v1.0) — registered BEFORE v5/v4 ──
-    // so /sales /purchase /accounting /audit win over any catch-all
-    // patterns the older shells might have. These are simple redirects
-    // and forward into the canonical screens registered later in this
-    // routes list.
-    GoRoute(path: '/sales', redirect: (c, s) => '/operations/live-sales-cycle'),
-    GoRoute(path: '/purchase', redirect: (c, s) => '/operations/purchase-cycle'),
-    GoRoute(path: '/accounting', redirect: (c, s) => '/compliance/journal-entries'),
-    GoRoute(path: '/audit', redirect: (c, s) => '/audit/engagements'),
+    // ── New IA Service Hubs (Blueprint v1.0) — registered BEFORE v5/v4 ──
+    // Each top-level service path now opens a Hub screen with featured
+    // tiles + secondary tools, instead of redirecting blindly into one
+    // sub-screen. This gives the user the proper hierarchical navigation:
+    //   Launchpad → Service Hub → App → Detail screen
+    GoRoute(path: '/sales', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'sales'), s)),
+    GoRoute(path: '/purchase', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'purchase'), s)),
+    GoRoute(path: '/accounting', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'accounting'), s)),
+    GoRoute(path: '/operations', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'operations'), s)),
+    GoRoute(path: '/compliance-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'compliance-hub'), s)),
+    GoRoute(path: '/audit-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'audit-hub'), s)),
+    GoRoute(path: '/audit', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'audit-hub'), s)),
+    GoRoute(path: '/analytics', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'analytics'), s)),
+    GoRoute(path: '/hr', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'hr-hub'), s)),
+    GoRoute(path: '/hr-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'hr-hub'), s)),
+    GoRoute(path: '/workflow', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'workflow-hub'), s)),
+    GoRoute(path: '/workflow-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'workflow-hub'), s)),
+    GoRoute(path: '/settings-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'settings-hub'), s)),
+
+    // Setup alias — keep simple redirect.
     GoRoute(path: '/setup', redirect: (c, s) => '/settings/entities'),
     GoRoute(path: '/reports', pageBuilder: (c, s) => _apexPage(const ReportsHubScreen(), s)),
     GoRoute(path: '/today', pageBuilder: (c, s) => _apexPage(const TodayDashboardScreen(), s)),
@@ -629,7 +641,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/accounting/je-list', pageBuilder: (c, s) => _apexPage(const JeListScreen(), s)),
     GoRoute(path: '/accounting/coa-v2', pageBuilder: (c, s) => _apexPage(const CoaTreeV2Screen(), s)),
     GoRoute(path: '/hr/employees', pageBuilder: (c, s) => _apexPage(const EmployeesListScreen(), s)),
-    GoRoute(path: '/hr', redirect: (c, s) => '/hr/employees'),
+    // /hr now serves the HR Hub (registered earlier at top of routes)
     GoRoute(path: '/accounting/bank-rec-v2', pageBuilder: (c, s) => _apexPage(const BankRecV2Screen(), s)),
     // /reports moved to top of routes list — see above
     GoRoute(path: '/reports/hub', redirect: (c, s) => '/reports'),
