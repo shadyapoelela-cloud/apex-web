@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class WhtV2Screen extends StatefulWidget {
   const WhtV2Screen({super.key});
@@ -62,6 +63,11 @@ class _WhtV2ScreenState extends State<WhtV2Screen> {
           _txnsCard(),
           const SizedBox(height: 12),
           _filingCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
+            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
+          ]),
         ]),
       ),
     );

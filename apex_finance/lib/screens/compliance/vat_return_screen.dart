@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class VatReturnScreen extends StatefulWidget {
   const VatReturnScreen({super.key});
@@ -98,7 +99,17 @@ class _VatReturnScreenState extends State<VatReturnScreen> {
         if (!wide) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: Column(children: [_form(), const SizedBox(height: 16), _results()]),
+            child: Column(children: [
+              _form(),
+              const SizedBox(height: 16),
+              _results(),
+              const ApexOutputChips(items: [
+                ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
+                ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
+                ApexChipLink('ZATCA Status', '/compliance/zatca-status', Icons.verified),
+                ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
+              ]),
+            ]),
           );
         }
         return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

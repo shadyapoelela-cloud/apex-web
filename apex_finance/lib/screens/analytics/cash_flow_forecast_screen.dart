@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class CashFlowForecastScreen extends StatefulWidget {
   const CashFlowForecastScreen({super.key});
@@ -42,6 +43,12 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
           _runwayCard(),
           const SizedBox(height: 12),
           _scenarioCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('أعمار AR', '/sales/aging', Icons.timeline),
+            ApexChipLink('أعمار AP', '/purchase/aging', Icons.timeline),
+            ApexChipLink('بناء الموازنة', '/analytics/budget-builder', Icons.calculate),
+            ApexChipLink('Health Score', '/analytics/health-score-v2', Icons.health_and_safety),
+          ]),
         ]),
       ),
     );

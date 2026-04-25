@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class RiskRegisterScreen extends StatefulWidget {
   const RiskRegisterScreen({super.key});
@@ -74,6 +75,11 @@ class _RiskRegisterScreenState extends State<RiskRegisterScreen> {
       items: _filtered,
       onRefresh: () async {},
       listHeader: _heatmapCard(),
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('KYC/AML', '/compliance/kyc-aml', Icons.fact_check),
+        ApexChipLink('Engagement Workspace', '/audit/engagements', Icons.folder),
+        ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.shield,
         title: 'لا توجد مخاطر مسجّلة',

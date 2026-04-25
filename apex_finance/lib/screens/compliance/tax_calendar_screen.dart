@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/hijri_date.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class TaxCalendarScreen extends StatelessWidget {
   const TaxCalendarScreen({super.key});
@@ -92,8 +93,16 @@ class TaxCalendarScreen extends StatelessWidget {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(14),
-        itemCount: items.length,
+        itemCount: items.length + 1,
         itemBuilder: (_, i) {
+          if (i == items.length) {
+            return const ApexOutputChips(items: [
+              ApexChipLink('ZATCA Status', '/compliance/zatca-status', Icons.verified),
+              ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
+              ApexChipLink('الزكاة', '/compliance/zakat', Icons.account_balance_wallet),
+              ApexChipLink('استقطاع المصدر WHT', '/compliance/wht-v2', Icons.percent),
+            ]);
+          }
           final item = items[i];
           final daysAway = item.dueDate.difference(now).inDays;
           final hijri = HijriDate.fromGregorian(item.dueDate);

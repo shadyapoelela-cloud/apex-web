@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class ActivityLogV2Screen extends StatefulWidget {
   const ActivityLogV2Screen({super.key});
@@ -83,6 +84,11 @@ class _ActivityLogV2ScreenState extends State<ActivityLogV2Screen> {
       ],
       items: _filtered,
       onRefresh: () async {},
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('صندوق الموافقات', '/workflow/approvals', Icons.inbox),
+        ApexChipLink('Engagement Workspace', '/audit/engagements', Icons.folder),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.history,
         title: 'لا توجد أحداث',

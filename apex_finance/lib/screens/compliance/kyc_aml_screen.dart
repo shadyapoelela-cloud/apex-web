@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class KycAmlScreen extends StatefulWidget {
   const KycAmlScreen({super.key});
@@ -74,6 +75,11 @@ class _KycAmlScreenState extends State<KycAmlScreen> {
       items: _filtered,
       onRefresh: () async {},
       listHeader: _summaryCard(),
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('سجل المخاطر', '/compliance/risk-register', Icons.shield),
+        ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
+        ApexChipLink('Engagement Workspace', '/audit/engagements', Icons.folder),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.shield,
         title: 'لا توجد فحوصات KYC',
