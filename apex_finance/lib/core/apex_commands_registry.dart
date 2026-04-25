@@ -179,6 +179,22 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/accounting/coa-v2'),
     ),
     ApexCommand(
+      id: 'nav_investment_v2',
+      label: 'المحفظة الاستثمارية',
+      subtitle: 'أسهم + صناديق + سندات + عقارات + حصص',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.savings,
+      onRun: (_) => go('/analytics/investment-portfolio-v2'),
+    ),
+    ApexCommand(
+      id: 'nav_project_profitability',
+      label: 'ربحية المشاريع',
+      subtitle: 'P&L per project مع progress + budget util',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.engineering,
+      onRun: (_) => go('/analytics/project-profitability'),
+    ),
+    ApexCommand(
       id: 'nav_consolidation_v2',
       label: 'التوحيد المحاسبي (IFRS 10)',
       subtitle: 'كيانات + استبعادات + إيرادات موحّدة',
