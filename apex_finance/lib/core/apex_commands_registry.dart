@@ -146,6 +146,23 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/purchase/aging'),
     ),
     ApexCommand(
+      id: 'nav_reports_hub',
+      label: 'مركز التقارير',
+      subtitle: 'كل التقارير في مكان واحد',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.assessment_outlined,
+      shortcut: 'G R',
+      onRun: (_) => go('/reports'),
+    ),
+    ApexCommand(
+      id: 'nav_bank_rec_v2',
+      label: 'التسوية البنكية AI',
+      subtitle: 'auto-match >95% (Xero JAX pattern)',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.account_balance_wallet,
+      onRun: (_) => go('/accounting/bank-rec-v2'),
+    ),
+    ApexCommand(
       id: 'nav_je_list_v2',
       label: 'القيود اليومية (canonical)',
       subtitle: 'كل القيود مع filters: مرحّل / مسودة / معكوس',

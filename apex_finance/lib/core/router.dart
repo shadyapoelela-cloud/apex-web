@@ -81,6 +81,8 @@ import '../screens/compliance/tax_calendar_screen.dart';
 import '../screens/accounting/je_list_screen.dart';
 import '../screens/accounting/coa_tree_v2_screen.dart';
 import '../screens/hr/employees_list_screen.dart';
+import '../screens/accounting/bank_rec_v2_screen.dart';
+import '../screens/reports/reports_hub_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -615,6 +617,9 @@ final appRouter = GoRouter(
     GoRoute(path: '/accounting/coa-v2', pageBuilder: (c, s) => _apexPage(const CoaTreeV2Screen(), s)),
     GoRoute(path: '/hr/employees', pageBuilder: (c, s) => _apexPage(const EmployeesListScreen(), s)),
     GoRoute(path: '/hr', redirect: (c, s) => '/hr/employees'),
+    GoRoute(path: '/accounting/bank-rec-v2', pageBuilder: (c, s) => _apexPage(const BankRecV2Screen(), s)),
+    GoRoute(path: '/reports', pageBuilder: (c, s) => _apexPage(const ReportsHubScreen(), s)),
+    GoRoute(path: '/reports/hub', redirect: (c, s) => '/reports'),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(
