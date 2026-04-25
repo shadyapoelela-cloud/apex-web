@@ -5,6 +5,7 @@ library;
 import 'package:flutter/material.dart';
 import '../../core/apex_csid_warning.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class ZatcaStatusCenterScreen extends StatelessWidget {
   const ZatcaStatusCenterScreen({super.key});
@@ -30,6 +31,12 @@ class ZatcaStatusCenterScreen extends StatelessWidget {
           _queueCard(),
           const SizedBox(height: 12),
           _recentErrorsCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
+            ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
+            ApexChipLink('التقويم الضريبي', '/compliance/tax-calendar', Icons.event),
+            ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
+          ]),
         ]),
       ),
     );

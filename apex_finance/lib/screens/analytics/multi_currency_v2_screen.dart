@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class MultiCurrencyV2Screen extends StatefulWidget {
   const MultiCurrencyV2Screen({super.key});
@@ -43,6 +44,11 @@ class _MultiCurrencyV2ScreenState extends State<MultiCurrencyV2Screen> {
           _exposureCard(),
           const SizedBox(height: 12),
           _hedgingTipCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),
+            ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+          ]),
         ]),
       ),
     );

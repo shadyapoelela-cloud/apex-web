@@ -9,6 +9,7 @@ import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 import '../compliance/account_ledger_screen.dart';
 
 class CoaTreeV2Screen extends StatefulWidget {
@@ -92,6 +93,11 @@ class _CoaTreeV2ScreenState extends State<CoaTreeV2Screen> {
       loading: _loading,
       error: _error,
       onRefresh: _load,
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+        ApexChipLink('محرر الحسابات', '/accounting/coa/edit', Icons.edit_note),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.account_tree_outlined,
         title: 'لا توجد حسابات',

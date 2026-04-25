@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class PeriodCloseScreen extends StatefulWidget {
   const PeriodCloseScreen({super.key});
@@ -142,6 +143,11 @@ class _PeriodCloseScreenState extends State<PeriodCloseScreen> {
                       itemBuilder: (_, i) => _closeCard(_closes[i]),
                     ),
         ),
+        const ApexOutputChips(items: [
+          ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+          ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+          ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
+        ]),
       ],
     );
   }

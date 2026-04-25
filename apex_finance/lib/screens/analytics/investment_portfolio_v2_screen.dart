@@ -5,6 +5,7 @@ library;
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class InvestmentPortfolioV2Screen extends StatefulWidget {
   const InvestmentPortfolioV2Screen({super.key});
@@ -53,6 +54,11 @@ class _InvestmentPortfolioV2ScreenState
           _allocationCard(),
           const SizedBox(height: 12),
           _holdingsCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),
+            ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+            ApexChipLink('متابعة العملات', '/analytics/multi-currency-v2', Icons.currency_exchange),
+          ]),
         ]),
       ),
     );

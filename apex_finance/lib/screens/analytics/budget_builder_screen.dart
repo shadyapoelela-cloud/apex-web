@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class BudgetBuilderScreen extends StatefulWidget {
   const BudgetBuilderScreen({super.key});
@@ -66,6 +67,12 @@ class _BudgetBuilderScreenState extends State<BudgetBuilderScreen> {
           _gridCard(),
           const SizedBox(height: 12),
           _saveCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('انحراف الموازنة', '/analytics/budget-variance-v2', Icons.trending_up),
+            ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),
+            ApexChipLink('Health Score', '/analytics/health-score-v2', Icons.health_and_safety),
+            ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+          ]),
         ]),
       ),
     );

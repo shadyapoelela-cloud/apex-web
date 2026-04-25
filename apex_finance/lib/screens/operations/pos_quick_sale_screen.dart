@@ -14,6 +14,7 @@ import '../../core/apex_saudi_payment_grid.dart';
 import '../../core/apex_whatsapp_share.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class PosQuickSaleScreen extends StatefulWidget {
   const PosQuickSaleScreen({super.key});
@@ -177,6 +178,12 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
               ),
             ),
           ),
+          const ApexOutputChips(items: [
+            ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
+            ApexChipLink('المخزون', '/operations/inventory-v2', Icons.inventory_2),
+            ApexChipLink('بطاقة الصنف', '/operations/stock-card', Icons.timeline),
+            ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
+          ]),
         ]),
       ),
     );

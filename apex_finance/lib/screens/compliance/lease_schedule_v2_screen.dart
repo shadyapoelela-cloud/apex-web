@@ -5,6 +5,7 @@ library;
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class LeaseScheduleV2Screen extends StatefulWidget {
   const LeaseScheduleV2Screen({super.key});
@@ -70,6 +71,11 @@ class _LeaseScheduleV2ScreenState extends State<LeaseScheduleV2Screen> {
           _journalEntryCard(),
           const SizedBox(height: 12),
           _scheduleCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('الأصول الثابتة', '/operations/fixed-assets-v2', Icons.business),
+            ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+          ]),
         ]),
       ),
     );

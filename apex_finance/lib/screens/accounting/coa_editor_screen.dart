@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class CoaEditorScreen extends StatefulWidget {
   const CoaEditorScreen({super.key});
@@ -89,6 +90,11 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
                   textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
             ),
           ),
+          const ApexOutputChips(items: [
+            ApexChipLink('شجرة الحسابات', '/accounting/coa-v2', Icons.account_tree),
+            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+          ]),
         ]),
       ),
     );

@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class ReceiptCaptureScreen extends StatefulWidget {
   const ReceiptCaptureScreen({super.key});
@@ -101,6 +102,11 @@ class _ReceiptCaptureScreenState extends State<ReceiptCaptureScreen> {
           _imageCard(),
           const SizedBox(height: 14),
           if (_imageBytes != null || _vendorCtl.text.isNotEmpty) _fieldsCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
+            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('تقارير المصاريف', '/hr/expense-reports', Icons.receipt_long),
+          ]),
         ]),
       ),
       floatingActionButton: _vendorCtl.text.isEmpty

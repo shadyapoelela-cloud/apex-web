@@ -5,6 +5,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class BudgetVarianceV2Screen extends StatefulWidget {
   const BudgetVarianceV2Screen({super.key});
@@ -53,6 +54,11 @@ class _BudgetVarianceV2ScreenState extends State<BudgetVarianceV2Screen> {
           _ibcsTableCard(),
           const SizedBox(height: 12),
           _aiCommentaryCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('بناء الموازنة', '/analytics/budget-builder', Icons.calculate),
+            ApexChipLink('انحراف التكاليف', '/analytics/cost-variance-v2', Icons.precision_manufacturing),
+            ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),
+          ]),
         ]),
       ),
     );

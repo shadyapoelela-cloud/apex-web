@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class ProjectProfitabilityScreen extends StatelessWidget {
   const ProjectProfitabilityScreen({super.key});
@@ -49,6 +50,11 @@ class ProjectProfitabilityScreen extends StatelessWidget {
           _heroCard(totalRev, totalCost, totalGross, marginPct.toDouble()),
           const SizedBox(height: 12),
           ..._projects.map(_projectCard),
+          const ApexOutputChips(items: [
+            ApexChipLink('انحراف التكاليف', '/analytics/cost-variance-v2', Icons.precision_manufacturing),
+            ApexChipLink('بناء الموازنة', '/analytics/budget-builder', Icons.calculate),
+            ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+          ]),
         ]),
       ),
     );

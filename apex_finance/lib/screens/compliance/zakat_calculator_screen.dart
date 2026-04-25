@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import '../../api_service.dart';
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class ZakatCalculatorScreen extends StatefulWidget {
   const ZakatCalculatorScreen({super.key});
@@ -109,7 +110,17 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
         if (!wide) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: Column(children: [_form(), const SizedBox(height: 16), _results()]),
+            child: Column(children: [
+              _form(),
+              const SizedBox(height: 16),
+              _results(),
+              const ApexOutputChips(items: [
+                ApexChipLink('التقويم الضريبي', '/compliance/tax-calendar', Icons.event),
+                ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
+                ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+                ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
+              ]),
+            ]),
           );
         }
         return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

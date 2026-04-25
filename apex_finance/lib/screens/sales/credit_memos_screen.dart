@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class CreditMemosScreen extends StatefulWidget {
   const CreditMemosScreen({super.key});
@@ -63,6 +64,11 @@ class _CreditMemosScreenState extends State<CreditMemosScreen> {
       ],
       items: _filtered,
       onRefresh: () async {},
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
+        ApexChipLink('العملاء', '/sales/customers', Icons.people),
+        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.note,
         title: 'لا توجد إشعارات',

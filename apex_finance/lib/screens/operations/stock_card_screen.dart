@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class StockCardScreen extends StatelessWidget {
   final String sku;
@@ -34,6 +35,11 @@ class StockCardScreen extends StatelessWidget {
           _heroCard(currentQty, currentValue),
           const SizedBox(height: 12),
           _movementsCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('المخزون', '/operations/inventory-v2', Icons.inventory_2),
+            ApexChipLink('بيع سريع POS', '/pos/quick-sale', Icons.point_of_sale),
+            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+          ]),
         ]),
       ),
     );

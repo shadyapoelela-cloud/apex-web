@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class ConsolidationV2Screen extends StatefulWidget {
   const ConsolidationV2Screen({super.key});
@@ -50,6 +51,11 @@ class _ConsolidationV2ScreenState extends State<ConsolidationV2Screen> {
           _intercompanyCard(),
           const SizedBox(height: 12),
           _eliminationCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('متابعة العملات', '/analytics/multi-currency-v2', Icons.currency_exchange),
+          ]),
         ]),
       ),
     );

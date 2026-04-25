@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'dart:html' as html;
 import 'api_service.dart';
 import 'core/theme.dart';
+import 'widgets/apex_output_chips.dart';
 
 class FinancialStatementsScreen extends StatefulWidget {
   final Map<String, dynamic>? apiData;
@@ -145,6 +146,12 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
               _buildBalanceSheet(),
               _buildCashFlow(),
             ])),
+        const ApexOutputChips(items: [
+          ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+          ApexChipLink('شجرة الحسابات', '/accounting/coa-v2', Icons.account_tree),
+          ApexChipLink('إقفال الفترة', '/operations/period-close', Icons.lock_clock),
+          ApexChipLink('Health Score', '/analytics/health-score-v2', Icons.health_and_safety),
+        ]),
         _buildBottomButtons(),
       ]),
     );

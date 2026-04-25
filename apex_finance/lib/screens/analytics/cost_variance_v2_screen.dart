@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class CostVarianceV2Screen extends StatefulWidget {
   const CostVarianceV2Screen({super.key});
@@ -77,6 +78,11 @@ class _CostVarianceV2ScreenState extends State<CostVarianceV2Screen> {
           _variancesCard(),
           const SizedBox(height: 12),
           _aiCommentaryCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('انحراف الموازنة', '/analytics/budget-variance-v2', Icons.trending_up),
+            ApexChipLink('ربحية المشاريع', '/analytics/project-profitability', Icons.engineering),
+            ApexChipLink('المخزون', '/operations/inventory-v2', Icons.inventory_2),
+          ]),
         ]),
       ),
     );

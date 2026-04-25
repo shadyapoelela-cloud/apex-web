@@ -5,6 +5,7 @@ library;
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class HealthScoreV2Screen extends StatefulWidget {
   const HealthScoreV2Screen({super.key});
@@ -57,6 +58,11 @@ class _HealthScoreV2ScreenState extends State<HealthScoreV2Screen> {
           _dimensionsGrid(),
           const SizedBox(height: 12),
           _aiCommentaryCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('توقع التدفق النقدي', '/analytics/cash-flow-forecast', Icons.show_chart),
+            ApexChipLink('بناء الموازنة', '/analytics/budget-builder', Icons.calculate),
+            ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+          ]),
         ]),
       ),
     );

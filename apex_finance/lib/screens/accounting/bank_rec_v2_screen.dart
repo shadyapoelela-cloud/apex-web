@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/apex_loading_states.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class BankRecV2Screen extends StatefulWidget {
   const BankRecV2Screen({super.key});
@@ -55,6 +56,12 @@ class _BankRecV2ScreenState extends State<BankRecV2Screen> {
           if (_autoMatchResult != null) _resultCard(),
           const SizedBox(height: 12),
           _explanationCard(),
+          const ApexOutputChips(items: [
+            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+            ApexChipLink('ربط البنوك', '/settings/bank-feeds', Icons.account_balance),
+            ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
+          ]),
         ]),
       ),
     );
