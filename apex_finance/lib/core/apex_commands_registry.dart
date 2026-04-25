@@ -179,6 +179,22 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/accounting/coa-v2'),
     ),
     ApexCommand(
+      id: 'nav_coa_editor',
+      label: 'محرر شجرة الحسابات',
+      subtitle: 'إنشاء/تعديل/نقل حساب',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.edit_note,
+      onRun: (_) => go('/accounting/coa/edit'),
+    ),
+    ApexCommand(
+      id: 'nav_risk_register',
+      label: 'سجل المخاطر',
+      subtitle: 'Impact × Probability heatmap',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.shield_outlined,
+      onRun: (_) => go('/compliance/risk-register'),
+    ),
+    ApexCommand(
       id: 'nav_approvals_inbox',
       label: 'صندوق الموافقات',
       subtitle: 'multi-step approval queue',
