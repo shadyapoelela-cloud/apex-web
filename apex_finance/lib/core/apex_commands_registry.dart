@@ -146,6 +146,15 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/purchase/aging'),
     ),
     ApexCommand(
+      id: 'action_pos_quick_sale',
+      label: 'بيع سريع — POS',
+      subtitle: 'كاش/مدى/STC Pay/Apple Pay',
+      kind: ApexCommandKind.action,
+      icon: Icons.point_of_sale,
+      shortcut: 'C P',
+      onRun: (_) => go('/pos/quick-sale'),
+    ),
+    ApexCommand(
       id: 'nav_notifications',
       label: 'الإشعارات',
       subtitle: 'صندوق الوارد + الإشعارات',
