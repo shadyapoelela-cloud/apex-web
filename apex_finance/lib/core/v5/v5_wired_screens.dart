@@ -71,6 +71,7 @@ import '../../screens/v4_erp/marketing_automation_screen.dart';
 import '../../screens/v4_erp/restaurant_pos_screen.dart';
 import '../../screens/v4_erp/retail_pos_screen.dart';
 import '../../screens/v4_erp/service_pos_screen.dart';
+import '../../screens/operations/pos_quick_sale_screen.dart';
 import '../../screens/v4_erp/corporate_cards_screen.dart';
 import '../../screens/v4_erp/travel_per_diem_screen.dart';
 import '../../screens/v4_erp/bom_mrp_screen.dart';
@@ -253,6 +254,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/integrations': (ctx) => const IntegrationsHubV52Screen(),  // V5.2 Card Grid
   'erp/finance/documents': (ctx) => const DocumentsV52Screen(),  // V5.2
   'erp/finance/onboarding': (ctx) => const PilotOnboardingWizard(),  // LIVE — creates real tenant+entity+branch+CoA
+  'erp/finance/pos': (ctx) => const PosQuickSaleScreen(),  // LIVE — JE auto-post + Saudi payment grid + WhatsApp share
 
   // V5.2 New Finance Chips (Week 1)
   'erp/finance/profit-centers': (ctx) => const ProfitCentersV52Screen(),
