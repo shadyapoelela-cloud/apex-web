@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class PettyCashScreen extends StatefulWidget {
   const PettyCashScreen({super.key});
@@ -43,6 +44,11 @@ class _PettyCashScreenState extends State<PettyCashScreen> {
       items: _txns,
       onRefresh: () async {},
       listHeader: _heroCard(),
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('تقارير المصاريف', '/hr/expense-reports', Icons.receipt_long),
+        ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.savings,
         title: 'لا توجد معاملات',

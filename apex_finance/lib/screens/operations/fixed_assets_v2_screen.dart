@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class FixedAssetsV2Screen extends StatefulWidget {
   const FixedAssetsV2Screen({super.key});
@@ -105,6 +106,11 @@ class _FixedAssetsV2ScreenState extends State<FixedAssetsV2Screen> {
       items: _filtered,
       onRefresh: () async {},
       listHeader: _summaryCard(),
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('IFRS 16 — الإيجارات', '/compliance/lease-v2', Icons.apartment),
+        ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.business,
         title: 'لا توجد أصول مسجّلة',

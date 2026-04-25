@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class ArAgingScreen extends StatefulWidget {
   const ArAgingScreen({super.key});
@@ -123,6 +124,14 @@ class _ArAgingScreenState extends State<ArAgingScreen> {
                       _bucketCard('31-60', '31-60 يوم', Colors.orange),
                       _bucketCard('61-90', '61-90 يوم', AC.err),
                       _bucketCard('90+', 'أكثر من 90 يوم', Colors.red.shade900),
+                      const ApexOutputChips(
+                        title: 'مرتبطة بـ',
+                        items: [
+                          ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
+                          ApexChipLink('العملاء', '/sales/customers', Icons.people),
+                          ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),
+                        ],
+                      ),
                     ],
                   ),
                 ),

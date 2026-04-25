@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class ApprovalsInboxScreen extends StatefulWidget {
   const ApprovalsInboxScreen({super.key});
@@ -113,6 +114,12 @@ class _ApprovalsInboxScreenState extends State<ApprovalsInboxScreen> {
       ],
       items: _filtered,
       onRefresh: () async {},
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
+        ApexChipLink('تقارير المصاريف', '/hr/expense-reports', Icons.receipt_long),
+        ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.inbox,
         title: 'لا توجد طلبات اعتماد',
