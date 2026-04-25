@@ -179,6 +179,23 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/accounting/coa-v2'),
     ),
     ApexCommand(
+      id: 'nav_recurring_invoices',
+      label: 'الفواتير المتكررة',
+      subtitle: 'اشتراكات + MRR + ARR',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.repeat,
+      onRun: (_) => go('/sales/recurring'),
+    ),
+    ApexCommand(
+      id: 'nav_knowledge_search',
+      label: 'قاعدة المعرفة',
+      subtitle: 'بحث في الأدلة + المعايير + ZATCA + GOSI',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.menu_book,
+      shortcut: 'CTRL K',
+      onRun: (_) => go('/knowledge/search'),
+    ),
+    ApexCommand(
       id: 'nav_bank_feeds_setup',
       label: 'ربط البنوك',
       subtitle: '11 بنك سعودي عبر Lean / Tarabut (SAMA Open Banking)',
