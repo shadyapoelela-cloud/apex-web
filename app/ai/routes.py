@@ -571,6 +571,13 @@ def onboarding_seed_demo(payload: dict[str, Any] = Body(...)):
                 for num, memo, kind, amount, dr_acc, cr_acc, dr_desc, cr_desc in demos:
                     if not (dr_acc and cr_acc):
                         continue
+                    # Idempotent — skip if this JE already exists for this entity.
+                    existing_je = db.query(JournalEntry).filter(
+                        JournalEntry.entity_id == entity_id,
+                        JournalEntry.je_number == num,
+                    ).first()
+                    if existing_je:
+                        continue
                     je = JournalEntry(
                         id=gen_uuid(), tenant_id=tenant_id, entity_id=entity_id,
                         fiscal_period_id=period.id,

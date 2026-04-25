@@ -126,24 +126,32 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
       _resultMessage = 'تم إنشاء الكيان · $accountsCreated حساب · $periodsCreated فترة. جارٍ تحميل بيانات تجريبية…';
     });
     // Optional: seed demo data so the user lands on a populated dashboard.
-    final seed = await ApiService.aiOnboardingSeedDemo(
-      tenantId: tenantId,
-      entityId: entityId,
-    );
-    if (!mounted) return;
-    if (seed.success) {
-      final seedData = (seed.data is Map<String, dynamic>)
-          ? (seed.data as Map)['data'] as Map?
-          : null;
-      final cust = seedData?['customers_created'] ?? 0;
-      final jes = seedData?['journal_entries_created'] ?? 0;
-      _resultMessage = 'تم! $cust عملاء + $jes قيود تجريبية جاهزة';
+    // Failure here is non-fatal — entity is already created and usable.
+    try {
+      final seed = await ApiService.aiOnboardingSeedDemo(
+        tenantId: tenantId,
+        entityId: entityId,
+      );
+      if (!mounted) return;
+      if (seed.success) {
+        final seedData = (seed.data is Map<String, dynamic>)
+            ? (seed.data as Map)['data'] as Map?
+            : null;
+        final cust = seedData?['customers_created'] ?? 0;
+        final jes = seedData?['journal_entries_created'] ?? 0;
+        _resultMessage = 'تم! $cust عملاء + $jes قيود تجريبية جاهزة';
+      }
+      // If seed.success is false we silently continue — the entity is still
+      // valid; demo data is non-essential.
+    } catch (_) {
+      // swallow seed-demo errors so they don't break onboarding flow.
     }
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(_resultMessage ?? 'تم الإعداد بنجاح 🎉'),
+        content: Text(_resultMessage ?? 'تم إعداد الكيان بنجاح 🎉'),
         backgroundColor: AC.ok,
+        duration: const Duration(seconds: 3),
       ),
     );
     context.go('/today');
