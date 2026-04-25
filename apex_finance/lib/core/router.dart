@@ -58,6 +58,7 @@ import '../screens/operations/period_close_screen.dart';
 import '../screens/operations/pos_session_screen.dart';
 import '../screens/operations/purchase_cycle_screen.dart';
 import '../screens/operations/consolidation_ui_screen.dart';
+import '../screens/operations/live_sales_cycle_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -516,6 +517,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/operations/pos-sessions', pageBuilder: (c, s) => _apexPage(const PosSessionScreen(), s)),
     GoRoute(path: '/operations/purchase-cycle', pageBuilder: (c, s) => _apexPage(const PurchaseCycleScreen(), s)),
     GoRoute(path: '/operations/consolidation-ui', pageBuilder: (c, s) => _apexPage(const ConsolidationUiScreen(), s)),
+    GoRoute(path: '/operations/live-sales-cycle', pageBuilder: (c, s) => _apexPage(const LiveSalesCycleScreen(), s)),
 
     // ─── COA Workflow ───
     GoRoute(path: '/upload', pageBuilder: (c, s) => _apexPage(const UploadScreen(), s)),
