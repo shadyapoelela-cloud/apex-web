@@ -27,14 +27,13 @@ import 'v5_wired_screens.dart';
 
 /// List of routes to be spread into the top-level GoRouter.routes.
 List<RouteBase> v5Routes() => [
-      // Phase 27.4: kill the cluttered V5 Launchpad — every entry routes to /services
-      GoRoute(path: '/', redirect: (ctx, state) => '/services'),
-      GoRoute(path: '/login', redirect: (ctx, state) => '/services'),
-      GoRoute(path: '/home', redirect: (ctx, state) => '/services'),
-      GoRoute(path: '/app', redirect: (ctx, state) => '/services'),
-      // V5 Launchpad still reachable for archaeology at /app/legacy
+      // Phase 27.5: V5 Launchpad is the home again — user wants this as the
+      // starting screen (Copilot hero + tile grid + news ticker + Ask APEX).
+      GoRoute(path: '/', redirect: (ctx, state) => '/app'),
+      GoRoute(path: '/login', redirect: (ctx, state) => '/app'),
+      GoRoute(path: '/home', redirect: (ctx, state) => '/app'),
       GoRoute(
-        path: '/app/legacy',
+        path: '/app',
         builder: (ctx, state) => const V5Launchpad(),
       ),
       GoRoute(
