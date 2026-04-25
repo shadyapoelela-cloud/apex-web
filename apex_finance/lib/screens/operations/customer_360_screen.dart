@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api_service.dart';
+import '../../core/apex_whatsapp_share.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 
@@ -86,6 +87,13 @@ class _Customer360ScreenState extends State<Customer360Screen> {
           style: TextStyle(color: AC.gold),
         ),
         actions: [
+          if (_profile?['phone'] != null)
+            ApexWhatsAppShareButton(
+              compact: true,
+              phoneNumber: '${_profile!['phone']}',
+              message:
+                  'مرحباً ${_profile!['name_ar']} — هذه ملاحظة من خلال APEX',
+            ),
           IconButton(
             icon: Icon(Icons.refresh, color: AC.gold),
             onPressed: _loading ? null : _load,

@@ -30,10 +30,12 @@ class ApexBottomNav extends StatelessWidget {
     this.child,
   });
 
+  // IA blueprint v1.0 — 5 primary destinations (gap-analysis P1 #6).
+  // Center-lifted action tab pattern (Saudi fintech signature).
   static const _items = [
     _NavItem(icon: Icons.dashboard_outlined, activeIcon: Icons.dashboard, label: 'اليوم', path: '/today'),
-    _NavItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'المبيعات', path: '/operations/live-sales-cycle'),
-    _NavItem(icon: Icons.assessment_outlined, activeIcon: Icons.assessment, label: 'القوائم', path: '/compliance/financial-statements'),
+    _NavItem(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'المبيعات', path: '/sales'),
+    _NavItem(icon: Icons.assessment_outlined, activeIcon: Icons.assessment, label: 'المحاسبة', path: '/accounting'),
     _NavItem(icon: Icons.auto_awesome_outlined, activeIcon: Icons.auto_awesome, label: 'كوبايلوت', path: '/copilot'),
     _NavItem(icon: Icons.more_horiz, activeIcon: Icons.more_horiz, label: 'المزيد', path: '__more__'),
   ];

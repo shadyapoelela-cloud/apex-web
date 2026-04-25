@@ -62,6 +62,7 @@ import '../screens/operations/live_sales_cycle_screen.dart';
 import '../screens/home/today_dashboard_screen.dart';
 import '../screens/operations/customer_360_screen.dart';
 import '../screens/compliance/journal_entry_detail_screen.dart' as je_detail_v2;
+import '../screens/audit/audit_engagement_workspace_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -535,6 +536,23 @@ final appRouter = GoRouter(
     GoRoute(path: '/operations/consolidation-ui', pageBuilder: (c, s) => _apexPage(const ConsolidationUiScreen(), s)),
     GoRoute(path: '/operations/live-sales-cycle', pageBuilder: (c, s) => _apexPage(const LiveSalesCycleScreen(), s)),
     GoRoute(path: '/today', pageBuilder: (c, s) => _apexPage(const TodayDashboardScreen(), s)),
+    // ─── New IA top-level aliases (blueprint v1.0) ───────────────────────
+    GoRoute(path: '/sales', redirect: (c, s) => '/operations/live-sales-cycle'),
+    GoRoute(path: '/purchase', redirect: (c, s) => '/operations/purchase-cycle'),
+    GoRoute(path: '/accounting', redirect: (c, s) => '/compliance/journal-entries'),
+    GoRoute(path: '/accounting/coa', redirect: (c, s) => '/coa-tree'),
+    GoRoute(path: '/accounting/journal-entries', redirect: (c, s) => '/compliance/journal-entries'),
+    GoRoute(path: '/accounting/trial-balance', redirect: (c, s) => '/compliance/financial-statements'),
+    GoRoute(path: '/accounting/period-close', redirect: (c, s) => '/operations/period-close'),
+    GoRoute(path: '/financial-statements', redirect: (c, s) => '/compliance/financial-statements'),
+    GoRoute(path: '/audit', redirect: (c, s) => '/audit/engagements'),
+    GoRoute(path: '/audit/engagements', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
+    GoRoute(path: '/audit/engagement-workspace', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
+    GoRoute(path: '/audit/benford', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
+    GoRoute(path: '/audit/sampling', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
+    GoRoute(path: '/audit/workpapers', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
+    GoRoute(path: '/setup', redirect: (c, s) => '/settings/entities'),
+    GoRoute(path: '/setup/entity', redirect: (c, s) => '/settings/entities'),
     GoRoute(
       path: '/operations/customer-360/:id',
       pageBuilder: (c, s) => _apexPage(

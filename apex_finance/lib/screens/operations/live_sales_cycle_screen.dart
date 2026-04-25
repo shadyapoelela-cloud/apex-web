@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api_service.dart';
+import '../../core/apex_whatsapp_share.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 
@@ -438,6 +439,14 @@ class _LiveSalesCycleScreenState extends State<LiveSalesCycleScreen> {
                           Text('${inv['total']} SAR',
                               style: TextStyle(
                                   color: AC.gold, fontFamily: 'monospace', fontWeight: FontWeight.w700)),
+                          if (isIssued)
+                            ApexWhatsAppShareButton(
+                              compact: true,
+                              tooltip: 'مشاركة الفاتورة على واتساب',
+                              message:
+                                  'فاتورة ${inv['invoice_number']} بمبلغ ${inv['total']} ريال — '
+                                  'تاريخ الإصدار ${inv['issue_date']}',
+                            ),
                         ]),
                       );
                     }).toList(),
