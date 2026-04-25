@@ -112,6 +112,8 @@ import '../screens/audit/anomaly_detail_screen.dart';
 import '../screens/workflow/approvals_inbox_screen.dart';
 import '../screens/accounting/coa_editor_screen.dart';
 import '../screens/compliance/risk_register_screen.dart';
+import '../screens/analytics/budget_builder_screen.dart';
+import '../screens/compliance/kyc_aml_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -694,6 +696,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/workflow/approvals', pageBuilder: (c, s) => _apexPage(const ApprovalsInboxScreen(), s)),
     GoRoute(path: '/accounting/coa/edit', pageBuilder: (c, s) => _apexPage(const CoaEditorScreen(), s)),
     GoRoute(path: '/compliance/risk-register', pageBuilder: (c, s) => _apexPage(const RiskRegisterScreen(), s)),
+    GoRoute(path: '/analytics/budget-builder', pageBuilder: (c, s) => _apexPage(const BudgetBuilderScreen(), s)),
+    GoRoute(path: '/compliance/kyc-aml', pageBuilder: (c, s) => _apexPage(const KycAmlScreen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(

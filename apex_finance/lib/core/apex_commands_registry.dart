@@ -179,6 +179,22 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/accounting/coa-v2'),
     ),
     ApexCommand(
+      id: 'nav_budget_builder',
+      label: 'بناء الموازنة السنوية',
+      subtitle: '12 شهر × N حساب + AI generation',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.calculate,
+      onRun: (_) => go('/analytics/budget-builder'),
+    ),
+    ApexCommand(
+      id: 'nav_kyc_aml',
+      label: 'KYC/AML',
+      subtitle: 'فحص العملاء والموردين + Sanctions + PEP',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.fact_check,
+      onRun: (_) => go('/compliance/kyc-aml'),
+    ),
+    ApexCommand(
       id: 'nav_coa_editor',
       label: 'محرر شجرة الحسابات',
       subtitle: 'إنشاء/تعديل/نقل حساب',
