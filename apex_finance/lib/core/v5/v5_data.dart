@@ -477,57 +477,83 @@ List<V5Service> v5Services = [
         descriptionAr: 'دفتر أستاذ شامل، قمرة إقفال ذكية، قوائم مالية بـ4 إصدارات، AI عربي',
         group: AppGroup.core,
         chips: [
-          // ━━━ Dashboard ━━━
+          // ════════════════════════════════════════════════════════════════
+          // الترتيب الجديد: 9 فئات بحسب يوم المحاسب الفعلي (لا دورة الإعداد)
+          // ════════════════════════════════════════════════════════════════
+
+          // ━━━ 1️⃣ My Work — صندوق مهامي (يومي + شخصي) ━━━
+          const V5Chip(id: 'workflows', labelAr: 'الموافقات والمهام', labelEn: 'Approvals & Tasks', icon: Icons.inbox, phase: ChipPhase.process, category: 'my-work'),
+
+          // ━━━ 2️⃣ Command Center — لوحة القرارات المالية ━━━
           _dashboardChip(
             id: 'dashboard',
-            labelAr: 'لوحة المالية',
-            labelEn: 'Finance Dashboard',
+            labelAr: 'مركز القيادة المالي',
+            labelEn: 'Financial Command Center',
             icon: Icons.dashboard,
             widgets: _financeDashboardWidgets,
           ),
 
-          // ━━━ المرحلة 1 — تأسيس الكيان (Foundation) ━━━
-          const V5Chip(id: 'entity-setup', labelAr: 'إعداد الكيانات والشركات والفروع', labelEn: 'Entity / Company / Branch Setup', icon: Icons.corporate_fare_rounded, phase: ChipPhase.setup, setupGroup: 'foundation'),
+          // ━━━ 3️⃣ Daily Operations — العمليات اليومية ━━━
+          //   3.a دورة المبيعات
+          const V5Chip(id: 'sales-customers', labelAr: 'العملاء — دورة المبيعات', labelEn: 'Customers (Sales)', icon: Icons.people, phase: ChipPhase.capture, category: 'operations'),
+          const V5Chip(id: 'sales-invoices', labelAr: 'فواتير المبيعات', labelEn: 'Sales Invoices', icon: Icons.receipt, phase: ChipPhase.capture, category: 'operations'),
+          const V5Chip(id: 'pos', labelAr: 'بيع سريع POS', labelEn: 'POS Quick Sale', icon: Icons.point_of_sale, phase: ChipPhase.capture, category: 'operations'),
+          //   3.b دورة المشتريات
+          const V5Chip(id: 'purchase-vendors', labelAr: 'الموردون — دورة الشراء', labelEn: 'Vendors (Purchase)', icon: Icons.business, phase: ChipPhase.capture, category: 'operations'),
+          const V5Chip(id: 'purchase-bills', labelAr: 'فواتير الموردين', labelEn: 'Vendor Bills', icon: Icons.receipt_outlined, phase: ChipPhase.capture, category: 'operations'),
+          const V5Chip(id: 'receipt-capture', labelAr: 'التقاط إيصال (OCR)', labelEn: 'Receipt OCR', icon: Icons.document_scanner, phase: ChipPhase.capture, category: 'operations', aiPowered: true),
+          //   3.c النقد والبنوك
+          _chipFromV4('erp', 'gl', labelOverrideAr: 'الأستاذ الشامل (GL)'),
+          //   3.d الأصول والمخزون
+          const V5Chip(id: 'fixed-assets', labelAr: 'الأصول الثابتة', labelEn: 'Fixed Assets', icon: Icons.business_center, phase: ChipPhase.capture, category: 'operations'),
+          const V5Chip(id: 'inventory', labelAr: 'المخزون', labelEn: 'Inventory', icon: Icons.inventory_2, phase: ChipPhase.capture, category: 'operations'),
+          //   3.e القيود اليدوية
+          const V5Chip(id: 'je-builder', labelAr: 'قيد يومية جديد', labelEn: 'New Journal Entry', icon: Icons.edit_note, phase: ChipPhase.capture, category: 'operations', aiPowered: true),
+          const V5Chip(id: 'recurring-entries', labelAr: 'القيود الدورية', labelEn: 'Recurring Entries', icon: Icons.repeat, phase: ChipPhase.capture, category: 'operations'),
 
-          // ━━━ المرحلة 2 — الهيكل المحاسبي (Backbone) ━━━
-          const V5Chip(id: 'coa-editor', labelAr: 'دليل الحسابات', labelEn: 'Chart of Accounts', icon: Icons.account_tree, phase: ChipPhase.setup, setupGroup: 'backbone'),
+          // ━━━ 4️⃣ Reconciliation Center — مركز المطابقات ━━━
+          const V5Chip(id: 'ai-reconciliation', labelAr: 'التسوية البنكية الذكية', labelEn: 'AI Bank Reconciliation', icon: Icons.auto_fix_high, phase: ChipPhase.process, category: 'reconciliation', aiPowered: true),
+          const V5Chip(id: 'ar-aging', labelAr: 'أعمار الذمم AR', labelEn: 'AR Aging', icon: Icons.timeline, phase: ChipPhase.process, category: 'reconciliation'),
+          const V5Chip(id: 'ap-aging', labelAr: 'أعمار الذمم AP', labelEn: 'AP Aging', icon: Icons.timeline, phase: ChipPhase.process, category: 'reconciliation'),
 
-          // ━━━ المرحلة 3 — الأبعاد التحليلية (Dimensions) ━━━
-          const V5Chip(id: 'cost-centers', labelAr: 'مراكز التكلفة', labelEn: 'Cost Centers', icon: Icons.pie_chart, phase: ChipPhase.setup, setupGroup: 'dimensions'),
-          const V5Chip(id: 'profit-centers', labelAr: 'مراكز الربحية', labelEn: 'Profit Centers', icon: Icons.donut_small, phase: ChipPhase.setup, setupGroup: 'dimensions'),
-          const V5Chip(id: 'internal-orders', labelAr: 'الأوامر الداخلية', labelEn: 'Internal Orders', icon: Icons.assignment_turned_in, phase: ChipPhase.setup, setupGroup: 'dimensions'),
-          const V5Chip(id: 'dimensions', labelAr: 'الأبعاد المحاسبية', labelEn: 'Accounting Dimensions', icon: Icons.view_in_ar, phase: ChipPhase.setup, setupGroup: 'dimensions'),
+          // ━━━ 5️⃣ Tax & Compliance — الضرائب والامتثال ━━━
+          const V5Chip(id: 'tax-calendar', labelAr: 'التقويم الضريبي', labelEn: 'Tax Calendar', icon: Icons.event, phase: ChipPhase.process, category: 'tax'),
+          const V5Chip(id: 'vat-return', labelAr: 'إقرار VAT', labelEn: 'VAT Return', icon: Icons.receipt_long, phase: ChipPhase.process, category: 'tax'),
+          const V5Chip(id: 'wht', labelAr: 'استقطاع المصدر WHT', labelEn: 'Withholding Tax', icon: Icons.percent, phase: ChipPhase.process, category: 'tax'),
+          const V5Chip(id: 'zakat', labelAr: 'الزكاة', labelEn: 'Zakat Calculator', icon: Icons.account_balance_wallet, phase: ChipPhase.process, category: 'tax'),
+          const V5Chip(id: 'zatca-status', labelAr: 'مركز ZATCA', labelEn: 'ZATCA Status Center', icon: Icons.verified, phase: ChipPhase.process, category: 'tax'),
 
-          // ━━━ Transactions (5) ━━━
-          _chipFromV4('erp', 'gl', labelOverrideAr: 'الأستاذ الشامل'),
-          const V5Chip(id: 'je-builder', labelAr: 'قيود اليومية', labelEn: 'Journal Entries', icon: Icons.edit_note, phase: ChipPhase.capture),
-          const V5Chip(id: 'recurring-entries', labelAr: 'القيود الدورية', labelEn: 'Recurring Entries', icon: Icons.repeat, phase: ChipPhase.capture),
-          const V5Chip(id: 'fixed-assets', labelAr: 'الأصول الثابتة', labelEn: 'Fixed Assets', icon: Icons.business, phase: ChipPhase.capture),
-          const V5Chip(id: 'ai-reconciliation', labelAr: 'المطابقات الذكية', labelEn: 'AI Reconciliation', icon: Icons.auto_fix_high, phase: ChipPhase.capture),
+          // ━━━ 6️⃣ Financial Reports — التقارير المالية ━━━
+          //   6.a النظامية (Statutory)
+          const V5Chip(id: 'statements', labelAr: 'القوائم المالية', labelEn: 'Financial Statements', icon: Icons.insert_chart, phase: ChipPhase.report, category: 'reports'),
+          //   6.b الإدارية
+          const V5Chip(id: 'budgets', labelAr: 'الموازنات', labelEn: 'Budgets', icon: Icons.pie_chart, phase: ChipPhase.report, category: 'reports'),
+          const V5Chip(id: 'budget-actual', labelAr: 'الموازنة مقابل الفعلي', labelEn: 'Budget vs Actual', icon: Icons.compare_arrows, phase: ChipPhase.report, category: 'reports'),
+          const V5Chip(id: 'budget-planning', labelAr: 'تخطيط الموازنات', labelEn: 'Budget Planning', icon: Icons.account_tree, phase: ChipPhase.report, category: 'reports'),
 
-          // ━━━ Period Close (3) ━━━
-          const V5Chip(id: 'period-close', labelAr: 'قمرة الإقفال 🎯', labelEn: 'Closing Cockpit', icon: Icons.lock_clock, phase: ChipPhase.process),
-          const V5Chip(id: 'workflows', labelAr: 'مسارات الاعتماد', labelEn: 'Approval Workflows', icon: Icons.approval, phase: ChipPhase.process),
-          const V5Chip(id: 'anomalies', labelAr: 'كاشف الشذوذ AI', labelEn: 'AI Anomaly Detector', icon: Icons.psychology, phase: ChipPhase.process),
+          // ━━━ 7️⃣ Smart Intelligence — الذكاء المالي ━━━
+          const V5Chip(id: 'ai-analyst', labelAr: 'المحلل المالي AI', labelEn: 'AI Financial Analyst', icon: Icons.auto_awesome, phase: ChipPhase.report, category: 'intelligence', aiPowered: true),
+          const V5Chip(id: 'anomalies', labelAr: 'كاشف الشذوذ', labelEn: 'AI Anomaly Detector', icon: Icons.psychology, phase: ChipPhase.process, category: 'intelligence', aiPowered: true),
+          const V5Chip(id: 'scenarios', labelAr: 'سيناريوهات What-If', labelEn: 'What-If Scenarios', icon: Icons.insights, phase: ChipPhase.report, category: 'intelligence', aiPowered: true),
+          const V5Chip(id: 'breakeven', labelAr: 'نقطة التعادل', labelEn: 'Break-Even Analysis', icon: Icons.balance, phase: ChipPhase.report, category: 'intelligence'),
+          const V5Chip(id: 'cash-flow-forecast', labelAr: 'توقع التدفق النقدي', labelEn: 'Cash Flow Forecast', icon: Icons.show_chart, phase: ChipPhase.report, category: 'intelligence', aiPowered: true),
+          const V5Chip(id: 'health-score', labelAr: 'مؤشر صحة الكيان', labelEn: 'Health Score', icon: Icons.health_and_safety, phase: ChipPhase.report, category: 'intelligence', aiPowered: true),
 
-          // ━━━ Reporting (7) ━━━
-          const V5Chip(id: 'statements', labelAr: 'القوائم المالية', labelEn: 'Financial Statements', icon: Icons.insert_chart, phase: ChipPhase.report),
-          const V5Chip(id: 'ai-analyst', labelAr: 'المحلل المالي AI 🎉', labelEn: 'AI Financial Analyst', icon: Icons.auto_awesome, phase: ChipPhase.report),
-          const V5Chip(id: 'budgets', labelAr: 'الموازنات', labelEn: 'Budgets', icon: Icons.pie_chart, phase: ChipPhase.report),
-          const V5Chip(id: 'budget-actual', labelAr: 'الموازنة مقابل الفعلي', labelEn: 'Budget vs Actual', icon: Icons.compare_arrows, phase: ChipPhase.report),
-          const V5Chip(id: 'budget-planning', labelAr: 'تخطيط الموازنات', labelEn: 'Budget Planning', icon: Icons.account_tree, phase: ChipPhase.report),
-          const V5Chip(id: 'scenarios', labelAr: 'سيناريوهات What-If', labelEn: 'What-If Scenarios', icon: Icons.insights, phase: ChipPhase.report),
-          const V5Chip(id: 'breakeven', labelAr: 'نقطة التعادل', labelEn: 'Break-Even', icon: Icons.balance, phase: ChipPhase.report),
+          // ━━━ 8️⃣ Control & Close — الإقفال والرقابة (شهري) ━━━
+          const V5Chip(id: 'period-close', labelAr: 'قمرة الإقفال', labelEn: 'Closing Cockpit', icon: Icons.lock_clock, phase: ChipPhase.process, category: 'close'),
+          const V5Chip(id: 'activity-log', labelAr: 'سجل النشاط (Audit Trail)', labelEn: 'Activity Log', icon: Icons.history, phase: ChipPhase.process, category: 'close'),
 
-          // ━━━ المرحلة 4 — المستندات (Documents) ━━━
-          const V5Chip(id: 'documents', labelAr: 'خزانة الوثائق', labelEn: 'Document Vault', icon: Icons.folder_shared, phase: ChipPhase.setup, setupGroup: 'documents'),
-
-          // ━━━ المرحلة 6 — التكاملات (Integrations) ━━━
-          const V5Chip(id: 'integrations', labelAr: 'التكاملات API', labelEn: 'Integrations Hub', icon: Icons.hub, phase: ChipPhase.setup, setupGroup: 'integrations'),
-
-          // ━━━ المرحلة 7 — الإطلاق (Go-Live) ━━━
-          const V5Chip(id: 'onboarding', labelAr: 'رحلة الإعداد', labelEn: 'Onboarding', icon: Icons.auto_awesome, phase: ChipPhase.setup, setupGroup: 'golive'),
-          const V5Chip(id: 'advanced-settings', labelAr: 'إعدادات متقدّمة', labelEn: 'Advanced Settings', icon: Icons.settings_applications, phase: ChipPhase.setup, setupGroup: 'golive'),
+          // ━━━ 9️⃣ Data Foundation — التأسيس (نادر) ━━━
+          const V5Chip(id: 'entity-setup', labelAr: 'إعداد الكيانات والشركات والفروع', labelEn: 'Entity / Company / Branch Setup', icon: Icons.corporate_fare_rounded, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'foundation'),
+          const V5Chip(id: 'coa-editor', labelAr: 'دليل الحسابات', labelEn: 'Chart of Accounts', icon: Icons.account_tree, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'backbone'),
+          const V5Chip(id: 'cost-centers', labelAr: 'مراكز التكلفة', labelEn: 'Cost Centers', icon: Icons.pie_chart, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'dimensions'),
+          const V5Chip(id: 'profit-centers', labelAr: 'مراكز الربحية', labelEn: 'Profit Centers', icon: Icons.donut_small, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'dimensions'),
+          const V5Chip(id: 'internal-orders', labelAr: 'الأوامر الداخلية', labelEn: 'Internal Orders', icon: Icons.assignment_turned_in, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'dimensions'),
+          const V5Chip(id: 'dimensions', labelAr: 'الأبعاد المحاسبية', labelEn: 'Accounting Dimensions', icon: Icons.view_in_ar, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'dimensions'),
+          const V5Chip(id: 'documents', labelAr: 'خزانة الوثائق', labelEn: 'Document Vault', icon: Icons.folder_shared, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'documents'),
+          const V5Chip(id: 'integrations', labelAr: 'التكاملات API', labelEn: 'Integrations Hub', icon: Icons.hub, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'integrations'),
+          const V5Chip(id: 'onboarding', labelAr: 'رحلة الإعداد', labelEn: 'Onboarding', icon: Icons.auto_awesome, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'golive'),
+          const V5Chip(id: 'advanced-settings', labelAr: 'إعدادات متقدّمة', labelEn: 'Advanced Settings', icon: Icons.settings_applications, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'golive'),
         ],
       ),
 

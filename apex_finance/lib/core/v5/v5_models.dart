@@ -128,6 +128,26 @@ class V5Chip {
   ///   golive       — Opening balances, pre-go-live checklist, onboarding
   final String? setupGroup;
 
+  /// Modern 9-category taxonomy reflecting the accountant's daily workflow
+  /// rather than the product setup lifecycle. When present, supersedes
+  /// `phase` for visual grouping in the sidebar. Values:
+  ///   my-work        — Personal task inbox (approvals, errors, reminders)
+  ///   command        — Financial Command Center (decision engine)
+  ///   operations     — Daily Operations (Sales/Purchase/Cash/Assets/Manual)
+  ///   reconciliation — Reconciliation Center (Bank, AR, AP, IC, Suspense)
+  ///   tax            — Tax & Compliance (VAT, WHT, Zakat, ZATCA)
+  ///   reports        — Financial Reports (Operational/Statutory/Mgmt/Smart)
+  ///   intelligence   — Smart Intelligence (AI analyst, anomalies, forecast)
+  ///   close          — Control & Close (period close, lock, adjustments)
+  ///   foundation     — Data Foundation (entity, COA, dimensions — rare)
+  final String? category;
+
+  /// True for screens powered by AI. Renders a small ✨ badge so the user
+  /// can instantly spot the smart parts of the platform (JE Builder with
+  /// 10 AI templates, AI Bank Rec >95% auto-match, AI Anomaly Detector,
+  /// AI Financial Analyst, OCR Receipt Capture, Copilot).
+  final bool aiPowered;
+
   const V5Chip({
     required this.id,
     required this.labelAr,
@@ -139,6 +159,8 @@ class V5Chip {
     this.requiredCapability,
     this.phase,
     this.setupGroup,
+    this.category,
+    this.aiPowered = false,
   });
 
   /// Convenience: build from existing V4SubModule.

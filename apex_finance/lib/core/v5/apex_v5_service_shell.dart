@@ -2003,9 +2003,83 @@ class _Sidebar extends StatelessWidget {
     );
   }
 
+  /// Renders the chip list of a module's sidebar.
+  ///
+  /// Two grouping modes:
+  ///   • New: when chips have `category`, group by 9-category daily-workflow
+  ///     taxonomy (my-work → command → operations → reconciliation → tax →
+  ///     reports → intelligence → close → foundation). Used by /accounting.
+  ///   • Legacy: chips without `category` fall back to 4-phase grouping
+  ///     (Setup/Capture/Process/Report). Used by other modules.
   List<Widget> _buildChipsOfActiveModule(
       BuildContext context, V5MainModule m) {
     if (m.chips.isEmpty) return const [];
+    final usingCategories = m.chips.any((c) => c.category != null);
+    if (usingCategories) {
+      return _buildByCategory(context, m);
+    }
+    return _buildByPhase(context, m);
+  }
+
+  /// Modern 9-category sidebar — accountant's daily workflow.
+  List<Widget> _buildByCategory(BuildContext context, V5MainModule m) {
+    // Preserve insertion order in the source; one category per chip.
+    const order = [
+      'my-work', 'command', 'operations', 'reconciliation',
+      'tax', 'reports', 'intelligence', 'close', 'foundation',
+    ];
+    final byCat = <String, List<V5Chip>>{};
+    for (final c in m.chips) {
+      final cat = c.category ?? 'foundation';
+      byCat.putIfAbsent(cat, () => []).add(c);
+    }
+    final currentPath = GoRouterState.of(context).matchedLocation;
+    final widgets = <Widget>[];
+    bool firstCat = true;
+    for (final cat in order) {
+      final chips = byCat[cat];
+      if (chips == null || chips.isEmpty) continue;
+      if (isCollapsed && !firstCat) {
+        widgets.add(_collapsedPhaseDivider());
+      } else if (!isCollapsed) {
+        widgets.add(_categoryHeader(cat));
+      }
+      firstCat = false;
+      // Foundation category preserves the legacy 7-phase setup sub-grouping
+      // (Foundation → Backbone → Dimensions → Documents → Integrations → Go-Live).
+      if (cat == 'foundation' && !isCollapsed) {
+        String? lastGroup;
+        for (final c in chips) {
+          final g = c.setupGroup;
+          if (g != null && g != lastGroup) {
+            widgets.add(_setupGroupHeader(g));
+            lastGroup = g;
+          }
+          widgets.add(_ChipSubItem(
+            chip: c,
+            moduleId: m.id,
+            serviceColor: core_theme.AC.gold,
+            isActive: currentPath.endsWith('/${c.id}'),
+            isCollapsed: isCollapsed,
+          ));
+        }
+      } else {
+        for (final c in chips) {
+          widgets.add(_ChipSubItem(
+            chip: c,
+            moduleId: m.id,
+            serviceColor: core_theme.AC.gold,
+            isActive: currentPath.endsWith('/${c.id}'),
+            isCollapsed: isCollapsed,
+          ));
+        }
+      }
+    }
+    return widgets;
+  }
+
+  /// Legacy 4-phase grouping (Setup/Capture/Process/Report).
+  List<Widget> _buildByPhase(BuildContext context, V5MainModule m) {
     final byPhase = <ChipPhase, List<V5Chip>>{};
     for (final c in m.chips) {
       byPhase.putIfAbsent(c.phase ?? ChipPhase.capture, () => []).add(c);
@@ -2022,8 +2096,6 @@ class _Sidebar extends StatelessWidget {
         widgets.add(_phaseHeader(phase));
       }
       firstPhase = false;
-      // Setup phase gets a sub-grouping (foundation/backbone/dimensions/...)
-      // following the global accountant onboarding journey.
       if (phase == ChipPhase.setup && !isCollapsed) {
         String? lastGroup;
         for (final c in chips) {
@@ -2053,6 +2125,59 @@ class _Sidebar extends StatelessWidget {
       }
     }
     return widgets;
+  }
+
+  /// Top-level category header for the 9-category sidebar.
+  Widget _categoryHeader(String catId) {
+    final (label, icon, color) = switch (catId) {
+      'my-work'        => ('1️⃣ مهامي اليوم',          Icons.inbox_outlined,           const Color(0xFFE91E63)),
+      'command'        => ('2️⃣ مركز القيادة',          Icons.dashboard_outlined,       const Color(0xFFFFC107)),
+      'operations'     => ('3️⃣ العمليات اليومية',      Icons.fact_check_outlined,      const Color(0xFF4CAF50)),
+      'reconciliation' => ('4️⃣ مركز المطابقات',         Icons.compare_arrows,           const Color(0xFF9C27B0)),
+      'tax'            => ('5️⃣ الضرائب والامتثال',     Icons.gavel,                    const Color(0xFFFF5722)),
+      'reports'        => ('6️⃣ التقارير المالية',       Icons.assessment_outlined,      const Color(0xFF2196F3)),
+      'intelligence'   => ('7️⃣ الذكاء المالي ✨',       Icons.psychology_outlined,      const Color(0xFF00BCD4)),
+      'close'          => ('8️⃣ الإقفال والرقابة',       Icons.lock_clock_outlined,      const Color(0xFF607D8B)),
+      'foundation'     => ('9️⃣ التأسيس (Setup)',       Icons.settings_outlined,        const Color(0xFF795548)),
+      _                => (catId, Icons.label_outline, core_theme.AC.gold),
+    };
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(14, 16, 14, 6),
+      child: Row(children: [
+        Container(
+          width: 3, height: 14,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter, end: Alignment.bottomCenter,
+              colors: [color, color.withValues(alpha: 0.4)],
+            ),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Icon(icon, size: 12, color: color.withValues(alpha: 0.85)),
+        const SizedBox(width: 5),
+        Text(label,
+            style: TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w900,
+              color: color,
+              letterSpacing: 0.6,
+            )),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [
+                color.withValues(alpha: 0.20),
+                color.withValues(alpha: 0.0),
+              ]),
+            ),
+          ),
+        ),
+      ]),
+    );
   }
 
   Widget _setupGroupHeader(String groupId) {
@@ -2646,22 +2771,54 @@ class _ChipSubItemState extends State<_ChipSubItem> {
               ),
               const SizedBox(width: 9),
               Expanded(
-                child: Text(
-                  widget.chip.labelAr,
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: isActive
-                        ? FontWeight.w800
-                        : (_hover ? FontWeight.w600 : FontWeight.w500),
-                    color: isActive
-                        ? c
-                        : (_hover ? core_theme.AC.tp : core_theme.AC.tp),
-                    height: 1.15,
-                    letterSpacing: 0.1,
+                child: Row(children: [
+                  Flexible(
+                    child: Text(
+                      widget.chip.labelAr,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: isActive
+                            ? FontWeight.w800
+                            : (_hover ? FontWeight.w600 : FontWeight.w500),
+                        color: isActive
+                            ? c
+                            : (_hover ? core_theme.AC.tp : core_theme.AC.tp),
+                        height: 1.15,
+                        letterSpacing: 0.1,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                  // ✨ AI badge — instantly identifies smart screens
+                  if (widget.chip.aiPowered) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [
+                          const Color(0xFF673AB7).withValues(alpha: 0.20),
+                          const Color(0xFF00BCD4).withValues(alpha: 0.20),
+                        ]),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                            color: const Color(0xFF673AB7).withValues(alpha: 0.4)),
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.auto_awesome,
+                            size: 8, color: const Color(0xFF673AB7)),
+                        const SizedBox(width: 2),
+                        const Text('AI',
+                            style: TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF673AB7),
+                              letterSpacing: 0.3,
+                            )),
+                      ]),
+                    ),
+                  ],
+                ]),
               ),
               if (isActive)
                 Container(
