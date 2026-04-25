@@ -28,6 +28,14 @@ class _Tile {
   const _Tile(this.title, this.subtitle, this.route, this.icon, {this.featured = false});
 }
 
+class _Section {
+  final String title;
+  final IconData icon;
+  final int color;
+  final List<_Tile> tiles;
+  const _Section(this.title, {required this.icon, required this.color, required this.tiles});
+}
+
 class _ServiceConfig {
   final String title;
   final String subtitle;
@@ -40,6 +48,10 @@ class _ServiceConfig {
   /// Canonical input → output flow as a list of route paths.
   /// Each route must exist in [tiles] (used to resolve title/icon).
   final List<String> flow;
+  /// Optional grouped sections. When present, supersedes the
+  /// featured/others split — tiles render under labelled section headers
+  /// (e.g. المدخلات / الدفاتر / المخرجات / التحليل / الإعدادات).
+  final List<_Section> sections;
   const _ServiceConfig({
     required this.title,
     required this.subtitle,
@@ -50,6 +62,7 @@ class _ServiceConfig {
     this.heroLabel,
     this.heroIcon,
     this.flow = const [],
+    this.sections = const [],
   });
 }
 
@@ -98,6 +111,52 @@ class ApexServiceHubScreen extends StatelessWidget {
       heroRoute: '/compliance/financial-statements',
       heroLabel: 'افتح ميزان المراجعة (Live)',
       flow: ['/accounting/coa-v2', '/accounting/je-list', '/compliance/financial-statements', '/operations/period-close'],
+      sections: [
+        _Section('المدخلات — مستندات المصدر',
+          icon: Icons.input,
+          color: 0xFF4CAF50,
+          tiles: [
+            _Tile('قيد يومية جديد', 'إدخال يدوي + توازن تلقائي', '/compliance/journal-entry-builder', Icons.edit_note),
+            _Tile('فاتورة مبيعات', 'إصدار + ZATCA Phase 2', '/sales/invoices', Icons.receipt),
+            _Tile('فاتورة مشتريات', 'تسجيل + WHT', '/purchase/bills', Icons.receipt_outlined),
+            _Tile('بيع سريع POS', 'Mada/STC/Apple Pay', '/pos/quick-sale', Icons.point_of_sale),
+            _Tile('التقاط إيصال', 'OCR — Claude Vision', '/receipt/capture', Icons.document_scanner),
+          ]),
+        _Section('الدفاتر — التسجيل',
+          icon: Icons.menu_book,
+          color: 0xFF9C27B0,
+          tiles: [
+            _Tile('قائمة القيود', 'JE List canonical', '/accounting/je-list', Icons.book),
+            _Tile('شجرة الحسابات', 'CoA Tree (SOCPA)', '/accounting/coa-v2', Icons.account_tree),
+            _Tile('التسوية البنكية AI', 'Auto-match >95%', '/accounting/bank-rec-v2', Icons.account_balance_wallet),
+          ]),
+        _Section('المخرجات — القوائم المالية',
+          icon: Icons.assessment,
+          color: 0xFFFFC107,
+          tiles: [
+            _Tile('ميزان المراجعة', 'TB + Drill chain', '/compliance/financial-statements', Icons.assessment),
+            _Tile('إقفال الفترة', 'NetSuite checklist', '/operations/period-close', Icons.lock_clock),
+            _Tile('مركز التقارير', 'كل القوائم', '/reports', Icons.folder_special),
+            _Tile('سجل النشاط', 'Hash-Chain Audit Trail', '/compliance/activity-log-v2', Icons.history),
+          ]),
+        _Section('التحليل المالي',
+          icon: Icons.analytics,
+          color: 0xFF00BCD4,
+          tiles: [
+            _Tile('Health Score', 'مؤشر صحة الكيان', '/analytics/health-score-v2', Icons.health_and_safety),
+            _Tile('توقع التدفق النقدي', '90 يوم + Runway', '/analytics/cash-flow-forecast', Icons.show_chart),
+            _Tile('بناء الموازنة', '12 شهر + AI', '/analytics/budget-builder', Icons.calculate),
+            _Tile('انحراف الموازنة', 'IBCS variance', '/analytics/budget-variance-v2', Icons.trending_up),
+          ]),
+        _Section('الإعدادات',
+          icon: Icons.settings,
+          color: 0xFF795548,
+          tiles: [
+            _Tile('محرر الحسابات', 'إضافة/تعديل CoA', '/accounting/coa/edit', Icons.edit_note),
+            _Tile('ربط البنوك', '11 بنك سعودي', '/settings/bank-feeds', Icons.account_balance),
+            _Tile('إعداد الكيان', 'Onboarding wizard', '/onboarding', Icons.business_center),
+          ]),
+      ],
       tiles: [
         _Tile('قائمة القيود', 'JE List canonical', '/accounting/je-list', Icons.book, featured: true),
         _Tile('شجرة الحسابات', 'CoA Tree (SOCPA)', '/accounting/coa-v2', Icons.account_tree, featured: true),
@@ -255,22 +314,70 @@ class ApexServiceHubScreen extends StatelessWidget {
             const SizedBox(height: 14),
             _flowChain(context, config, color),
           ],
-          if (featured.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Text('الأكثر استخداماً',
-                style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 8),
-            _tilesGrid(context, featured, color),
-          ],
-          if (others.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Text('الأدوات الإضافية',
-                style: TextStyle(color: AC.ts, fontSize: 12.5, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            _tilesGrid(context, others, color),
+          // Sections take precedence over featured/others when present.
+          if (config.sections.isNotEmpty) ...[
+            for (final s in config.sections) ...[
+              const SizedBox(height: 18),
+              _sectionHeader(s),
+              const SizedBox(height: 8),
+              _tilesGrid(context, s.tiles, Color(s.color)),
+            ],
+          ] else ...[
+            if (featured.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Text('الأكثر استخداماً',
+                  style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 8),
+              _tilesGrid(context, featured, color),
+            ],
+            if (others.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Text('الأدوات الإضافية',
+                  style: TextStyle(color: AC.ts, fontSize: 12.5, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
+              _tilesGrid(context, others, color),
+            ],
           ],
         ],
       ),
+    );
+  }
+
+  Widget _sectionHeader(_Section section) {
+    final color = Color(section.color);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [color.withValues(alpha: 0.18), AC.navy3],
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+        ),
+        border: Border(
+          right: BorderSide(color: color, width: 4),
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(children: [
+        Icon(section.icon, color: color, size: 18),
+        const SizedBox(width: 10),
+        Text(section.title,
+            style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.w900)),
+        const Spacer(),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.20),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text('${section.tiles.length}',
+              style: TextStyle(
+                  color: color,
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.w800,
+                  fontSize: 12)),
+        ),
+      ]),
     );
   }
 
