@@ -70,6 +70,9 @@ import '../screens/operations/customers_list_screen.dart';
 import '../screens/operations/vendors_list_screen.dart';
 import '../screens/operations/invoices_list_screen.dart';
 import '../screens/operations/ar_aging_screen.dart';
+import '../screens/operations/bills_list_screen.dart';
+import '../screens/operations/ap_aging_screen.dart';
+import '../screens/notifications/notifications_panel_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -580,6 +583,9 @@ final appRouter = GoRouter(
     GoRoute(path: '/sales/invoices', pageBuilder: (c, s) => _apexPage(const InvoicesListScreen(), s)),
     GoRoute(path: '/sales/aging', pageBuilder: (c, s) => _apexPage(const ArAgingScreen(), s)),
     GoRoute(path: '/purchase/vendors', pageBuilder: (c, s) => _apexPage(const VendorsListScreen(), s)),
+    GoRoute(path: '/purchase/bills', pageBuilder: (c, s) => _apexPage(const BillsListScreen(), s)),
+    GoRoute(path: '/purchase/aging', pageBuilder: (c, s) => _apexPage(const ApAgingScreen(), s)),
+    GoRoute(path: '/notifications/panel', pageBuilder: (c, s) => _apexPage(const NotificationsPanelScreen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(
