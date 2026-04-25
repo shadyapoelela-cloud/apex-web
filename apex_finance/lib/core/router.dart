@@ -63,6 +63,7 @@ import '../screens/home/today_dashboard_screen.dart';
 import '../screens/operations/customer_360_screen.dart';
 import '../screens/compliance/journal_entry_detail_screen.dart' as je_detail_v2;
 import '../screens/audit/audit_engagement_workspace_screen.dart';
+import '../screens/operations/vendor_360_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -557,6 +558,13 @@ final appRouter = GoRouter(
       path: '/operations/customer-360/:id',
       pageBuilder: (c, s) => _apexPage(
         Customer360Screen(customerId: s.pathParameters['id']!),
+        s,
+      ),
+    ),
+    GoRoute(
+      path: '/operations/vendor-360/:id',
+      pageBuilder: (c, s) => _apexPage(
+        Vendor360Screen(vendorId: s.pathParameters['id']!),
         s,
       ),
     ),
