@@ -100,6 +100,9 @@ import '../screens/settings/bank_feed_setup_screen.dart';
 import '../screens/compliance/activity_log_v2_screen.dart';
 import '../screens/sales/recurring_invoices_screen.dart';
 import '../screens/knowledge/knowledge_search_v2_screen.dart';
+import '../screens/sales/quotes_list_screen.dart';
+import '../screens/sales/credit_memos_screen.dart';
+import '../screens/hr/expense_reports_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -660,6 +663,9 @@ final appRouter = GoRouter(
     GoRoute(path: '/compliance/activity-log-v2', pageBuilder: (c, s) => _apexPage(const ActivityLogV2Screen(), s)),
     GoRoute(path: '/sales/recurring', pageBuilder: (c, s) => _apexPage(const RecurringInvoicesScreen(), s)),
     GoRoute(path: '/knowledge/search', pageBuilder: (c, s) => _apexPage(const KnowledgeSearchV2Screen(), s)),
+    GoRoute(path: '/sales/quotes', pageBuilder: (c, s) => _apexPage(const QuotesListScreen(), s)),
+    GoRoute(path: '/sales/memos', pageBuilder: (c, s) => _apexPage(const CreditMemosScreen(), s)),
+    GoRoute(path: '/hr/expense-reports', pageBuilder: (c, s) => _apexPage(const ExpenseReportsScreen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(
