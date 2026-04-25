@@ -507,9 +507,8 @@ List<V5Service> v5Services = [
           //   3.d الأصول والمخزون
           const V5Chip(id: 'fixed-assets', labelAr: 'الأصول الثابتة', labelEn: 'Fixed Assets', icon: Icons.business_center, phase: ChipPhase.capture, category: 'operations'),
           const V5Chip(id: 'inventory', labelAr: 'المخزون', labelEn: 'Inventory', icon: Icons.inventory_2, phase: ChipPhase.capture, category: 'operations'),
-          //   3.e القيود اليومية
-          const V5Chip(id: 'je-list', labelAr: 'قائمة قيود اليومية', labelEn: 'Journal Entries', icon: Icons.book, phase: ChipPhase.capture, category: 'operations'),
-          const V5Chip(id: 'je-builder', labelAr: 'قيد يومية جديد', labelEn: 'New Journal Entry', icon: Icons.edit_note, phase: ChipPhase.capture, category: 'operations', aiPowered: true),
+          //   3.e القيود اليومية (الشاشة الواحدة تعرض القائمة + الإنشاء + 10 قوالب AI)
+          const V5Chip(id: 'je-builder', labelAr: 'قيود اليومية', labelEn: 'Journal Entries', icon: Icons.edit_note, phase: ChipPhase.capture, category: 'operations', aiPowered: true),
           const V5Chip(id: 'recurring-entries', labelAr: 'القيود الدورية', labelEn: 'Recurring Entries', icon: Icons.repeat, phase: ChipPhase.capture, category: 'operations'),
 
           // ━━━ 4️⃣ Reconciliation Center — مركز المطابقات ━━━
