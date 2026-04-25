@@ -37,6 +37,9 @@ class _ServiceConfig {
   final String? heroRoute;
   final String? heroLabel;
   final String? heroIcon;
+  /// Canonical input → output flow as a list of route paths.
+  /// Each route must exist in [tiles] (used to resolve title/icon).
+  final List<String> flow;
   const _ServiceConfig({
     required this.title,
     required this.subtitle,
@@ -46,6 +49,7 @@ class _ServiceConfig {
     this.heroRoute,
     this.heroLabel,
     this.heroIcon,
+    this.flow = const [],
   });
 }
 
@@ -61,6 +65,7 @@ class ApexServiceHubScreen extends StatelessWidget {
       color: 0xFF4CAF50,
       heroRoute: '/operations/live-sales-cycle',
       heroLabel: 'افتح دورة المبيعات الكاملة',
+      flow: ['/sales/customers', '/sales/quotes', '/sales/invoices', '/sales/aging'],
       tiles: [
         _Tile('العملاء', 'قائمة + Customer 360', '/sales/customers', Icons.people, featured: true),
         _Tile('الفواتير', '5 filters + WhatsApp', '/sales/invoices', Icons.receipt, featured: true),
@@ -78,6 +83,7 @@ class ApexServiceHubScreen extends StatelessWidget {
       color: 0xFF2196F3,
       heroRoute: '/operations/purchase-cycle',
       heroLabel: 'افتح دورة الشراء الكاملة',
+      flow: ['/purchase/vendors', '/purchase/bills', '/purchase/aging'],
       tiles: [
         _Tile('الموردون', 'قائمة + Vendor 360', '/purchase/vendors', Icons.business, featured: true),
         _Tile('فواتير الموردين', 'Bills List + filters', '/purchase/bills', Icons.receipt_outlined, featured: true),
@@ -91,6 +97,7 @@ class ApexServiceHubScreen extends StatelessWidget {
       color: 0xFF9C27B0,
       heroRoute: '/compliance/financial-statements',
       heroLabel: 'افتح ميزان المراجعة (Live)',
+      flow: ['/accounting/coa-v2', '/accounting/je-list', '/compliance/financial-statements', '/operations/period-close'],
       tiles: [
         _Tile('قائمة القيود', 'JE List canonical', '/accounting/je-list', Icons.book, featured: true),
         _Tile('شجرة الحسابات', 'CoA Tree (SOCPA)', '/accounting/coa-v2', Icons.account_tree, featured: true),
@@ -105,6 +112,7 @@ class ApexServiceHubScreen extends StatelessWidget {
       subtitle: 'POS · إيصالات · مخزون · أصول · عهدة',
       icon: Icons.precision_manufacturing,
       color: 0xFFFF5722,
+      flow: ['/receipt/capture', '/pos/quick-sale', '/operations/inventory-v2', '/operations/stock-card'],
       tiles: [
         _Tile('بيع سريع POS', 'Mada/STC/Apple Pay', '/pos/quick-sale', Icons.point_of_sale, featured: true),
         _Tile('التقاط إيصال', 'OCR scaffold', '/receipt/capture', Icons.receipt, featured: true),
@@ -121,6 +129,7 @@ class ApexServiceHubScreen extends StatelessWidget {
       color: 0xFFE91E63,
       heroRoute: '/compliance/tax-calendar',
       heroLabel: 'افتح التقويم الضريبي السعودي',
+      flow: ['/compliance/tax-calendar', '/compliance/zatca-status', '/compliance/vat-return', '/compliance/activity-log-v2'],
       tiles: [
         _Tile('التقويم الضريبي', '7 obligations', '/compliance/tax-calendar', Icons.event, featured: true),
         _Tile('ZATCA Status Center', 'CSID + Queue + Errors', '/compliance/zatca-status', Icons.verified, featured: true),
@@ -141,6 +150,7 @@ class ApexServiceHubScreen extends StatelessWidget {
       color: 0xFF607D8B,
       heroRoute: '/audit/engagements',
       heroLabel: 'افتح Engagement Workspace',
+      flow: ['/audit/workpapers', '/audit/sampling', '/audit/benford', '/audit/engagements'],
       tiles: [
         _Tile('Engagement Workspace', '5 tabs + Evidence Chain', '/audit/engagements', Icons.folder, featured: true),
         _Tile('Benford Analysis', 'تحليل الرقم الأول', '/audit/benford', Icons.bar_chart, featured: true),
@@ -153,6 +163,7 @@ class ApexServiceHubScreen extends StatelessWidget {
       subtitle: 'تدفقات · موازنات · صحة · عملات · ربحية',
       icon: Icons.analytics,
       color: 0xFF00BCD4,
+      flow: ['/analytics/cash-flow-forecast', '/analytics/health-score-v2', '/analytics/budget-builder', '/analytics/budget-variance-v2'],
       tiles: [
         _Tile('توقع التدفق النقدي', '90 يوم + شهور التشغيل', '/analytics/cash-flow-forecast', Icons.show_chart, featured: true),
         _Tile('Health Score', 'Radial gauge — 6 أبعاد', '/analytics/health-score-v2', Icons.health_and_safety, featured: true),
@@ -171,6 +182,7 @@ class ApexServiceHubScreen extends StatelessWidget {
       color: 0xFF8BC34A,
       heroRoute: '/hr/employees',
       heroLabel: 'افتح قائمة الموظفين + Saudization',
+      flow: ['/hr/employees', '/hr/timesheet', '/hr/payroll-run', '/hr/expense-reports'],
       tiles: [
         _Tile('الموظفون', 'مع Saudization tier', '/hr/employees', Icons.badge, featured: true),
         _Tile('تشغيل الرواتب', 'GOSI + Saudization', '/hr/payroll-run', Icons.payments, featured: true),
@@ -183,6 +195,7 @@ class ApexServiceHubScreen extends StatelessWidget {
       subtitle: 'الموافقات · AI · المعرفة · Copilot',
       icon: Icons.account_tree,
       color: 0xFF673AB7,
+      flow: ['/copilot', '/admin/ai-suggestions-v2', '/workflow/approvals', '/knowledge/search'],
       tiles: [
         _Tile('صندوق الموافقات', 'Multi-step queue', '/workflow/approvals', Icons.inbox, featured: true),
         _Tile('اقتراحات AI', 'Confidence-Gated', '/admin/ai-suggestions-v2', Icons.lightbulb_outline, featured: true),
@@ -195,6 +208,7 @@ class ApexServiceHubScreen extends StatelessWidget {
       subtitle: 'الحساب · الكيان · التكاملات · البنوك',
       icon: Icons.settings,
       color: 0xFF795548,
+      flow: ['/onboarding', '/settings/unified', '/settings/bank-feeds'],
       tiles: [
         _Tile('الإعدادات الموحّدة', '5 sections', '/settings/unified', Icons.tune, featured: true),
         _Tile('ربط البنوك', '11 بنك سعودي', '/settings/bank-feeds', Icons.account_balance, featured: true),
@@ -237,6 +251,10 @@ class ApexServiceHubScreen extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         children: [
           _heroCard(context, config, color),
+          if (config.flow.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            _flowChain(context, config, color),
+          ],
           if (featured.isNotEmpty) ...[
             const SizedBox(height: 16),
             Text('الأكثر استخداماً',
@@ -307,6 +325,76 @@ class ApexServiceHubScreen extends StatelessWidget {
                 backgroundColor: color, foregroundColor: Colors.white),
           ),
         ],
+      ]),
+    );
+  }
+
+  /// Visualizes the canonical input → output flow for the service.
+  /// Each step is a clickable chip; arrows separate them.
+  Widget _flowChain(BuildContext context, _ServiceConfig config, Color color) {
+    final steps = <Widget>[];
+    for (var i = 0; i < config.flow.length; i++) {
+      final route = config.flow[i];
+      final tile = config.tiles.firstWhere(
+        (t) => t.route == route,
+        orElse: () => _Tile(route, '', route, Icons.circle_outlined),
+      );
+      final isFirst = i == 0;
+      final isLast = i == config.flow.length - 1;
+      final stageLabel = isFirst ? 'مدخلات' : (isLast ? 'مخرجات' : 'معالجة');
+      final stageColor = isFirst
+          ? const Color(0xFF4CAF50)
+          : (isLast ? const Color(0xFFFFC107) : color);
+      steps.add(InkWell(
+        onTap: () => context.go(route),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: AC.navy2,
+            border: Border.all(color: stageColor.withValues(alpha: 0.5)),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(tile.icon, color: stageColor, size: 14),
+              const SizedBox(width: 6),
+              Text(tile.title,
+                  style: TextStyle(color: AC.tp, fontSize: 11.5, fontWeight: FontWeight.w800)),
+            ]),
+            const SizedBox(height: 2),
+            Text(stageLabel,
+                style: TextStyle(color: stageColor, fontSize: 9.5, fontWeight: FontWeight.w700)),
+          ]),
+        ),
+      ));
+      if (!isLast) {
+        steps.add(Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Icon(Icons.arrow_back, color: color.withValues(alpha: 0.6), size: 16),
+        ));
+      }
+    }
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AC.navy3,
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(Icons.timeline, color: color, size: 14),
+          const SizedBox(width: 6),
+          Text('تدفق العمل — المدخلات تربط بالمخرجات',
+              style: TextStyle(color: color, fontSize: 11.5, fontWeight: FontWeight.w800)),
+        ]),
+        const SizedBox(height: 8),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          reverse: true,
+          child: Row(children: steps),
+        ),
       ]),
     );
   }
