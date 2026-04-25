@@ -179,6 +179,22 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/accounting/coa-v2'),
     ),
     ApexCommand(
+      id: 'nav_multi_currency_v2',
+      label: 'متابعة العملات الأجنبية',
+      subtitle: 'FX exposure + AR/AP per currency + hedging tips',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.currency_exchange,
+      onRun: (_) => go('/analytics/multi-currency-v2'),
+    ),
+    ApexCommand(
+      id: 'nav_health_score_v2',
+      label: 'Health Score',
+      subtitle: '6 أبعاد: السيولة/الربحية/الكفاءة/الرافعة/النمو/الامتثال',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.health_and_safety_outlined,
+      onRun: (_) => go('/analytics/health-score-v2'),
+    ),
+    ApexCommand(
       id: 'nav_inventory_v2',
       label: 'المخزون (FIFO/LIFO/WAC)',
       subtitle: 'تقييم + توافر + low/out',
