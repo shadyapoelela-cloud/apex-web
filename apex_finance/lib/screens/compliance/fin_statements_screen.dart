@@ -95,6 +95,64 @@ class _FinStatementsScreenState extends State<FinStatementsScreen>
     }).toList(),
   };
 
+  /// Asks Claude to interpret a single TB row in plain Arabic — what
+  /// drove the balance, what's normal vs unusual, and one suggested action.
+  Future<void> _explainAccountAi(Map row, double balance) async {
+    showDialog(
+      context: context,
+      builder: (c) => AlertDialog(
+        backgroundColor: AC.navy2,
+        content: Row(mainAxisSize: MainAxisSize.min, children: [
+          CircularProgressIndicator(color: AC.gold),
+          const SizedBox(width: 12),
+          Text('جارٍ تحليل الحساب…', style: TextStyle(color: AC.tp)),
+        ]),
+      ),
+    );
+    final prompt = '''حساب رقم ${row['code']} — ${row['name_ar']} (${row['category']})
+الرصيد: ${balance.toStringAsFixed(2)} ريال
+المدين: ${row['total_debit']} · الدائن: ${row['total_credit']}
+الطبيعة: ${row['normal_balance']}
+
+اشرح ماذا يعني هذا الرصيد بالعربية في 2-3 جمل قصيرة، ثم اقترح إجراءً محدداً واحداً يجب على المالك القيام به. لا مقدمات، لا قوائم.''';
+    final res = await ApiService.aiAsk(prompt, maxTurns: 1);
+    if (!mounted) return;
+    Navigator.of(context).pop(); // dismiss loader
+    final answer = res.success && res.data is Map
+        ? ((res.data as Map)['answer'] ?? (res.data as Map)['response'] ?? (res.data as Map)['text'] ?? '').toString()
+        : '';
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (c) => AlertDialog(
+        backgroundColor: AC.navy2,
+        title: Row(children: [
+          Icon(Icons.psychology, color: AC.gold),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text('${row['code']} — ${row['name_ar']}',
+                style: TextStyle(color: AC.gold, fontSize: 14)),
+          ),
+        ]),
+        content: SizedBox(
+          width: 420,
+          child: Text(
+            answer.isEmpty
+                ? (res.error ?? 'لم يستطع الذكاء الاصطناعي تقديم تحليل')
+                : answer,
+            style: TextStyle(color: AC.tp, fontSize: 13, height: 1.5),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(c),
+            child: Text('إغلاق', style: TextStyle(color: AC.gold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Pull TB + IS + BS directly from the active entity (not from manual input).
   /// Uses S.savedEntityId set during onboarding.
   Future<void> _generateFromLiveEntity() async {
@@ -385,7 +443,14 @@ class _FinStatementsScreenState extends State<FinStatementsScreen>
                     style: TextStyle(
                         color: isDr ? AC.ok : AC.warn,
                         fontFamily: 'monospace', fontSize: 12, fontWeight: FontWeight.w700)),
-                const SizedBox(width: 6),
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: Icon(Icons.psychology_outlined, color: AC.gold, size: 14),
+                  tooltip: 'اسأل الذكاء عن هذا الحساب',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  onPressed: () => _explainAccountAi(m, balance),
+                ),
                 Icon(Icons.chevron_left, color: AC.ts, size: 14),
               ]),
             ),

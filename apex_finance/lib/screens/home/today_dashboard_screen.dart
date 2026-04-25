@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api_service.dart';
+import '../../core/hijri_date.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 
@@ -306,6 +307,8 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  _dateHeader(),
+                  const SizedBox(height: 12),
                   _aiPulseCard(),
                   const SizedBox(height: 16),
                   _kpiGrid(),
@@ -338,6 +341,37 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
           ]),
         ),
       );
+
+  Widget _dateHeader() {
+    final now = DateTime.now();
+    final hijri = HijriDate.fromGregorian(now);
+    const arabicWeekdays = [
+      'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس',
+      'الجمعة', 'السبت', 'الأحد',
+    ];
+    final weekday = arabicWeekdays[(now.weekday - 1).clamp(0, 6)];
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AC.navy3,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AC.bdr),
+      ),
+      child: Row(children: [
+        Icon(Icons.calendar_today_outlined, color: AC.gold, size: 16),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(weekday, style: TextStyle(color: AC.ts, fontSize: 11)),
+            Text(
+              '${now.year}/${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')} م · ${hijri.formatLong()}',
+              style: TextStyle(color: AC.tp, fontSize: 12.5, fontWeight: FontWeight.w600),
+            ),
+          ]),
+        ),
+      ]),
+    );
+  }
 
   Widget _aiPulseCard() {
     final text = _aiPulseRemote ?? (_loading ? 'جارٍ تحديث المؤشرات…' : _aiPulse());

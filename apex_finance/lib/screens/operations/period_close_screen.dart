@@ -8,6 +8,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../api_service.dart';
+import '../../core/session.dart';
 import '../../core/theme.dart';
 
 class PeriodCloseScreen extends StatefulWidget {
@@ -26,6 +27,17 @@ class _PeriodCloseScreenState extends State<PeriodCloseScreen> {
   String? _error;
   List<Map<String, dynamic>> _closes = [];
   Map<String, dynamic>? _active;
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-fill scope from active session.
+    if (S.savedTenantId != null) _tenantCtl.text = S.savedTenantId!;
+    if (S.savedEntityId != null) _entityCtl.text = S.savedEntityId!;
+    if (S.savedTenantId != null || S.savedEntityId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _loadList());
+    }
+  }
 
   @override
   void dispose() {
