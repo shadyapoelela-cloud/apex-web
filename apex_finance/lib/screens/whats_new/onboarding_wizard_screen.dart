@@ -144,7 +144,7 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
         backgroundColor: AC.ok,
       ),
     );
-    context.go('/operations/live-sales-cycle');
+    context.go('/today');
   }
 
   void _back() {
