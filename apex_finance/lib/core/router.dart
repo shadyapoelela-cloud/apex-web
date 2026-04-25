@@ -60,6 +60,7 @@ import '../screens/operations/purchase_cycle_screen.dart';
 import '../screens/operations/consolidation_ui_screen.dart';
 import '../screens/operations/live_sales_cycle_screen.dart';
 import '../screens/home/today_dashboard_screen.dart';
+import '../screens/operations/customer_360_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -520,6 +521,13 @@ final appRouter = GoRouter(
     GoRoute(path: '/operations/consolidation-ui', pageBuilder: (c, s) => _apexPage(const ConsolidationUiScreen(), s)),
     GoRoute(path: '/operations/live-sales-cycle', pageBuilder: (c, s) => _apexPage(const LiveSalesCycleScreen(), s)),
     GoRoute(path: '/today', pageBuilder: (c, s) => _apexPage(const TodayDashboardScreen(), s)),
+    GoRoute(
+      path: '/operations/customer-360/:id',
+      pageBuilder: (c, s) => _apexPage(
+        Customer360Screen(customerId: s.pathParameters['id']!),
+        s,
+      ),
+    ),
 
     // ─── COA Workflow ───
     GoRoute(path: '/upload', pageBuilder: (c, s) => _apexPage(const UploadScreen(), s)),

@@ -31,6 +31,8 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
   Map<String, dynamic>? _bs;
   Map<String, dynamic>? _is;
   List<Map<String, dynamic>> _invoices = [];
+  String? _aiPulseRemote;
+  bool _aiPulseLoading = false;
 
   @override
   void initState() {
@@ -44,6 +46,7 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
     setState(() {
       _loading = true;
       _error = null;
+      _aiPulseRemote = null;
     });
     final today = DateTime.now();
     String fmt(DateTime d) =>
@@ -61,6 +64,37 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
       if (results[1].success && results[1].data is Map) _is = results[1].data as Map<String, dynamic>;
       if (results[2].success && results[2].data is List) {
         _invoices = (results[2].data as List).cast<Map<String, dynamic>>();
+      }
+    });
+    // Fire-and-forget: ask Claude for an Arabic 1-line variance commentary.
+    _fetchAiPulse();
+  }
+
+  /// Calls /api/v1/ai/ask with a structured prompt feeding the live KPIs.
+  /// No tool calls needed — Claude just composes a single-line summary.
+  /// Falls back silently to the local heuristic if the call errors out.
+  Future<void> _fetchAiPulse() async {
+    if (_aiPulseLoading) return;
+    setState(() => _aiPulseLoading = true);
+    final prompt = '''بناءً على هذه المؤشرات:
+- النقد + الأصول: ${_cash.toStringAsFixed(0)} ريال
+- صافي الدخل (السنة حتى الآن): ${_netIncome.toStringAsFixed(0)} ريال
+- إجمالي الإيرادات: ${_revenue.toStringAsFixed(0)} ريال
+- إجمالي المصاريف: ${_expense.toStringAsFixed(0)} ريال
+- الذمم غير المُحصّلة: ${_outstandingAR.toStringAsFixed(0)} ريال
+- عدد فواتير اليوم: $_todayInvoicesCount
+- إجمالي الفواتير: ${_invoices.length}
+
+اكتب جملة عربية واحدة (≤25 كلمة) تلخّص الأداء وتقترح إجراءً واحداً ملموساً. لا مقدمات، لا قوائم، فقط جملة واحدة مباشرة.''';
+    final res = await ApiService.aiAsk(prompt, maxTurns: 1);
+    if (!mounted) return;
+    setState(() {
+      _aiPulseLoading = false;
+      if (res.success && res.data is Map) {
+        final answer = (res.data as Map)['answer'] ?? (res.data as Map)['response'] ?? (res.data as Map)['text'];
+        if (answer is String && answer.trim().isNotEmpty) {
+          _aiPulseRemote = answer.trim();
+        }
       }
     });
   }
@@ -151,28 +185,54 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
         ),
       );
 
-  Widget _aiPulseCard() => Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AC.gold.withValues(alpha: 0.18), AC.navy3],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-          ),
-          border: Border.all(color: AC.gold.withValues(alpha: 0.4)),
-          borderRadius: BorderRadius.circular(12),
+  Widget _aiPulseCard() {
+    final text = _aiPulseRemote ?? (_loading ? 'جارٍ تحديث المؤشرات…' : _aiPulse());
+    final isLive = _aiPulseRemote != null;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AC.gold.withValues(alpha: 0.18), AC.navy3],
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
         ),
-        child: Row(children: [
-          Icon(Icons.auto_awesome, color: AC.gold, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              _loading ? 'جارٍ تحديث المؤشرات…' : _aiPulse(),
-              style: TextStyle(color: AC.tp, fontSize: 13.5, fontWeight: FontWeight.w600),
-            ),
+        border: Border.all(color: AC.gold.withValues(alpha: 0.4)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(children: [
+        Icon(Icons.auto_awesome, color: AC.gold, size: 20),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(children: [
+                Text(isLive ? 'تعليق الذكاء الاصطناعي' : 'مؤشر سريع',
+                    style: TextStyle(
+                        color: AC.gold,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3)),
+                if (_aiPulseLoading) ...[
+                  const SizedBox(width: 6),
+                  SizedBox(
+                    width: 9, height: 9,
+                    child: CircularProgressIndicator(strokeWidth: 1.5, color: AC.gold),
+                  ),
+                ],
+              ]),
+              const SizedBox(height: 3),
+              Text(
+                text,
+                style: TextStyle(color: AC.tp, fontSize: 13.5, fontWeight: FontWeight.w600),
+              ),
+            ],
           ),
-        ]),
-      );
+        ),
+      ]),
+    );
+  }
 
   Widget _kpiGrid() {
     final cards = [

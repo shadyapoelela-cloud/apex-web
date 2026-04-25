@@ -357,6 +357,13 @@ class _LiveSalesCycleScreenState extends State<LiveSalesCycleScreen> {
                   if (c['vat_number'] != null)
                     Text('${c['vat_number']}',
                         style: TextStyle(color: AC.ts, fontSize: 10, fontFamily: 'monospace')),
+                  IconButton(
+                    icon: Icon(Icons.open_in_new, color: AC.gold, size: 14),
+                    tooltip: 'ملف العميل (Customer 360)',
+                    onPressed: () => context.go('/operations/customer-360/${c['id']}'),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  ),
                 ]),
               ),
             );
