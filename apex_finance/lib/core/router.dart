@@ -238,6 +238,19 @@ final appRouter = GoRouter(
   initialLocation: '/app',
   // redirect: disabled for now - auth handled in login screen,
     routes: [
+    // ── New IA aliases (Blueprint v1.0) — registered BEFORE v5/v4 ──
+    // so /sales /purchase /accounting /audit win over any catch-all
+    // patterns the older shells might have. These are simple redirects
+    // and forward into the canonical screens registered later in this
+    // routes list.
+    GoRoute(path: '/sales', redirect: (c, s) => '/operations/live-sales-cycle'),
+    GoRoute(path: '/purchase', redirect: (c, s) => '/operations/purchase-cycle'),
+    GoRoute(path: '/accounting', redirect: (c, s) => '/compliance/journal-entries'),
+    GoRoute(path: '/audit', redirect: (c, s) => '/audit/engagements'),
+    GoRoute(path: '/setup', redirect: (c, s) => '/settings/entities'),
+    GoRoute(path: '/reports', pageBuilder: (c, s) => _apexPage(const ReportsHubScreen(), s)),
+    GoRoute(path: '/today', pageBuilder: (c, s) => _apexPage(const TodayDashboardScreen(), s)),
+
     // ── V5.1 shell (16-app ERP + Cmd+K palette + Entity Scope) ──
     // Registered FIRST so /app/* routes win over legacy paths.
     ...v5Routes(),
@@ -586,17 +599,12 @@ final appRouter = GoRouter(
     GoRoute(path: '/operations/purchase-cycle', pageBuilder: (c, s) => _apexPage(const PurchaseCycleScreen(), s)),
     GoRoute(path: '/operations/consolidation-ui', pageBuilder: (c, s) => _apexPage(const ConsolidationUiScreen(), s)),
     GoRoute(path: '/operations/live-sales-cycle', pageBuilder: (c, s) => _apexPage(const LiveSalesCycleScreen(), s)),
-    GoRoute(path: '/today', pageBuilder: (c, s) => _apexPage(const TodayDashboardScreen(), s)),
-    // ─── New IA top-level aliases (blueprint v1.0) ───────────────────────
-    GoRoute(path: '/sales', redirect: (c, s) => '/operations/live-sales-cycle'),
-    GoRoute(path: '/purchase', redirect: (c, s) => '/operations/purchase-cycle'),
-    GoRoute(path: '/accounting', redirect: (c, s) => '/compliance/journal-entries'),
+    // /today and /sales etc. moved to top of routes list — see above
     GoRoute(path: '/accounting/coa', redirect: (c, s) => '/coa-tree'),
     GoRoute(path: '/accounting/journal-entries', redirect: (c, s) => '/compliance/journal-entries'),
     GoRoute(path: '/accounting/trial-balance', redirect: (c, s) => '/compliance/financial-statements'),
     GoRoute(path: '/accounting/period-close', redirect: (c, s) => '/operations/period-close'),
     GoRoute(path: '/financial-statements', redirect: (c, s) => '/compliance/financial-statements'),
-    GoRoute(path: '/audit', redirect: (c, s) => '/audit/engagements'),
     GoRoute(path: '/audit/engagements', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
     GoRoute(path: '/audit/engagement-workspace', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
     GoRoute(path: '/audit/benford', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
@@ -649,7 +657,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/hr/employees', pageBuilder: (c, s) => _apexPage(const EmployeesListScreen(), s)),
     GoRoute(path: '/hr', redirect: (c, s) => '/hr/employees'),
     GoRoute(path: '/accounting/bank-rec-v2', pageBuilder: (c, s) => _apexPage(const BankRecV2Screen(), s)),
-    GoRoute(path: '/reports', pageBuilder: (c, s) => _apexPage(const ReportsHubScreen(), s)),
+    // /reports moved to top of routes list — see above
     GoRoute(path: '/reports/hub', redirect: (c, s) => '/reports'),
     GoRoute(
       path: '/compliance/zatca-invoice/:id',
