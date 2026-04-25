@@ -179,6 +179,22 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/accounting/coa-v2'),
     ),
     ApexCommand(
+      id: 'nav_consolidation_v2',
+      label: 'التوحيد المحاسبي (IFRS 10)',
+      subtitle: 'كيانات + استبعادات + إيرادات موحّدة',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.layers,
+      onRun: (_) => go('/compliance/consolidation-v2'),
+    ),
+    ApexCommand(
+      id: 'nav_ai_suggestions_v2',
+      label: 'صندوق اقتراحات AI',
+      subtitle: 'Confidence-Gated Autopilot review queue',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.lightbulb_outline,
+      onRun: (_) => go('/admin/ai-suggestions-v2'),
+    ),
+    ApexCommand(
       id: 'nav_lease_v2',
       label: 'IFRS 16 — جدول الإيجار',
       subtitle: 'ROU + التزام + جدول إهلاك',
