@@ -90,6 +90,8 @@ import '../screens/operations/fixed_assets_v2_screen.dart';
 import '../screens/analytics/budget_variance_v2_screen.dart';
 import '../screens/analytics/multi_currency_v2_screen.dart';
 import '../screens/analytics/health_score_v2_screen.dart';
+import '../screens/compliance/lease_schedule_v2_screen.dart';
+import '../screens/compliance/zatca_status_center_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -640,6 +642,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/analytics/budget-variance-v2', pageBuilder: (c, s) => _apexPage(const BudgetVarianceV2Screen(), s)),
     GoRoute(path: '/analytics/multi-currency-v2', pageBuilder: (c, s) => _apexPage(const MultiCurrencyV2Screen(), s)),
     GoRoute(path: '/analytics/health-score-v2', pageBuilder: (c, s) => _apexPage(const HealthScoreV2Screen(), s)),
+    GoRoute(path: '/compliance/lease-v2', pageBuilder: (c, s) => _apexPage(const LeaseScheduleV2Screen(), s)),
+    GoRoute(path: '/compliance/zatca-status', pageBuilder: (c, s) => _apexPage(const ZatcaStatusCenterScreen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(

@@ -179,6 +179,22 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/accounting/coa-v2'),
     ),
     ApexCommand(
+      id: 'nav_lease_v2',
+      label: 'IFRS 16 — جدول الإيجار',
+      subtitle: 'ROU + التزام + جدول إهلاك',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.apartment,
+      onRun: (_) => go('/compliance/lease-v2'),
+    ),
+    ApexCommand(
+      id: 'nav_zatca_status',
+      label: 'مركز ZATCA',
+      subtitle: 'CSID + Queue + Errors',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.verified_user_outlined,
+      onRun: (_) => go('/compliance/zatca-status'),
+    ),
+    ApexCommand(
       id: 'nav_multi_currency_v2',
       label: 'متابعة العملات الأجنبية',
       subtitle: 'FX exposure + AR/AP per currency + hedging tips',
