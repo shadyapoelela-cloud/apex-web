@@ -29,7 +29,7 @@ import '../../screens/v4_ai/ai_agents_gallery_screen.dart';
 import '../../screens/v4_compliance/aml_kyc_screen.dart';
 import '../../screens/v4_compliance/audit_analytics_screen.dart';
 import '../../screens/v4_compliance/audit_reporting_screen.dart';
-import '../../screens/compliance/consolidation_screen.dart';
+import '../../screens/compliance/consolidation_v2_screen.dart';
 import '../../screens/compliance/depreciation_screen.dart';
 import '../../screens/v4_compliance/tax_filing_center_screen.dart';
 import '../../screens/v4_compliance/zatca_csid_manager_screen.dart';
@@ -264,7 +264,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/company-settings': (ctx) => const CompanySettingsScreen(),  // LIVE alias
 
   // ── 1.2 Consolidation ────────────────────────────────────────────
-  'erp/consolidation/consolidation': (ctx) => const ConsolidationScreen(),
+  'erp/consolidation/consolidation': (ctx) => const ConsolidationV2Screen(),
   'erp/consolidation/intercompany': (ctx) => const IntercompanyScreen(),
   'erp/consolidation/cap-table': (ctx) => const CapTableScreen(),
   'erp/consolidation/board': (ctx) => const BoardPackScreen(),
@@ -625,7 +625,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/credit-notes': (ctx) => const CreditNotesScreen(),
   'erp/finance/subscription-billing': (ctx) => const SubscriptionBillingScreen(),
   'erp/finance/credit': (ctx) => const CreditScoringScreen(),
-  'erp/finance/consolidation': (ctx) => const ConsolidationScreen(),
+  'erp/finance/consolidation': (ctx) => const ConsolidationV2Screen(),
   'erp/finance/intercompany': (ctx) => const IntercompanyScreen(),
   'erp/finance/cap-table': (ctx) => const CapTableScreen(),
   'erp/finance/board': (ctx) => const BoardPackScreen(),

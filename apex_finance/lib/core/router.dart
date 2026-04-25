@@ -40,11 +40,11 @@ import '../screens/admin/admin_sub_screens.dart' show ReviewerConsoleScreen, Pro
 import '../screens/admin/ai_suggestions_inbox_screen.dart';
 import '../screens/admin/ai_console_screen.dart';
 import '../screens/compliance/tax_timeline_screen.dart';
-import '../screens/compliance/bank_rec_ai_screen.dart';
+// import '../screens/compliance/bank_rec_ai_screen.dart'; // deduplicated → /accounting/bank-rec-v2
 import '../screens/compliance/audit_workflow_screen.dart' show AiAuditWorkflowScreen;
 import '../screens/compliance/islamic_finance_screen.dart';
 // import '../screens/compliance/depreciation_ai_screen.dart';  // redirects to existing /compliance/depreciation
-import '../screens/compliance/multi_currency_screen.dart';
+// import '../screens/compliance/multi_currency_screen.dart'; // deduplicated → /analytics/multi-currency-v2
 import '../screens/onboarding/onboarding_wizard_screen.dart' as onboarding_ai;
 import '../screens/admin/audit_chain_viewer_screen.dart';
 // Operations duplicates kept as files for reference but unmounted —
@@ -140,7 +140,7 @@ import '../screens/simulation/roadmap_screen.dart';
 import '../screens/simulation/trial_balance_screen.dart';
 import '../tb_binding_screen.dart';
 import '../financial_statements_screen.dart';
-import '../screens/compliance/journal_entries_screen.dart';
+// import '../screens/compliance/journal_entries_screen.dart'; // deduplicated → /accounting/je-list
 import '../screens/compliance/audit_trail_screen.dart';
 import '../screens/compliance/zatca_invoice_builder_screen.dart';
 import '../screens/compliance/compliance_hub_screen.dart';
@@ -153,27 +153,28 @@ import '../screens/compliance/amortization_screen.dart';
 import '../screens/compliance/payroll_screen.dart';
 import '../screens/compliance/breakeven_screen.dart';
 import '../screens/compliance/investment_screen.dart';
-import '../screens/compliance/budget_variance_screen.dart';
-import '../screens/compliance/bank_rec_screen.dart';
-import '../screens/compliance/inventory_screen.dart';
-import '../screens/compliance/aging_screen.dart';
+// Legacy screens deduplicated to canonical paths (Phase 26):
+// import '../screens/compliance/budget_variance_screen.dart'; // → /analytics/budget-variance-v2
+// import '../screens/compliance/bank_rec_screen.dart';        // → /accounting/bank-rec-v2
+// import '../screens/compliance/inventory_screen.dart';       // → /operations/inventory-v2
+// import '../screens/compliance/aging_screen.dart';           // → /sales/aging
 import '../screens/compliance/working_capital_screen.dart';
-import '../screens/compliance/health_score_screen.dart';
+// import '../screens/compliance/health_score_screen.dart'; // deduplicated → /analytics/health-score-v2
 import '../screens/compliance/executive_dashboard_screen.dart';
 import '../screens/compliance/ocr_screen.dart';
 import '../screens/compliance/dscr_screen.dart';
 import '../screens/compliance/valuation_screen.dart';
 import '../screens/compliance/journal_entry_builder_screen.dart';
 import '../screens/compliance/fx_converter_screen.dart';
-import '../screens/compliance/cost_variance_screen.dart';
+// import '../screens/compliance/cost_variance_screen.dart'; // deduplicated → /analytics/cost-variance-v2
 import '../screens/compliance/fin_statements_screen.dart';
 import '../screens/compliance/cashflow_statement_screen.dart';
-import '../screens/compliance/wht_screen.dart';
-import '../screens/compliance/consolidation_screen.dart';
+// import '../screens/compliance/wht_screen.dart';         // deduplicated → /compliance/wht-v2
+// import '../screens/compliance/consolidation_screen.dart'; // deduplicated → /compliance/consolidation-v2
 import '../screens/compliance/deferred_tax_screen.dart';
-import '../screens/compliance/lease_screen.dart';
+// import '../screens/compliance/lease_screen.dart'; // deduplicated → /compliance/lease-v2
 import '../screens/compliance/ifrs_tools_screen.dart';
-import '../screens/compliance/fixed_assets_screen.dart';
+// import '../screens/compliance/fixed_assets_screen.dart'; // deduplicated → /operations/fixed-assets-v2
 import '../screens/compliance/transfer_pricing_screen.dart';
 import '../screens/compliance/extras_tools_screen.dart';
 import 'package:file_picker/file_picker.dart';
@@ -382,10 +383,8 @@ final appRouter = GoRouter(
       path: '/compliance',
       pageBuilder: (c, s) => _apexPage(const ComplianceHubScreen(), s),
     ),
-    GoRoute(
-      path: '/compliance/journal-entries',
-      pageBuilder: (c, s) => _apexPage(const JournalEntriesScreen(), s),
-    ),
+    // Legacy → canonical (Phase 26 dedup)
+    GoRoute(path: '/compliance/journal-entries', redirect: (c, s) => '/accounting/je-list'),
     GoRoute(
       path: '/compliance/audit-trail',
       pageBuilder: (c, s) => _apexPage(const AuditTrailScreen(), s),
@@ -430,30 +429,15 @@ final appRouter = GoRouter(
       path: '/compliance/investment',
       pageBuilder: (c, s) => _apexPage(const InvestmentScreen(), s),
     ),
-    GoRoute(
-      path: '/compliance/budget-variance',
-      pageBuilder: (c, s) => _apexPage(const BudgetVarianceScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/bank-rec',
-      pageBuilder: (c, s) => _apexPage(const BankRecScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/inventory',
-      pageBuilder: (c, s) => _apexPage(const InventoryScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/aging',
-      pageBuilder: (c, s) => _apexPage(const AgingScreen(), s),
-    ),
+    GoRoute(path: '/compliance/budget-variance', redirect: (c, s) => '/analytics/budget-variance-v2'),
+    GoRoute(path: '/compliance/bank-rec', redirect: (c, s) => '/accounting/bank-rec-v2'),
+    GoRoute(path: '/compliance/inventory', redirect: (c, s) => '/operations/inventory-v2'),
+    GoRoute(path: '/compliance/aging', redirect: (c, s) => '/sales/aging'),
     GoRoute(
       path: '/compliance/working-capital',
       pageBuilder: (c, s) => _apexPage(const WorkingCapitalScreen(), s),
     ),
-    GoRoute(
-      path: '/compliance/health-score',
-      pageBuilder: (c, s) => _apexPage(const HealthScoreScreen(), s),
-    ),
+    GoRoute(path: '/compliance/health-score', redirect: (c, s) => '/analytics/health-score-v2'),
     GoRoute(
       path: '/compliance/executive',
       pageBuilder: (c, s) => _apexPage(const ExecutiveDashboardScreen(), s),
@@ -478,10 +462,7 @@ final appRouter = GoRouter(
       path: '/compliance/fx-converter',
       pageBuilder: (c, s) => _apexPage(const FxConverterScreen(), s),
     ),
-    GoRoute(
-      path: '/compliance/cost-variance',
-      pageBuilder: (c, s) => _apexPage(const CostVarianceScreen(), s),
-    ),
+    GoRoute(path: '/compliance/cost-variance', redirect: (c, s) => '/analytics/cost-variance-v2'),
     GoRoute(
       path: '/compliance/financial-statements',
       pageBuilder: (c, s) => _apexPage(const FinStatementsScreen(), s),
@@ -490,30 +471,18 @@ final appRouter = GoRouter(
       path: '/compliance/cashflow-statement',
       pageBuilder: (c, s) => _apexPage(const CashflowStatementScreen(), s),
     ),
-    GoRoute(
-      path: '/compliance/wht',
-      pageBuilder: (c, s) => _apexPage(const WhtScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/consolidation',
-      pageBuilder: (c, s) => _apexPage(const ConsolidationScreen(), s),
-    ),
+    GoRoute(path: '/compliance/wht', redirect: (c, s) => '/compliance/wht-v2'),
+    GoRoute(path: '/compliance/consolidation', redirect: (c, s) => '/compliance/consolidation-v2'),
     GoRoute(
       path: '/compliance/deferred-tax',
       pageBuilder: (c, s) => _apexPage(const DeferredTaxScreen(), s),
     ),
-    GoRoute(
-      path: '/compliance/lease',
-      pageBuilder: (c, s) => _apexPage(const LeaseScreen(), s),
-    ),
+    GoRoute(path: '/compliance/lease', redirect: (c, s) => '/compliance/lease-v2'),
     GoRoute(
       path: '/compliance/ifrs-tools',
       pageBuilder: (c, s) => _apexPage(const IfrsToolsScreen(), s),
     ),
-    GoRoute(
-      path: '/compliance/fixed-assets',
-      pageBuilder: (c, s) => _apexPage(const FixedAssetsScreen(), s),
-    ),
+    GoRoute(path: '/compliance/fixed-assets', redirect: (c, s) => '/operations/fixed-assets-v2'),
     GoRoute(
       path: '/compliance/transfer-pricing',
       pageBuilder: (c, s) => _apexPage(const TransferPricingScreen(), s),
@@ -579,13 +548,13 @@ final appRouter = GoRouter(
     GoRoute(path: '/admin/ai-suggestions', pageBuilder: (c, s) => _apexPage(const AiSuggestionsInboxScreen(), s)),
     GoRoute(path: '/admin/ai-console', pageBuilder: (c, s) => _apexPage(const AiConsoleScreen(), s)),
     GoRoute(path: '/compliance/tax-timeline', pageBuilder: (c, s) => _apexPage(const TaxTimelineScreen(), s)),
-    GoRoute(path: '/compliance/bank-rec-ai', pageBuilder: (c, s) => _apexPage(const BankRecAiScreen(), s)),
+    GoRoute(path: '/compliance/bank-rec-ai', redirect: (c, s) => '/accounting/bank-rec-v2'),
     GoRoute(path: '/compliance/audit-workflow-ai', pageBuilder: (c, s) => _apexPage(const AiAuditWorkflowScreen(), s)),
     GoRoute(path: '/compliance/islamic-finance', pageBuilder: (c, s) => _apexPage(const IslamicFinanceScreen(), s)),
     // ── My new "AI-assisted" depreciation was a duplicate — redirect to the
     //    pre-existing /compliance/depreciation + /compliance/fixed-assets screens.
     GoRoute(path: '/compliance/depreciation-ai', redirect: (c, s) => '/compliance/depreciation'),
-    GoRoute(path: '/compliance/multi-currency', pageBuilder: (c, s) => _apexPage(const MultiCurrencyScreen(), s)),
+    GoRoute(path: '/compliance/multi-currency', redirect: (c, s) => '/analytics/multi-currency-v2'),
     GoRoute(path: '/onboarding/wizard', pageBuilder: (c, s) => _apexPage(const onboarding_ai.OnboardingWizardScreen(), s)),
     GoRoute(path: '/admin/audit-chain', pageBuilder: (c, s) => _apexPage(const AuditChainViewerScreen(), s)),
     // ── Operations routes redirect to pre-existing screens (avoid duplication) ──
