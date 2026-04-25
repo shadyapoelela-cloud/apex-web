@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class ReportsHubScreen extends StatelessWidget {
   const ReportsHubScreen({super.key});
@@ -107,8 +108,18 @@ class ReportsHubScreen extends StatelessWidget {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(14),
-        itemCount: _sections.length,
-        itemBuilder: (_, i) => _sectionCard(_sections[i], context),
+        itemCount: _sections.length + 1,
+        itemBuilder: (_, i) {
+          if (i == _sections.length) {
+            return const ApexOutputChips(items: [
+              ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+              ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+              ApexChipLink('Health Score', '/analytics/health-score-v2', Icons.health_and_safety),
+              ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),
+            ]);
+          }
+          return _sectionCard(_sections[i], context);
+        },
       ),
     );
   }

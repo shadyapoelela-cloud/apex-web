@@ -19,6 +19,7 @@ import '../../api_service.dart';
 import '../../core/apex_whatsapp_share.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class Customer360Screen extends StatefulWidget {
   final String customerId;
@@ -117,6 +118,12 @@ class _Customer360ScreenState extends State<Customer360Screen> {
                       _kpiRow(),
                       const SizedBox(height: 12),
                       _invoicesCard(),
+                      const ApexOutputChips(items: [
+                        ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
+                        ApexChipLink('عروض الأسعار', '/sales/quotes', Icons.description),
+                        ApexChipLink('أعمار AR', '/sales/aging', Icons.timeline),
+                        ApexChipLink('قائمة العملاء', '/sales/customers', Icons.people),
+                      ]),
                     ]),
                   ),
                 ),

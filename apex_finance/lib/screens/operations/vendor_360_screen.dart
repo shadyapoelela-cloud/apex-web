@@ -13,6 +13,7 @@ import '../../api_service.dart';
 import '../../core/apex_whatsapp_share.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class Vendor360Screen extends StatefulWidget {
   final String vendorId;
@@ -108,6 +109,12 @@ class _Vendor360ScreenState extends State<Vendor360Screen> {
                       _kpiRow(),
                       const SizedBox(height: 12),
                       _billsCard(),
+                      const ApexOutputChips(items: [
+                        ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
+                        ApexChipLink('أعمار AP', '/purchase/aging', Icons.timeline),
+                        ApexChipLink('استقطاع المصدر WHT', '/compliance/wht-v2', Icons.percent),
+                        ApexChipLink('قائمة الموردين', '/purchase/vendors', Icons.business),
+                      ]),
                     ]),
                   ),
                 ),

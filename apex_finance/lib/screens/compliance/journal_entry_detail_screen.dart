@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class JournalEntryDetailScreen extends StatefulWidget {
   final String jeId;
@@ -92,6 +93,12 @@ class _JournalEntryDetailScreenState extends State<JournalEntryDetailScreen> {
         _linesCard(lines),
         const SizedBox(height: 12),
         _balanceCard(je),
+        const ApexOutputChips(items: [
+          ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+          ApexChipLink('شجرة الحسابات', '/accounting/coa-v2', Icons.account_tree),
+          ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+          ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
+        ]),
       ]),
     );
   }

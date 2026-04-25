@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class AccountLedgerScreen extends StatefulWidget {
   final String accountId;
@@ -181,6 +182,12 @@ class _AccountLedgerScreenState extends State<AccountLedgerScreen> {
                 },
               ),
       ),
+      const ApexOutputChips(items: [
+        ApexChipLink('شجرة الحسابات', '/accounting/coa-v2', Icons.account_tree),
+        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+        ApexChipLink('إقفال الفترة', '/operations/period-close', Icons.lock_clock),
+      ]),
     ]);
   }
 
