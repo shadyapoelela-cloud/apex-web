@@ -146,6 +146,14 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (_) => go('/purchase/aging'),
     ),
     ApexCommand(
+      id: 'nav_cashflow_forecast',
+      label: 'توقع التدفق النقدي',
+      subtitle: 'إسقاط 90 يوماً + شهور التشغيل + سيناريوهات AI',
+      kind: ApexCommandKind.navigation,
+      icon: Icons.show_chart,
+      onRun: (_) => go('/analytics/cash-flow-forecast'),
+    ),
+    ApexCommand(
       id: 'action_pos_quick_sale',
       label: 'بيع سريع — POS',
       subtitle: 'كاش/مدى/STC Pay/Apple Pay',

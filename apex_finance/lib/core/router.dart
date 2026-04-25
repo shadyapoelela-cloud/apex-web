@@ -74,6 +74,8 @@ import '../screens/operations/bills_list_screen.dart';
 import '../screens/operations/ap_aging_screen.dart';
 import '../screens/notifications/notifications_panel_screen.dart';
 import '../screens/operations/pos_quick_sale_screen.dart';
+import '../screens/operations/customer_payment_screen.dart';
+import '../screens/analytics/cash_flow_forecast_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -588,6 +590,14 @@ final appRouter = GoRouter(
     GoRoute(path: '/purchase/aging', pageBuilder: (c, s) => _apexPage(const ApAgingScreen(), s)),
     GoRoute(path: '/notifications/panel', pageBuilder: (c, s) => _apexPage(const NotificationsPanelScreen(), s)),
     GoRoute(path: '/pos/quick-sale', pageBuilder: (c, s) => _apexPage(const PosQuickSaleScreen(), s)),
+    GoRoute(
+      path: '/sales/payment/:invoiceId',
+      pageBuilder: (c, s) => _apexPage(
+        CustomerPaymentScreen(invoiceId: s.pathParameters['invoiceId']!),
+        s,
+      ),
+    ),
+    GoRoute(path: '/analytics/cash-flow-forecast', pageBuilder: (c, s) => _apexPage(const CashFlowForecastScreen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     GoRoute(

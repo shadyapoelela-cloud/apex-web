@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api_service.dart';
+import '../../core/apex_anomaly_feed.dart';
 import '../../core/hijri_date.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
@@ -312,6 +313,10 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
                   _aiPulseCard(),
                   const SizedBox(height: 16),
                   _kpiGrid(),
+                  const SizedBox(height: 16),
+                  ApexAnomalyFeedCard(
+                    onSeeAll: () => context.go('/audit'),
+                  ),
                   const SizedBox(height: 16),
                   _expressInvoiceCard(),
                   const SizedBox(height: 12),
