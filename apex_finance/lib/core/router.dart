@@ -62,6 +62,7 @@ import '../screens/operations/live_sales_cycle_screen.dart';
 import '../screens/home/today_dashboard_screen.dart';
 import '../screens/home/apex_launchpad_screen.dart';
 import '../screens/home/apex_service_hub_screen.dart';
+import '../screens/home/apex_services_screen.dart';
 import '../screens/operations/customer_360_screen.dart';
 import '../screens/compliance/journal_entry_detail_screen.dart' as je_detail_v2;
 import '../screens/audit/audit_engagement_workspace_screen.dart';
@@ -238,7 +239,8 @@ final appRouter = GoRouter(
   refreshListenable: authRefresh,
   // V5.1: /app is the new default landing. Shows the 5-service Launchpad
   // with 16-app ERP grid and horizontal layer (Cmd+K, Entity Scope, etc.)
-  initialLocation: '/app',
+  // Initial landing — Services page (clean hierarchy entry)
+  initialLocation: '/services',
   // redirect: disabled for now - auth handled in login screen,
     routes: [
     // ── New IA Service Hubs (Blueprint v1.0) — registered BEFORE v5/v4 ──
@@ -264,10 +266,18 @@ final appRouter = GoRouter(
     GoRoute(path: '/setup', redirect: (c, s) => '/settings/entities'),
     GoRoute(path: '/reports', pageBuilder: (c, s) => _apexPage(const ReportsHubScreen(), s)),
     GoRoute(path: '/today', pageBuilder: (c, s) => _apexPage(const TodayDashboardScreen(), s)),
-    GoRoute(path: '/launchpad', pageBuilder: (c, s) => _apexPage(const ApexLaunchpadScreen(), s)),
-    GoRoute(path: '/apps', redirect: (c, s) => '/launchpad'),
-    GoRoute(path: '/services', redirect: (c, s) => '/launchpad'),
-    GoRoute(path: '/all', redirect: (c, s) => '/launchpad'),
+
+    // ── Services Page (Level 0) — clean entry point ──
+    // The user's mental model: Services → Apps → Screen → Detail.
+    // /services shows the 11 services as big tiles. Clicking one opens
+    // its hub (e.g., /sales → SalesHub with apps tiles), and from there
+    // you click an app to open its working screen.
+    GoRoute(path: '/services', pageBuilder: (c, s) => _apexPage(const ApexServicesScreen(), s)),
+    GoRoute(path: '/launchpad', redirect: (c, s) => '/services'),
+    GoRoute(path: '/apps', redirect: (c, s) => '/services'),
+    GoRoute(path: '/all', redirect: (c, s) => '/services'),
+    // Old verbose Launchpad still accessible at /launchpad/full for power users
+    GoRoute(path: '/launchpad/full', pageBuilder: (c, s) => _apexPage(const ApexLaunchpadScreen(), s)),
 
     // ── V5.1 shell (16-app ERP + Cmd+K palette + Entity Scope) ──
     // Registered FIRST so /app/* routes win over legacy paths.
