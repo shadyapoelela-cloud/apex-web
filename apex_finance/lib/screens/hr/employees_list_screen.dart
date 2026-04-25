@@ -8,6 +8,7 @@ import '../../api_service.dart';
 import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class EmployeesListScreen extends StatefulWidget {
   const EmployeesListScreen({super.key});
@@ -104,6 +105,11 @@ class _EmployeesListScreenState extends State<EmployeesListScreen> {
       error: _error,
       onRefresh: _load,
       listHeader: _saudizationCard(),
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('تشغيل الرواتب', '/hr/payroll-run', Icons.payments),
+        ApexChipLink('سجل ساعات العمل', '/hr/timesheet', Icons.access_time),
+        ApexChipLink('تقارير المصاريف', '/hr/expense-reports', Icons.receipt_long),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.people_outline,
         title: 'لا يوجد موظفون',

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class InventoryV2Screen extends StatefulWidget {
   const InventoryV2Screen({super.key});
@@ -89,6 +90,11 @@ class _InventoryV2ScreenState extends State<InventoryV2Screen> {
       items: _filtered,
       onRefresh: () async {},
       listHeader: _valuationCard(),
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('بطاقة الصنف', '/operations/stock-card', Icons.timeline),
+        ApexChipLink('بيع سريع POS', '/pos/quick-sale', Icons.point_of_sale),
+        ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.inventory_2_outlined,
         title: 'لا توجد أصناف',

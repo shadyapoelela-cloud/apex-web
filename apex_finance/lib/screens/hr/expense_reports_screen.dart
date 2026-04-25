@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class ExpenseReportsScreen extends StatefulWidget {
   const ExpenseReportsScreen({super.key});
@@ -90,6 +91,11 @@ class _ExpenseReportsScreenState extends State<ExpenseReportsScreen> {
       ],
       items: _filtered,
       onRefresh: () async {},
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
+        ApexChipLink('صندوق الموافقات', '/workflow/approvals', Icons.inbox),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.receipt_long,
         title: 'لا توجد تقارير مصاريف',

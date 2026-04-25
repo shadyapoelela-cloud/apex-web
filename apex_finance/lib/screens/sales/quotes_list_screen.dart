@@ -8,6 +8,7 @@ import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/apex_whatsapp_share.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class QuotesListScreen extends StatefulWidget {
   const QuotesListScreen({super.key});
@@ -102,6 +103,11 @@ class _QuotesListScreenState extends State<QuotesListScreen> {
       ],
       items: _filtered,
       onRefresh: () async {},
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
+        ApexChipLink('العملاء', '/sales/customers', Icons.people),
+        ApexChipLink('أعمار AR', '/sales/aging', Icons.timeline),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.description,
         title: 'لا توجد عروض أسعار',

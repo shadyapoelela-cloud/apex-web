@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class RecurringInvoicesScreen extends StatefulWidget {
   const RecurringInvoicesScreen({super.key});
@@ -114,6 +115,11 @@ class _RecurringInvoicesScreenState extends State<RecurringInvoicesScreen> {
       items: _filtered,
       onRefresh: () async {},
       listHeader: _mrrCard(),
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
+        ApexChipLink('أعمار AR', '/sales/aging', Icons.timeline),
+        ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.repeat,
         title: 'لا توجد اشتراكات',

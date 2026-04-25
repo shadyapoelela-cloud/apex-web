@@ -12,6 +12,7 @@ import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_output_chips.dart';
 
 class CustomersListScreen extends StatefulWidget {
   const CustomersListScreen({super.key});
@@ -97,6 +98,11 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
       loading: _loading,
       error: _error,
       onRefresh: _load,
+      listFooter: const ApexOutputChips(items: [
+        ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
+        ApexChipLink('عروض الأسعار', '/sales/quotes', Icons.description),
+        ApexChipLink('أعمار AR', '/sales/aging', Icons.timeline),
+      ]),
       emptyState: ApexEmptyState(
         icon: Icons.people_outline,
         title: 'لا يوجد عملاء بعد',
