@@ -253,6 +253,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/integrations': (ctx) => const IntegrationsHubV52Screen(),  // V5.2 Card Grid
   'erp/finance/documents': (ctx) => const DocumentsV52Screen(),  // V5.2
   'erp/finance/onboarding': (ctx) => const PilotOnboardingWizard(),  // LIVE — creates real tenant+entity+branch+CoA
+  'erp/finance/pos': (ctx) => const RetailPosScreen(),  // LIVE — self-contained retail POS wired to /pilot/* (products + variants + barcodes + sessions + sale)
 
   // V5.2 New Finance Chips (Week 1)
   'erp/finance/profit-centers': (ctx) => const ProfitCentersV52Screen(),
