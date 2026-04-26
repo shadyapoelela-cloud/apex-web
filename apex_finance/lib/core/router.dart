@@ -72,6 +72,7 @@ import '../screens/settings/unified_settings_screen.dart';
 import '../screens/operations/customers_list_screen.dart';
 import '../screens/operations/vendors_list_screen.dart';
 import '../screens/operations/invoices_list_screen.dart';
+import '../screens/operations/sales_invoice_create_screen.dart';
 import '../screens/operations/ar_aging_screen.dart';
 import '../screens/operations/bills_list_screen.dart';
 import '../screens/operations/ap_aging_screen.dart';
@@ -626,6 +627,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/settings/unified', pageBuilder: (c, s) => _apexPage(const UnifiedSettingsScreen(), s)),
     GoRoute(path: '/sales/customers', pageBuilder: (c, s) => _apexPage(const CustomersListScreen(), s)),
     GoRoute(path: '/sales/invoices', pageBuilder: (c, s) => _apexPage(const InvoicesListScreen(), s)),
+    GoRoute(path: '/sales/invoices/new', pageBuilder: (c, s) => _apexPage(const SalesInvoiceCreateScreen(), s)),
     GoRoute(path: '/sales/aging', pageBuilder: (c, s) => _apexPage(const ArAgingScreen(), s)),
     GoRoute(path: '/purchase/vendors', pageBuilder: (c, s) => _apexPage(const VendorsListScreen(), s)),
     GoRoute(path: '/purchase/bills', pageBuilder: (c, s) => _apexPage(const BillsListScreen(), s)),
