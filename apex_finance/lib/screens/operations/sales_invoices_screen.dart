@@ -146,7 +146,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   }
 
   // ── Actions ──────────────────────────────────────────────────────────
-  void _onCreate() => context.go('/sales');
+  void _onCreate() => context.go('/operations/live-sales-cycle');
 
   void _onReports() => context.go('/sales/aging');
 
