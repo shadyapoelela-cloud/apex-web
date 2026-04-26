@@ -589,11 +589,6 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
   // Inspired by SAP Fiori Object Page header + NetSuite hero band.
   // ══════════════════════════════════════════════════════════════════
   Widget _header(List<Map<String, dynamic>> visible) {
-    final totalDebit =
-        visible.fold(0.0, (t, e) => t + asDouble(e['total_debit']));
-    final totalCredit =
-        visible.fold(0.0, (t, e) => t + asDouble(e['total_credit']));
-    final balanced = (totalDebit - totalCredit).abs() < 0.005;
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 18, 24, 14),
       decoration: BoxDecoration(
@@ -748,38 +743,10 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
               ),
             ),
           ]),
-          const SizedBox(height: 14),
-          // Row 2: live stats cards (debit / credit / balance)
-          Row(children: [
-            Expanded(
-              child: _StatCard(
-                icon: Icons.trending_up_rounded,
-                label: 'إجمالي مدين',
-                value: _fmt(totalDebit),
-                color: _ok,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _StatCard(
-                icon: Icons.trending_down_rounded,
-                label: 'إجمالي دائن',
-                value: _fmt(totalCredit),
-                color: _indigo,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _StatCard(
-                icon: balanced
-                    ? Icons.balance_rounded
-                    : Icons.warning_amber_rounded,
-                label: balanced ? 'متوازن' : 'فرق',
-                value: balanced ? '✓' : _fmt((totalDebit - totalCredit).abs()),
-                color: balanced ? _ok : _warn,
-              ),
-            ),
-          ]),
+          // Removed: live stats cards (إجمالي مدين / إجمالي دائن / متوازن).
+          // The same totals already appear inside the JE detail/builder
+          // pane footer when a single entry is open — the top row was
+          // redundant noise on the list view.
         ],
       ),
     );
