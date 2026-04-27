@@ -118,7 +118,10 @@ const List<ApexTheme> apexThemes = [
     error: Color(0xFFE05050),
     warning: Color(0xFFF0A500),
     info: Color(0xFF00C2E0),
-    purple: Color(0xFF1E3A5F),
+    purple: Color(0xFF7C3AED),  // vivid purple — was 0xFF1E3A5F (navy
+                                // duplicate of `primary`, copy-paste bug
+                                // that made AI buttons render kohl/navy
+                                // in light mode).
     btnFg: Color(0xFFFFFFFF),
     textAccent: Color(0xFFC9A84C),  // gold for text only
   ),
