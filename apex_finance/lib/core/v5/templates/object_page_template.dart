@@ -104,6 +104,12 @@ class ObjectPageTemplate extends StatefulWidget {
   /// Tabs (left sidebar in desktop, top tabs in narrow).
   final List<ObjectPageTab> tabs;
 
+  /// When true, render tabs as a horizontal row directly above the content
+  /// (Odoo-style) instead of as a vertical sidebar on the right. Default
+  /// false to preserve existing screens. Width-narrow always falls back
+  /// to top tabs regardless of this flag.
+  final bool tabsAtTop;
+
   /// Chatter rail entries (right side). Null = no chatter rail.
   final List<ChatterEntry>? chatterEntries;
 
@@ -122,6 +128,7 @@ class ObjectPageTemplate extends StatefulWidget {
     this.primaryActions,
     this.chatterEntries,
     this.onBack,
+    this.tabsAtTop = false,
   });
 
   @override
@@ -139,6 +146,8 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
   Widget build(BuildContext context) {
     final isNarrow = MediaQuery.of(context).size.width < 900;
 
+    final useTopTabs = widget.tabsAtTop || isNarrow;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -151,11 +160,13 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
             if (widget.smartButtons != null && widget.smartButtons!.isNotEmpty)
               _buildSmartButtons(),
             const Divider(height: 1),
+            if (useTopTabs) _buildTabsHorizontal(),
+            if (useTopTabs) const Divider(height: 1),
             Expanded(
               child: Row(
                 children: [
-                  if (!isNarrow) _buildTabsSidebar(),
-                  if (!isNarrow) const VerticalDivider(width: 1),
+                  if (!useTopTabs) _buildTabsSidebar(),
+                  if (!useTopTabs) const VerticalDivider(width: 1),
                   Expanded(child: _buildContent()),
                   if (widget.chatterEntries != null && _chatterOpen && !isNarrow) ...[
                     const VerticalDivider(width: 1),
@@ -165,6 +176,56 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // ── Tabs Horizontal (Odoo-style top bar) ───────────────────────
+  Widget _buildTabsHorizontal() {
+    return Container(
+      color: Colors.white,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsetsDirectional.symmetric(horizontal: 8),
+        child: Row(
+          children: List.generate(widget.tabs.length, (i) {
+            final tab = widget.tabs[i];
+            final active = i == _tabIndex;
+            return InkWell(
+              onTap: () => setState(() => _tabIndex = i),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: active ? _gold : Colors.transparent,
+                      width: 3,
+                    ),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(tab.icon,
+                        size: 16,
+                        color: active ? _gold : core_theme.AC.ts),
+                    const SizedBox(width: 8),
+                    Text(
+                      tab.labelAr,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight:
+                            active ? FontWeight.w800 : FontWeight.w500,
+                        color: active ? _navy : core_theme.AC.tp,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
         ),
       ),
     );

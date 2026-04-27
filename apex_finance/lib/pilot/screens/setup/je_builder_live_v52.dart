@@ -488,6 +488,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       // Stepper (4-stage) and smart-buttons strip removed — they took ~200px
       // for info already conveyed via the status pill + summary card +
       // new timeline section in the overview tab.
+      tabsAtTop: true,
       primaryActions: _buildPrimaryActions(status),
       tabs: [
         ObjectPageTab(
