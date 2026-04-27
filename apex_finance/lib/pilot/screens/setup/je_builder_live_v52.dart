@@ -1421,30 +1421,12 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           child: _createBasicFields(),
         ),
         const SizedBox(height: 18),
-        _sectionCard(
-          title: 'بنود القيد — قابلة للتعديل',
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: _bdr),
+          ),
           child: Column(children: [
-            Row(children: [
-              Text('أدخل الحسابات والمبالغ — مجموع المدين = مجموع الدائن',
-                  style: TextStyle(color: _ts, fontSize: 12)),
-              const Spacer(),
-              TextButton.icon(
-                onPressed: () => setState(() => _lines.add(_LineState())),
-                icon: Icon(Icons.add_rounded, size: 14, color: _gold),
-                label: Text('إضافة سطر',
-                    style: TextStyle(
-                        color: _gold,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700)),
-              ),
-            ]),
-            const SizedBox(height: 10),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: _bdr),
-              ),
-              child: Column(children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 10),
@@ -1528,9 +1510,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                     .asMap()
                     .entries
                     .map((e) => _lineEditRow(e.key, e.value)),
+                _addLineFooterRow(),
               ]),
-            ),
-          ]),
         ),
         _buildSummaryAndTimelineSection(),
       ],
@@ -1947,6 +1928,28 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // Column-settings button (⚙️) — Odoo-style toggle for optional
   // line-item columns: partner / cost-center / VAT.
   // ─────────────────────────────────────────────────────────────────
+  // Odoo-style "Add a line" affordance — sits as the last row inside the table.
+  Widget _addLineFooterRow() {
+    return InkWell(
+      onTap: () => setState(() => _lines.add(_LineState())),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: _bdr.withValues(alpha: 0.5))),
+        ),
+        child: Row(children: [
+          Icon(Icons.add_rounded, size: 14, color: _gold),
+          const SizedBox(width: 6),
+          Text('إضافة سطر',
+              style: TextStyle(
+                  color: _gold,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700)),
+        ]),
+      ),
+    );
+  }
+
   Widget _columnSettingsButton() {
     return PopupMenuButton<String>(
       tooltip: 'إعدادات الأعمدة',
