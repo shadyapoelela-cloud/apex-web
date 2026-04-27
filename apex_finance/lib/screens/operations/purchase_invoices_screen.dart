@@ -769,6 +769,26 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
         ApexShortcut('S', 'حفظ البحث الحالي'),
         ApexShortcut('Esc', 'مسح الفلتر / التحديد / إغلاق'),
       ],
+      tips: const [
+        ApexTip(
+          titleAr: 'فاتورة بالذكاء — OCR',
+          bodyAr:
+              'زر "ذكاء" ينقلك إلى نموذج إنشاء يدعم رفع صورة فاتورة المورّد ليستخرج الـ OCR الحقول تلقائياً (الرقم، التاريخ، المبالغ، VAT) — توفر دقائق من الإدخال اليدوي.',
+          icon: Icons.document_scanner_outlined,
+        ),
+        ApexTip(
+          titleAr: 'متابعة الاستحقاق',
+          bodyAr:
+              'استخدم "تجميع: الاستحقاق" لرؤية الفواتير مقسّمة إلى متأخرة / تستحق اليوم / هذا الأسبوع / هذا الشهر — يساعدك على إدارة السيولة والدفعات.',
+          icon: Icons.event_busy_rounded,
+        ),
+        ApexTip(
+          titleAr: 'تصدير CSV للمراجعة',
+          bodyAr:
+              'حدّد عدة فواتير ثم "تصدير CSV" — يُنزَّل ملف يفتح في Excel مباشرةً مع الترميز العربي السليم (UTF-8 BOM).',
+          icon: Icons.file_download_outlined,
+        ),
+      ],
     );
   }
 

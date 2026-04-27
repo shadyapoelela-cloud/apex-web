@@ -471,6 +471,26 @@ class _VendorsListScreenState extends State<VendorsListScreen> {
         ApexShortcut('S', 'حفظ البحث الحالي'),
         ApexShortcut('Esc', 'إلغاء التحديد / إغلاق'),
       ],
+      tips: const [
+        ApexTip(
+          titleAr: 'دفعة موحّدة لعدة موردين',
+          bodyAr:
+              'حدّد الموردين الذين تريد دفع مستحقاتهم في نفس اليوم ثم "دفعة موحّدة" — يولّد أمر دفع واحد من البنك بدل عمليات منفصلة، يوفّر رسوم التحويل.',
+          icon: Icons.payments_outlined,
+        ),
+        ApexTip(
+          titleAr: 'بحث بالرقم الضريبي',
+          bodyAr:
+              'حقل البحث يقبل الرقم الضريبي مباشرةً — مفيد عند تسجيل فاتورة جديدة وأنت تتحقق من وجود المورّد قبل إنشاء سجل مكرّر.',
+          icon: Icons.numbers_rounded,
+        ),
+        ApexTip(
+          titleAr: 'مساعد ذكاء على بيانات المورّدين',
+          bodyAr:
+              'زر "ذكاء" يفتح مساعد AI يعرف الموردين الظاهرين على شاشتك — اسأله "من أكثر مورّد تعاملنا معه آخر سنة؟" أو "أيهم لم نشتر منه منذ ٦ أشهر؟".',
+          icon: Icons.auto_awesome_rounded,
+        ),
+      ],
     );
   }
 

@@ -475,6 +475,26 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
         ApexShortcut('S', 'حفظ البحث الحالي'),
         ApexShortcut('Esc', 'إلغاء التحديد / إغلاق'),
       ],
+      tips: const [
+        ApexTip(
+          titleAr: 'بحث سريع',
+          bodyAr:
+              'حقل البحث يطابق الكود، الاسم العربي/الإنجليزي، الهاتف، البريد، والرقم الضريبي دفعة واحدة. اكتب أي جزء وستظهر النتائج فوراً.',
+          icon: Icons.search_rounded,
+        ),
+        ApexTip(
+          titleAr: 'تجميع حسب المدينة',
+          bodyAr:
+              'استخدم تجميع "المدينة" لرؤية انتشار قاعدة عملائك جغرافياً — مفيد لفِرَق المبيعات الميدانية وتخطيط الزيارات.',
+          icon: Icons.location_city_rounded,
+        ),
+        ApexTip(
+          titleAr: 'حملات WhatsApp مستهدفة',
+          bodyAr:
+              'حدّد عملاء (long-press أو checkbox) ثم "حملة WhatsApp" لإرسال رسالة موحّدة — تذكير بفاتورة، عرض موسمي، إعلان منتج جديد.',
+          icon: Icons.message_outlined,
+        ),
+      ],
     );
   }
 
