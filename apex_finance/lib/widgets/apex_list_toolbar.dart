@@ -120,6 +120,20 @@ class ApexShortcut {
   const ApexShortcut(this.key, this.labelAr);
 }
 
+/// One usage tip / how-to bullet shown in the help dialog. Renders
+/// alongside keyboard shortcuts so the user can discover *what* the
+/// screen can do, not just *how* to use the keyboard.
+class ApexTip {
+  final String titleAr;
+  final String bodyAr;
+  final IconData icon;
+  const ApexTip({
+    required this.titleAr,
+    required this.bodyAr,
+    this.icon = Icons.lightbulb_outline_rounded,
+  });
+}
+
 /// One bulk action button shown in the selection bar.
 /// `destructive: true` paints in `AC.err` to signal data-loss risk.
 class ApexBulkAction {
@@ -218,6 +232,10 @@ class ApexListToolbar extends StatelessWidget {
   /// button is hidden.
   final List<ApexShortcut> shortcuts;
 
+  /// Optional usage tips ("how do I…") shown alongside the shortcuts in
+  /// the help dialog. Empty list = section is omitted.
+  final List<ApexTip> tips;
+
   // ── Theme override ─────────────────────────────────────────────────
   /// Background color of the AI button. Defaults to AC.purple (theme-aware).
   final Color? aiButtonColor;
@@ -270,6 +288,7 @@ class ApexListToolbar extends StatelessWidget {
     this.onAiCreate,
     this.aiCreateLabelAr = 'ذكاء',
     this.shortcuts = const [],
+    this.tips = const [],
     this.aiButtonColor,
     this.selectedCount = 0,
     this.bulkActions = const [],
@@ -369,22 +388,28 @@ class ApexListToolbar extends StatelessWidget {
 
   Widget _bulkActionButton(ApexBulkAction action) {
     final color = action.destructive ? AC.err : AC.tp;
-    return OutlinedButton.icon(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: color,
-        side: BorderSide(color: color.withValues(alpha: 0.5)),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+    // A4: Semantics — destructive flagged so assistive tech can warn.
+    return Semantics(
+      label: action.labelAr,
+      button: true,
+      hint: action.destructive ? 'إجراء حذف لا يمكن التراجع عنه' : null,
+      child: OutlinedButton.icon(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: color,
+          side: BorderSide(color: color.withValues(alpha: 0.5)),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
-      ),
-      onPressed: action.onTap,
-      icon: Icon(action.icon, size: 15, color: color),
-      label: Text(
-        action.labelAr,
-        style: const TextStyle(
-            fontSize: 12, fontWeight: FontWeight.w700),
+        onPressed: action.onTap,
+        icon: Icon(action.icon, size: 15, color: color),
+        label: Text(
+          action.labelAr,
+          style: const TextStyle(
+              fontSize: 12, fontWeight: FontWeight.w700),
+        ),
       ),
     );
   }
@@ -463,11 +488,12 @@ class ApexListToolbar extends StatelessWidget {
               activeKey: activeViewKey,
               onChange: onChangeView,
             ),
-            if (shortcuts.isNotEmpty) ...[
+            if (shortcuts.isNotEmpty || tips.isNotEmpty) ...[
               const SizedBox(width: 4),
               _HelpButton(
                 titleAr: titleAr,
                 shortcuts: shortcuts,
+                tips: tips,
               ),
             ],
           ],
@@ -1840,49 +1866,139 @@ class _ViewModeMenu extends StatelessWidget {
 class _HelpButton extends StatelessWidget {
   final String titleAr;
   final List<ApexShortcut> shortcuts;
-  const _HelpButton({required this.titleAr, required this.shortcuts});
+  final List<ApexTip> tips;
+  const _HelpButton({
+    required this.titleAr,
+    required this.shortcuts,
+    this.tips = const [],
+  });
 
   void _show(BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AC.navy2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: BorderSide(color: AC.bdr),
-        ),
-        title: Row(children: [
-          Icon(Icons.keyboard_rounded, color: AC.gold, size: 20),
-          const SizedBox(width: 8),
-          Text('اختصارات — $titleAr',
-              style: TextStyle(
-                color: AC.gold,
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-              )),
-        ]),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (final s in shortcuts) _shortcutRow(s.key, s.labelAr),
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          backgroundColor: AC.navy2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: BorderSide(color: AC.bdr),
+          ),
+          title: Row(children: [
+            Icon(Icons.help_outline_rounded, color: AC.gold, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text('مساعدة — $titleAr',
+                  style: TextStyle(
+                    color: AC.gold,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                  )),
+            ),
+          ]),
+          content: SizedBox(
+            width: 460,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ── Tips section (when provided) ─────────────────
+                  if (tips.isNotEmpty) ...[
+                    _sectionLabel('نصائح وممارسات',
+                        icon: Icons.lightbulb_outline_rounded,
+                        iconColor: AC.purple),
+                    const SizedBox(height: 4),
+                    for (final t in tips) _tipRow(t),
+                    const SizedBox(height: 12),
+                  ],
+                  // ── Shortcuts section ────────────────────────────
+                  if (shortcuts.isNotEmpty) ...[
+                    _sectionLabel('اختصارات لوحة المفاتيح',
+                        icon: Icons.keyboard_rounded, iconColor: AC.gold),
+                    const SizedBox(height: 4),
+                    for (final s in shortcuts) _shortcutRow(s.key, s.labelAr),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('إغلاق',
+                  style: TextStyle(
+                      color: AC.gold, fontWeight: FontWeight.w700)),
+            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('إغلاق',
-                style:
-                    TextStyle(color: AC.gold, fontWeight: FontWeight.w700)),
-          ),
-        ],
+      ),
+    );
+  }
+
+  Widget _sectionLabel(String label,
+      {required IconData icon, required Color iconColor}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(children: [
+        Icon(icon, color: iconColor, size: 14),
+        const SizedBox(width: 6),
+        Text(label,
+            style: TextStyle(
+              color: AC.ts,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.3,
+            )),
+      ]),
+    );
+  }
+
+  Widget _tipRow(ApexTip t) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+        decoration: BoxDecoration(
+          color: AC.purple.withValues(alpha: 0.06),
+          border: Border(
+              right: BorderSide(color: AC.purple, width: 3)),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(t.icon, color: AC.purple, size: 14),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(t.titleAr,
+                      style: TextStyle(
+                        color: AC.tp,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                      )),
+                  const SizedBox(height: 2),
+                  Text(t.bodyAr,
+                      style: TextStyle(
+                        color: AC.ts,
+                        fontSize: 11.5,
+                        height: 1.5,
+                      )),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _shortcutRow(String k, String label) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -1909,18 +2025,24 @@ class _HelpButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: 'اختصارات',
-      child: IconButton(
-        onPressed: () => _show(context),
-        icon: Icon(Icons.help_outline_rounded, color: AC.ts, size: 18),
-        style: IconButton.styleFrom(
-          backgroundColor: AC.navy3,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: AC.bdr),
+    // A4: Semantics so screen readers announce this control as
+    // "Help and shortcuts button".
+    return Semantics(
+      label: 'مساعدة واختصارات',
+      button: true,
+      child: Tooltip(
+        message: 'مساعدة',
+        child: IconButton(
+          onPressed: () => _show(context),
+          icon: Icon(Icons.help_outline_rounded, color: AC.ts, size: 18),
+          style: IconButton.styleFrom(
+            backgroundColor: AC.navy3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: BorderSide(color: AC.bdr),
+            ),
+            padding: const EdgeInsets.all(8),
           ),
-          padding: const EdgeInsets.all(8),
         ),
       ),
     );

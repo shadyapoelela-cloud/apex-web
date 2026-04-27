@@ -751,6 +751,32 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
         ApexShortcut('Ctrl+A', 'تحديد الكل'),
         ApexShortcut('Esc', 'مسح الفلتر / التحديد / إغلاق'),
       ],
+      tips: const [
+        ApexTip(
+          titleAr: 'بحث متقدّم بالـ chips',
+          bodyAr:
+              'اضغط على ▼ بجانب البحث ثم افتح أي قسم فلتر. اختياراتك تظهر كـ chips داخل شريط البحث، اضغط ✕ على أي chip لإزالته.',
+          icon: Icons.filter_list_rounded,
+        ),
+        ApexTip(
+          titleAr: 'تحديد متعدّد',
+          bodyAr:
+              'اضغط مطوّلاً (long-press) على أي فاتورة لدخول وضع التحديد. شريط الأدوات يتحوّل إلى شريط إجراءات يحوي تصدير، طباعة، حذف.',
+          icon: Icons.check_box_rounded,
+        ),
+        ApexTip(
+          titleAr: 'حفظ البحث الحالي',
+          bodyAr:
+              'بعد ضبط الفلاتر/التجميع/الترتيب، افتح ▼ ← المفضلات ← "حفظ البحث الحالي". يُحفظ في متصفحك ويظهر في القائمة لاحقاً للاستدعاء بضغطة.',
+          icon: Icons.bookmark_add_rounded,
+        ),
+        ApexTip(
+          titleAr: 'مساعد ذكاء سياقي',
+          bodyAr:
+              'زر "ذكاء" البنفسجي يفتح مساعد AI في الجانب يعرف ما تنظر إليه (عدد السجلات، الفلاتر النشطة، التجميع الحالي) — اسأله عن ملخّص أو اقتراح.',
+          icon: Icons.auto_awesome_rounded,
+        ),
+      ],
     );
   }
 
