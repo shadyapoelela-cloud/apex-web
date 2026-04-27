@@ -560,6 +560,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     if (_je == null) {
       // CREATE mode
       return [
+        _aiReadDocButton(),
+        const SizedBox(width: 8),
         OutlinedButton.icon(
           onPressed: _submitting ? null : () => Navigator.of(context).pop(),
           icon: const Icon(Icons.close_rounded, size: 16),
@@ -817,70 +819,34 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   }
 
   // ─── AI quick bar (create mode only) ───
-  Widget _aiQuickBar() {
+  // Violet AI document-read button — lives in the top action bar.
+  Widget _aiReadDocButton() {
     final hasDoc = _aiDocFilename != null;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            _purple.withValues(alpha: 0.14),
-            _gold.withValues(alpha: 0.06),
-          ],
-          begin: Alignment.centerRight,
-          end: Alignment.centerLeft,
+    final tooltip = hasDoc
+        ? 'قُرئ من: $_aiDocFilename · ثقة ${((_aiDocConfidence ?? 0) * 100).toStringAsFixed(0)}%'
+        : 'ارفع فاتورة / إيصال / PDF — Claude يستخرج الحقول والسطور تلقائياً';
+    return Tooltip(
+      message: tooltip,
+      child: FilledButton.icon(
+        style: FilledButton.styleFrom(
+          backgroundColor: _purple,
+          foregroundColor: Colors.white,
         ),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: _purple.withValues(alpha: 0.4)),
+        onPressed: _aiDocLoading ? null : _aiReadDocument,
+        icon: _aiDocLoading
+            ? const SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: Colors.white),
+              )
+            : Icon(
+                hasDoc ? Icons.refresh_rounded : Icons.upload_file_rounded,
+                size: 16),
+        label: Text(_aiDocLoading
+            ? 'جاري...'
+            : (hasDoc ? 'إعادة القراءة' : 'قراءة مستند')),
       ),
-      child: Row(children: [
-        Icon(Icons.auto_awesome_rounded, color: _purple, size: 22),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                hasDoc
-                    ? 'قُرئ من: $_aiDocFilename · ثقة ${((_aiDocConfidence ?? 0) * 100).toStringAsFixed(0)}%'
-                    : 'ابدأ من مستند بالذكاء الاصطناعي',
-                style: TextStyle(
-                    color: _tp, fontSize: 13, fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                hasDoc
-                    ? 'تمّت تعبئة الحقول والسطور — راجع قبل الحفظ'
-                    : 'ارفع فاتورة / إيصال / PDF — Claude يستخرج الحقول والسطور تلقائياً',
-                style: TextStyle(color: _ts, fontSize: 11, height: 1.4),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        FilledButton.icon(
-          style: FilledButton.styleFrom(
-            backgroundColor: _purple,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          ),
-          onPressed: _aiDocLoading ? null : _aiReadDocument,
-          icon: _aiDocLoading
-              ? const SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: Colors.white),
-                )
-              : Icon(hasDoc
-                  ? Icons.refresh_rounded
-                  : Icons.upload_file_rounded),
-          label: Text(_aiDocLoading
-              ? 'جاري...'
-              : (hasDoc ? 'إعادة القراءة' : 'قراءة مستند')),
-        ),
-      ]),
     );
   }
 
@@ -1412,10 +1378,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        _aiQuickBar(),
-        if (_aiWarnings.isNotEmpty) const SizedBox(height: 10),
         if (_aiWarnings.isNotEmpty) _aiWarningsStrip(),
-        const SizedBox(height: 18),
+        if (_aiWarnings.isNotEmpty) const SizedBox(height: 18),
         _sectionCard(
           title: 'البيانات الأساسية',
           child: _createBasicFields(),
