@@ -1428,9 +1428,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               Text('أدخل الحسابات والمبالغ — مجموع المدين = مجموع الدائن',
                   style: TextStyle(color: _ts, fontSize: 12)),
               const Spacer(),
-              // Odoo-style ⚙️ column visibility toggle.
-              _columnSettingsButton(),
-              const SizedBox(width: 8),
               TextButton.icon(
                 onPressed: () => setState(() => _lines.add(_LineState())),
                 icon: Icon(Icons.add_rounded, size: 14, color: _gold),
@@ -1524,7 +1521,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                                 fontWeight: FontWeight.w800,
                                 color: _td),
                             textAlign: TextAlign.end)),
-                    const SizedBox(width: 30),
+                    SizedBox(width: 30, child: _columnSettingsButton()),
                   ]),
                 ),
                 ..._lines
@@ -1954,7 +1951,9 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     return PopupMenuButton<String>(
       tooltip: 'إعدادات الأعمدة',
       position: PopupMenuPosition.under,
-      icon: Icon(Icons.tune_rounded, size: 18, color: _ts),
+      padding: EdgeInsets.zero,
+      iconSize: 16,
+      icon: Icon(Icons.tune_rounded, size: 16, color: _ts),
       itemBuilder: (_) => [
         CheckedPopupMenuItem<String>(
           value: 'partner',
