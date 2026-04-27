@@ -586,7 +586,20 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(children: [
+          // LayoutBuilder + horizontal scroll so the toolbar never collapses
+          // its title or hides icons when the viewport is narrow (e.g. user
+          // has DevTools / sidebar / split view eating into page width). At
+          // wider widths the inner Row fills the visible space and Spacer
+          // distributes leftover; at narrow widths the user can scroll
+          // horizontally and every element stays at its natural size.
+          LayoutBuilder(
+            builder: (ctx, constraints) {
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: ConstrainedBox(
+                  constraints:
+                      BoxConstraints(minWidth: constraints.maxWidth),
+                  child: Row(children: [
             // ── Gradient pill icon (matches JE) ─────────────────────
             Container(
               padding: const EdgeInsets.all(10),
@@ -613,46 +626,42 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
             ),
             const SizedBox(width: 14),
             // ── Title + counter ─────────────────────────────────────
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'فواتير المبيعات',
-                    softWrap: false,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: AC.tp,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.2,
-                      height: 1.1,
-                    ),
+            // No Flexible — title takes its natural width and never
+            // collapses to ellipsis-only. Mirrors the JE pattern AND
+            // guarantees visibility at any viewport size.
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'فواتير المبيعات',
+                  softWrap: false,
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: AC.tp,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.2,
+                    height: 1.1,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _activeFilterCount > 0
-                        ? '$visibleCount / ${_all.length}'
-                        : '${_all.length} فاتورة',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style:
-                        TextStyle(color: AC.ts, fontSize: 11, height: 1.1),
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _activeFilterCount > 0
+                      ? '$visibleCount / ${_all.length}'
+                      : '${_all.length} فاتورة',
+                  maxLines: 1,
+                  style:
+                      TextStyle(color: AC.ts, fontSize: 11, height: 1.1),
+                ),
+              ],
             ),
             const SizedBox(width: 12),
-            // ── Compact search (RTL, 120-220px flex:2) ──────────────
-            Flexible(
-              flex: 2,
-              child: ConstrainedBox(
-                constraints:
-                    const BoxConstraints(maxWidth: 220, minWidth: 120),
-                child: _compactSearchField(),
-              ),
+            // ── Compact search (fixed 200px — no Flexible to keep
+            //    layout deterministic inside the scrollable Row) ─────
+            SizedBox(
+              width: 200,
+              child: _compactSearchField(),
             ),
             const SizedBox(width: 6),
             // ── Combined Filter / Group-by / View toggle ────────────
@@ -732,7 +741,11 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
                 style: TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
-          ]),
+                  ]),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
