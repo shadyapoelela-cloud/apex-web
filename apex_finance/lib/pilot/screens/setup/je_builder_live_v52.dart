@@ -899,7 +899,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     );
   }
 
-  Widget _sectionCard({required String title, required Widget child}) {
+  Widget _sectionCard({String? title, required Widget child}) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -910,10 +910,12 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
-          const SizedBox(height: 14),
+          if (title != null) ...[
+            Text(title,
+                style: TextStyle(
+                    fontSize: 14, fontWeight: FontWeight.w800, color: _navy)),
+            const SizedBox(height: 14),
+          ],
           child,
         ],
       ),
@@ -1159,10 +1161,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        _sectionCard(
-          title: 'البيانات الأساسية',
-          child: _viewBasicFields(),
-        ),
+        _sectionCard(child: _viewBasicFields()),
         const SizedBox(height: 18),
         _sectionCard(
           title: 'بنود القيد',
@@ -1329,10 +1328,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       children: [
         if (_aiWarnings.isNotEmpty) _aiWarningsStrip(),
         if (_aiWarnings.isNotEmpty) const SizedBox(height: 18),
-        _sectionCard(
-          title: 'البيانات الأساسية',
-          child: _createBasicFields(),
-        ),
+        _sectionCard(child: _createBasicFields()),
         const SizedBox(height: 18),
         Container(
           decoration: BoxDecoration(
