@@ -1149,8 +1149,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     switch (_activeView) {
       case 'other_info':
         return _buildOtherInfoTab();
-      case 'audit':
-        return _buildAuditTab();
       case 'lines':
       default:
         return _buildLinesTab();
@@ -1162,7 +1160,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     final tabs = <(String id, String label, IconData icon)>[
       ('lines', 'البنود ($linesCount)', Icons.list_alt_rounded),
       ('other_info', 'معلومات أخرى', Icons.info_outline_rounded),
-      ('audit', 'سجل التدقيق', Icons.shield_rounded),
     ];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -2032,61 +2029,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             break;
         }
       }),
-    );
-  }
-
-  // ─────────────────────────────────────────────────────────────────
-  // TAB: AUDIT TRAIL
-  // ─────────────────────────────────────────────────────────────────
-  Widget _buildAuditTab() {
-    final entries = [
-      if (_je != null)
-        (_je!['created_at']?.toString() ?? '', 'النظام',
-            'تم إنشاء القيد', Icons.add_circle_rounded)
-      else
-        (DateTime.now().toIso8601String().substring(0, 16).replaceAll('T', ' '),
-            'أنت', 'يتمّ إنشاء القيد الآن', Icons.edit_note_rounded),
-    ];
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        _sectionCard(child: _localTabsStrip()),
-        const SizedBox(height: 18),
-        for (var i = 0; i < entries.length; i++) ...[
-          if (i > 0) const SizedBox(height: 8),
-          Builder(builder: (_) {
-            final (ts, who, what, icon) = entries[i];
-            return Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: _bdr),
-              ),
-              child: Row(children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: _gold.withValues(alpha: 0.15),
-                  child: Icon(icon, color: _gold, size: 14),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(what,
-                          style: const TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w700)),
-                      Text('$ts · $who',
-                          style: TextStyle(fontSize: 10, color: _ts)),
-                    ],
-                  ),
-                ),
-              ]),
-            );
-          }),
-        ],
-      ],
     );
   }
 
