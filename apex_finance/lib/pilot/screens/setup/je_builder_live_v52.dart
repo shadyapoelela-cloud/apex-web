@@ -481,18 +481,13 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           ? 'قيد يومية ${_je!['je_number'] ?? ""}'
           : 'قيد يومية جديد',
       subtitleAr: _je != null
-          ? '${_kindLabel(_je!['kind'] as String? ?? 'manual')} · ${_fmt(_totalDebit)} ر.س'
-          : 'وضع الإنشاء — ${_accounts.length} حساب متاح',
+          ? '${_kindLabel(_je!['kind'] as String? ?? 'manual')} · ${_fmt(_totalDebit)} ر.س · ${_balanced ? "متوازن" : "غير متوازن"}'
+          : 'وضع الإنشاء · ${_accounts.length} حساب · ${_balanced ? "متوازن" : "غير متوازن"}',
       statusLabelAr: _statusLabel(status),
       statusColor: stageInfo.color,
-      processStages: const [
-        ProcessStage(labelAr: 'مسودة', icon: Icons.edit_note),
-        ProcessStage(labelAr: 'قيد الاعتماد', icon: Icons.hourglass_empty),
-        ProcessStage(labelAr: 'معتمد', icon: Icons.verified),
-        ProcessStage(labelAr: 'مرحّل', icon: Icons.check_circle),
-      ],
-      processCurrentIndex: stageInfo.index,
-      smartButtons: _buildSmartButtons(),
+      // Stepper (4-stage) and smart-buttons strip removed — they took ~200px
+      // for info already conveyed via the status pill + summary card +
+      // new timeline section in the overview tab.
       primaryActions: _buildPrimaryActions(status),
       tabs: [
         ObjectPageTab(
@@ -568,46 +563,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         'auto_po': 'من مشتريات',
         'reversal': 'عكسي',
       }[k] ?? k;
-
-  // ─────────────────────────────────────────────────────────────────
-  // SMART BUTTONS
-  // ─────────────────────────────────────────────────────────────────
-  List<SmartButton> _buildSmartButtons() {
-    return [
-      SmartButton(
-        icon: Icons.receipt_long_rounded,
-        labelAr: 'الحسابات',
-        count: _accounts.length,
-        color: _gold,
-        onTap: () {},
-      ),
-      SmartButton(
-        icon: Icons.attach_file_rounded,
-        labelAr: 'مرفقات',
-        count: 0,
-        color: _navy,
-        onTap: () {},
-      ),
-      if (_aiDocFilename != null)
-        SmartButton(
-          icon: Icons.auto_awesome_rounded,
-          labelAr: 'مُستخرَج بالذكاء',
-          count: _aiDocConfidence != null
-              ? (_aiDocConfidence! * 100).round()
-              : null,
-          color: _purple,
-          onTap: () {},
-        ),
-      SmartButton(
-        icon: _balanced
-            ? Icons.check_circle_rounded
-            : Icons.warning_amber_rounded,
-        labelAr: _balanced ? 'متوازن' : 'غير متوازن',
-        color: _balanced ? _ok : _err,
-        onTap: () {},
-      ),
-    ];
-  }
 
   // ─────────────────────────────────────────────────────────────────
   // PRIMARY ACTIONS (depends on status)
@@ -722,10 +677,161 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           ),
           const SizedBox(height: 18),
           _sectionCard(title: 'ملخّص القيد', child: _summaryRow()),
+          const SizedBox(height: 18),
+          _sectionCard(title: 'السجل', child: _buildHistoryTimeline()),
           if (_error != null) ...[
             const SizedBox(height: 14),
             _errorStrip(),
           ],
+        ],
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // History timeline — replaces the 4-stage stepper at the top.
+  // Shows lifecycle events from creation through approval to posting,
+  // each with timestamp + actor. In create mode renders a single
+  // placeholder row.
+  // ─────────────────────────────────────────────────────────────────
+  Widget _buildHistoryTimeline() {
+    final events = <(String ts, String who, String what, IconData icon, Color color)>[];
+    String fmtTs(dynamic v) {
+      if (v == null) return '';
+      final s = v.toString();
+      if (s.length < 16) return s;
+      return s.substring(0, 16).replaceAll('T', ' ');
+    }
+
+    if (_je == null) {
+      events.add((
+        DateTime.now().toIso8601String().substring(0, 16).replaceAll('T', ' '),
+        'أنت',
+        'قيد قيد الإنشاء — لم يُحفظ بعد',
+        Icons.edit_note_rounded,
+        _td,
+      ));
+    } else {
+      final j = _je!;
+      if (j['created_at'] != null) {
+        events.add((
+          fmtTs(j['created_at']),
+          (j['created_by_user_id'] as String?) ?? 'النظام',
+          'تم إنشاء القيد',
+          Icons.add_circle_rounded,
+          _td,
+        ));
+      }
+      if (j['submitted_at'] != null) {
+        events.add((
+          fmtTs(j['submitted_at']),
+          (j['submitted_by_user_id'] as String?) ?? 'النظام',
+          'تم رفع القيد للاعتماد',
+          Icons.hourglass_top_rounded,
+          _warn,
+        ));
+      }
+      if (j['approved_at'] != null) {
+        events.add((
+          fmtTs(j['approved_at']),
+          (j['approved_by_user_id'] as String?) ?? 'النظام',
+          'تم اعتماد القيد',
+          Icons.verified_rounded,
+          _gold,
+        ));
+      }
+      if (j['posted_at'] != null) {
+        events.add((
+          fmtTs(j['posted_at']),
+          (j['posted_by_user_id'] as String?) ?? 'النظام',
+          'تم ترحيل القيد إلى GL',
+          Icons.check_circle_rounded,
+          _ok,
+        ));
+      }
+      if (j['reversed_by_je_id'] != null) {
+        events.add((
+          '',
+          'النظام',
+          'تم عكس القيد بقيد مقابل',
+          Icons.undo_rounded,
+          _err,
+        ));
+      }
+      if (j['rejection_reason'] != null &&
+          (j['rejection_reason'] as String).isNotEmpty) {
+        events.add((
+          '',
+          'المعتمد',
+          'رُفض الاعتماد — ${j['rejection_reason']}',
+          Icons.cancel_rounded,
+          _err,
+        ));
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var i = 0; i < events.length; i++) ...[
+          _timelineRow(events[i], isLast: i == events.length - 1),
+        ],
+      ],
+    );
+  }
+
+  Widget _timelineRow(
+      (String, String, String, IconData, Color) ev,
+      {required bool isLast}) {
+    final (ts, who, what, icon, color) = ev;
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Vertical rail with dot
+          Column(
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: color.withValues(alpha: 0.5)),
+                ),
+                child: Icon(icon, color: color, size: 14),
+              ),
+              if (!isLast)
+                Expanded(
+                  child: Container(
+                    width: 2,
+                    color: _bdr,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(what,
+                      style: TextStyle(
+                          color: _tp,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 2),
+                  Text(
+                    [if (ts.isNotEmpty) ts, who].join(' · '),
+                    style: TextStyle(color: _ts, fontSize: 10.5),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
