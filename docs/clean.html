@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>APEX — تنظيف الذاكرة المؤقتة</title>
+  <link href='https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap' rel='stylesheet'>
+  <style>
+    * { box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
+    body {
+      margin: 0; min-height: 100vh;
+      background: linear-gradient(135deg, #0A1628 0%, #132339 100%);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+    }
+    .card {
+      max-width: 520px; padding: 36px; border-radius: 16px;
+      background: rgba(29, 49, 80, 0.6); border: 1px solid #D4AF37;
+      box-shadow: 0 10px 40px rgba(0,0,0,.4);
+      text-align: center;
+    }
+    h1 { color: #D4AF37; margin: 0 0 8px; }
+    p  { color: #BCC5D3; line-height: 1.7; }
+    .log {
+      margin-top: 20px; padding: 14px; border-radius: 8px;
+      background: rgba(10, 22, 40, .6); border: 1px solid rgba(255,255,255,.1);
+      text-align: right; font-family: monospace; font-size: 12px;
+      max-height: 200px; overflow-y: auto; direction: ltr;
+    }
+    .log .ok  { color: #10B981; }
+    .log .err { color: #EF4444; }
+    .log .info { color: #BCC5D3; }
+    .btn {
+      display: inline-block; margin-top: 20px;
+      padding: 12px 28px; border-radius: 8px;
+      background: #D4AF37; color: #000; font-weight: 900;
+      text-decoration: none; font-size: 15px;
+      transition: transform .15s ease;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .loader {
+      display: inline-block; width: 40px; height: 40px;
+      border: 3px solid rgba(212, 175, 55, .3);
+      border-top-color: #D4AF37; border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #done { display: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🧹 تنظيف الذاكرة المؤقتة</h1>
+    <p>سيتم إلغاء تسجيل Service Workers القديمة ومسح كل Cache لضمان ظهور آخر نسخة.</p>
+
+    <div id="working">
+      <div class="loader" style="margin:16px auto;"></div>
+      <div class="log" id="log"></div>
+    </div>
+
+    <div id="done">
+      <p style="color:#10B981;font-weight:700;">✓ تم التنظيف بنجاح</p>
+      <a href="/#/app/erp/finance/advanced-settings" class="btn">افتح إعدادات متقدّمة</a>
+    </div>
+  </div>
+
+  <script>
+    const log = document.getElementById('log');
+    function add(msg, cls = 'info') {
+      const line = document.createElement('div');
+      line.className = cls;
+      line.textContent = '[' + new Date().toLocaleTimeString('en-GB') + '] ' + msg;
+      log.appendChild(line);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    async function clean() {
+      add('Starting cleanup...', 'info');
+
+      // 1. Unregister service workers
+      if ('serviceWorker' in navigator) {
+        try {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          add('Found ' + regs.length + ' service worker registration(s)', 'info');
+          for (const r of regs) {
+            const ok = await r.unregister();
+            add(ok ? 'Unregistered: ' + (r.scope || 'scope') : 'Failed: ' + r.scope, ok ? 'ok' : 'err');
+          }
+        } catch (e) {
+          add('SW error: ' + e.message, 'err');
+        }
+      } else {
+        add('serviceWorker API not supported', 'info');
+      }
+
+      // 2. Clear all caches
+      if (window.caches) {
+        try {
+          const keys = await caches.keys();
+          add('Found ' + keys.length + ' cache(s)', 'info');
+          for (const k of keys) {
+            const ok = await caches.delete(k);
+            add(ok ? 'Deleted cache: ' + k : 'Failed cache: ' + k, ok ? 'ok' : 'err');
+          }
+        } catch (e) {
+          add('Cache error: ' + e.message, 'err');
+        }
+      }
+
+      // 3. Don't wipe localStorage (keeps pilot.tenant_id etc.)
+      add('localStorage preserved (keeps your session)', 'info');
+
+      add('Cleanup complete ✓', 'ok');
+      setTimeout(function() {
+        document.getElementById('working').style.display = 'none';
+        document.getElementById('done').style.display = 'block';
+      }, 400);
+    }
+
+    clean();
+  </script>
+</body>
+</html>
