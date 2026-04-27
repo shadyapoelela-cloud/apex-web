@@ -541,7 +541,14 @@ class _SearchBarWithMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Directionality(
+      // Defensive: previous attempt set textDirection on the Row only
+      // and the chevron still rendered on the visual LEFT — Material's
+      // ButtonStyleButton / Container sometimes inserts a Directionality
+      // up the tree that overrides the Row-level parameter. Wrapping in
+      // an explicit Directionality wins.
+      textDirection: TextDirection.rtl,
+      child: Container(
       height: 38,
       decoration: BoxDecoration(
         color: AC.navy3,
@@ -620,6 +627,7 @@ class _SearchBarWithMenu extends StatelessWidget {
             child: Icon(Icons.search_rounded, color: AC.ts, size: 16),
           ),
         ],
+      ),
       ),
     );
   }
@@ -734,7 +742,11 @@ class _PanelOpenerState extends State<_PanelOpener> {
       ),
       menuChildren: [
         SizedBox(
-          width: 880,
+          // 720px — three columns of ~230px each. Reasonable size on
+          // desktop, no awkward wrapping for typical option labels
+          // ("هذا الأسبوع", "تاريخ الإصدار (الأحدث)", etc.). The earlier
+          // 880px was too wide and dominated the screen per user feedback.
+          width: 720,
           child: _FilterPanel(
             filterGroups: widget.filterGroups,
             groupOptions: widget.groupOptions,
@@ -799,11 +811,11 @@ class _FilterPanel extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: ConstrainedBox(
-      // Wider panel so each of the 3 columns has ~290px breathing room —
-      // long Arabic option labels (e.g. "إضافة عامل تصفية مخصّص") used
-      // to wrap awkwardly into 2 lines at 540px total width.
+      // 680-720px — keeps each of 3 columns at ~225px (enough for typical
+      // Arabic option labels) without dominating the screen. User found
+      // 880-980 too wide.
       constraints: const BoxConstraints(
-          minWidth: 880, maxWidth: 980, maxHeight: 560),
+          minWidth: 680, maxWidth: 720, maxHeight: 540),
       child: SingleChildScrollView(
         child: IntrinsicHeight(
           child: Row(
