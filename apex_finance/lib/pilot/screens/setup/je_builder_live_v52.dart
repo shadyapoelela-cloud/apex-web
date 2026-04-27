@@ -34,14 +34,22 @@ class _LineState {
   String description = '';
   String aiHint = '';
   double aiMatchConfidence = 0;
+  // Odoo-style optional columns (Phase 1) — backend already supports them.
+  String partnerLabel = '';   // posted as `partner_id` (free-text label)
+  String costCenterLabel = ''; // posted as `cost_center_id` (free-text label)
+  String vatCode = '';         // standard / zero_rated / exempt
   final TextEditingController debitCtrl = TextEditingController();
   final TextEditingController creditCtrl = TextEditingController();
   final TextEditingController descCtrl = TextEditingController();
+  final TextEditingController partnerCtrl = TextEditingController();
+  final TextEditingController costCenterCtrl = TextEditingController();
 
   void dispose() {
     debitCtrl.dispose();
     creditCtrl.dispose();
     descCtrl.dispose();
+    partnerCtrl.dispose();
+    costCenterCtrl.dispose();
   }
 }
 
@@ -69,11 +77,20 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // ─── Create-mode form state ───
   final _memo = TextEditingController();
   final _reference = TextEditingController();
+  final _internalNote = TextEditingController();
   DateTime _date = DateTime.now();
   String _kind = 'manual';
   bool _autoPost = true;
+  bool _toCheck = false;
   final List<_LineState> _lines = [_LineState(), _LineState()];
   bool _submitting = false;
+
+  // ─── Optional column visibility (Odoo-style ⚙️ toggle) ───
+  // All default OFF — keep first impression simple. User toggles via
+  // the column-settings popup in the lines table header.
+  bool _showPartner = false;
+  bool _showCostCenter = false;
+  bool _showVat = false;
 
   // ─── AI state ───
   bool _aiDocLoading = false;
@@ -105,6 +122,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   void dispose() {
     _memo.dispose();
     _reference.dispose();
+    _internalNote.dispose();
     for (final l in _lines) {
       l.dispose();
     }
@@ -331,6 +349,9 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       'auto_post': autoPost,
       if (_reference.text.trim().isNotEmpty)
         'source_reference': _reference.text.trim(),
+      if (_internalNote.text.trim().isNotEmpty)
+        'internal_note': _internalNote.text.trim(),
+      'to_check': _toCheck,
       'lines': valid
           .map((l) => {
                 'account_id': l.accountId,
@@ -338,6 +359,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                 'credit': l.credit.toString(),
                 if (l.description.trim().isNotEmpty)
                   'description': l.description.trim(),
+                if (l.partnerLabel.trim().isNotEmpty)
+                  'partner_id': l.partnerLabel.trim(),
+                if (l.costCenterLabel.trim().isNotEmpty)
+                  'cost_center_id': l.costCenterLabel.trim(),
+                if (l.vatCode.isNotEmpty) 'vat_code': l.vatCode,
               })
           .toList(),
     };
@@ -482,6 +508,12 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               : 'البنود (${_lines.length})',
           icon: Icons.list_alt_rounded,
           builder: (_) => _buildLinesTab(),
+        ),
+        ObjectPageTab(
+          id: 'other_info',
+          labelAr: 'معلومات أخرى',
+          icon: Icons.info_outline_rounded,
+          builder: (_) => _buildOtherInfoTab(),
         ),
         ObjectPageTab(
           id: 'attachments',
@@ -1295,6 +1327,9 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               Text('أدخل الحسابات والمبالغ — مجموع المدين = مجموع الدائن',
                   style: TextStyle(color: _ts, fontSize: 12)),
               const Spacer(),
+              // Odoo-style ⚙️ column visibility toggle.
+              _columnSettingsButton(),
+              const SizedBox(width: 8),
               TextButton.icon(
                 onPressed: () => setState(() => _lines.add(_LineState())),
                 icon: Icon(Icons.add_rounded, size: 14, color: _gold),
@@ -1335,6 +1370,16 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
                                 color: _td))),
+                    if (_showPartner) ...[
+                      const SizedBox(width: 8),
+                      Expanded(
+                          flex: 2,
+                          child: Text('الشريك',
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: _td))),
+                    ],
                     Expanded(
                         flex: 3,
                         child: Text('البيان',
@@ -1342,6 +1387,26 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
                                 color: _td))),
+                    if (_showCostCenter) ...[
+                      const SizedBox(width: 8),
+                      Expanded(
+                          flex: 2,
+                          child: Text('التوزيع التحليلي',
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: _td))),
+                    ],
+                    if (_showVat) ...[
+                      const SizedBox(width: 8),
+                      SizedBox(
+                          width: 100,
+                          child: Text('شبكات الضرائب',
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: _td))),
+                    ],
                     SizedBox(
                         width: 110,
                         child: Text('مدين',
@@ -1430,6 +1495,24 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             ),
           ),
         ),
+        if (_showPartner) ...[
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 2,
+            child: TextField(
+              controller: l.partnerCtrl,
+              onChanged: (v) => l.partnerLabel = v,
+              style: TextStyle(color: _tp, fontSize: 11),
+              decoration: InputDecoration(
+                hintText: 'مورد / عميل',
+                hintStyle: TextStyle(color: _td, fontSize: 10),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+        ],
         const SizedBox(width: 8),
         Expanded(
           flex: 3,
@@ -1446,6 +1529,56 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             ),
           ),
         ),
+        if (_showCostCenter) ...[
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 2,
+            child: TextField(
+              controller: l.costCenterCtrl,
+              onChanged: (v) => l.costCenterLabel = v,
+              style: TextStyle(color: _tp, fontSize: 11),
+              decoration: InputDecoration(
+                hintText: 'مركز تكلفة',
+                hintStyle: TextStyle(color: _td, fontSize: 10),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+        ],
+        if (_showVat) ...[
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 100,
+            child: DropdownButtonFormField<String>(
+              value: l.vatCode.isEmpty ? null : l.vatCode,
+              isDense: true,
+              isExpanded: true,
+              hint: Text('VAT', style: TextStyle(color: _td, fontSize: 10)),
+              style: TextStyle(color: _tp, fontSize: 11),
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(4),
+                  borderSide: BorderSide(color: _bdr),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(4),
+                  borderSide: BorderSide(color: _bdr),
+                ),
+              ),
+              items: const [
+                DropdownMenuItem(value: 'standard', child: Text('قياسي 15%')),
+                DropdownMenuItem(value: 'zero_rated', child: Text('صفري')),
+                DropdownMenuItem(value: 'exempt', child: Text('معفى')),
+              ],
+              onChanged: (v) => setState(() => l.vatCode = v ?? ''),
+            ),
+          ),
+        ],
         SizedBox(
           width: 110,
           child: TextField(
@@ -1654,6 +1787,130 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           ),
         ]),
       ),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // TAB: OTHER INFO — Odoo "Other Information" parity
+  // Auto-post toggle, To-check flag, internal note. Read-only when
+  // viewing an existing entry; editable in create mode.
+  // ─────────────────────────────────────────────────────────────────
+  Widget _buildOtherInfoTab() {
+    final isCreateMode = _je == null;
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        _sectionCard(
+          title: 'معلومات أخرى',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text('الترحيل التلقائي',
+                    style: TextStyle(
+                        color: _tp,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700)),
+                subtitle: Text(
+                    'عند الحفظ، يتم ترحيل القيد مباشرة إلى GL Postings.',
+                    style: TextStyle(color: _ts, fontSize: 11)),
+                value: _autoPost,
+                activeColor: _gold,
+                onChanged: isCreateMode
+                    ? (v) => setState(() => _autoPost = v)
+                    : null,
+              ),
+              Divider(color: _bdr.withValues(alpha: 0.5)),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text('للتحقق منه',
+                    style: TextStyle(
+                        color: _tp,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700)),
+                subtitle: Text(
+                    'تمييز القيد لمراجعة لاحقة قبل الترحيل.',
+                    style: TextStyle(color: _ts, fontSize: 11)),
+                value: _toCheck,
+                activeColor: _warn,
+                onChanged: isCreateMode
+                    ? (v) => setState(() => _toCheck = v)
+                    : null,
+              ),
+              Divider(color: _bdr.withValues(alpha: 0.5)),
+              const SizedBox(height: 12),
+              Text('ملاحظة داخلية',
+                  style: TextStyle(
+                      color: _td,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _internalNote,
+                enabled: isCreateMode,
+                maxLines: 4,
+                style: TextStyle(color: _tp, fontSize: 12),
+                decoration: InputDecoration(
+                  hintText: 'ملاحظة لا تظهر للعميل — للسجل الداخلي فقط…',
+                  hintStyle: TextStyle(color: _td, fontSize: 11),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: BorderSide(color: _bdr),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: BorderSide(color: _bdr),
+                  ),
+                  contentPadding: const EdgeInsets.all(10),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // Column-settings button (⚙️) — Odoo-style toggle for optional
+  // line-item columns: partner / cost-center / VAT.
+  // ─────────────────────────────────────────────────────────────────
+  Widget _columnSettingsButton() {
+    return PopupMenuButton<String>(
+      tooltip: 'إعدادات الأعمدة',
+      position: PopupMenuPosition.under,
+      icon: Icon(Icons.tune_rounded, size: 18, color: _ts),
+      itemBuilder: (_) => [
+        CheckedPopupMenuItem<String>(
+          value: 'partner',
+          checked: _showPartner,
+          child: const Text('الشريك'),
+        ),
+        CheckedPopupMenuItem<String>(
+          value: 'cost_center',
+          checked: _showCostCenter,
+          child: const Text('التوزيع التحليلي'),
+        ),
+        CheckedPopupMenuItem<String>(
+          value: 'vat',
+          checked: _showVat,
+          child: const Text('شبكات الضرائب'),
+        ),
+      ],
+      onSelected: (v) => setState(() {
+        switch (v) {
+          case 'partner':
+            _showPartner = !_showPartner;
+            break;
+          case 'cost_center':
+            _showCostCenter = !_showCostCenter;
+            break;
+          case 'vat':
+            _showVat = !_showVat;
+            break;
+        }
+      }),
     );
   }
 
