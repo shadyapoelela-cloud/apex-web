@@ -18,6 +18,7 @@ import '../../api_service.dart';
 import '../../core/apex_saved_views_v2.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_copilot_drawer.dart';
 import '../../widgets/apex_list_toolbar.dart';
 
 const String _kScreenKey = '/purchase/bills';
@@ -499,8 +500,23 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
   // ─────────────────────────────────────────────────────────────────────
   //  CTA actions
   // ─────────────────────────────────────────────────────────────────────
+  final GlobalKey<ScaffoldState> _scaffoldKey =
+      GlobalKey<ScaffoldState>();
+
   void _onCreate() => context.go('/purchase/bills/new');
-  void _onAiCreate() => context.go('/purchase/bills/new?ai=1');
+
+  void _onAiCreate() {
+    _scaffoldKey.currentState?.openEndDrawer();
+  }
+
+  Map<String, dynamic> _buildScreenContext() => {
+        'totalCount': _all.length,
+        'visibleCount': _visible.length,
+        'filters': _captureFiltersAsMap(),
+        'groupBy': _groupBy,
+        'sortKey': _sortKey,
+        'viewMode': _viewMode,
+      };
 
   // ─────────────────────────────────────────────────────────────────────
   //  Build
@@ -508,7 +524,12 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AC.navy,
+      endDrawer: ApexCopilotDrawer(
+        screenName: 'فواتير المشتريات',
+        screenContext: _buildScreenContext(),
+      ),
       body: Column(children: [
         _buildToolbar(),
         if (_error != null) _buildErrorBanner(),

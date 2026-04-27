@@ -18,6 +18,7 @@ import '../../api_service.dart';
 import '../../core/apex_saved_views_v2.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+import '../../widgets/apex_copilot_drawer.dart';
 import '../../widgets/apex_list_toolbar.dart';
 
 const String _kScreenKey = '/sales/invoices';
@@ -525,15 +526,44 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   //  CTA actions
   // ─────────────────────────────────────────────────────────────────────
   void _onCreate() => context.go('/sales/invoices/new');
-  void _onAiCreate() => context.go('/sales/invoices/new?ai=1');
+
+  /// "ذكاء" button — opens an inline AI Copilot drawer grounded in the
+  /// current screen state. Replaces the old `?ai=1` create-route fallback;
+  /// the user explicitly asked the AI button to surface Ask APEX, not a
+  /// new-with-AI flow.
+  void _onAiCreate() {
+    _scaffoldKey.currentState?.openEndDrawer();
+  }
+
+  /// Endpoint snapshot the drawer can use to ground its responses.
+  Map<String, dynamic> _buildScreenContext() => {
+        'totalCount': _all.length,
+        'visibleCount': _visible.length,
+        'filters': _captureFiltersAsMap(),
+        'groupBy': _groupBy,
+        'sortKey': _sortKey,
+        'viewMode': _viewMode,
+      };
 
   // ─────────────────────────────────────────────────────────────────────
   //  Build
   // ─────────────────────────────────────────────────────────────────────
+  // GlobalKey lets `_onAiCreate` reach the Scaffold's openEndDrawer
+  // without scaffolding a Builder around the body.
+  final GlobalKey<ScaffoldState> _scaffoldKey =
+      GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AC.navy,
+      // RTL endDrawer slides in from the visual LEFT — matches the
+      // "ذكاء" button position in the toolbar.
+      endDrawer: ApexCopilotDrawer(
+        screenName: 'فواتير المبيعات',
+        screenContext: _buildScreenContext(),
+      ),
       body: Column(children: [
         _buildToolbar(),
         if (_error != null) _buildErrorBanner(),
