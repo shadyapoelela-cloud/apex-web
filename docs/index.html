@@ -1,142 +1,313 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-<link href='https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap' rel='stylesheet'>
-<style>body{font-family:'Tajawal',sans-serif!important}*{font-family:'Tajawal',sans-serif!important}</style><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <base href="/apex-web/">
-
   <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="APEX — منصّة العمليات والامتثال والاستشارات المالية">
-
-  <!-- PWA + iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="APEX">
-  <!-- Theme colour matches APEX dark navy so the Edge / Chrome PWA
-       window-controls-overlay blends with the app's own top bar. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APEX — منصّة المحاسبة والامتثال للسوق السعودي</title>
+  <meta name="description" content="منصّة سعودية متكاملة للمحاسبة والامتثال — فواتير ZATCA، شجرة حسابات SOCPA، إقرارات VAT، الزكاة، WPS، GOSI. ابدأ مجاناً.">
   <meta name="theme-color" content="#0A1628">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>APEX</title>
-  <link rel="manifest" href="manifest.json">
-
-  <!-- When installed as PWA with window-controls-overlay, keep the
-       app's canvas clear of the OS title-bar area. The browser exposes
-       env(titlebar-area-*) vars; our Flutter top bar renders underneath
-       but we reserve the WCO area so window controls remain clickable. -->
-  <style>
-    html, body { margin: 0; padding: 0; height: 100%; background: #0A1628; }
-  </style>
-
-  <!-- APEX: unregister stale service workers + purge caches on load (fix stale cache issues) -->
-  <script id="apex_sw_cleanup">
-    (function() {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(regs) {
-          for (var r of regs) {
-            r.unregister().then(function(ok) {
-              if (ok) console.log('[APEX] Unregistered stale service worker');
-            });
-          }
-        }).catch(function(e) { console.warn('[APEX] SW cleanup failed:', e); });
-      }
-      if (window.caches && caches.keys) {
-        caches.keys().then(function(keys) {
-          for (var k of keys) {
-            caches.delete(k).then(function(ok) {
-              if (ok) console.log('[APEX] Deleted cache:', k);
-            });
-          }
-        }).catch(function(e) { console.warn('[APEX] cache cleanup failed:', e); });
-      }
-    })();
-  </script>
-
-  <!-- APEX Pre-redirect (v6.5.3): auth-disabled build — no forced redirects.
-       The app's GoRouter already redirects /login → /app, so the old
-       JS-level hash override was silently discarding the user's target
-       route (e.g. #/clients → #/login → #/app). Now: only the "already
-       logged-in and sitting on /login" case still redirects to home. -->
-  <script id="apex_pre_redirect">
-    (function() {
-      var token = localStorage.getItem('apex_token');
-      var hash = window.location.hash || '';
-      if (token && token.length > 10) {
-        if (hash === '#/login') {
-          window.location.hash = '#/home';
-        }
-      }
-    })();
-  </script>
-
-  <!-- APEX PWA install prompt capture + standalone detection -->
-  <script id="apex_pwa_install">
-    (function() {
-      window.__APEX_PWA__ = {
-        installEvent: null,
-        canInstall: false,
-        isStandalone: window.matchMedia('(display-mode: standalone)').matches ||
-                      window.navigator.standalone === true,
-        promptInstall: function() {
-          if (!this.installEvent) return false;
-          this.installEvent.prompt();
-          this.installEvent.userChoice.then(function(choice) {
-            console.log('[APEX] PWA install choice:', choice.outcome);
-            window.__APEX_PWA__.installEvent = null;
-            window.__APEX_PWA__.canInstall = false;
-            window.dispatchEvent(new Event('apex:pwa-changed'));
-          });
-          return true;
-        }
-      };
-      window.addEventListener('beforeinstallprompt', function(e) {
-        e.preventDefault();
-        window.__APEX_PWA__.installEvent = e;
-        window.__APEX_PWA__.canInstall = true;
-        window.dispatchEvent(new Event('apex:pwa-changed'));
-        console.log('[APEX] PWA install prompt ready');
-      });
-      window.addEventListener('appinstalled', function() {
-        window.__APEX_PWA__.installEvent = null;
-        window.__APEX_PWA__.canInstall = false;
-        window.__APEX_PWA__.isStandalone = true;
-        window.dispatchEvent(new Event('apex:pwa-changed'));
-        console.log('[APEX] PWA installed');
-      });
-      // APEX: function-style accessors for Dart js_util.callMethod
-      // (Dart side calls window.apexCanInstall() / apexIsStandalone() as functions)
-      window.apexCanInstall = function() {
-        return !!(window.__APEX_PWA__ && window.__APEX_PWA__.canInstall);
-      };
-      window.apexIsStandalone = function() {
-        return !!(window.__APEX_PWA__ && window.__APEX_PWA__.isStandalone);
-      };
-      window.apexPromptInstall = function() {
-        return window.__APEX_PWA__ ? window.__APEX_PWA__.promptInstall() : false;
-      };
-    })();
-  </script>
+  <link rel="canonical" href="https://shadyapoelela-cloud.github.io/apex-web/">
+  <link rel="icon" type="image/png" href="/apex-web/app/favicon.png">
+  <link rel="stylesheet" href="/apex-web/css/apex.css">
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+
+<!-- ── Top bar ────────────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="topbar__inner">
+    <a href="/apex-web/" class="brand" aria-label="الصفحة الرئيسية">
+      <span class="brand__bolt">⚡</span>
+      <span>APEX</span>
+      <span class="brand__sub">— منصّة المحاسبة والامتثال</span>
+    </a>
+    <nav class="nav">
+      <a class="nav__link nav__link--active" href="/apex-web/">الرئيسية</a>
+      <a class="nav__link" href="/apex-web/product.html">المنتج</a>
+      <a class="nav__link" href="/apex-web/pricing.html">الأسعار</a>
+      <a class="nav__link" href="/apex-web/solutions.html">الحلول</a>
+      <a class="nav__link" href="/apex-web/resources.html">الموارد</a>
+      <a class="nav__link" href="/apex-web/customers.html">العملاء</a>
+      <a class="nav__link" href="/apex-web/contact.html">تواصل</a>
+    </nav>
+    <div class="nav__cta">
+      <a class="btn btn--ghost" href="/apex-web/app/">تسجيل الدخول</a>
+      <a class="btn btn--primary" href="/apex-web/app/#/app/erp/finance/onboarding">ابدأ مجاناً ←</a>
+      <button class="menu-toggle" aria-label="القائمة" onclick="document.getElementById('m').classList.toggle('is-open')">☰</button>
+    </div>
+  </div>
+  <div id="m" class="mobile-menu">
+    <a class="nav__link" href="/apex-web/">الرئيسية</a>
+    <a class="nav__link" href="/apex-web/product.html">المنتج</a>
+    <a class="nav__link" href="/apex-web/pricing.html">الأسعار</a>
+    <a class="nav__link" href="/apex-web/solutions.html">الحلول</a>
+    <a class="nav__link" href="/apex-web/resources.html">الموارد</a>
+    <a class="nav__link" href="/apex-web/customers.html">العملاء</a>
+    <a class="nav__link" href="/apex-web/contact.html">تواصل</a>
+  </div>
+</header>
+
+<!-- ── Hero ───────────────────────────────────────────────────────── -->
+<section class="section section--hero">
+  <div class="container">
+    <div class="hero">
+      <div>
+        <span class="eyebrow">منصّة سعودية ١٠٠٪ — جاهزة لـ ZATCA &amp; SOCPA</span>
+        <h1>إدارة محاسبية كاملة لشركتك من فاتورة إلى إقرار</h1>
+        <p class="lead">
+          منصّة سحابية موحّدة تجمع المحاسبة، الفوترة الإلكترونية ZATCA، إدارة المخزون،
+          الرواتب، والإقرارات الضريبية في مكان واحد — مصمّمة خصيصاً لاحتياجات الشركات السعودية.
+        </p>
+        <div class="hero__cta">
+          <a class="btn btn--primary btn--lg" href="/apex-web/app/#/app/erp/finance/onboarding">ابدأ تجربة مجانية ١٤ يوم ←</a>
+          <a class="btn btn--ghost btn--lg" href="/apex-web/contact.html">تحدث مع مستشار</a>
+        </div>
+        <ul class="hero__bullets">
+          <li>لا حاجة لبطاقة ائتمان</li>
+          <li>إعداد في أقل من ٥ دقائق</li>
+          <li>دعم عربي حي</li>
+        </ul>
+      </div>
+      <div class="hero__visual" aria-hidden="true">
+        <div class="hero__kpi">
+          <div class="hero__kpi-icon">📈</div>
+          <div>
+            <div class="hero__kpi-label">إيرادات الشهر</div>
+            <div class="hero__kpi-value">٤٢٨٫٥٠٠ ر.س</div>
+          </div>
+        </div>
+        <div class="hero__kpi">
+          <div class="hero__kpi-icon">🧾</div>
+          <div>
+            <div class="hero__kpi-label">فواتير صادرة هذا الشهر</div>
+            <div class="hero__kpi-value">١٬٠٤٢ فاتورة</div>
+          </div>
+        </div>
+        <div class="hero__kpi">
+          <div class="hero__kpi-icon">✓</div>
+          <div>
+            <div class="hero__kpi-label">حالة ZATCA</div>
+            <div class="hero__kpi-value" style="color:#4ECDC4">نشط ومتوافق</div>
+          </div>
+        </div>
+        <div class="hero__kpi">
+          <div class="hero__kpi-icon">📅</div>
+          <div>
+            <div class="hero__kpi-label">إقرار VAT القادم</div>
+            <div class="hero__kpi-value">١٥ يوم</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Modules grid (Services) ───────────────────────────────────── -->
+<section class="section" id="services">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">الخدمات</span>
+      <h2>كل ما تحتاجه شركتك في منصّة واحدة</h2>
+      <p class="lead">١٢ تطبيقاً متكاملاً يربط البيانات تلقائياً — لا حاجة لاستيراد/تصدير بين الأنظمة.</p>
+    </div>
+
+    <div class="grid grid--3">
+      <a href="/apex-web/product.html#accounting" class="card">
+        <div class="card__icon">📒</div>
+        <h3 class="card__title">المحاسبة المالية</h3>
+        <p class="card__desc">قيود يومية، شجرة حسابات SOCPA، ميزان مراجعة، قوائم مالية فورية.</p>
+        <ul class="card__features">
+          <li>قيود اليومية + الترحيل التلقائي</li>
+          <li>شجرة حسابات معتمدة SOCPA</li>
+          <li>قوائم مالية: P&amp;L · ميزانية · تدفق نقدي</li>
+        </ul>
+      </a>
+
+      <a href="/apex-web/product.html#sales" class="card">
+        <div class="card__icon">🧾</div>
+        <h3 class="card__title">فواتير المبيعات &amp; ZATCA</h3>
+        <p class="card__desc">فوترة إلكترونية معتمدة من هيئة الزكاة، QR + توقيع رقمي + إشعار في الوقت الحقيقي.</p>
+        <ul class="card__features">
+          <li>تكامل ZATCA Phase 2 مباشر</li>
+          <li>إصدار + إرسال + متابعة الدفع</li>
+          <li>فاتورة عربي/إنجليزي</li>
+        </ul>
+      </a>
+
+      <a href="/apex-web/product.html#inventory" class="card">
+        <div class="card__icon">📦</div>
+        <h3 class="card__title">المخزون &amp; المستودعات</h3>
+        <p class="card__desc">تتبّع الأصناف عبر فروع متعددة، حدود إعادة طلب، تكلفة متوسطة.</p>
+        <ul class="card__features">
+          <li>مخازن متعدّدة + فروع</li>
+          <li>تنبيهات نقص المخزون</li>
+          <li>تقييم FIFO / متوسط مرجّح</li>
+        </ul>
+      </a>
+
+      <a href="/apex-web/product.html#purchasing" class="card">
+        <div class="card__icon">🛒</div>
+        <h3 class="card__title">المشتريات &amp; الموردون</h3>
+        <p class="card__desc">طلبات شراء، فواتير موردين، أعمار الذمم الدائنة، WPS للمدفوعات.</p>
+        <ul class="card__features">
+          <li>دورة شراء كاملة (RFQ → PO → استلام)</li>
+          <li>أعمار الذمم AP</li>
+          <li>دفعات WPS عبر ملف SAMA</li>
+        </ul>
+      </a>
+
+      <a href="/apex-web/product.html#hr" class="card">
+        <div class="card__icon">👥</div>
+        <h3 class="card__title">الرواتب &amp; الموارد البشرية</h3>
+        <p class="card__desc">رواتب شهرية، مكافأة نهاية الخدمة، GOSI، ملف WPS تلقائي.</p>
+        <ul class="card__features">
+          <li>تشغيل رواتب شهري بضغطة</li>
+          <li>تكامل GOSI + مكتب العمل</li>
+          <li>ملف WPS جاهز للبنك</li>
+        </ul>
+      </a>
+
+      <a href="/apex-web/product.html#tax" class="card">
+        <div class="card__icon">📊</div>
+        <h3 class="card__title">الإقرارات الضريبية</h3>
+        <p class="card__desc">إقرار VAT الربعي، الزكاة السنوية، استقطاع WHT — تلقائياً من قيودك.</p>
+        <ul class="card__features">
+          <li>إقرار VAT جاهز للتقديم</li>
+          <li>حاسبة الزكاة طبقاً للهيئة</li>
+          <li>تذكيرات بمواعيد التقديم</li>
+        </ul>
+      </a>
+
+      <a href="/apex-web/product.html#pos" class="card">
+        <div class="card__icon">🛍️</div>
+        <h3 class="card__title">نقاط البيع POS</h3>
+        <p class="card__desc">جلسات بيع سريعة، طرق دفع متعددة، تسوية يومية مع الخزينة.</p>
+        <ul class="card__features">
+          <li>POS سريع لكل فرع</li>
+          <li>كاش + بطاقة + تحويل + STC Pay</li>
+          <li>إقفال جلسة + تقرير يومي</li>
+        </ul>
+      </a>
+
+      <a href="/apex-web/product.html#assets" class="card">
+        <div class="card__icon">🏢</div>
+        <h3 class="card__title">الأصول الثابتة</h3>
+        <p class="card__desc">سجلّ أصول، إهلاك تلقائي، تصرفات (بيع/استبعاد) مع قيود فورية.</p>
+        <ul class="card__features">
+          <li>إهلاك خط مستقيم / متناقص</li>
+          <li>قيود ترحيل تلقائية</li>
+          <li>تقرير الأصول الكامل</li>
+        </ul>
+      </a>
+
+      <a href="/apex-web/product.html#analytics" class="card">
+        <div class="card__icon">🧠</div>
+        <h3 class="card__title">المُساعد الذكي AI</h3>
+        <p class="card__desc">ذكاء اصطناعي يحلّل بياناتك، يقترح تحسينات، ويكتشف القيم الشاذّة.</p>
+        <ul class="card__features">
+          <li>تحليل تلقائي للمصاريف</li>
+          <li>كشف الانحرافات (Anomalies)</li>
+          <li>توصيات لتحسين الربحية</li>
+        </ul>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Why APEX ──────────────────────────────────────────────────── -->
+<section class="section section--alt">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">لماذا APEX</span>
+      <h2>الفرق بين المنصّة المحلّية والمنصّة المعرّبة</h2>
+    </div>
+    <div class="grid grid--3">
+      <div class="card">
+        <div class="card__icon">🇸🇦</div>
+        <h3 class="card__title">سعودية بالكامل</h3>
+        <p class="card__desc">شجرة حسابات SOCPA، تقويم هجري/ميلادي، نموذج عناوين سعودي رسمي، عملة SAR افتراضية.</p>
+      </div>
+      <div class="card">
+        <div class="card__icon">🛡️</div>
+        <h3 class="card__title">ZATCA Phase 2 معتمدة</h3>
+        <p class="card__desc">إصدار فاتورة إلكترونية مباشر إلى هيئة الزكاة مع QR + Cryptographic Stamp.</p>
+      </div>
+      <div class="card">
+        <div class="card__icon">⚡</div>
+        <h3 class="card__title">إعداد في ٥ دقائق</h3>
+        <p class="card__desc">معالج إعداد ذكي ينشئ كيانك + فروعك + شجرة حساباتك + فترات محاسبية بضغطة واحدة.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Social proof ──────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">يثقون بنا</span>
+      <h2>شركات تنمو مع APEX</h2>
+    </div>
+    <div class="logos">
+      <div>عميل ١</div>
+      <div>عميل ٢</div>
+      <div>عميل ٣</div>
+      <div>عميل ٤</div>
+      <div>عميل ٥</div>
+      <div>عميل ٦</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA strip ─────────────────────────────────────────────────── -->
+<section class="cta-strip">
+  <div class="container">
+    <h2>جاهز تبدأ؟</h2>
+    <p>إعداد فوري · ١٤ يوم تجربة مجانية · بدون بطاقة ائتمان</p>
+    <a class="btn btn--primary btn--lg" href="/apex-web/app/#/app/erp/finance/onboarding">ابدأ الآن مجاناً ←</a>
+    <a class="btn btn--ghost btn--lg" href="/apex-web/contact.html" style="margin-inline-start:8px">احجز عرض توضيحي</a>
+  </div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div>
+      <div class="brand"><span class="brand__bolt">⚡</span><span>APEX</span></div>
+      <p style="color:var(--ts); font-size:13px; margin-top:12px; max-width:340px;">
+        منصّة سعودية متكاملة للمحاسبة والامتثال — تخدم الشركات الصغيرة والمتوسطة في المملكة ودول الخليج.
+      </p>
+    </div>
+    <div>
+      <h4>المنتج</h4>
+      <ul>
+        <li><a href="/apex-web/product.html">الخدمات</a></li>
+        <li><a href="/apex-web/pricing.html">الأسعار</a></li>
+        <li><a href="/apex-web/solutions.html">الحلول</a></li>
+        <li><a href="/apex-web/app/">تسجيل الدخول</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>الموارد</h4>
+      <ul>
+        <li><a href="/apex-web/resources.html">المدوّنة</a></li>
+        <li><a href="/apex-web/resources.html">دليل ZATCA</a></li>
+        <li><a href="/apex-web/customers.html">قصص نجاح</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>تواصل</h4>
+      <ul>
+        <li><a href="/apex-web/contact.html">تواصل معنا</a></li>
+        <li><a href="https://wa.me/966500000000" target="_blank" rel="noopener">واتساب</a></li>
+        <li><a href="mailto:hello@apex.sa">hello@apex.sa</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer__legal">
+    <span>© 2026 APEX. جميع الحقوق محفوظة.</span>
+    <span>صُنع بفخر في المملكة العربية السعودية 🇸🇦</span>
+  </div>
+</footer>
+
 </body>
 </html>
-
