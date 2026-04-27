@@ -560,29 +560,19 @@ class _SearchBarWithMenu extends StatelessWidget {
           width: activeFilterCount > 0 ? 1.4 : 1.0,
         ),
       ),
-      // Force RTL on this Row + put the chevron FIRST so it renders on
-      // the visual RIGHT (RTL start). Previously the chevron was on the
-      // visual LEFT — the user asked to move it to the other side.
-      // Order:
-      //   children[0] (chevron _PanelOpener) → visual RIGHT (start in RTL)
-      //   children[Expanded](TextField)       → MIDDLE
-      //   children[last] (search icon)        → visual LEFT (end in RTL)
+      // Force RTL on this Row. Order swapped per user request — search
+      // icon now sits at the RTL start (visual RIGHT) and the chevron
+      // sits at the RTL end (visual LEFT):
+      //   children[0] (search icon)   → visual RIGHT (RTL start)
+      //   children[Expanded](TextField) → MIDDLE
+      //   children[last] (chevron)     → visual LEFT (RTL end)
       child: Row(
         textDirection: TextDirection.rtl,
         children: [
-          // ── Chevron at the RTL start (visual RIGHT) ───────────────
-          _PanelOpener(
-            filterGroups: filterGroups,
-            groupOptions: groupOptions,
-            activeGroupKey: activeGroupKey,
-            onChangeGroup: onChangeGroup,
-            sortOptions: sortOptions,
-            activeSortKey: activeSortKey,
-            onChangeSort: onChangeSort,
-            favorites: favorites,
-            onSaveFavorite: onSaveFavorite,
-            onClearAllFilters: onClearAllFilters,
-            activeFilterCount: activeFilterCount,
+          // ── Search icon at the RTL start (visual RIGHT) ──────────
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Icon(Icons.search_rounded, color: AC.ts, size: 16),
           ),
           // ── Search field — fills middle ────────────────────────────
           Expanded(
@@ -621,10 +611,19 @@ class _SearchBarWithMenu extends StatelessWidget {
               },
             ),
           ),
-          // ── Search icon at the RTL end (visual LEFT) ──────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Icon(Icons.search_rounded, color: AC.ts, size: 16),
+          // ── Chevron at the RTL end (visual LEFT) ──────────────────
+          _PanelOpener(
+            filterGroups: filterGroups,
+            groupOptions: groupOptions,
+            activeGroupKey: activeGroupKey,
+            onChangeGroup: onChangeGroup,
+            sortOptions: sortOptions,
+            activeSortKey: activeSortKey,
+            onChangeSort: onChangeSort,
+            favorites: favorites,
+            onSaveFavorite: onSaveFavorite,
+            onClearAllFilters: onClearAllFilters,
+            activeFilterCount: activeFilterCount,
           ),
         ],
       ),
