@@ -773,19 +773,24 @@ class _FilterPanel extends StatelessWidget {
           child: Row(
             textDirection: TextDirection.rtl,
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            // Column order matches Odoo's filter panel (in RTL):
+            //   RIGHT  → عوامل التصفية   (filters — most-used)
+            //   MIDDLE → تجميع حسب       (group-by + sort)
+            //   LEFT   → المفضلات         (saved searches)
+            // First child in a textDirection.rtl Row is visually rightmost.
             children: [
-              // ── Column 1: Favorites (leftmost in RTL = visually right)
+              // ── RIGHT: Filters (first child in RTL = right edge)
               Expanded(
                 child: _column(
                   context,
-                  iconColor: AC.gold,
-                  icon: Icons.star_rounded,
-                  title: 'المفضلات',
-                  child: _favoritesList(),
+                  iconColor: AC.purple,
+                  icon: Icons.filter_alt_rounded,
+                  title: 'عوامل التصفية',
+                  child: _filtersList(),
                 ),
               ),
               VerticalDivider(width: 1, color: AC.bdr),
-              // ── Column 2: Group-by
+              // ── MIDDLE: Group-by + Sort
               Expanded(
                 child: _column(
                   context,
@@ -796,14 +801,14 @@ class _FilterPanel extends StatelessWidget {
                 ),
               ),
               VerticalDivider(width: 1, color: AC.bdr),
-              // ── Column 3: Filters
+              // ── LEFT: Favorites (last child in RTL = left edge)
               Expanded(
                 child: _column(
                   context,
-                  iconColor: AC.purple,
-                  icon: Icons.filter_alt_rounded,
-                  title: 'عوامل التصفية',
-                  child: _filtersList(),
+                  iconColor: AC.gold,
+                  icon: Icons.star_rounded,
+                  title: 'المفضلات',
+                  child: _favoritesList(),
                 ),
               ),
             ],
@@ -826,17 +831,22 @@ class _FilterPanel extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+          // RTL header: icon on the LEFT-side accent, title on the RIGHT.
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text(title,
+              Icon(icon, color: iconColor, size: 16),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  title,
+                  textAlign: TextAlign.right,
                   style: TextStyle(
                     color: AC.tp,
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                  )),
-              const SizedBox(width: 6),
-              Icon(icon, color: iconColor, size: 16),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -878,17 +888,22 @@ class _FilterPanel extends StatelessWidget {
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                // RTL row: clear icon LEFT, "مسح كل الفلاتر" RIGHT.
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('مسح كل الفلاتر',
+                    Icon(Icons.clear_all_rounded,
+                        color: AC.warn, size: 14),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        'مسح كل الفلاتر',
+                        textAlign: TextAlign.right,
                         style: TextStyle(
                             color: AC.warn,
                             fontSize: 12,
-                            fontWeight: FontWeight.w700)),
-                    const SizedBox(width: 6),
-                    Icon(Icons.clear_all_rounded,
-                        color: AC.warn, size: 14),
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -912,24 +927,28 @@ class _FilterPanel extends StatelessWidget {
       onTap: () => g.onToggle(o.key),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        // RTL row: check on the LEFT, optional type-icon next to it,
+        // text label fills the rest with right alignment.
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text(
-              o.labelAr,
-              style: TextStyle(
-                color: selected ? AC.gold : AC.tp,
-                fontSize: 12.5,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
+            Icon(tickIcon,
+                color: selected ? (o.color ?? AC.gold) : AC.td, size: 14),
             const SizedBox(width: 8),
             if (o.icon != null) ...[
               Icon(o.icon, color: o.color ?? AC.ts, size: 13),
               const SizedBox(width: 6),
             ],
-            Icon(tickIcon,
-                color: selected ? (o.color ?? AC.gold) : AC.td, size: 14),
+            Expanded(
+              child: Text(
+                o.labelAr,
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: selected ? AC.gold : AC.tp,
+                  fontSize: 12.5,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -948,18 +967,15 @@ class _FilterPanel extends StatelessWidget {
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                // RTL row: radio left, optional icon, label right.
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      o.labelAr,
-                      style: TextStyle(
-                        color: o.key == activeGroupKey ? AC.gold : AC.tp,
-                        fontSize: 12.5,
-                        fontWeight: o.key == activeGroupKey
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                      ),
+                    Icon(
+                      o.key == activeGroupKey
+                          ? Icons.radio_button_checked_rounded
+                          : Icons.radio_button_unchecked_rounded,
+                      color: o.key == activeGroupKey ? AC.gold : AC.td,
+                      size: 14,
                     ),
                     const SizedBox(width: 8),
                     if (o.icon != null) ...[
@@ -968,12 +984,18 @@ class _FilterPanel extends StatelessWidget {
                           size: 13),
                       const SizedBox(width: 6),
                     ],
-                    Icon(
-                      o.key == activeGroupKey
-                          ? Icons.radio_button_checked_rounded
-                          : Icons.radio_button_unchecked_rounded,
-                      color: o.key == activeGroupKey ? AC.gold : AC.td,
-                      size: 14,
+                    Expanded(
+                      child: Text(
+                        o.labelAr,
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          color: o.key == activeGroupKey ? AC.gold : AC.tp,
+                          fontSize: 12.5,
+                          fontWeight: o.key == activeGroupKey
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -1001,26 +1023,29 @@ class _FilterPanel extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 5),
+                  // RTL row: radio left, label right.
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        o.labelAr,
-                        style: TextStyle(
-                          color: o.key == activeSortKey ? AC.gold : AC.tp,
-                          fontSize: 12.5,
-                          fontWeight: o.key == activeSortKey
-                              ? FontWeight.w700
-                              : FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
                       Icon(
                         o.key == activeSortKey
                             ? Icons.radio_button_checked_rounded
                             : Icons.radio_button_unchecked_rounded,
                         color: o.key == activeSortKey ? AC.gold : AC.td,
                         size: 14,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          o.labelAr,
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            color: o.key == activeSortKey ? AC.gold : AC.tp,
+                            fontSize: 12.5,
+                            fontWeight: o.key == activeSortKey
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -1055,8 +1080,8 @@ class _FilterPanel extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 5),
+                  // RTL row: delete-icon LEFT, favorite name RIGHT.
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       if (f.onDelete != null)
                         InkWell(
@@ -1066,9 +1091,13 @@ class _FilterPanel extends StatelessWidget {
                         )
                       else
                         const SizedBox(width: 14),
-                      Text(
-                        f.labelAr,
-                        style: TextStyle(color: AC.tp, fontSize: 12.5),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          f.labelAr,
+                          textAlign: TextAlign.right,
+                          style: TextStyle(color: AC.tp, fontSize: 12.5),
+                        ),
                       ),
                     ],
                   ),
@@ -1081,17 +1110,22 @@ class _FilterPanel extends StatelessWidget {
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                // RTL row: bookmark icon LEFT, label RIGHT.
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('حفظ البحث الحالي',
+                    Icon(Icons.bookmark_add_rounded,
+                        color: AC.gold, size: 14),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        'حفظ البحث الحالي',
+                        textAlign: TextAlign.right,
                         style: TextStyle(
                             color: AC.gold,
                             fontSize: 12,
-                            fontWeight: FontWeight.w700)),
-                    const SizedBox(width: 6),
-                    Icon(Icons.bookmark_add_rounded,
-                        color: AC.gold, size: 14),
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -1210,27 +1244,34 @@ class _ViewModeMenu extends StatelessWidget {
         for (final m in modes)
           PopupMenuItem<String>(
             value: m.key,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                if (m.key == activeKey) ...[
-                  Icon(Icons.check_rounded, color: AC.gold, size: 14),
-                  const SizedBox(width: 6),
-                ],
-                Text(
-                  m.labelAr,
-                  style: TextStyle(
-                    color: m.key == activeKey ? AC.gold : AC.tp,
-                    fontSize: 12.5,
-                    fontWeight: m.key == activeKey
-                        ? FontWeight.w700
-                        : FontWeight.w500,
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              // RTL row: mode icon LEFT, label text RIGHT, optional check
+              // mark on the far LEFT (next to mode icon).
+              child: Row(
+                children: [
+                  Icon(m.icon,
+                      color: m.key == activeKey ? AC.gold : AC.ts, size: 14),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      m.labelAr,
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        color: m.key == activeKey ? AC.gold : AC.tp,
+                        fontSize: 12.5,
+                        fontWeight: m.key == activeKey
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Icon(m.icon,
-                    color: m.key == activeKey ? AC.gold : AC.ts, size: 14),
-              ],
+                  if (m.key == activeKey) ...[
+                    const SizedBox(width: 6),
+                    Icon(Icons.check_rounded, color: AC.gold, size: 14),
+                  ],
+                ],
+              ),
             ),
           ),
       ],
