@@ -1,0 +1,1343 @@
+/// APEX — ApexListToolbar (Odoo-inspired ribbon for list screens).
+///
+/// Shared widget used across فواتير المبيعات / فواتير المشتريات /
+/// قيود اليومية and any future list-style chip body. RTL-first.
+///
+/// Visual layout (right-to-left):
+///   ┌─────────────────────────────────────────────────────────────────┐
+///   │ [TITLE]               🔍 search ⚙ ▼   ‹ 1-N/M ›   ☰▾   ?       │
+///   │ [✨ ذكاء][+ جديد]                                                │
+///   └─────────────────────────────────────────────────────────────────┘
+///
+/// Right column (vertical stack):
+///   • Title (flexible width — full screen name regardless of length)
+///   • Two CTAs side-by-side: AI (filled, theme purple) + Create (gold outlined)
+///
+/// Middle (Expanded):
+///   • Single search field with `⚙` settings icon and `▼` chevron that
+///     opens a 3-column Odoo-style panel: Filters · Group-by · Favorites.
+///   • Filter and group-by labels are removed from the toolbar surface
+///     and live entirely inside this panel (cleaner, fewer chrome pills).
+///
+/// Left cluster:
+///   • Pagination: `‹ 1-32 / 32 ›` text + nav arrows
+///   • View-mode menu (List / Cards / Kanban / Activity — per screen)
+///   • Help button (`?`) — opens a screen-specific shortcuts dialog
+///
+/// Theme: button colors come from AC tokens, so each apex theme paints
+/// the AI button in its own purple/violet/pink and the create button in
+/// its own gold/honey. Container uses navy2 → 5% gold gradient (matches
+/// JE Builder header for visual continuity).
+library;
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../core/theme.dart';
+
+// ─────────────────────────────────────────────────────────────────────────
+// Public data classes — describe per-screen content for the dropdown panels.
+// ─────────────────────────────────────────────────────────────────────────
+
+/// One option inside the filter panel (e.g. a status, a date preset).
+class ApexFilterOption {
+  final String key;
+  final String labelAr;
+  final IconData? icon;
+  final Color? color;
+  const ApexFilterOption({
+    required this.key,
+    required this.labelAr,
+    this.icon,
+    this.color,
+  });
+}
+
+/// A group of filter options that render together with a header.
+/// `multi: true` → user can tick multiple options at once (status, customer).
+/// `multi: false` → radio-style (date preset, amount bucket).
+class ApexFilterGroup {
+  final String labelAr;
+  final IconData? icon;
+  final List<ApexFilterOption> options;
+  final bool multi;
+  /// Currently active keys (subset of `options[*].key`).
+  final Set<String> selected;
+  /// Toggle handler: receives the key the user clicked.
+  final void Function(String key) onToggle;
+  const ApexFilterGroup({
+    required this.labelAr,
+    required this.options,
+    required this.selected,
+    required this.onToggle,
+    this.icon,
+    this.multi = true,
+  });
+}
+
+/// Group-by option (radio — only one active at a time).
+class ApexGroupOption {
+  final String key;
+  final String labelAr;
+  final IconData? icon;
+  const ApexGroupOption({
+    required this.key,
+    required this.labelAr,
+    this.icon,
+  });
+}
+
+/// Saved search / quick filter preset.
+class ApexFavorite {
+  final String key;
+  final String labelAr;
+  final VoidCallback onApply;
+  final VoidCallback? onDelete;
+  const ApexFavorite({
+    required this.key,
+    required this.labelAr,
+    required this.onApply,
+    this.onDelete,
+  });
+}
+
+/// View mode (List / Kanban / Cards / Activity / etc.).
+class ApexViewMode {
+  final String key;
+  final String labelAr;
+  final IconData icon;
+  const ApexViewMode({
+    required this.key,
+    required this.labelAr,
+    required this.icon,
+  });
+}
+
+/// Keyboard shortcut row in the help dialog.
+class ApexShortcut {
+  final String key;
+  final String labelAr;
+  const ApexShortcut(this.key, this.labelAr);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Defaults — most screens won't customize these.
+// ─────────────────────────────────────────────────────────────────────────
+
+const List<ApexViewMode> kDefaultViewModes = [
+  ApexViewMode(key: 'list', labelAr: 'قائمة', icon: Icons.view_list_rounded),
+  ApexViewMode(key: 'cards', labelAr: 'بطاقات', icon: Icons.grid_view_rounded),
+  ApexViewMode(
+      key: 'kanban', labelAr: 'كانبان', icon: Icons.view_kanban_rounded),
+  ApexViewMode(
+      key: 'activity', labelAr: 'النشاط', icon: Icons.timeline_rounded),
+];
+
+// ─────────────────────────────────────────────────────────────────────────
+// The widget.
+// ─────────────────────────────────────────────────────────────────────────
+
+class ApexListToolbar extends StatelessWidget {
+  // ── Title block ────────────────────────────────────────────────────
+  /// Screen name (e.g. "فواتير المبيعات"). Renders above the CTA buttons.
+  final String titleAr;
+
+  /// Optional pill icon next to the title (e.g. Icons.receipt_long_rounded).
+  final IconData? titleIcon;
+
+  /// Total record count loaded.
+  final int totalCount;
+
+  /// Records visible after filters/search.
+  final int visibleCount;
+
+  /// Singular noun for the counter (e.g. "فاتورة" → "32 فاتورة").
+  final String itemNounAr;
+
+  // ── Search ─────────────────────────────────────────────────────────
+  final TextEditingController searchCtl;
+  final FocusNode? searchFocus;
+  final String searchHint;
+  final VoidCallback? onSearchChanged;
+
+  // ── Filter panel content ───────────────────────────────────────────
+  final List<ApexFilterGroup> filterGroups;
+  final List<ApexGroupOption> groupOptions;
+  final String activeGroupKey;
+  final void Function(String key) onChangeGroup;
+
+  /// Optional sort options (radio-style).
+  final List<ApexFilterOption> sortOptions;
+  final String activeSortKey;
+  final void Function(String key) onChangeSort;
+
+  /// Saved searches (user-curated views).
+  final List<ApexFavorite> favorites;
+  final VoidCallback? onSaveFavorite;
+
+  /// Clear-all callback (only shown if any filters are active).
+  final VoidCallback? onClearAllFilters;
+
+  // ── View modes ─────────────────────────────────────────────────────
+  final List<ApexViewMode> viewModes;
+  final String activeViewKey;
+  final void Function(String key) onChangeView;
+
+  // ── Pagination ─────────────────────────────────────────────────────
+  /// Optional. When null, the pagination cluster is hidden.
+  final int? currentPage;
+  final int? pageSize;
+  final VoidCallback? onPrevPage;
+  final VoidCallback? onNextPage;
+
+  // ── CTAs ───────────────────────────────────────────────────────────
+  final VoidCallback? onCreate;
+  final String createLabelAr;
+  final IconData createIcon;
+
+  final VoidCallback? onAiCreate;
+  final String aiCreateLabelAr;
+
+  // ── Help dialog ────────────────────────────────────────────────────
+  /// Shortcut rows displayed in the help dialog. If empty, the help
+  /// button is hidden.
+  final List<ApexShortcut> shortcuts;
+
+  // ── Theme override ─────────────────────────────────────────────────
+  /// Background color of the AI button. Defaults to AC.purple (theme-aware).
+  final Color? aiButtonColor;
+
+  const ApexListToolbar({
+    super.key,
+    required this.titleAr,
+    required this.totalCount,
+    required this.visibleCount,
+    required this.itemNounAr,
+    required this.searchCtl,
+    required this.searchHint,
+    required this.filterGroups,
+    required this.groupOptions,
+    required this.activeGroupKey,
+    required this.onChangeGroup,
+    required this.viewModes,
+    required this.activeViewKey,
+    required this.onChangeView,
+    this.titleIcon,
+    this.searchFocus,
+    this.onSearchChanged,
+    this.sortOptions = const [],
+    this.activeSortKey = '',
+    this.onChangeSort = _noop,
+    this.favorites = const [],
+    this.onSaveFavorite,
+    this.onClearAllFilters,
+    this.currentPage,
+    this.pageSize,
+    this.onPrevPage,
+    this.onNextPage,
+    this.onCreate,
+    this.createLabelAr = 'جديد',
+    this.createIcon = Icons.add_rounded,
+    this.onAiCreate,
+    this.aiCreateLabelAr = 'ذكاء',
+    this.shortcuts = const [],
+    this.aiButtonColor,
+  });
+
+  static void _noop(String _) {}
+
+  // ── Active filter counter (drives the chevron badge) ───────────────
+  int get _activeFilterCount {
+    var n = 0;
+    for (final g in filterGroups) {
+      n += g.selected.length;
+    }
+    if (searchCtl.text.trim().isNotEmpty) n++;
+    return n;
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  //  Build
+  // ─────────────────────────────────────────────────────────────────
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AC.navy2,
+            Color.lerp(AC.navy2, AC.gold, 0.05) ?? AC.navy2,
+          ],
+        ),
+        border: Border(bottom: BorderSide(color: AC.bdr)),
+      ),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // ── RIGHT: title above CTAs ─────────────────────────────
+            _RightCluster(
+              titleAr: titleAr,
+              titleIcon: titleIcon,
+              totalCount: totalCount,
+              visibleCount: visibleCount,
+              itemNounAr: itemNounAr,
+              activeFilterCount: _activeFilterCount,
+              onCreate: onCreate,
+              createLabelAr: createLabelAr,
+              createIcon: createIcon,
+              onAiCreate: onAiCreate,
+              aiCreateLabelAr: aiCreateLabelAr,
+              aiButtonColor: aiButtonColor ?? AC.purple,
+            ),
+            const SizedBox(width: 16),
+            // ── MIDDLE: search bar with embedded filter/group/favorites ─
+            Expanded(
+              child: _SearchBarWithMenu(
+                searchCtl: searchCtl,
+                searchFocus: searchFocus,
+                searchHint: searchHint,
+                onSearchChanged: onSearchChanged,
+                filterGroups: filterGroups,
+                groupOptions: groupOptions,
+                activeGroupKey: activeGroupKey,
+                onChangeGroup: onChangeGroup,
+                sortOptions: sortOptions,
+                activeSortKey: activeSortKey,
+                onChangeSort: onChangeSort,
+                favorites: favorites,
+                onSaveFavorite: onSaveFavorite,
+                onClearAllFilters: onClearAllFilters,
+                activeFilterCount: _activeFilterCount,
+              ),
+            ),
+            const SizedBox(width: 12),
+            // ── LEFT: pagination · view-mode · help ─────────────────
+            if (currentPage != null && pageSize != null)
+              _PaginationCluster(
+                currentPage: currentPage!,
+                pageSize: pageSize!,
+                totalItems: totalCount,
+                onPrev: onPrevPage,
+                onNext: onNextPage,
+              ),
+            if (currentPage != null && pageSize != null)
+              const SizedBox(width: 6),
+            _ViewModeMenu(
+              modes: viewModes,
+              activeKey: activeViewKey,
+              onChange: onChangeView,
+            ),
+            if (shortcuts.isNotEmpty) ...[
+              const SizedBox(width: 4),
+              _HelpButton(
+                titleAr: titleAr,
+                shortcuts: shortcuts,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  RIGHT CLUSTER — title + counter + 2-button CTAs (stacked)
+// ═══════════════════════════════════════════════════════════════════════
+
+class _RightCluster extends StatelessWidget {
+  final String titleAr;
+  final IconData? titleIcon;
+  final int totalCount;
+  final int visibleCount;
+  final String itemNounAr;
+  final int activeFilterCount;
+  final VoidCallback? onCreate;
+  final String createLabelAr;
+  final IconData createIcon;
+  final VoidCallback? onAiCreate;
+  final String aiCreateLabelAr;
+  final Color aiButtonColor;
+
+  const _RightCluster({
+    required this.titleAr,
+    required this.totalCount,
+    required this.visibleCount,
+    required this.itemNounAr,
+    required this.activeFilterCount,
+    required this.createLabelAr,
+    required this.createIcon,
+    required this.aiCreateLabelAr,
+    required this.aiButtonColor,
+    this.titleIcon,
+    this.onCreate,
+    this.onAiCreate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end, // RTL — right-align
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Row 1: optional pill icon + title + counter
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (titleIcon != null) ...[
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AC.gold.withValues(alpha: 0.22),
+                      AC.gold.withValues(alpha: 0.10),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AC.gold.withValues(alpha: 0.45)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AC.gold.withValues(alpha: 0.18),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(titleIcon, color: AC.gold, size: 18),
+              ),
+              const SizedBox(width: 10),
+            ],
+            // Title + counter — natural width (no Flexible, never collapses).
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  titleAr,
+                  softWrap: false,
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: AC.tp,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.2,
+                    height: 1.1,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  activeFilterCount > 0
+                      ? '$visibleCount / $totalCount'
+                      : '$totalCount $itemNounAr',
+                  maxLines: 1,
+                  style: TextStyle(color: AC.ts, fontSize: 11, height: 1.1),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // Row 2: AI (purple filled) + جديد (gold outlined)
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (onAiCreate != null)
+              FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: aiButtonColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 0,
+                  textStyle: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w700),
+                ),
+                onPressed: onAiCreate,
+                icon: const Icon(Icons.auto_awesome_rounded, size: 16),
+                label: Text(aiCreateLabelAr),
+              ),
+            if (onAiCreate != null && onCreate != null)
+              const SizedBox(width: 8),
+            if (onCreate != null)
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AC.tp,
+                  side: BorderSide(color: AC.gold.withValues(alpha: 0.6)),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  textStyle: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w700),
+                ),
+                onPressed: onCreate,
+                icon: Icon(createIcon, size: 16, color: AC.gold),
+                label: Text(createLabelAr),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  SEARCH BAR + integrated 3-column dropdown panel
+// ═══════════════════════════════════════════════════════════════════════
+
+class _SearchBarWithMenu extends StatelessWidget {
+  final TextEditingController searchCtl;
+  final FocusNode? searchFocus;
+  final String searchHint;
+  final VoidCallback? onSearchChanged;
+  final List<ApexFilterGroup> filterGroups;
+  final List<ApexGroupOption> groupOptions;
+  final String activeGroupKey;
+  final void Function(String) onChangeGroup;
+  final List<ApexFilterOption> sortOptions;
+  final String activeSortKey;
+  final void Function(String) onChangeSort;
+  final List<ApexFavorite> favorites;
+  final VoidCallback? onSaveFavorite;
+  final VoidCallback? onClearAllFilters;
+  final int activeFilterCount;
+
+  const _SearchBarWithMenu({
+    required this.searchCtl,
+    required this.searchHint,
+    required this.filterGroups,
+    required this.groupOptions,
+    required this.activeGroupKey,
+    required this.onChangeGroup,
+    required this.activeFilterCount,
+    this.searchFocus,
+    this.onSearchChanged,
+    this.sortOptions = const [],
+    this.activeSortKey = '',
+    this.onChangeSort = _noop,
+    this.favorites = const [],
+    this.onSaveFavorite,
+    this.onClearAllFilters,
+  });
+
+  static void _noop(String _) {}
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 38,
+      decoration: BoxDecoration(
+        color: AC.navy3,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: activeFilterCount > 0
+              ? AC.gold.withValues(alpha: 0.6)
+              : AC.bdr,
+          width: activeFilterCount > 0 ? 1.4 : 1.0,
+        ),
+      ),
+      child: Row(
+        children: [
+          // [▼] menu opener — leftmost in RTL = OPENS the panel.
+          _PanelOpener(
+            filterGroups: filterGroups,
+            groupOptions: groupOptions,
+            activeGroupKey: activeGroupKey,
+            onChangeGroup: onChangeGroup,
+            sortOptions: sortOptions,
+            activeSortKey: activeSortKey,
+            onChangeSort: onChangeSort,
+            favorites: favorites,
+            onSaveFavorite: onSaveFavorite,
+            onClearAllFilters: onClearAllFilters,
+            activeFilterCount: activeFilterCount,
+          ),
+          // [⚙] gear — opens "settings" submenu (sort, density, etc.)
+          //  For now wired to the same panel opener but visually it sits
+          //  to the right of the chevron, mimicking Odoo.
+          //  (Removed for v1 — keeping toolbar clean. Uncomment if needed.)
+          // ── Search field ───────────────────────────────────────────
+          Expanded(
+            child: ValueListenableBuilder<TextEditingValue>(
+              valueListenable: searchCtl,
+              builder: (_, v, __) {
+                return TextField(
+                  controller: searchCtl,
+                  focusNode: searchFocus,
+                  textDirection: TextDirection.rtl,
+                  onChanged: (_) => onSearchChanged?.call(),
+                  style: TextStyle(color: AC.tp, fontSize: 13),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    hintText: searchHint,
+                    hintStyle: TextStyle(color: AC.td, fontSize: 12.5),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 8),
+                    suffixIcon: v.text.isEmpty
+                        ? null
+                        : InkWell(
+                            onTap: () {
+                              searchCtl.clear();
+                              onSearchChanged?.call();
+                            },
+                            child: Icon(Icons.close_rounded,
+                                color: AC.td, size: 16),
+                          ),
+                    suffixIconConstraints: const BoxConstraints(
+                        minWidth: 26, minHeight: 26),
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Icon(Icons.search_rounded, color: AC.ts, size: 16),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// The chevron+filter+group+favorites panel (3-column, Odoo-style)
+// ─────────────────────────────────────────────────────────────────────────
+
+class _PanelOpener extends StatelessWidget {
+  final List<ApexFilterGroup> filterGroups;
+  final List<ApexGroupOption> groupOptions;
+  final String activeGroupKey;
+  final void Function(String) onChangeGroup;
+  final List<ApexFilterOption> sortOptions;
+  final String activeSortKey;
+  final void Function(String) onChangeSort;
+  final List<ApexFavorite> favorites;
+  final VoidCallback? onSaveFavorite;
+  final VoidCallback? onClearAllFilters;
+  final int activeFilterCount;
+
+  const _PanelOpener({
+    required this.filterGroups,
+    required this.groupOptions,
+    required this.activeGroupKey,
+    required this.onChangeGroup,
+    required this.sortOptions,
+    required this.activeSortKey,
+    required this.onChangeSort,
+    required this.favorites,
+    required this.onSaveFavorite,
+    required this.onClearAllFilters,
+    required this.activeFilterCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<int>(
+      tooltip: 'فلاتر · تجميع · مفضلات',
+      offset: const Offset(0, 40),
+      color: AC.navy2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AC.bdr),
+      ),
+      // Custom child = the chevron pill at the leftmost edge of search bar.
+      itemBuilder: (ctx) => [
+        PopupMenuItem<int>(
+          enabled: false,
+          padding: EdgeInsets.zero,
+          child: _FilterPanel(
+            filterGroups: filterGroups,
+            groupOptions: groupOptions,
+            activeGroupKey: activeGroupKey,
+            onChangeGroup: (k) {
+              onChangeGroup(k);
+              Navigator.of(ctx).pop();
+            },
+            sortOptions: sortOptions,
+            activeSortKey: activeSortKey,
+            onChangeSort: (k) {
+              onChangeSort(k);
+              Navigator.of(ctx).pop();
+            },
+            favorites: favorites,
+            onSaveFavorite: () {
+              onSaveFavorite?.call();
+              Navigator.of(ctx).pop();
+            },
+            onClearAllFilters: onClearAllFilters == null
+                ? null
+                : () {
+                    onClearAllFilters!();
+                    Navigator.of(ctx).pop();
+                  },
+          ),
+        ),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(10),
+            bottomLeft: Radius.circular(10),
+          ),
+          color: activeFilterCount > 0
+              ? AC.gold.withValues(alpha: 0.12)
+              : Colors.transparent,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.expand_more_rounded,
+                color: activeFilterCount > 0 ? AC.gold : AC.ts, size: 18),
+            if (activeFilterCount > 0) ...[
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                  color: AC.gold,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '$activeFilterCount',
+                  style: TextStyle(
+                    color: AC.navy,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterPanel extends StatelessWidget {
+  final List<ApexFilterGroup> filterGroups;
+  final List<ApexGroupOption> groupOptions;
+  final String activeGroupKey;
+  final void Function(String) onChangeGroup;
+  final List<ApexFilterOption> sortOptions;
+  final String activeSortKey;
+  final void Function(String) onChangeSort;
+  final List<ApexFavorite> favorites;
+  final VoidCallback? onSaveFavorite;
+  final VoidCallback? onClearAllFilters;
+
+  const _FilterPanel({
+    required this.filterGroups,
+    required this.groupOptions,
+    required this.activeGroupKey,
+    required this.onChangeGroup,
+    required this.sortOptions,
+    required this.activeSortKey,
+    required this.onChangeSort,
+    required this.favorites,
+    required this.onSaveFavorite,
+    required this.onClearAllFilters,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+          minWidth: 540, maxWidth: 640, maxHeight: 520),
+      child: SingleChildScrollView(
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ── Column 1: Favorites (leftmost in RTL = visually right)
+              Expanded(
+                child: _column(
+                  context,
+                  iconColor: AC.gold,
+                  icon: Icons.star_rounded,
+                  title: 'المفضلات',
+                  child: _favoritesList(),
+                ),
+              ),
+              VerticalDivider(width: 1, color: AC.bdr),
+              // ── Column 2: Group-by
+              Expanded(
+                child: _column(
+                  context,
+                  iconColor: AC.info,
+                  icon: Icons.layers_rounded,
+                  title: 'تجميع حسب',
+                  child: _groupList(),
+                ),
+              ),
+              VerticalDivider(width: 1, color: AC.bdr),
+              // ── Column 3: Filters
+              Expanded(
+                child: _column(
+                  context,
+                  iconColor: AC.purple,
+                  icon: Icons.filter_alt_rounded,
+                  title: 'عوامل التصفية',
+                  child: _filtersList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _column(
+    BuildContext ctx, {
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required Widget child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(title,
+                  style: TextStyle(
+                    color: AC.tp,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  )),
+              const SizedBox(width: 6),
+              Icon(icon, color: iconColor, size: 16),
+            ],
+          ),
+        ),
+        Divider(height: 1, color: AC.bdr),
+        child,
+      ],
+    );
+  }
+
+  Widget _filtersList() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final group in filterGroups) ...[
+            if (group.labelAr.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 6, 12, 2),
+                child: Text(
+                  group.labelAr,
+                  style: TextStyle(
+                    color: AC.td,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.4,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            for (final opt in group.options)
+              _filterRow(group, opt),
+            const SizedBox(height: 4),
+          ],
+          if (onClearAllFilters != null) ...[
+            Divider(height: 1, color: AC.bdr),
+            InkWell(
+              onTap: onClearAllFilters,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('مسح كل الفلاتر',
+                        style: TextStyle(
+                            color: AC.warn,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700)),
+                    const SizedBox(width: 6),
+                    Icon(Icons.clear_all_rounded,
+                        color: AC.warn, size: 14),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _filterRow(ApexFilterGroup g, ApexFilterOption o) {
+    final selected = g.selected.contains(o.key);
+    final tickIcon = g.multi
+        ? (selected
+            ? Icons.check_box_rounded
+            : Icons.check_box_outline_blank_rounded)
+        : (selected
+            ? Icons.radio_button_checked_rounded
+            : Icons.radio_button_unchecked_rounded);
+    return InkWell(
+      onTap: () => g.onToggle(o.key),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              o.labelAr,
+              style: TextStyle(
+                color: selected ? AC.gold : AC.tp,
+                fontSize: 12.5,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+            const SizedBox(width: 8),
+            if (o.icon != null) ...[
+              Icon(o.icon, color: o.color ?? AC.ts, size: 13),
+              const SizedBox(width: 6),
+            ],
+            Icon(tickIcon,
+                color: selected ? (o.color ?? AC.gold) : AC.td, size: 14),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _groupList() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final o in groupOptions)
+            InkWell(
+              onTap: () => onChangeGroup(o.key),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      o.labelAr,
+                      style: TextStyle(
+                        color: o.key == activeGroupKey ? AC.gold : AC.tp,
+                        fontSize: 12.5,
+                        fontWeight: o.key == activeGroupKey
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    if (o.icon != null) ...[
+                      Icon(o.icon,
+                          color: o.key == activeGroupKey ? AC.gold : AC.ts,
+                          size: 13),
+                      const SizedBox(width: 6),
+                    ],
+                    Icon(
+                      o.key == activeGroupKey
+                          ? Icons.radio_button_checked_rounded
+                          : Icons.radio_button_unchecked_rounded,
+                      color: o.key == activeGroupKey ? AC.gold : AC.td,
+                      size: 14,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          if (sortOptions.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Divider(height: 1, color: AC.bdr),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 2),
+              child: Text(
+                'الترتيب',
+                style: TextStyle(
+                  color: AC.td,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.4,
+                ),
+                textAlign: TextAlign.right,
+              ),
+            ),
+            for (final o in sortOptions)
+              InkWell(
+                onTap: () => onChangeSort(o.key),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        o.labelAr,
+                        style: TextStyle(
+                          color: o.key == activeSortKey ? AC.gold : AC.tp,
+                          fontSize: 12.5,
+                          fontWeight: o.key == activeSortKey
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        o.key == activeSortKey
+                            ? Icons.radio_button_checked_rounded
+                            : Icons.radio_button_unchecked_rounded,
+                        color: o.key == activeSortKey ? AC.gold : AC.td,
+                        size: 14,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _favoritesList() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (favorites.isEmpty)
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              child: Text(
+                'لا يوجد بحث محفوظ',
+                style: TextStyle(color: AC.td, fontSize: 11.5),
+                textAlign: TextAlign.right,
+              ),
+            )
+          else
+            for (final f in favorites)
+              InkWell(
+                onTap: f.onApply,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (f.onDelete != null)
+                        InkWell(
+                          onTap: f.onDelete,
+                          child: Icon(Icons.delete_outline_rounded,
+                              color: AC.td, size: 14),
+                        )
+                      else
+                        const SizedBox(width: 14),
+                      Text(
+                        f.labelAr,
+                        style: TextStyle(color: AC.tp, fontSize: 12.5),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          if (onSaveFavorite != null) ...[
+            Divider(height: 1, color: AC.bdr),
+            InkWell(
+              onTap: onSaveFavorite,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('حفظ البحث الحالي',
+                        style: TextStyle(
+                            color: AC.gold,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700)),
+                    const SizedBox(width: 6),
+                    Icon(Icons.bookmark_add_rounded,
+                        color: AC.gold, size: 14),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  PAGINATION CLUSTER — "‹ 1-32 / 100 ›"
+// ═══════════════════════════════════════════════════════════════════════
+
+class _PaginationCluster extends StatelessWidget {
+  final int currentPage;
+  final int pageSize;
+  final int totalItems;
+  final VoidCallback? onPrev;
+  final VoidCallback? onNext;
+  const _PaginationCluster({
+    required this.currentPage,
+    required this.pageSize,
+    required this.totalItems,
+    required this.onPrev,
+    required this.onNext,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final from = totalItems == 0 ? 0 : ((currentPage - 1) * pageSize) + 1;
+    final to = (currentPage * pageSize).clamp(0, totalItems);
+    final canPrev = onPrev != null && currentPage > 1;
+    final canNext = onNext != null && to < totalItems;
+    return Container(
+      height: 36,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        color: AC.navy3,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AC.bdr),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            onPressed: canNext ? onNext : null,
+            icon: Icon(Icons.chevron_left_rounded,
+                color: canNext ? AC.tp : AC.td, size: 18),
+            tooltip: 'التالي',
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: Text(
+              '$from-$to / $totalItems',
+              style: TextStyle(
+                  color: AC.tp,
+                  fontSize: 11.5,
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.w600),
+            ),
+          ),
+          IconButton(
+            onPressed: canPrev ? onPrev : null,
+            icon: Icon(Icons.chevron_right_rounded,
+                color: canPrev ? AC.tp : AC.td, size: 18),
+            tooltip: 'السابق',
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  VIEW-MODE MENU — List / Cards / Kanban / Activity
+// ═══════════════════════════════════════════════════════════════════════
+
+class _ViewModeMenu extends StatelessWidget {
+  final List<ApexViewMode> modes;
+  final String activeKey;
+  final void Function(String) onChange;
+  const _ViewModeMenu({
+    required this.modes,
+    required this.activeKey,
+    required this.onChange,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final active = modes.firstWhere(
+      (m) => m.key == activeKey,
+      orElse: () => modes.isNotEmpty
+          ? modes.first
+          : const ApexViewMode(
+              key: 'list',
+              labelAr: 'قائمة',
+              icon: Icons.view_list_rounded,
+            ),
+    );
+    return PopupMenuButton<String>(
+      tooltip: 'وضع العرض',
+      offset: const Offset(0, 40),
+      color: AC.navy2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: AC.bdr),
+      ),
+      onSelected: onChange,
+      itemBuilder: (ctx) => [
+        for (final m in modes)
+          PopupMenuItem<String>(
+            value: m.key,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (m.key == activeKey) ...[
+                  Icon(Icons.check_rounded, color: AC.gold, size: 14),
+                  const SizedBox(width: 6),
+                ],
+                Text(
+                  m.labelAr,
+                  style: TextStyle(
+                    color: m.key == activeKey ? AC.gold : AC.tp,
+                    fontSize: 12.5,
+                    fontWeight: m.key == activeKey
+                        ? FontWeight.w700
+                        : FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(m.icon,
+                    color: m.key == activeKey ? AC.gold : AC.ts, size: 14),
+              ],
+            ),
+          ),
+      ],
+      child: Container(
+        height: 36,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          color: AC.navy3,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AC.bdr),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(active.icon, color: AC.tp, size: 16),
+            const SizedBox(width: 4),
+            Icon(Icons.expand_more_rounded, color: AC.ts, size: 14),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  HELP BUTTON — opens shortcuts dialog
+// ═══════════════════════════════════════════════════════════════════════
+
+class _HelpButton extends StatelessWidget {
+  final String titleAr;
+  final List<ApexShortcut> shortcuts;
+  const _HelpButton({required this.titleAr, required this.shortcuts});
+
+  void _show(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AC.navy2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: AC.bdr),
+        ),
+        title: Row(children: [
+          Icon(Icons.keyboard_rounded, color: AC.gold, size: 20),
+          const SizedBox(width: 8),
+          Text('اختصارات — $titleAr',
+              style: TextStyle(
+                color: AC.gold,
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+              )),
+        ]),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final s in shortcuts) _shortcutRow(s.key, s.labelAr),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('إغلاق',
+                style:
+                    TextStyle(color: AC.gold, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _shortcutRow(String k, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: AC.navy3,
+            border: Border.all(color: AC.bdr),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Text(k,
+              style: TextStyle(
+                color: AC.tp,
+                fontFamily: 'monospace',
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              )),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(label, style: TextStyle(color: AC.tp, fontSize: 13)),
+        ),
+      ]),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: 'اختصارات',
+      child: IconButton(
+        onPressed: () => _show(context),
+        icon: Icon(Icons.help_outline_rounded, color: AC.ts, size: 18),
+        style: IconButton.styleFrom(
+          backgroundColor: AC.navy3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: BorderSide(color: AC.bdr),
+          ),
+          padding: const EdgeInsets.all(8),
+        ),
+      ),
+    );
+  }
+}
+
+// Keep the `services` import used (HardwareKeyboard hooks live in
+// caller screens; importing here keeps the public API friendly).
+// ignore: unused_element
+const _kKeepServicesImportAlive = LogicalKeyboardKey.escape;

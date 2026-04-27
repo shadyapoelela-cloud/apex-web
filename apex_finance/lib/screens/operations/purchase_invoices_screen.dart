@@ -1,14 +1,14 @@
-/// APEX — Sales Invoices (V5 chip body for /app/erp/finance/sales-invoices)
+/// APEX — Purchase Invoices (V5 chip body for /app/erp/finance/purchase-bills)
 ///
-/// Uses the shared `ApexListToolbar` (Odoo-style) so the visual layout
-/// matches قيود اليومية and فواتير المشتريات. Sales-specific behavior:
+/// Same shared toolbar (`ApexListToolbar`) as فواتير المبيعات + قيود
+/// اليومية. Purchase-specific behavior:
 ///
-///   • Filter groups: date / status / customer / amount
-///   • Group-by:      none / status / customer / month / quarter / due-week
+///   • Filter groups: date / status / vendor / amount
+///   • Group-by:      none / status / vendor / month / quarter / due-week
 ///   • Sort:          date↓↑ · number · total↓↑ · due-date↑
 ///   • View modes:    list, cards
-///   • CTAs:          + جديد → /sales/invoices/new
-///                    ✨ ذكاء → /sales/invoices/new?ai=1
+///   • CTAs:          + جديد   → /purchase/bills/new
+///                    ✨ ذكاء   → /purchase/bills/new?ai=1   (OCR upload)
 library;
 
 import 'package:flutter/material.dart';
@@ -19,13 +19,14 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../widgets/apex_list_toolbar.dart';
 
-class SalesInvoicesScreen extends StatefulWidget {
-  const SalesInvoicesScreen({super.key});
+class PurchaseInvoicesScreen extends StatefulWidget {
+  const PurchaseInvoicesScreen({super.key});
   @override
-  State<SalesInvoicesScreen> createState() => _SalesInvoicesScreenState();
+  State<PurchaseInvoicesScreen> createState() =>
+      _PurchaseInvoicesScreenState();
 }
 
-class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
+class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
   // ── Data ─────────────────────────────────────────────────────────────
   List<Map<String, dynamic>> _all = [];
   bool _loading = false;
@@ -35,50 +36,40 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   final TextEditingController _searchCtl = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
 
-  // Multi-select filter sets (keyed to filter-option `key`)
   final Set<String> _statusMulti = <String>{};
-  final Set<String> _customerMulti = <String>{};
-
-  // Single-select radio values
-  String _datePreset = 'all'; // all|today|week|month|quarter|year|custom
+  final Set<String> _vendorMulti = <String>{};
+  String _datePreset = 'all';
   DateTime? _dateFrom;
   DateTime? _dateTo;
-  String _amountBucket = 'all'; // all|lt1k|1k_10k|10k_100k|gt100k
+  String _amountBucket = 'all';
 
-  // Group-by + sort + view (string keys, matching toolbar API)
   String _groupBy = 'none';
   String _sortKey = 'date_desc';
   String _viewMode = 'list';
 
-  // ── Status palette (drives row icons + group headers) ─────────────────
-  static const _statusColors = {
-    'draft': 'warn',
-    'issued': 'gold',
-    'overdue': 'err',
-    'paid': 'ok',
-  };
+  // ── Status palette (vendor-side equivalents) ─────────────────────────
   static const _statusLabels = {
     'draft': 'مسودة',
-    'issued': 'صادرة',
+    'received': 'مستلمة',
     'overdue': 'متأخرة',
     'paid': 'مدفوعة',
   };
   static const _statusIcons = {
     'draft': Icons.edit_note,
-    'issued': Icons.send,
+    'received': Icons.inventory_2_outlined,
     'overdue': Icons.warning_amber,
     'paid': Icons.verified,
   };
 
   Color _statusColor(String key) {
-    switch (_statusColors[key]) {
-      case 'warn':
+    switch (key) {
+      case 'draft':
         return AC.warn;
-      case 'gold':
-        return AC.gold;
-      case 'err':
+      case 'received':
+        return AC.info;
+      case 'overdue':
         return AC.err;
-      case 'ok':
+      case 'paid':
         return AC.ok;
       default:
         return AC.ts;
@@ -111,14 +102,15 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       _loading = true;
       _error = null;
     });
-    final res = await ApiService.pilotListSalesInvoices(entityId, limit: 500);
+    final res =
+        await ApiService.pilotListPurchaseInvoices(entityId, limit: 500);
     if (!mounted) return;
     setState(() {
       _loading = false;
       if (res.success && res.data is List) {
         _all = (res.data as List).cast<Map<String, dynamic>>();
       } else {
-        _error = res.error ?? 'تعذّر تحميل الفواتير';
+        _error = res.error ?? 'تعذّر تحميل فواتير المشتريات';
       }
     });
   }
@@ -127,7 +119,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   //  Per-row helpers
   // ─────────────────────────────────────────────────────────────────────
   bool _isOverdue(Map inv) {
-    if (inv['status'] != 'issued') return false;
+    if (inv['status'] != 'received') return false;
     final dueStr = inv['due_date'];
     if (dueStr == null) return false;
     try {
@@ -152,7 +144,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   }
 
   DateTime? _issueDateOf(Map inv) {
-    final v = inv['issue_date'];
+    final v = inv['invoice_date'] ?? inv['issue_date'];
     if (v == null) return null;
     try {
       return DateTime.parse(v.toString());
@@ -216,9 +208,9 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
           !_statusMulti.contains(_statusKey(inv))) {
         return false;
       }
-      if (_customerMulti.isNotEmpty) {
-        final cid = inv['customer_id']?.toString() ?? '';
-        if (!_customerMulti.contains(cid)) return false;
+      if (_vendorMulti.isNotEmpty) {
+        final vid = inv['vendor_id']?.toString() ?? '';
+        if (!_vendorMulti.contains(vid)) return false;
       }
       if (_datePreset != 'all' && _dateFrom != null && _dateTo != null) {
         final d = _issueDateOf(inv);
@@ -243,8 +235,9 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       if (q.isNotEmpty) {
         final hay = [
           inv['invoice_number'],
-          inv['customer_name'],
-          inv['customer_id'],
+          inv['vendor_name'],
+          inv['vendor_id'],
+          inv['invoice_date'],
           inv['issue_date'],
           inv['due_date'],
           inv['total'],
@@ -300,12 +293,12 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
     for (final inv in list) {
       final key = switch (_groupBy) {
         'status' => _statusLabel(inv),
-        'customer' => (inv['customer_name'] ??
-                inv['customer_id'] ??
-                'بدون عميل')
+        'vendor' => (inv['vendor_name'] ??
+                inv['vendor_id'] ??
+                'بدون مورّد')
             .toString(),
-        'month' => _monthKey(inv['issue_date']),
-        'quarter' => _quarterKey(inv['issue_date']),
+        'month' => _monthKey(inv['invoice_date'] ?? inv['issue_date']),
+        'quarter' => _quarterKey(inv['invoice_date'] ?? inv['issue_date']),
         'due_week' => _dueWeekKey(inv),
         _ => '__all__',
       };
@@ -351,7 +344,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
     setState(() {
       _searchCtl.clear();
       _statusMulti.clear();
-      _customerMulti.clear();
+      _vendorMulti.clear();
       _datePreset = 'all';
       _dateFrom = null;
       _dateTo = null;
@@ -362,8 +355,8 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   // ─────────────────────────────────────────────────────────────────────
   //  CTA actions
   // ─────────────────────────────────────────────────────────────────────
-  void _onCreate() => context.go('/sales/invoices/new');
-  void _onAiCreate() => context.go('/sales/invoices/new?ai=1');
+  void _onCreate() => context.go('/purchase/bills/new');
+  void _onAiCreate() => context.go('/purchase/bills/new?ai=1');
 
   // ─────────────────────────────────────────────────────────────────────
   //  Build
@@ -381,7 +374,6 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   }
 
   Widget _buildToolbar() {
-    // Build date filter group
     final dateGroup = ApexFilterGroup(
       labelAr: 'التاريخ',
       icon: Icons.calendar_month_rounded,
@@ -417,23 +409,22 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       ],
     );
 
-    // Build customer choices from currently-loaded invoices
-    final customerMap = <String, String>{};
+    final vendorMap = <String, String>{};
     for (final inv in _all) {
-      final id = inv['customer_id']?.toString() ?? '';
-      final name = inv['customer_name']?.toString() ?? id;
-      if (id.isNotEmpty) customerMap[id] = name;
+      final id = inv['vendor_id']?.toString() ?? '';
+      final name = inv['vendor_name']?.toString() ?? id;
+      if (id.isNotEmpty) vendorMap[id] = name;
     }
-    final customerGroup = ApexFilterGroup(
-      labelAr: 'العميل',
-      icon: Icons.person_outline_rounded,
+    final vendorGroup = ApexFilterGroup(
+      labelAr: 'المورّد',
+      icon: Icons.business_center_outlined,
       multi: true,
-      selected: _customerMulti,
+      selected: _vendorMulti,
       onToggle: (k) => setState(() {
-        if (!_customerMulti.add(k)) _customerMulti.remove(k);
+        if (!_vendorMulti.add(k)) _vendorMulti.remove(k);
       }),
       options: [
-        for (final e in customerMap.entries)
+        for (final e in vendorMap.entries)
           ApexFilterOption(key: e.key, labelAr: e.value),
       ],
     );
@@ -454,19 +445,19 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
     );
 
     return ApexListToolbar(
-      titleAr: 'فواتير المبيعات',
-      titleIcon: Icons.receipt_long_rounded,
+      titleAr: 'فواتير المشتريات',
+      titleIcon: Icons.receipt_outlined,
       itemNounAr: 'فاتورة',
       totalCount: _all.length,
       visibleCount: _visible.length,
       searchCtl: _searchCtl,
       searchFocus: _searchFocus,
-      searchHint: 'بحث برقم الفاتورة أو العميل…',
+      searchHint: 'بحث برقم الفاتورة أو المورّد…',
       onSearchChanged: () => setState(() {}),
       filterGroups: [
         dateGroup,
         statusGroup,
-        if (customerMap.isNotEmpty) customerGroup,
+        if (vendorMap.isNotEmpty) vendorGroup,
         amountGroup,
       ],
       groupOptions: const [
@@ -475,9 +466,9 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
         ApexGroupOption(
             key: 'status', labelAr: 'الحالة', icon: Icons.task_alt_rounded),
         ApexGroupOption(
-            key: 'customer',
-            labelAr: 'العميل',
-            icon: Icons.person_outline_rounded),
+            key: 'vendor',
+            labelAr: 'المورّد',
+            icon: Icons.business_center_outlined),
         ApexGroupOption(
             key: 'month',
             labelAr: 'الشهر',
@@ -494,8 +485,8 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       activeGroupKey: _groupBy,
       onChangeGroup: (k) => setState(() => _groupBy = k),
       sortOptions: const [
-        ApexFilterOption(key: 'date_desc', labelAr: 'تاريخ الإصدار (الأحدث)'),
-        ApexFilterOption(key: 'date_asc', labelAr: 'تاريخ الإصدار (الأقدم)'),
+        ApexFilterOption(key: 'date_desc', labelAr: 'تاريخ الفاتورة (الأحدث)'),
+        ApexFilterOption(key: 'date_asc', labelAr: 'تاريخ الفاتورة (الأقدم)'),
         ApexFilterOption(key: 'number_asc', labelAr: 'رقم الفاتورة'),
         ApexFilterOption(key: 'total_desc', labelAr: 'الإجمالي (الأكبر)'),
         ApexFilterOption(key: 'total_asc', labelAr: 'الإجمالي (الأصغر)'),
@@ -504,7 +495,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       activeSortKey: _sortKey,
       onChangeSort: (k) => setState(() => _sortKey = k),
       onClearAllFilters: _statusMulti.isNotEmpty ||
-              _customerMulti.isNotEmpty ||
+              _vendorMulti.isNotEmpty ||
               _datePreset != 'all' ||
               _amountBucket != 'all' ||
               _searchCtl.text.isNotEmpty
@@ -526,7 +517,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       aiCreateLabelAr: 'ذكاء',
       shortcuts: const [
         ApexShortcut('N', 'فاتورة جديدة'),
-        ApexShortcut('A', 'فاتورة بالذكاء'),
+        ApexShortcut('A', 'فاتورة بالذكاء (OCR)'),
         ApexShortcut('/', 'بحث'),
         ApexShortcut('F', 'فلتر'),
         ApexShortcut('G', 'تجميع'),
@@ -566,18 +557,18 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.receipt_long_outlined, color: AC.ts, size: 48),
+            Icon(Icons.receipt_outlined, color: AC.ts, size: 48),
             const SizedBox(height: 12),
-            Text('لا توجد فواتير مطابقة',
+            Text('لا توجد فواتير مشتريات مطابقة',
                 style: TextStyle(color: AC.tp, fontSize: 14)),
             const SizedBox(height: 6),
-            Text('جرّب إزالة الفلتر أو ابدأ بإصدار فاتورة جديدة',
+            Text('جرّب إزالة الفلتر أو ابدأ بإدخال فاتورة جديدة',
                 style: TextStyle(color: AC.ts, fontSize: 12)),
             const SizedBox(height: 16),
             FilledButton.icon(
               onPressed: _onCreate,
               icon: const Icon(Icons.add, size: 16),
-              label: const Text('إنشاء فاتورة'),
+              label: const Text('فاتورة مورّد جديدة'),
               style: FilledButton.styleFrom(
                   backgroundColor: AC.gold, foregroundColor: AC.navy),
             ),
@@ -638,7 +629,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   Widget _invoiceRow(Map<String, dynamic> inv) {
     final k = _statusKey(inv);
     final color = _statusColor(k);
-    final iconData = _statusIcons[k] ?? Icons.receipt_long;
+    final iconData = _statusIcons[k] ?? Icons.receipt_outlined;
     return InkWell(
       onTap: () => _openInvoice(inv),
       child: Container(
@@ -663,7 +654,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
                           fontWeight: FontWeight.w700)),
                   const SizedBox(height: 2),
                   Text(
-                      '${inv['issue_date'] ?? ''} · ${inv['customer_name'] ?? inv['customer_id'] ?? ''}',
+                      '${inv['invoice_date'] ?? inv['issue_date'] ?? ''} · ${inv['vendor_name'] ?? inv['vendor_id'] ?? ''}',
                       style: TextStyle(color: AC.ts, fontSize: 11)),
                 ]),
           ),
@@ -693,7 +684,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   Widget _invoiceCard(Map<String, dynamic> inv) {
     final k = _statusKey(inv);
     final color = _statusColor(k);
-    final iconData = _statusIcons[k] ?? Icons.receipt_long;
+    final iconData = _statusIcons[k] ?? Icons.receipt_outlined;
     return InkWell(
       onTap: () => _openInvoice(inv),
       borderRadius: BorderRadius.circular(10),
@@ -734,14 +725,14 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
             ]),
             const SizedBox(height: 8),
             Text(
-                inv['customer_name']?.toString() ??
-                    inv['customer_id']?.toString() ??
-                    'بدون عميل',
+                inv['vendor_name']?.toString() ??
+                    inv['vendor_id']?.toString() ??
+                    'بدون مورّد',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: AC.tp, fontSize: 12.5)),
             const SizedBox(height: 2),
-            Text('${inv['issue_date'] ?? ''}',
+            Text('${inv['invoice_date'] ?? inv['issue_date'] ?? ''}',
                 style: TextStyle(color: AC.ts, fontSize: 11)),
             const Spacer(),
             Align(
@@ -765,7 +756,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       context.go('/compliance/journal-entry/$jeId');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('الفاتورة ${inv['invoice_number']} لم تُصدر بعد'),
+        content: Text('الفاتورة ${inv['invoice_number']} لم تُرحَّل بعد'),
       ));
     }
   }
