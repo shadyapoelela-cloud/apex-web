@@ -396,6 +396,76 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
     context.go('/sales/invoices/new?ai=1');
   }
 
+  /// Universal shortcuts dialog — slot 9 of the toolbar in every screen.
+  /// Contents are screen-specific; the slot itself is identical.
+  void _showShortcutsHelp() {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AC.navy2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: AC.bdr),
+        ),
+        title: Row(children: [
+          Icon(Icons.keyboard_rounded, color: AC.gold, size: 20),
+          const SizedBox(width: 8),
+          Text('اختصارات لوحة المفاتيح',
+              style: TextStyle(
+                  color: AC.gold,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800)),
+        ]),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _shortcutRow('N', 'فاتورة جديدة'),
+            _shortcutRow('A', 'فاتورة بالذكاء'),
+            _shortcutRow('/', 'بحث'),
+            _shortcutRow('F', 'فلتر'),
+            _shortcutRow('G', 'تجميع'),
+            _shortcutRow('R', 'تحديث'),
+            _shortcutRow('E', 'تصدير / تقارير'),
+            _shortcutRow('Esc', 'مسح الفلتر / إغلاق'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('إغلاق',
+                style: TextStyle(color: AC.gold, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _shortcutRow(String key, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: AC.navy3,
+            border: Border.all(color: AC.bdr),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Text(key,
+              style: TextStyle(
+                  color: AC.tp,
+                  fontFamily: 'monospace',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700)),
+        ),
+        const SizedBox(width: 12),
+        Text(label,
+            style: TextStyle(color: AC.tp, fontSize: 13)),
+      ]),
+    );
+  }
+
   Future<void> _onImportExport() async {
     final action = await showModalBottomSheet<String>(
       context: context,
@@ -406,7 +476,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Text('استيراد / تصدير',
+            child: Text('تصدير وتقارير',
                 style: TextStyle(
                     color: AC.gold,
                     fontSize: 15,
@@ -434,21 +504,34 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
                 style: TextStyle(color: AC.tp, fontSize: 13.5)),
             onTap: () => Navigator.pop(ctx, 'export_pdf'),
           ),
+          Divider(color: AC.bdr, height: 1),
+          ListTile(
+            leading: Icon(Icons.bar_chart_rounded, color: AC.gold),
+            title: Text('تقارير المبيعات',
+                style: TextStyle(color: AC.tp, fontSize: 13.5)),
+            subtitle: Text('AR Aging · العملاء · المبيعات الشهرية',
+                style: TextStyle(color: AC.ts, fontSize: 11)),
+            trailing: Icon(Icons.chevron_left_rounded, color: AC.ts),
+            onTap: () => Navigator.pop(ctx, 'reports'),
+          ),
           const SizedBox(height: 8),
         ]),
       ),
     );
-    if (action != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AC.navy3,
-        content: Text(
-          action == 'import'
-              ? 'الاستيراد قيد التطوير — سيتوفر قريباً'
-              : 'بدأ التصدير — سيُنزَّل الملف خلال لحظات',
-          style: TextStyle(color: AC.tp),
-        ),
-      ));
+    if (action == null || !mounted) return;
+    if (action == 'reports') {
+      _onReports();
+      return;
     }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AC.navy3,
+      content: Text(
+        action == 'import'
+            ? 'الاستيراد قيد التطوير — سيتوفر قريباً'
+            : 'بدأ التصدير — سيُنزَّل الملف خلال لحظات',
+        style: TextStyle(color: AC.tp),
+      ),
+    ));
   }
 
   // ══════════════════════════════════════════════════════════════════════
@@ -602,11 +685,13 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
               onTap: _onImportExport,
             ),
             const SizedBox(width: 4),
-            // 3rd slot — JE has help, sales-invoices uses reports
+            // 3rd slot — UNIVERSAL across screens: shortcuts/help.
+            // Tooltip + dialog content are screen-specific; the slot is not.
             _headerIconBtn(
-              icon: Icons.bar_chart_rounded,
-              tooltip: 'تقارير المبيعات',
-              onTap: _onReports,
+              icon: Icons.help_outline_rounded,
+              tooltip:
+                  'اختصارات (N فاتورة جديدة · A بالذكاء · / بحث · Esc مسح)',
+              onTap: _showShortcutsHelp,
             ),
             const SizedBox(width: 12),
             // ── زر 1: إنشاء فاتورة يدوية (Outlined gold) ──
