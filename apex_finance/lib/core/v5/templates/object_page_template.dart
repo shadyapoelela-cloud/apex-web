@@ -110,6 +110,12 @@ class ObjectPageTemplate extends StatefulWidget {
   /// to top tabs regardless of this flag.
   final bool tabsAtTop;
 
+  /// When true, suppress the shell's tab bar entirely so the parent can
+  /// render its own tab strip inside the content area. The shell still
+  /// uses tabs[0].builder for content, so callers should pass a single
+  /// tab whose builder owns tab switching.
+  final bool hideTabsBar;
+
   /// Chatter rail entries (right side). Null = no chatter rail.
   final List<ChatterEntry>? chatterEntries;
 
@@ -129,6 +135,7 @@ class ObjectPageTemplate extends StatefulWidget {
     this.chatterEntries,
     this.onBack,
     this.tabsAtTop = false,
+    this.hideTabsBar = false,
   });
 
   @override
@@ -160,13 +167,14 @@ class _ObjectPageTemplateState extends State<ObjectPageTemplate> {
             if (widget.smartButtons != null && widget.smartButtons!.isNotEmpty)
               _buildSmartButtons(),
             const Divider(height: 1),
-            if (useTopTabs) _buildTabsHorizontal(),
-            if (useTopTabs) const Divider(height: 1),
+            if (useTopTabs && !widget.hideTabsBar) _buildTabsHorizontal(),
+            if (useTopTabs && !widget.hideTabsBar) const Divider(height: 1),
             Expanded(
               child: Row(
                 children: [
-                  if (!useTopTabs) _buildTabsSidebar(),
-                  if (!useTopTabs) const VerticalDivider(width: 1),
+                  if (!useTopTabs && !widget.hideTabsBar) _buildTabsSidebar(),
+                  if (!useTopTabs && !widget.hideTabsBar)
+                    const VerticalDivider(width: 1),
                   Expanded(child: _buildContent()),
                   if (widget.chatterEntries != null && _chatterOpen && !isNarrow) ...[
                     const VerticalDivider(width: 1),

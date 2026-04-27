@@ -99,6 +99,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   double? _aiDocConfidence;
   List<String> _aiWarnings = const [];
 
+  // ─── Local tab state (shell's tab bar is hidden; we render our own
+  // strip at the top of the content area where the البيانات الأساسية
+  // title used to sit) ───
+  String _activeView = 'lines';
+
   // ─── Theme shortcuts ───
   Color get _gold => core_theme.AC.gold;
   Color get _navy => const Color(0xFF1A237E);
@@ -489,27 +494,14 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       // for info already conveyed via the status pill + summary card +
       // new timeline section in the overview tab.
       tabsAtTop: true,
+      hideTabsBar: true,
       primaryActions: _buildPrimaryActions(status),
       tabs: [
         ObjectPageTab(
-          id: 'lines',
-          labelAr: _je != null
-              ? 'البنود (${_jeLines.length})'
-              : 'البنود (${_lines.length})',
+          id: 'main',
+          labelAr: '',
           icon: Icons.list_alt_rounded,
-          builder: (_) => _buildLinesTab(),
-        ),
-        ObjectPageTab(
-          id: 'other_info',
-          labelAr: 'معلومات أخرى',
-          icon: Icons.info_outline_rounded,
-          builder: (_) => _buildOtherInfoTab(),
-        ),
-        ObjectPageTab(
-          id: 'audit',
-          labelAr: 'سجل التدقيق',
-          icon: Icons.shield_rounded,
-          builder: (_) => _buildAuditTab(),
+          builder: (_) => _buildActiveViewBody(),
         ),
       ],
       chatterEntries: _buildChatterEntries(),
@@ -1149,6 +1141,64 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   }
 
   // ─────────────────────────────────────────────────────────────────
+  // Local tabs — moved out of the shell into the content area where the
+  // البيانات الأساسية title used to sit. The tab strip is rendered as
+  // the heading of the first section card on every view.
+  // ─────────────────────────────────────────────────────────────────
+  Widget _buildActiveViewBody() {
+    switch (_activeView) {
+      case 'other_info':
+        return _buildOtherInfoTab();
+      case 'audit':
+        return _buildAuditTab();
+      case 'lines':
+      default:
+        return _buildLinesTab();
+    }
+  }
+
+  Widget _localTabsStrip() {
+    final linesCount = _je != null ? _jeLines.length : _lines.length;
+    final tabs = <(String id, String label, IconData icon)>[
+      ('lines', 'البنود ($linesCount)', Icons.list_alt_rounded),
+      ('other_info', 'معلومات أخرى', Icons.info_outline_rounded),
+      ('audit', 'سجل التدقيق', Icons.shield_rounded),
+    ];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: tabs.map((t) {
+          final active = t.$1 == _activeView;
+          return InkWell(
+            onTap: () => setState(() => _activeView = t.$1),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: active ? _gold : Colors.transparent,
+                    width: 3,
+                  ),
+                ),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(t.$3, size: 14, color: active ? _gold : _ts),
+                const SizedBox(width: 6),
+                Text(t.$2,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: active ? FontWeight.w800 : FontWeight.w500,
+                      color: active ? _navy : _tp,
+                    )),
+              ]),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────
   // TAB: LINES — also hosts the AI quick bar + البيانات الأساسية at
   // the top so the user can fill the header and rows on a single tab.
   // ─────────────────────────────────────────────────────────────────
@@ -1161,7 +1211,16 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        _sectionCard(child: _viewBasicFields()),
+        _sectionCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _localTabsStrip(),
+              const SizedBox(height: 14),
+              _viewBasicFields(),
+            ],
+          ),
+        ),
         const SizedBox(height: 18),
         _sectionCard(
           title: 'بنود القيد',
@@ -1328,7 +1387,16 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       children: [
         if (_aiWarnings.isNotEmpty) _aiWarningsStrip(),
         if (_aiWarnings.isNotEmpty) const SizedBox(height: 18),
-        _sectionCard(child: _createBasicFields()),
+        _sectionCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _localTabsStrip(),
+              const SizedBox(height: 14),
+              _createBasicFields(),
+            ],
+          ),
+        ),
         const SizedBox(height: 18),
         Container(
           decoration: BoxDecoration(
@@ -1763,10 +1831,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       padding: const EdgeInsets.all(24),
       children: [
         _sectionCard(
-          title: 'معلومات أخرى',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              _localTabsStrip(),
+              const SizedBox(height: 14),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text('الترحيل التلقائي',
@@ -1978,41 +2047,46 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         (DateTime.now().toIso8601String().substring(0, 16).replaceAll('T', ' '),
             'أنت', 'يتمّ إنشاء القيد الآن', Icons.edit_note_rounded),
     ];
-    return ListView.separated(
+    return ListView(
       padding: const EdgeInsets.all(24),
-      itemCount: entries.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (_, i) {
-        final (ts, who, what, icon) = entries[i];
-        return Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: _bdr),
-          ),
-          child: Row(children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: _gold.withValues(alpha: 0.15),
-              child: Icon(icon, color: _gold, size: 14),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(what,
-                      style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w700)),
-                  Text('$ts · $who',
-                      style: TextStyle(fontSize: 10, color: _ts)),
-                ],
+      children: [
+        _sectionCard(child: _localTabsStrip()),
+        const SizedBox(height: 18),
+        for (var i = 0; i < entries.length; i++) ...[
+          if (i > 0) const SizedBox(height: 8),
+          Builder(builder: (_) {
+            final (ts, who, what, icon) = entries[i];
+            return Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: _bdr),
               ),
-            ),
-          ]),
-        );
-      },
+              child: Row(children: [
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: _gold.withValues(alpha: 0.15),
+                  child: Icon(icon, color: _gold, size: 14),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(what,
+                          style: const TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w700)),
+                      Text('$ts · $who',
+                          style: TextStyle(fontSize: 10, color: _ts)),
+                    ],
+                  ),
+                ),
+              ]),
+            );
+          }),
+        ],
+      ],
     );
   }
 
