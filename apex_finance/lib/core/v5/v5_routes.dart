@@ -17,6 +17,7 @@ import '../theme.dart' as core_theme;
 import 'package:go_router/go_router.dart';
 
 import '../../screens/v5_showcase/v5_showcase_screen.dart';
+import '../../pilot/screens/setup/je_builder_live_v52.dart';
 import 'apex_v5_service_shell.dart';
 import 'apex_v5_service_switcher.dart';
 import 'apex_v5_workspace_selector.dart';
@@ -97,6 +98,26 @@ List<RouteBase> v5Routes() => [
             chipBodyBuilder: wired != null
                 ? (ctx, _) => wired(ctx)
                 : null,
+          );
+        },
+      ),
+      // JE create — wraps the V5.2 ObjectPage builder with the unified
+      // top bar (logo + breadcrumb + Cmd+K + actions) so it doesn't lose
+      // the chrome when pushed from the JE list.
+      GoRoute(
+        path: '/app/erp/finance/je-builder/new',
+        builder: (ctx, state) {
+          final svc = v5ServiceById('erp');
+          final main = svc?.mainModuleById('finance');
+          final chip = main?.chipById('je-builder');
+          if (svc == null || main == null || chip == null) {
+            return const _V5NotFound();
+          }
+          return ApexV5ServiceShell(
+            service: svc,
+            mainModule: main,
+            activeChip: chip,
+            bodyOverride: const JeBuilderLiveV52Screen(),
           );
         },
       ),

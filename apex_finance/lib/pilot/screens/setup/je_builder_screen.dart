@@ -15,13 +15,13 @@ import 'dart:html' as html;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme.dart' as core_theme;
 
 import '../../api/pilot_client.dart';
 import '../../num_utils.dart';
 import '../../session.dart';
 import '../../widgets/attachments_panel.dart';
-import 'je_builder_live_v52.dart';
 
 // Wave R — CSV download helpers (dart:html wrappers)
 dynamic _makeBlob(List<int> bytes, String type) =>
@@ -363,13 +363,11 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
           content: Text('ابذر شجرة الحسابات أولاً')));
       return;
     }
-    // نفتح V5.2 screen — يدعم الوضعين manual و ai (الـ AI bar موجود
-    // داخل الـ screen نفسها فلا يهمّ mode هنا)
-    final saved = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder: (_) => const JeBuilderLiveV52Screen(),
-      ),
-    );
+    // Push via go_router so the V5.2 builder is wrapped by
+    // ApexV5ServiceShell — the unified top bar (logo + breadcrumb +
+    // Cmd+K + actions) stays visible. JeBuilderLiveV52Screen still pops
+    // with Navigator.pop(true) on save; go_router's PageRoute returns it.
+    final saved = await context.push<bool>('/app/erp/finance/je-builder/new');
     if (!mounted) return;
     if (saved == true) _load();
   }
