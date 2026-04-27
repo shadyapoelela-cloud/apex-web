@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تواصل معنا — APEX</title>
+  <meta name="description" content="فريق APEX جاهز للرد عليك — واتساب، هاتف، أو عبر النموذج.">
+  <link rel="icon" type="image/png" href="/apex-web/app/favicon.png">
+  <link rel="stylesheet" href="/apex-web/css/apex.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <a href="/apex-web/" class="brand"><span class="brand__bolt">⚡</span><span>APEX</span></a>
+    <nav class="nav">
+      <a class="nav__link" href="/apex-web/">الرئيسية</a>
+      <a class="nav__link" href="/apex-web/product.html">المنتج</a>
+      <a class="nav__link" href="/apex-web/pricing.html">الأسعار</a>
+      <a class="nav__link" href="/apex-web/solutions.html">الحلول</a>
+      <a class="nav__link" href="/apex-web/resources.html">الموارد</a>
+      <a class="nav__link" href="/apex-web/customers.html">العملاء</a>
+      <a class="nav__link nav__link--active" href="/apex-web/contact.html">تواصل</a>
+    </nav>
+    <div class="nav__cta">
+      <a class="btn btn--ghost" href="/apex-web/app/">دخول</a>
+      <a class="btn btn--primary" href="/apex-web/app/#/app/erp/finance/onboarding">ابدأ مجاناً ←</a>
+      <button class="menu-toggle" onclick="document.getElementById('m').classList.toggle('is-open')">☰</button>
+    </div>
+  </div>
+  <div id="m" class="mobile-menu">
+    <a class="nav__link" href="/apex-web/">الرئيسية</a>
+    <a class="nav__link" href="/apex-web/product.html">المنتج</a>
+    <a class="nav__link" href="/apex-web/pricing.html">الأسعار</a>
+    <a class="nav__link" href="/apex-web/solutions.html">الحلول</a>
+    <a class="nav__link" href="/apex-web/resources.html">الموارد</a>
+    <a class="nav__link" href="/apex-web/customers.html">العملاء</a>
+    <a class="nav__link" href="/apex-web/contact.html">تواصل</a>
+  </div>
+</header>
+
+<section class="section section--hero">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">تواصل معنا</span>
+      <h1>كيف نساعدك؟</h1>
+      <p class="lead">فريقنا في الرياض جاهز للرد خلال ساعة عمل واحدة (الأحد - الخميس، ٩ص - ٦م).</p>
+    </div>
+
+    <div class="contact-grid">
+      <div>
+        <h2 style="font-size:20px; margin-bottom:24px;">أرسل لنا رسالة</h2>
+        <form class="form" onsubmit="event.preventDefault(); alert('شكراً! سنتواصل معك قريباً.');">
+          <div>
+            <label for="name">الاسم الكامل</label>
+            <input id="name" name="name" type="text" required>
+          </div>
+          <div>
+            <label for="company">اسم الشركة</label>
+            <input id="company" name="company" type="text">
+          </div>
+          <div>
+            <label for="email">البريد الإلكتروني</label>
+            <input id="email" name="email" type="email" required>
+          </div>
+          <div>
+            <label for="phone">رقم الجوال</label>
+            <input id="phone" name="phone" type="tel" placeholder="05XXXXXXXX">
+          </div>
+          <div>
+            <label for="topic">الموضوع</label>
+            <select id="topic" name="topic">
+              <option>طلب عرض توضيحي</option>
+              <option>استفسار عن الأسعار</option>
+              <option>دعم فنّي</option>
+              <option>شراكة / Reseller</option>
+              <option>أخرى</option>
+            </select>
+          </div>
+          <div>
+            <label for="msg">رسالتك</label>
+            <textarea id="msg" name="msg" placeholder="أخبرنا كيف نقدر نساعدك..."></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary btn--lg" style="justify-self:start">إرسال ←</button>
+        </form>
+      </div>
+
+      <div>
+        <h2 style="font-size:20px; margin-bottom:24px;">قنوات التواصل المباشرة</h2>
+        <div class="contact-channels">
+          <a class="contact-channel contact-channel--whatsapp" href="https://wa.me/966500000000" target="_blank" rel="noopener">
+            <div class="contact-channel__icon">💬</div>
+            <div>
+              <div class="contact-channel__title">واتساب — الأسرع</div>
+              <div class="contact-channel__value">+966 50 000 0000</div>
+            </div>
+          </a>
+          <a class="contact-channel contact-channel--phone" href="tel:+966500000000">
+            <div class="contact-channel__icon">📞</div>
+            <div>
+              <div class="contact-channel__title">هاتف</div>
+              <div class="contact-channel__value">+966 50 000 0000</div>
+            </div>
+          </a>
+          <a class="contact-channel contact-channel--email" href="mailto:hello@apex.sa">
+            <div class="contact-channel__icon">✉️</div>
+            <div>
+              <div class="contact-channel__title">بريد إلكتروني</div>
+              <div class="contact-channel__value">hello@apex.sa</div>
+            </div>
+          </a>
+        </div>
+
+        <div style="margin-top:32px; padding:20px; background:var(--navy-800); border:1px solid var(--navy-600); border-radius:var(--radius);">
+          <h3 style="font-size:14px; color:var(--gold); margin-bottom:8px;">📍 المقرّ</h3>
+          <p style="font-size:13.5px; color:var(--ts); line-height:1.8;">
+            الرياض، المملكة العربية السعودية<br>
+            حيّ العليا — مبنى APEX<br>
+            <small>الموقع التفصيلي يُرسل بعد الموعد</small>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <div><div class="brand"><span class="brand__bolt">⚡</span><span>APEX</span></div></div>
+    <div><h4>المنتج</h4><ul><li><a href="/apex-web/product.html">الخدمات</a></li><li><a href="/apex-web/pricing.html">الأسعار</a></li></ul></div>
+    <div><h4>الموارد</h4><ul><li><a href="/apex-web/resources.html">المدوّنة</a></li></ul></div>
+    <div><h4>تواصل</h4><ul><li><a href="/apex-web/contact.html">تواصل معنا</a></li><li><a href="https://wa.me/966500000000">واتساب</a></li></ul></div>
+  </div>
+  <div class="footer__legal"><span>© 2026 APEX</span><span>صُنع بفخر في 🇸🇦</span></div>
+</footer>
+
+</body>
+</html>

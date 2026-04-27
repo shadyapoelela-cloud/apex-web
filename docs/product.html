@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المنتج — APEX</title>
+  <meta name="description" content="استعراض كامل لجميع تطبيقات APEX: المحاسبة، الفوترة الإلكترونية، المخزون، الرواتب، الإقرارات الضريبية.">
+  <link rel="icon" type="image/png" href="/apex-web/app/favicon.png">
+  <link rel="stylesheet" href="/apex-web/css/apex.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <a href="/apex-web/" class="brand"><span class="brand__bolt">⚡</span><span>APEX</span></a>
+    <nav class="nav">
+      <a class="nav__link" href="/apex-web/">الرئيسية</a>
+      <a class="nav__link nav__link--active" href="/apex-web/product.html">المنتج</a>
+      <a class="nav__link" href="/apex-web/pricing.html">الأسعار</a>
+      <a class="nav__link" href="/apex-web/solutions.html">الحلول</a>
+      <a class="nav__link" href="/apex-web/resources.html">الموارد</a>
+      <a class="nav__link" href="/apex-web/customers.html">العملاء</a>
+      <a class="nav__link" href="/apex-web/contact.html">تواصل</a>
+    </nav>
+    <div class="nav__cta">
+      <a class="btn btn--ghost" href="/apex-web/app/">دخول</a>
+      <a class="btn btn--primary" href="/apex-web/app/#/app/erp/finance/onboarding">ابدأ مجاناً ←</a>
+      <button class="menu-toggle" onclick="document.getElementById('m').classList.toggle('is-open')">☰</button>
+    </div>
+  </div>
+  <div id="m" class="mobile-menu">
+    <a class="nav__link" href="/apex-web/">الرئيسية</a>
+    <a class="nav__link" href="/apex-web/product.html">المنتج</a>
+    <a class="nav__link" href="/apex-web/pricing.html">الأسعار</a>
+    <a class="nav__link" href="/apex-web/solutions.html">الحلول</a>
+    <a class="nav__link" href="/apex-web/resources.html">الموارد</a>
+    <a class="nav__link" href="/apex-web/customers.html">العملاء</a>
+    <a class="nav__link" href="/apex-web/contact.html">تواصل</a>
+  </div>
+</header>
+
+<section class="section section--hero">
+  <div class="container">
+    <span class="eyebrow">المنتج</span>
+    <h1>منصّة موحّدة بـ ١٢ تطبيقاً متكاملاً</h1>
+    <p class="lead">كل البيانات تتدفّق تلقائياً بين التطبيقات — فاتورة المبيعات تُولّد قيد يومية، تُحدّث المخزون، وتظهر في إقرار VAT الربعي.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 id="accounting">📒 المحاسبة المالية</h2>
+    <p class="lead">قلب المنصّة — كل العمليات تنتهي هنا.</p>
+    <div class="grid grid--3" style="margin-top:24px">
+      <div class="card"><h3 class="card__title">قيود اليومية</h3><p class="card__desc">إنشاء، تعديل، ترحيل، عكس قيود يومية. مع تتبّع كامل لمن أنشأ ومن وافق.</p></div>
+      <div class="card"><h3 class="card__title">شجرة الحسابات</h3><p class="card__desc">قالب SOCPA معتمد، قابل للتخصيص. هرمية مرنة، مراكز تكلفة وأرباح.</p></div>
+      <div class="card"><h3 class="card__title">القوائم المالية</h3><p class="card__desc">قائمة الدخل، الميزانية، التدفق النقدي — جاهزة بضغطة، تتحدّث في الوقت الحقيقي.</p></div>
+    </div>
+
+    <h2 id="sales" style="margin-top:64px">🧾 فواتير المبيعات &amp; ZATCA</h2>
+    <p class="lead">فوترة إلكترونية معتمدة من هيئة الزكاة والضريبة والجمارك.</p>
+    <div class="grid grid--3" style="margin-top:24px">
+      <div class="card"><h3 class="card__title">إصدار فوري</h3><p class="card__desc">فاتورة بـ ٣٠ ثانية — اختر العميل، أدخل البنود، اضغط "إصدار" → ZATCA يستقبل فوراً.</p></div>
+      <div class="card"><h3 class="card__title">QR + توقيع رقمي</h3><p class="card__desc">كل فاتورة تأتي بـ QR Code + Cryptographic Stamp + UUID مطابق لمواصفات Phase 2.</p></div>
+      <div class="card"><h3 class="card__title">متابعة الدفع</h3><p class="card__desc">حالة الفاتورة (مسوّدة → مُصدرة → مدفوعة → متأخرة)، تذكيرات تلقائية، أعمار AR.</p></div>
+    </div>
+
+    <h2 id="inventory" style="margin-top:64px">📦 المخزون &amp; المستودعات</h2>
+    <div class="grid grid--3" style="margin-top:24px">
+      <div class="card"><h3 class="card__title">مخازن متعدّدة</h3><p class="card__desc">مخزن لكل فرع، تحويلات بين المخازن، رصيد فوري لكل صنف.</p></div>
+      <div class="card"><h3 class="card__title">حدود إعادة الطلب</h3><p class="card__desc">تنبيه تلقائي عند نزول الكمية تحت الحد الأدنى — مع اقتراح كمية الطلب.</p></div>
+      <div class="card"><h3 class="card__title">تقييم المخزون</h3><p class="card__desc">FIFO أو متوسط مرجّح — تكلفة دقيقة لكل صنف ولكل حركة.</p></div>
+    </div>
+
+    <h2 id="purchasing" style="margin-top:64px">🛒 المشتريات &amp; الموردون</h2>
+    <div class="grid grid--3" style="margin-top:24px">
+      <div class="card"><h3 class="card__title">دورة الشراء</h3><p class="card__desc">طلب عرض → أمر شراء → استلام بضاعة → فاتورة مورد — مع ترقيم تلقائي وموافقات.</p></div>
+      <div class="card"><h3 class="card__title">أعمار AP</h3><p class="card__desc">من عليه دفع وكم متأخّر، مرتّب حسب الفترات: ٣٠ / ٦٠ / ٩٠+ يوم.</p></div>
+      <div class="card"><h3 class="card__title">WPS للمدفوعات</h3><p class="card__desc">ملف SAMA جاهز للبنك — مدفوعات الموردين والرواتب في ضغطة واحدة.</p></div>
+    </div>
+
+    <h2 id="hr" style="margin-top:64px">👥 الرواتب &amp; الموارد البشرية</h2>
+    <div class="grid grid--3" style="margin-top:24px">
+      <div class="card"><h3 class="card__title">تشغيل الرواتب</h3><p class="card__desc">حساب رواتب شهري لجميع الموظفين بضغطة — مع البدلات، الاستقطاعات، الإجازات.</p></div>
+      <div class="card"><h3 class="card__title">GOSI &amp; مكتب العمل</h3><p class="card__desc">حساب التأمينات الاجتماعية تلقائياً، وتوليد ملف WPS للبنك.</p></div>
+      <div class="card"><h3 class="card__title">مكافأة نهاية الخدمة</h3><p class="card__desc">حسبة دقيقة طبقاً لنظام العمل السعودي — تظهر في كشف راتب نهاية الخدمة.</p></div>
+    </div>
+
+    <h2 id="tax" style="margin-top:64px">📊 الإقرارات الضريبية</h2>
+    <div class="grid grid--3" style="margin-top:24px">
+      <div class="card"><h3 class="card__title">إقرار VAT الربعي</h3><p class="card__desc">يُملأ تلقائياً من قيودك — تحقّق، ووقّع، وقدّم لهيئة الزكاة.</p></div>
+      <div class="card"><h3 class="card__title">حاسبة الزكاة</h3><p class="card__desc">حساب وعاء الزكاة طبقاً للهيئة، مع بيان مفصّل لكل بند.</p></div>
+      <div class="card"><h3 class="card__title">استقطاع WHT</h3><p class="card__desc">حساب وتقديم استقطاع المصدر للموردين الأجانب — تلقائي بحسب نوع الخدمة.</p></div>
+    </div>
+
+    <h2 id="pos" style="margin-top:64px">🛍️ نقاط البيع POS</h2>
+    <div class="grid grid--3" style="margin-top:24px">
+      <div class="card"><h3 class="card__title">جلسة بيع سريعة</h3><p class="card__desc">شاشة لمسية، بحث صنف فوري، خصومات، طبع تذكرة، فاتورة ZATCA لحظية.</p></div>
+      <div class="card"><h3 class="card__title">طرق دفع متعدّدة</h3><p class="card__desc">كاش، بطاقة، تحويل، STC Pay، Apple Pay — مع تسوية مع الخزينة.</p></div>
+      <div class="card"><h3 class="card__title">إقفال الجلسة</h3><p class="card__desc">تقرير يومي بعدد الفواتير، المرتجعات، الكاش الفعلي، فروقات الخزينة.</p></div>
+    </div>
+
+    <h2 id="assets" style="margin-top:64px">🏢 الأصول الثابتة</h2>
+    <div class="grid grid--3" style="margin-top:24px">
+      <div class="card"><h3 class="card__title">سجل الأصول</h3><p class="card__desc">كل أصل مع تاريخ الشراء، التكلفة، العمر الإنتاجي، طريقة الإهلاك.</p></div>
+      <div class="card"><h3 class="card__title">إهلاك تلقائي</h3><p class="card__desc">قسط ثابت أو متناقص — يُرحّل قيد إهلاك شهري بدون تدخّل.</p></div>
+      <div class="card"><h3 class="card__title">التصرفات</h3><p class="card__desc">بيع/استبعاد أصل مع حساب الربح/الخسارة وقيد ترحيل تلقائي.</p></div>
+    </div>
+
+    <h2 id="analytics" style="margin-top:64px">🧠 التحليلات والمساعد الذكي</h2>
+    <div class="grid grid--3" style="margin-top:24px">
+      <div class="card"><h3 class="card__title">لوحات حية</h3><p class="card__desc">KPIs مالية وتشغيلية، تتحدث فوراً مع كل عملية — للمدير وللمحاسب.</p></div>
+      <div class="card"><h3 class="card__title">كشف الانحرافات</h3><p class="card__desc">AI يكتشف القيود والمصاريف الشاذّة قبل أن تصبح مشكلة.</p></div>
+      <div class="card"><h3 class="card__title">اسأل APEX</h3><p class="card__desc">"كم مبيعات الشهر؟" "أكثر عميل مدين؟" — أجوبة فورية بلغة طبيعية.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-strip">
+  <div class="container">
+    <h2>جرّب كل هذا مجاناً ١٤ يوم</h2>
+    <p>كل التطبيقات بدون استثناء — لا حاجة لبطاقة ائتمان</p>
+    <a class="btn btn--primary btn--lg" href="/apex-web/app/#/app/erp/finance/onboarding">ابدأ الآن ←</a>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <div><div class="brand"><span class="brand__bolt">⚡</span><span>APEX</span></div></div>
+    <div><h4>المنتج</h4><ul><li><a href="/apex-web/product.html">الخدمات</a></li><li><a href="/apex-web/pricing.html">الأسعار</a></li></ul></div>
+    <div><h4>الموارد</h4><ul><li><a href="/apex-web/resources.html">المدوّنة</a></li></ul></div>
+    <div><h4>تواصل</h4><ul><li><a href="/apex-web/contact.html">تواصل معنا</a></li><li><a href="https://wa.me/966500000000">واتساب</a></li></ul></div>
+  </div>
+  <div class="footer__legal"><span>© 2026 APEX</span><span>صُنع بفخر في 🇸🇦</span></div>
+</footer>
+
+</body>
+</html>
