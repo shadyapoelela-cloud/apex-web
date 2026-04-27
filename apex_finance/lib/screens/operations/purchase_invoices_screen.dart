@@ -504,7 +504,11 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey =
       GlobalKey<ScaffoldState>();
 
-  void _onCreate() => context.go('/purchase/bills/new');
+  // No dedicated /purchase/bills/new screen yet (parallel to sales has
+  // SalesInvoiceCreateScreen at /sales/invoices/new). Route to the
+  // purchase hub for now — the user picks the right action there.
+  // TODO(wave-4): build PurchaseInvoiceCreateScreen + register route.
+  void _onCreate() => context.go('/purchase');
 
   void _onAiCreate() {
     _scaffoldKey.currentState?.openEndDrawer();

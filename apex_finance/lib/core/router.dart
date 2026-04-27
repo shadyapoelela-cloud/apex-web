@@ -636,6 +636,11 @@ final appRouter = GoRouter(
     GoRoute(path: '/sales/aging', pageBuilder: (c, s) => _apexPage(const ArAgingScreen(), s)),
     GoRoute(path: '/purchase/vendors', pageBuilder: (c, s) => _apexPage(const VendorsListScreen(), s)),
     GoRoute(path: '/purchase/bills', pageBuilder: (c, s) => _apexPage(const BillsListScreen(), s)),
+    // /purchase/bills/new doesn't exist yet (no PurchaseBillCreateScreen
+    // sibling to SalesInvoiceCreateScreen). Redirect to the purchase hub
+    // so any old links the user (or another screen) navigates to don't
+    // crash with GoException.
+    GoRoute(path: '/purchase/bills/new', redirect: (_, __) => '/purchase'),
     GoRoute(path: '/purchase/aging', pageBuilder: (c, s) => _apexPage(const ApAgingScreen(), s)),
     GoRoute(path: '/notifications/panel', pageBuilder: (c, s) => _apexPage(const NotificationsPanelScreen(), s)),
     GoRoute(path: '/pos/quick-sale', pageBuilder: (c, s) => _apexPage(const PosQuickSaleScreen(), s)),
