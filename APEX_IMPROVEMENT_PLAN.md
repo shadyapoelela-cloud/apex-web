@@ -103,12 +103,21 @@
 
 - [ ] ربط AI Copilot بـ Anthropic API streaming من backend
 - [ ] **اقتراحات AI inline** للشاشات (banner + apply/dismiss)
-- [ ] تطبيق `ApexListToolbar` على ٧ شاشات إضافية: المنتجات، GL، COA، JE Builder، المخزون، الموظفين، المصروفات
+- [x] تطبيق `ApexListToolbar` على شاشة العملاء ✅ — commit `7d6e104`
+- [x] تطبيق `ApexListToolbar` على شاشة الموردين ✅ — commit `7d6e104`
+- [ ] تطبيق `ApexListToolbar` على ٥ شاشات إضافية: المنتجات، GL، COA، JE Builder، المخزون
 - [ ] **A3** — تخزين التفضيلات (آخر فلتر/تجميع/عرض) في localStorage لكل شاشة
 
 ### 🌊 موجة ٣ — Backend audit + Tests (٣ أيام)
 
-- [ ] `tools/api_audit.py` — فحص شامل
+- [x] `tools/api_audit.py` — فحص شامل ✅ — يفحص ٤٦٠ ملف، يطبع تقرير Markdown
+  - **النتائج (الإصدار الأول):** 222 ملاحظة
+    - 🔴 8 endpoints إدارية بدون `verify_admin`
+    - 🔴 72 traceback leak (HTTPException يحوي str(e))
+    - 🟡 10 endpoints بشكل response غير معياري
+    - 🟡 132 silent except (لا يوجد `logging.error`)
+  - تقرير حيّ في `docs/audit/api_audit.md`
+- [ ] إصلاح الـ 🔴 errors (admin-unprotected + traceback-leak)
 - [ ] إضافة pytests للـ POS / Sales Invoices / Purchase Invoices / ApexListToolbar
 - [ ] flutter widget tests للـ chips + accordion logic
 - [ ] تطبيق structured logging (A6)
