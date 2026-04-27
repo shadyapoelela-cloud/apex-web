@@ -500,12 +500,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           builder: (_) => _buildLinesTab(),
         ),
         ObjectPageTab(
-          id: 'overview',
-          labelAr: 'ملاحظات عامة',
-          icon: Icons.dashboard_rounded,
-          builder: (_) => _buildOverviewTab(),
-        ),
-        ObjectPageTab(
           id: 'other_info',
           labelAr: 'معلومات أخرى',
           icon: Icons.info_outline_rounded,
@@ -654,23 +648,22 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // ─────────────────────────────────────────────────────────────────
   // TAB: OVERVIEW — AI quick bar + form inputs (create) OR details (view)
   // ─────────────────────────────────────────────────────────────────
-  Widget _buildOverviewTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // AI quick bar + البيانات الأساسية moved into the البنود tab —
-          // keeping ملاحظات عامة focused on summary + lifecycle.
-          _sectionCard(title: 'ملخّص القيد', child: _summaryRow()),
-          const SizedBox(height: 18),
-          _sectionCard(title: 'السجل', child: _buildHistoryTimeline()),
-          if (_error != null) ...[
-            const SizedBox(height: 14),
-            _errorStrip(),
-          ],
+  // ملاحظات عامة tab removed — its contents (ملخّص القيد + السجل) now
+  // render at the bottom of the البنود tab so the full JE lives on one
+  // scrollable surface.
+  Widget _buildSummaryAndTimelineSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 18),
+        _sectionCard(title: 'ملخّص القيد', child: _summaryRow()),
+        const SizedBox(height: 18),
+        _sectionCard(title: 'السجل', child: _buildHistoryTimeline()),
+        if (_error != null) ...[
+          const SizedBox(height: 14),
+          _errorStrip(),
         ],
-      ),
+      ],
     );
   }
 
@@ -1410,6 +1403,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             ]),
           ),
         ),
+        _buildSummaryAndTimelineSection(),
       ],
     );
   }
@@ -1541,6 +1535,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             ),
           ]),
         ),
+        _buildSummaryAndTimelineSection(),
       ],
     );
   }
