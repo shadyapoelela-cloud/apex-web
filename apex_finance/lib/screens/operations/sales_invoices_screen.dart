@@ -53,6 +53,35 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   String _sortKey = 'date_desc';
   String _viewMode = 'list';
 
+  // Bulk-select state — invoice IDs the user has ticked.
+  final Set<String> _selectedIds = <String>{};
+
+  bool _isSelected(Map inv) =>
+      _selectedIds.contains(inv['id']?.toString());
+
+  void _toggleSelected(Map inv) {
+    final id = inv['id']?.toString();
+    if (id == null) return;
+    setState(() {
+      if (!_selectedIds.add(id)) _selectedIds.remove(id);
+    });
+  }
+
+  // Helper retained for future "select-all-visible" UI (header checkbox)
+  // — unreferenced for now while bulk-select uses long-press to enter
+  // selection mode. Suppress unused warning until the header lands.
+  // ignore: unused_element
+  void _selectAllVisible() {
+    setState(() {
+      for (final inv in _visible) {
+        final id = inv['id']?.toString();
+        if (id != null) _selectedIds.add(id);
+      }
+    });
+  }
+
+  void _clearSelection() => setState(_selectedIds.clear);
+
   // ── Status palette (drives row icons + group headers) ─────────────────
   static const _statusColors = {
     'draft': 'warn',
@@ -659,6 +688,28 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       aiCreateLabelAr: 'ذكاء',
       favorites: _loadFavorites(),
       onSaveFavorite: _onSaveCurrentView,
+      // Bulk-select: when N rows ticked, toolbar swaps to a selection
+      // bar with these actions on the LEFT.
+      selectedCount: _selectedIds.length,
+      onClearSelection: _clearSelection,
+      bulkActions: [
+        ApexBulkAction(
+          labelAr: 'تصدير المحدّد',
+          icon: Icons.file_download_outlined,
+          onTap: () => _bulkExport(),
+        ),
+        ApexBulkAction(
+          labelAr: 'طباعة',
+          icon: Icons.print_outlined,
+          onTap: () => _bulkPrint(),
+        ),
+        ApexBulkAction(
+          labelAr: 'حذف',
+          icon: Icons.delete_outline_rounded,
+          onTap: () => _bulkDelete(),
+          destructive: true,
+        ),
+      ],
       shortcuts: const [
         ApexShortcut('N', 'فاتورة جديدة'),
         ApexShortcut('A', 'فاتورة بالذكاء'),
@@ -667,9 +718,81 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
         ApexShortcut('G', 'تجميع'),
         ApexShortcut('R', 'تحديث'),
         ApexShortcut('S', 'حفظ البحث الحالي'),
-        ApexShortcut('Esc', 'مسح الفلتر / إغلاق'),
+        ApexShortcut('Ctrl+A', 'تحديد الكل'),
+        ApexShortcut('Esc', 'مسح الفلتر / التحديد / إغلاق'),
       ],
     );
+  }
+
+  // ─── Bulk action implementations (wave 1: snackbar placeholders;
+  //     wave 4 wires real export/print/delete via API) ─────────────
+  void _bulkExport() {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AC.navy3,
+      content: Text(
+          'تصدير ${_selectedIds.length} فاتورة — قيد التطوير (الموجة ٤)',
+          style: TextStyle(color: AC.tp),
+          textAlign: TextAlign.right),
+    ));
+  }
+
+  void _bulkPrint() {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AC.navy3,
+      content: Text(
+          'طباعة ${_selectedIds.length} فاتورة — قيد التطوير (الموجة ٤)',
+          style: TextStyle(color: AC.tp),
+          textAlign: TextAlign.right),
+    ));
+  }
+
+  Future<void> _bulkDelete() async {
+    final n = _selectedIds.length;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AC.navy2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: AC.err),
+        ),
+        title: Row(children: [
+          Icon(Icons.warning_amber_rounded, color: AC.err, size: 22),
+          const SizedBox(width: 8),
+          Text('حذف $n فاتورة؟',
+              style: TextStyle(
+                  color: AC.err, fontWeight: FontWeight.w800)),
+        ]),
+        content: Text(
+          'سيتم حذف الفواتير المحدّدة. لا يمكن التراجع عن هذا الإجراء.',
+          style: TextStyle(color: AC.tp),
+          textDirection: TextDirection.rtl,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('إلغاء', style: TextStyle(color: AC.td)),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: FilledButton.styleFrom(
+                backgroundColor: AC.err, foregroundColor: Colors.white),
+            child: const Text('حذف'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    // TODO(wave-4): wire to real DELETE endpoint when available.
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.navy3,
+        content: Text('حذف $n فاتورة — endpoint قيد التطوير (الموجة ٤)',
+            style: TextStyle(color: AC.tp),
+            textAlign: TextAlign.right),
+      ));
+      _clearSelection();
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────────
@@ -775,17 +898,41 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
     final k = _statusKey(inv);
     final color = _statusColor(k);
     final iconData = _statusIcons[k] ?? Icons.receipt_long;
+    final selected = _isSelected(inv);
+    final inSelectionMode = _selectedIds.isNotEmpty;
     return InkWell(
-      onTap: () => _openInvoice(inv),
+      // Tap behavior: in selection mode → toggle; otherwise → open invoice.
+      onTap: () =>
+          inSelectionMode ? _toggleSelected(inv) : _openInvoice(inv),
+      // Long-press → enter selection mode.
+      onLongPress: () => _toggleSelected(inv),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: AC.navy2,
-          border: Border.all(color: AC.bdr),
+          color: selected
+              ? AC.gold.withValues(alpha: 0.10)
+              : AC.navy2,
+          border: Border.all(
+              color: selected ? AC.gold.withValues(alpha: 0.6) : AC.bdr),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(children: [
+          // Checkbox (visible in selection mode, or always — here we show
+          // it only when selection mode is active, to keep the row clean).
+          if (inSelectionMode) ...[
+            InkWell(
+              onTap: () => _toggleSelected(inv),
+              child: Icon(
+                selected
+                    ? Icons.check_box_rounded
+                    : Icons.check_box_outline_blank_rounded,
+                color: selected ? AC.gold : AC.td,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 10),
+          ],
           Icon(iconData, color: color, size: 18),
           const SizedBox(width: 10),
           Expanded(
@@ -830,20 +977,38 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
     final k = _statusKey(inv);
     final color = _statusColor(k);
     final iconData = _statusIcons[k] ?? Icons.receipt_long;
+    final selected = _isSelected(inv);
+    final inSelectionMode = _selectedIds.isNotEmpty;
     return InkWell(
-      onTap: () => _openInvoice(inv),
+      onTap: () =>
+          inSelectionMode ? _toggleSelected(inv) : _openInvoice(inv),
+      onLongPress: () => _toggleSelected(inv),
       borderRadius: BorderRadius.circular(10),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AC.navy2,
-          border: Border.all(color: AC.bdr),
+          color: selected ? AC.gold.withValues(alpha: 0.10) : AC.navy2,
+          border: Border.all(
+              color: selected ? AC.gold.withValues(alpha: 0.6) : AC.bdr),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
+              if (inSelectionMode) ...[
+                InkWell(
+                  onTap: () => _toggleSelected(inv),
+                  child: Icon(
+                    selected
+                        ? Icons.check_box_rounded
+                        : Icons.check_box_outline_blank_rounded,
+                    color: selected ? AC.gold : AC.td,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 6),
+              ],
               Icon(iconData, color: color, size: 18),
               const SizedBox(width: 6),
               Expanded(

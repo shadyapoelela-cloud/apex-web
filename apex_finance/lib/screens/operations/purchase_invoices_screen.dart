@@ -50,6 +50,22 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
   String _sortKey = 'date_desc';
   String _viewMode = 'list';
 
+  // Bulk-select state — invoice IDs the user has ticked.
+  final Set<String> _selectedIds = <String>{};
+
+  bool _isSelected(Map inv) =>
+      _selectedIds.contains(inv['id']?.toString());
+
+  void _toggleSelected(Map inv) {
+    final id = inv['id']?.toString();
+    if (id == null) return;
+    setState(() {
+      if (!_selectedIds.add(id)) _selectedIds.remove(id);
+    });
+  }
+
+  void _clearSelection() => setState(_selectedIds.clear);
+
   // ── Status palette (vendor-side equivalents) ─────────────────────────
   static const _statusLabels = {
     'draft': 'مسودة',
@@ -645,6 +661,48 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
       aiCreateLabelAr: 'ذكاء',
       favorites: _loadFavorites(),
       onSaveFavorite: _onSaveCurrentView,
+      // Bulk-select bar appears when N rows are ticked.
+      selectedCount: _selectedIds.length,
+      onClearSelection: _clearSelection,
+      bulkActions: [
+        ApexBulkAction(
+          labelAr: 'تصدير المحدّد',
+          icon: Icons.file_download_outlined,
+          onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: AC.navy3,
+            content: Text(
+              'تصدير ${_selectedIds.length} فاتورة — قيد التطوير',
+              style: TextStyle(color: AC.tp),
+              textAlign: TextAlign.right,
+            ),
+          )),
+        ),
+        ApexBulkAction(
+          labelAr: 'طباعة',
+          icon: Icons.print_outlined,
+          onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: AC.navy3,
+            content: Text(
+              'طباعة ${_selectedIds.length} فاتورة — قيد التطوير',
+              style: TextStyle(color: AC.tp),
+              textAlign: TextAlign.right,
+            ),
+          )),
+        ),
+        ApexBulkAction(
+          labelAr: 'حذف',
+          icon: Icons.delete_outline_rounded,
+          destructive: true,
+          onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: AC.navy3,
+            content: Text(
+              'حذف ${_selectedIds.length} فاتورة — endpoint قيد التطوير',
+              style: TextStyle(color: AC.tp),
+              textAlign: TextAlign.right,
+            ),
+          )),
+        ),
+      ],
       shortcuts: const [
         ApexShortcut('N', 'فاتورة جديدة'),
         ApexShortcut('A', 'فاتورة بالذكاء (OCR)'),
@@ -653,7 +711,7 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
         ApexShortcut('G', 'تجميع'),
         ApexShortcut('R', 'تحديث'),
         ApexShortcut('S', 'حفظ البحث الحالي'),
-        ApexShortcut('Esc', 'مسح الفلتر / إغلاق'),
+        ApexShortcut('Esc', 'مسح الفلتر / التحديد / إغلاق'),
       ],
     );
   }
@@ -761,17 +819,35 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
     final k = _statusKey(inv);
     final color = _statusColor(k);
     final iconData = _statusIcons[k] ?? Icons.receipt_outlined;
+    final selected = _isSelected(inv);
+    final inSelectionMode = _selectedIds.isNotEmpty;
     return InkWell(
-      onTap: () => _openInvoice(inv),
+      onTap: () =>
+          inSelectionMode ? _toggleSelected(inv) : _openInvoice(inv),
+      onLongPress: () => _toggleSelected(inv),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: AC.navy2,
-          border: Border.all(color: AC.bdr),
+          color: selected ? AC.gold.withValues(alpha: 0.10) : AC.navy2,
+          border: Border.all(
+              color: selected ? AC.gold.withValues(alpha: 0.6) : AC.bdr),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(children: [
+          if (inSelectionMode) ...[
+            InkWell(
+              onTap: () => _toggleSelected(inv),
+              child: Icon(
+                selected
+                    ? Icons.check_box_rounded
+                    : Icons.check_box_outline_blank_rounded,
+                color: selected ? AC.gold : AC.td,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 10),
+          ],
           Icon(iconData, color: color, size: 18),
           const SizedBox(width: 10),
           Expanded(
@@ -816,20 +892,38 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
     final k = _statusKey(inv);
     final color = _statusColor(k);
     final iconData = _statusIcons[k] ?? Icons.receipt_outlined;
+    final selected = _isSelected(inv);
+    final inSelectionMode = _selectedIds.isNotEmpty;
     return InkWell(
-      onTap: () => _openInvoice(inv),
+      onTap: () =>
+          inSelectionMode ? _toggleSelected(inv) : _openInvoice(inv),
+      onLongPress: () => _toggleSelected(inv),
       borderRadius: BorderRadius.circular(10),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AC.navy2,
-          border: Border.all(color: AC.bdr),
+          color: selected ? AC.gold.withValues(alpha: 0.10) : AC.navy2,
+          border: Border.all(
+              color: selected ? AC.gold.withValues(alpha: 0.6) : AC.bdr),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
+              if (inSelectionMode) ...[
+                InkWell(
+                  onTap: () => _toggleSelected(inv),
+                  child: Icon(
+                    selected
+                        ? Icons.check_box_rounded
+                        : Icons.check_box_outline_blank_rounded,
+                    color: selected ? AC.gold : AC.td,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 6),
+              ],
               Icon(iconData, color: color, size: 18),
               const SizedBox(width: 6),
               Expanded(

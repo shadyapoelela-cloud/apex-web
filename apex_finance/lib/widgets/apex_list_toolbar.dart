@@ -120,6 +120,21 @@ class ApexShortcut {
   const ApexShortcut(this.key, this.labelAr);
 }
 
+/// One bulk action button shown in the selection bar.
+/// `destructive: true` paints in `AC.err` to signal data-loss risk.
+class ApexBulkAction {
+  final String labelAr;
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool destructive;
+  const ApexBulkAction({
+    required this.labelAr,
+    required this.icon,
+    required this.onTap,
+    this.destructive = false,
+  });
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // Defaults — most screens won't customize these.
 // ─────────────────────────────────────────────────────────────────────────
@@ -207,6 +222,20 @@ class ApexListToolbar extends StatelessWidget {
   /// Background color of the AI button. Defaults to AC.purple (theme-aware).
   final Color? aiButtonColor;
 
+  // ── Bulk-select (A2) ───────────────────────────────────────────────
+  /// Number of currently selected rows. When > 0 the toolbar swaps to
+  /// a "selection bar" that exposes bulk actions instead of the normal
+  /// title/search/CTAs. Set to 0 (default) to keep the regular toolbar.
+  final int selectedCount;
+
+  /// Bulk operations available when one or more rows are selected.
+  /// Rendered on the LEFT of the selection bar.
+  final List<ApexBulkAction> bulkActions;
+
+  /// Clears the selection (typically resets the screen's selected-IDs Set).
+  /// Required when `selectedCount > 0`.
+  final VoidCallback? onClearSelection;
+
   const ApexListToolbar({
     super.key,
     required this.titleAr,
@@ -242,6 +271,9 @@ class ApexListToolbar extends StatelessWidget {
     this.aiCreateLabelAr = 'ذكاء',
     this.shortcuts = const [],
     this.aiButtonColor,
+    this.selectedCount = 0,
+    this.bulkActions = const [],
+    this.onClearSelection,
   });
 
   static void _noop(String _) {}
@@ -265,9 +297,102 @@ class ApexListToolbar extends StatelessWidget {
   // ─────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
+    // When rows are selected, swap the toolbar for a selection bar
+    // (Material 3 / Odoo pattern). The bar shows count + bulk actions
+    // and an X to clear the selection. Animated swap (180ms cross-fade).
+    final inSelectionMode = selectedCount > 0 && onClearSelection != null;
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Container(
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 180),
+        switchInCurve: Curves.easeOut,
+        switchOutCurve: Curves.easeIn,
+        child: inSelectionMode
+            ? _buildSelectionBar(context)
+            : _buildNormalToolbar(context),
+      ),
+    );
+  }
+
+  // ── Selection bar (visible when selectedCount > 0) ─────────────────
+  Widget _buildSelectionBar(BuildContext context) {
+    return Container(
+      key: const ValueKey('selection-bar'),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AC.gold.withValues(alpha: 0.20),
+            AC.gold.withValues(alpha: 0.10),
+          ],
+        ),
+        border: Border(bottom: BorderSide(color: AC.gold)),
+      ),
+      child: Row(
+        textDirection: TextDirection.rtl,
+        children: [
+          // ── RIGHT: clear-selection X + count ────────────────────
+          Tooltip(
+            message: 'إلغاء التحديد',
+            child: IconButton(
+              onPressed: onClearSelection,
+              icon: Icon(Icons.close_rounded, color: AC.gold, size: 20),
+              style: IconButton.styleFrom(
+                backgroundColor: AC.gold.withValues(alpha: 0.15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            '$selectedCount محدّد',
+            style: TextStyle(
+              color: AC.gold,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const Spacer(),
+          // ── LEFT: bulk action buttons ───────────────────────────
+          for (var i = 0; i < bulkActions.length; i++) ...[
+            if (i > 0) const SizedBox(width: 6),
+            _bulkActionButton(bulkActions[i]),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _bulkActionButton(ApexBulkAction action) {
+    final color = action.destructive ? AC.err : AC.tp;
+    return OutlinedButton.icon(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: color,
+        side: BorderSide(color: color.withValues(alpha: 0.5)),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      onPressed: action.onTap,
+      icon: Icon(action.icon, size: 15, color: color),
+      label: Text(
+        action.labelAr,
+        style: const TextStyle(
+            fontSize: 12, fontWeight: FontWeight.w700),
+      ),
+    );
+  }
+
+  // ── Normal toolbar (visible when no rows selected) ─────────────────
+  Widget _buildNormalToolbar(BuildContext context) {
+    return Container(
+      key: const ValueKey('normal-toolbar'),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -347,7 +472,6 @@ class ApexListToolbar extends StatelessWidget {
             ],
           ],
         ),
-      ),
       ),
     );
   }
