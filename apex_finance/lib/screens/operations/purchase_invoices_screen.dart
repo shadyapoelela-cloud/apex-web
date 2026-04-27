@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api_service.dart';
+import '../../core/apex_csv_export.dart';
 import '../../core/apex_saved_views_v2.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
@@ -509,6 +510,47 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
     _scaffoldKey.currentState?.openEndDrawer();
   }
 
+  void _bulkExportCsv() {
+    final selectedRows = _all
+        .where((inv) => _selectedIds.contains(inv['id']?.toString()))
+        .toList();
+    if (selectedRows.isEmpty) return;
+    final stamp = DateTime.now().toIso8601String().substring(0, 10);
+    ApexCsvExport.download<Map<String, dynamic>>(
+      filename: 'purchase-invoices-$stamp',
+      rows: selectedRows,
+      columns: [
+        ApexCsvColumn(
+            header: 'رقم الفاتورة',
+            extract: (r) => (r['invoice_number'] ?? '').toString()),
+        ApexCsvColumn(
+            header: 'تاريخ الفاتورة',
+            extract: (r) =>
+                (r['invoice_date'] ?? r['issue_date'] ?? '').toString()),
+        ApexCsvColumn(
+            header: 'تاريخ الاستحقاق',
+            extract: (r) => (r['due_date'] ?? '').toString()),
+        ApexCsvColumn(
+            header: 'المورّد',
+            extract: (r) =>
+                (r['vendor_name'] ?? r['vendor_id'] ?? '').toString()),
+        ApexCsvColumn(
+            header: 'الإجمالي',
+            extract: (r) => (r['total'] ?? 0).toString()),
+        ApexCsvColumn(
+            header: 'الحالة',
+            extract: (r) => _statusLabel(r)),
+      ],
+    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.navy3,
+        content: Text('تم تصدير ${selectedRows.length} فاتورة كـ CSV',
+            style: TextStyle(color: AC.tp), textAlign: TextAlign.right),
+      ));
+    }
+  }
+
   Map<String, dynamic> _buildScreenContext() => {
         'totalCount': _all.length,
         'visibleCount': _visible.length,
@@ -689,14 +731,7 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
         ApexBulkAction(
           labelAr: 'تصدير المحدّد',
           icon: Icons.file_download_outlined,
-          onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: AC.navy3,
-            content: Text(
-              'تصدير ${_selectedIds.length} فاتورة — قيد التطوير',
-              style: TextStyle(color: AC.tp),
-              textAlign: TextAlign.right,
-            ),
-          )),
+          onTap: _bulkExportCsv,
         ),
         ApexBulkAction(
           labelAr: 'طباعة',

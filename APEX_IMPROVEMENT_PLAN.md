@@ -124,12 +124,15 @@
 
 ### 🌊 موجة ٤ — صقل + a11y + responsive (٢-٣ أيام)
 
-- [ ] **A4** — Semantics + keyboard navigation
+- [x] **A4 جزئي** — `Semantics` على زر المساعدة + أزرار bulk-action (مع `hint` على الـ destructive) ✅ — commit `8527f70`
+- [ ] **A4 كامل** — Semantics على باقي العناصر + keyboard navigation
 - [ ] **A5** — Responsive breakpoints
-- [ ] **A7** — Code-splitting
-- [ ] **A8** — Bulk export فعلي (Excel + PDF)
+- [ ] **A7** — Code-splitting (الباندل ٩.٥MB يحتاج تخفيض)
+- [ ] **A8** — Bulk export فعلي (Excel + PDF بدل SnackBar)
 - [ ] **A9** — Optimistic updates + offline queue
-- [ ] **A10** — محتوى help dialog
+- [x] **A10** — محتوى help dialog (نصائح مع شرح + الاختصارات) ✅ — commit `8527f70`
+  - مطبَّق على فواتير المبيعات بـ ٤ نصائح كاملة
+  - بقية الشاشات تحتاج إضافة `tips: [...]` في الـ build
 - [ ] مراجعة كل theme + dark/light + screenshots للتحقق
 
 ---
@@ -138,12 +141,27 @@
 
 | الموجة | الحالة | عدد المهام | المُنجَز |
 |---------|--------|--------------|---------|
-| ١ — Toolbar + wins | 🟡 قيد التنفيذ | ٧ | ٠ |
-| ٢ — AI integration | ⚪ في الانتظار | ٤ | ٠ |
-| ٣ — Backend + tests | ⚪ في الانتظار | ٤ | ٠ |
-| ٤ — Polish + a11y | ⚪ في الانتظار | ٧ | ٠ |
+| ١ — Toolbar + wins | ✅ شبه مكتملة | ٧ | ٥ |
+| ٢ — AI + شاشات | 🟡 ٢ من ٧ | ٧ | ٢ (عملاء + موردين) |
+| ٣ — Backend + tests | 🟡 audit script | ٤ | ١ |
+| ٤ — Polish + a11y | 🟡 a11y + help dialog | ٧ | ٢ |
 
-**سيُحدَّث هذا الجدول بعد كل push.**
+**التحديث الأخير:** بعد commit `d98f7ed` (Wave 4 a11y + help dialog).
+
+### Commits الجلسة الحالية
+
+| Commit | الموجة | البند |
+|--------|--------|-------|
+| `8617bdb` | ١ | A1 — favorites localStorage |
+| `8ea1857` | ١ | A2 — bulk-select + sales/purchase rows |
+| `637fac1` | ١ | AI Copilot drawer wiring |
+| `c51637b` | ١ | Wave 1 build |
+| `9c3a90c` | ١ | Plan progress تحديث |
+| `7d6e104` | ٢ | Customers + Vendors migrated |
+| `bcf69e9` | ٢ | Wave 2 build |
+| `5818110` | ٣ | Backend audit script + first report |
+| `8527f70` | ٤ | A4 Semantics + A10 enhanced help |
+| `d98f7ed` | ٤ | Wave 4 build |
 
 ---
 

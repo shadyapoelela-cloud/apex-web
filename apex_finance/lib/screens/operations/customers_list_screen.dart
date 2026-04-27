@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api_service.dart';
+import '../../core/apex_csv_export.dart';
 import '../../core/apex_saved_views_v2.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
@@ -274,6 +275,47 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
   void _onCreate() => context.go('/sales');
   void _onAiCreate() => _scaffoldKey.currentState?.openEndDrawer();
 
+  void _bulkExportCsv() {
+    final selectedRows = _all
+        .where((c) => _selectedIds.contains(c['id']?.toString()))
+        .toList();
+    if (selectedRows.isEmpty) return;
+    final stamp = DateTime.now().toIso8601String().substring(0, 10);
+    ApexCsvExport.download<Map<String, dynamic>>(
+      filename: 'customers-$stamp',
+      rows: selectedRows,
+      columns: [
+        ApexCsvColumn(
+            header: 'الكود', extract: (r) => (r['code'] ?? '').toString()),
+        ApexCsvColumn(
+            header: 'الاسم العربي',
+            extract: (r) => (r['name_ar'] ?? '').toString()),
+        ApexCsvColumn(
+            header: 'الاسم الإنجليزي',
+            extract: (r) => (r['name_en'] ?? '').toString()),
+        ApexCsvColumn(
+            header: 'الهاتف', extract: (r) => (r['phone'] ?? '').toString()),
+        ApexCsvColumn(
+            header: 'البريد', extract: (r) => (r['email'] ?? '').toString()),
+        ApexCsvColumn(
+            header: 'الرقم الضريبي',
+            extract: (r) => (r['vat_number'] ?? '').toString()),
+        ApexCsvColumn(
+            header: 'المدينة', extract: (r) => (r['city'] ?? '').toString()),
+        ApexCsvColumn(
+            header: 'الحالة',
+            extract: (r) => (r['is_active'] == true) ? 'نشط' : 'غير نشط'),
+      ],
+    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.navy3,
+        content: Text('تم تصدير ${selectedRows.length} عميل كـ CSV',
+            style: TextStyle(color: AC.tp), textAlign: TextAlign.right),
+      ));
+    }
+  }
+
   Map<String, dynamic> _buildScreenContext() => {
         'totalCount': _all.length,
         'visibleCount': _visible.length,
@@ -406,16 +448,9 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
       onClearSelection: _clearSelection,
       bulkActions: [
         ApexBulkAction(
-          labelAr: 'تصدير المحدّد',
+          labelAr: 'تصدير CSV',
           icon: Icons.file_download_outlined,
-          onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: AC.navy3,
-            content: Text(
-              'تصدير ${_selectedIds.length} عميل — قيد التطوير',
-              style: TextStyle(color: AC.tp),
-              textAlign: TextAlign.right,
-            ),
-          )),
+          onTap: _bulkExportCsv,
         ),
         ApexBulkAction(
           labelAr: 'حملة WhatsApp',
