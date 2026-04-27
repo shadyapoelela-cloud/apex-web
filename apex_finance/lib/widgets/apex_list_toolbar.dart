@@ -539,8 +539,115 @@ class _SearchBarWithMenu extends StatelessWidget {
 
   static void _noop(String _) {}
 
+  // ─── Build the active-filter chip list (Odoo-style).
+  // Each filter dimension with an active selection becomes one chip:
+  //   • Multi-select with N options → "{label}: opt1 أو opt2 أو …"
+  //   • Single-select (radio) → "{label}: chosen-value" (skip if 'all')
+  // The active group-by also appears as a chip (different accent color).
+  // X removes the whole filter dimension at once.
+  List<Widget> _buildActiveChips() {
+    final chips = <Widget>[];
+
+    // Filter chips (gold-tinted)
+    for (final group in filterGroups) {
+      final activeOpts = group.options
+          .where((o) => group.selected.contains(o.key))
+          .toList();
+      if (activeOpts.isEmpty) continue;
+      // Skip "all" radio default
+      if (!group.multi &&
+          activeOpts.length == 1 &&
+          activeOpts.first.key == 'all') {
+        continue;
+      }
+      final valueLabels =
+          activeOpts.map((o) => o.labelAr).join(' أو ');
+      chips.add(_chip(
+        labelAr: '${group.labelAr}: $valueLabels',
+        accentColor: AC.gold,
+        onRemove: () {
+          if (group.multi) {
+            for (final opt in List.of(activeOpts)) {
+              if (group.selected.contains(opt.key)) {
+                group.onToggle(opt.key);
+              }
+            }
+          } else {
+            // Radio default = 'all' — pick that key explicitly.
+            group.onToggle('all');
+          }
+        },
+      ));
+    }
+
+    // Group-by chip (info-blue tinted, different accent so user can
+    // distinguish "filter" vs "group" at a glance)
+    if (activeGroupKey.isNotEmpty && activeGroupKey != 'none') {
+      final opt = groupOptions.firstWhere(
+        (o) => o.key == activeGroupKey,
+        orElse: () => ApexGroupOption(
+            key: activeGroupKey, labelAr: activeGroupKey),
+      );
+      chips.add(_chip(
+        labelAr: 'تجميع: ${opt.labelAr}',
+        accentColor: AC.info,
+        onRemove: () => onChangeGroup('none'),
+      ));
+    }
+
+    return chips;
+  }
+
+  Widget _chip({
+    required String labelAr,
+    required Color accentColor,
+    required VoidCallback onRemove,
+  }) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(4, 3, 8, 3),
+      decoration: BoxDecoration(
+        color: accentColor.withValues(alpha: 0.12),
+        border: Border.all(color: accentColor.withValues(alpha: 0.45)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // X on RTL start (visual RIGHT… wait — chips are *small* so
+          // X belongs at the visual LEFT. Use Material's Chip convention:
+          // delete-icon on the END of the label. In RTL → visual LEFT.
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 220),
+            child: Text(
+              labelAr,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: accentColor,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          InkWell(
+            onTap: onRemove,
+            borderRadius: BorderRadius.circular(6),
+            child: Padding(
+              padding: const EdgeInsets.all(2),
+              child: Icon(Icons.close_rounded,
+                  size: 12, color: accentColor),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final chips = _buildActiveChips();
+    final hasChips = chips.isNotEmpty;
     return Directionality(
       // Defensive: previous attempt set textDirection on the Row only
       // and the chevron still rendered on the visual LEFT — Material's
@@ -548,85 +655,116 @@ class _SearchBarWithMenu extends StatelessWidget {
       // up the tree that overrides the Row-level parameter. Wrapping in
       // an explicit Directionality wins.
       textDirection: TextDirection.rtl,
-      child: Container(
-      height: 38,
-      decoration: BoxDecoration(
-        color: AC.navy3,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: activeFilterCount > 0
-              ? AC.gold.withValues(alpha: 0.6)
-              : AC.bdr,
-          width: activeFilterCount > 0 ? 1.4 : 1.0,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        // Container auto-grows in height as chips wrap. Min 38 keeps the
+        // search bar at the same height as before when no chips exist.
+        constraints: const BoxConstraints(minHeight: 38),
+        decoration: BoxDecoration(
+          color: AC.navy3,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: activeFilterCount > 0
+                ? AC.gold.withValues(alpha: 0.6)
+                : AC.bdr,
+            width: activeFilterCount > 0 ? 1.4 : 1.0,
+          ),
         ),
-      ),
-      // Force RTL on this Row. Order swapped per user request — search
-      // icon now sits at the RTL start (visual RIGHT) and the chevron
-      // sits at the RTL end (visual LEFT):
-      //   children[0] (search icon)   → visual RIGHT (RTL start)
-      //   children[Expanded](TextField) → MIDDLE
-      //   children[last] (chevron)     → visual LEFT (RTL end)
-      child: Row(
-        textDirection: TextDirection.rtl,
-        children: [
-          // ── Search icon at the RTL start (visual RIGHT) ──────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Icon(Icons.search_rounded, color: AC.ts, size: 16),
-          ),
-          // ── Search field — fills middle ────────────────────────────
-          Expanded(
-            child: ValueListenableBuilder<TextEditingValue>(
-              valueListenable: searchCtl,
-              builder: (_, v, __) {
-                return TextField(
-                  controller: searchCtl,
-                  focusNode: searchFocus,
+        // Force RTL on this Row. Order:
+        //   children[0] (search icon)   → visual RIGHT (RTL start)
+        //   children[Expanded](TextField + chips wrap) → MIDDLE
+        //   children[last] (chevron)     → visual LEFT (RTL end)
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            textDirection: TextDirection.rtl,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // ── Search icon at RTL start (visual RIGHT) ────────────
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child:
+                    Icon(Icons.search_rounded, color: AC.ts, size: 16),
+              ),
+              // ── Chips + search input (Wrap — grows vertically) ────
+              Expanded(
+                child: Wrap(
                   textDirection: TextDirection.rtl,
-                  onChanged: (_) => onSearchChanged?.call(),
-                  style: TextStyle(color: AC.tp, fontSize: 13),
-                  decoration: InputDecoration(
-                    isDense: true,
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    hintText: searchHint,
-                    hintStyle: TextStyle(color: AC.td, fontSize: 12.5),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 4, vertical: 8),
-                    suffixIcon: v.text.isEmpty
-                        ? null
-                        : InkWell(
-                            onTap: () {
-                              searchCtl.clear();
-                              onSearchChanged?.call();
-                            },
-                            child: Icon(Icons.close_rounded,
-                                color: AC.td, size: 16),
-                          ),
-                    suffixIconConstraints: const BoxConstraints(
-                        minWidth: 26, minHeight: 26),
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 4,
+                  runSpacing: 4,
+                  children: [
+                    // Filter / group chips
+                    ...chips,
+                    // The text input — fixed width inside Wrap so it
+                    // sits inline with chips. Shrinks when chips are
+                    // present so they all fit visually.
+                    SizedBox(
+                      width: hasChips ? 140 : 220,
+                      child: ValueListenableBuilder<TextEditingValue>(
+                          valueListenable: searchCtl,
+                          builder: (_, v, __) {
+                            return TextField(
+                              controller: searchCtl,
+                              focusNode: searchFocus,
+                              textDirection: TextDirection.rtl,
+                              onChanged: (_) => onSearchChanged?.call(),
+                              style: TextStyle(
+                                  color: AC.tp, fontSize: 13),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                // Show hint only when no chips active —
+                                // otherwise chips already explain context.
+                                hintText: hasChips ? '' : searchHint,
+                                hintStyle: TextStyle(
+                                    color: AC.td, fontSize: 12.5),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(
+                                        horizontal: 4, vertical: 6),
+                                suffixIcon: v.text.isEmpty
+                                    ? null
+                                    : InkWell(
+                                        onTap: () {
+                                          searchCtl.clear();
+                                          onSearchChanged?.call();
+                                        },
+                                        child: Icon(
+                                            Icons.close_rounded,
+                                            color: AC.td,
+                                            size: 16),
+                                      ),
+                                suffixIconConstraints:
+                                    const BoxConstraints(
+                                        minWidth: 26,
+                                        minHeight: 26),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              // ── Chevron at RTL end (visual LEFT) ───────────────────
+              _PanelOpener(
+                filterGroups: filterGroups,
+                groupOptions: groupOptions,
+                activeGroupKey: activeGroupKey,
+                onChangeGroup: onChangeGroup,
+                sortOptions: sortOptions,
+                activeSortKey: activeSortKey,
+                onChangeSort: onChangeSort,
+                favorites: favorites,
+                onSaveFavorite: onSaveFavorite,
+                onClearAllFilters: onClearAllFilters,
+                activeFilterCount: activeFilterCount,
+              ),
+            ],
           ),
-          // ── Chevron at the RTL end (visual LEFT) ──────────────────
-          _PanelOpener(
-            filterGroups: filterGroups,
-            groupOptions: groupOptions,
-            activeGroupKey: activeGroupKey,
-            onChangeGroup: onChangeGroup,
-            sortOptions: sortOptions,
-            activeSortKey: activeSortKey,
-            onChangeSort: onChangeSort,
-            favorites: favorites,
-            onSaveFavorite: onSaveFavorite,
-            onClearAllFilters: onClearAllFilters,
-            activeFilterCount: activeFilterCount,
-          ),
-        ],
-      ),
+        ),
       ),
     );
   }
