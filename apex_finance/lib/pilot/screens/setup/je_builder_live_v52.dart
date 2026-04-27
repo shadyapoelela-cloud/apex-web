@@ -660,17 +660,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (_je == null) ...[
-            _aiQuickBar(),
-            if (_aiWarnings.isNotEmpty) const SizedBox(height: 10),
-            if (_aiWarnings.isNotEmpty) _aiWarningsStrip(),
-            const SizedBox(height: 18),
-          ],
-          _sectionCard(
-            title: 'البيانات الأساسية',
-            child: _je == null ? _createBasicFields() : _viewBasicFields(),
-          ),
-          const SizedBox(height: 18),
+          // AI quick bar + البيانات الأساسية moved into the البنود tab —
+          // keeping ملاحظات عامة focused on summary + lifecycle.
           _sectionCard(title: 'ملخّص القيد', child: _summaryRow()),
           const SizedBox(height: 18),
           _sectionCard(title: 'السجل', child: _buildHistoryTimeline()),
@@ -1253,7 +1244,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // TAB: LINES
+  // TAB: LINES — also hosts the AI quick bar + البيانات الأساسية at
+  // the top so the user can fill the header and rows on a single tab.
   // ─────────────────────────────────────────────────────────────────
   Widget _buildLinesTab() {
     if (_je != null) return _buildLinesViewTable();
@@ -1264,6 +1256,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
+        _sectionCard(
+          title: 'البيانات الأساسية',
+          child: _viewBasicFields(),
+        ),
+        const SizedBox(height: 18),
         _sectionCard(
           title: 'بنود القيد',
           child: Container(
@@ -1421,6 +1418,15 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
+        _aiQuickBar(),
+        if (_aiWarnings.isNotEmpty) const SizedBox(height: 10),
+        if (_aiWarnings.isNotEmpty) _aiWarningsStrip(),
+        const SizedBox(height: 18),
+        _sectionCard(
+          title: 'البيانات الأساسية',
+          child: _createBasicFields(),
+        ),
+        const SizedBox(height: 18),
         _sectionCard(
           title: 'بنود القيد — قابلة للتعديل',
           child: Column(children: [
