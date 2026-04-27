@@ -72,6 +72,8 @@ import '../../screens/v4_erp/restaurant_pos_screen.dart';
 import '../../screens/v4_erp/retail_pos_screen.dart';
 import '../../screens/v4_erp/service_pos_screen.dart';
 import '../../screens/operations/purchase_invoices_screen.dart';
+import '../../screens/operations/customers_list_screen.dart';
+import '../../screens/operations/vendors_list_screen.dart';
 import '../../screens/v4_erp/corporate_cards_screen.dart';
 import '../../screens/v4_erp/travel_per_diem_screen.dart';
 import '../../screens/v4_erp/bom_mrp_screen.dart';
@@ -256,6 +258,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/onboarding': (ctx) => const PilotOnboardingWizard(),  // LIVE — creates real tenant+entity+branch+CoA
   'erp/finance/pos': (ctx) => const RetailPosScreen(),  // LIVE — self-contained retail POS wired to /pilot/* (products + variants + barcodes + sessions + sale)
   'erp/finance/purchase-bills': (ctx) => const PurchaseInvoicesScreen(),  // LIVE — Odoo-style toolbar + filter/group/sort/view backed by /pilot/purchase-invoices
+  // Wave 2 of APEX_IMPROVEMENT_PLAN.md — both chips live in the Finance
+  // main module's chips list (see v5_data.dart line 498/502), so the
+  // canonical URLs are /app/erp/finance/sales-customers and
+  // /app/erp/finance/purchase-vendors.
+  'erp/finance/sales-customers': (ctx) => const CustomersListScreen(),
+  'erp/finance/purchase-vendors': (ctx) => const VendorsListScreen(),
 
   // V5.2 New Finance Chips (Week 1)
   'erp/finance/profit-centers': (ctx) => const ProfitCentersV52Screen(),
@@ -294,7 +302,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/purchasing/purchase-orders': (ctx) => const pilot_purch.PurchasingScreen(),  // LIVE alias
   'erp/purchasing/invoices': (ctx) => const pilot_purch.PurchasingScreen(),  // LIVE alias
   'erp/purchasing/payments': (ctx) => const pilot_purch.PurchasingScreen(),  // LIVE alias
-  'erp/purchasing/suppliers': (ctx) => const pilot_vendors.VendorsScreen(),  // LIVE — real CRUD + ledger
+  'erp/purchasing/suppliers': (ctx) => const VendorsListScreen(),  // Wave 2 — migrated from pilot_vendors.VendorsScreen to the unified ApexListToolbar pattern (saved searches + bulk-select + AI drawer + CSV export)
   'erp/purchasing/vendor-onboarding': (ctx) => const VendorOnboardingScreen(),
   'erp/purchasing/requisitions': (ctx) => const PurchaseRequisitionScreen(),
   'erp/purchasing/procurement-rfq': (ctx) => const ProcurementRfqScreen(),
