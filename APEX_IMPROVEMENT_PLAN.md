@@ -178,3 +178,35 @@
 ---
 
 *هذه الوثيقة مخصصة لفريق Claude Copilot لتنفيذ خطة التحسينات بشكل دقيق ومنهجي على آخر نسخة من الكود.*
+
+## ٩. ملاحظات الجلسة الحالية
+
+تم في جلسة واحدة (٢٧ أبريل ٢٠٢٦):
+- ١٤ commit دفعت لـ `origin/main`
+- ٧ بنايات Flutter web ونشرها على GitHub Pages
+- ٤ ملفات widget جديدة (`apex_list_toolbar`, `apex_copilot_drawer`, `apex_csv_export`, `error_helpers`)
+- ٤ شاشات قائمة موحَّدة على نمط `ApexListToolbar`:
+  فواتير المبيعات، فواتير المشتريات، العملاء، الموردون
+- أداة تدقيق backend (`tools/api_audit.py`) كشفت ٢٢٢ ملاحظة
+- تقرير حيّ في `docs/audit/api_audit.md`
+
+### Commits الخارطة المرجعية
+
+| # | Commit | الوصف |
+|---|--------|-------|
+| ١ | `8617bdb` | A1 favorites localStorage |
+| ٢ | `8ea1857` | A2 bulk-select + sales/purchase rows |
+| ٣ | `637fac1` | AI Copilot drawer wiring |
+| ٤ | `c51637b` | Wave 1 build |
+| ٥ | `9c3a90c` | Plan progress |
+| ٦ | `7d6e104` | Customers + Vendors migrated |
+| ٧ | `bcf69e9` | Wave 2 build |
+| ٨ | `5818110` | Backend audit script + first report |
+| ٩ | `8527f70` | A4 Semantics + A10 enhanced help |
+| ١٠ | `d98f7ed` | Wave 4 build |
+| ١١ | `19657d5` | A8 real CSV bulk export |
+| ١٢ | `1a33a99` | A8 build |
+| ١٣ | `8446554` | Tips rolled out to all 4 screens |
+| ١٤ | `3613217` | Tips build |
+| ١٥ | (هذا) | A6 error helpers + plan tracker |
+
