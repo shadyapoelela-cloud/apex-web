@@ -856,57 +856,143 @@ class _FilterPanel extends StatelessWidget {
     );
   }
 
+  // ─── Reusable section divider (between named groups in any column).
+  Widget _sectionDivider() => Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        height: 1,
+        color: AC.bdr.withValues(alpha: 0.5),
+      );
+
+  // ─── Reusable section header (group name + icon, RTL).
+  // Used by every dropdown column so spacing/typography stay identical.
+  Widget _sectionHeader({
+    required String labelAr,
+    IconData? icon,
+    Color? iconColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+      child: Row(
+        children: [
+          if (icon != null) ...[
+            Icon(icon, color: iconColor ?? AC.ts, size: 12),
+            const SizedBox(width: 6),
+          ],
+          Expanded(
+            child: Text(
+              labelAr,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: AC.ts,
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Reusable footer action row (e.g. "+ إضافة فلتر مخصّص").
+  // RTL: icon LEFT, label RIGHT. Used for all "Add custom" placeholders
+  // and the destructive "Clear all" action.
+  Widget _footerActionRow({
+    required IconData icon,
+    required String labelAr,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 14),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                labelAr,
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Disabled "+ إضافة" placeholder. Shows a SnackBar when tapped so the
+  // user knows the custom-filter builder is on the roadmap. This row
+  // mirrors Odoo's "+ Add custom filter" affordance — the slot exists
+  // even before the builder lands so the menu stays visually complete.
+  Widget _addCustomPlaceholder({
+    required IconData icon,
+    required String labelAr,
+    required String comingSoonMessage,
+  }) {
+    return Builder(
+      builder: (ctx) => _footerActionRow(
+        icon: icon,
+        labelAr: labelAr,
+        color: AC.gold,
+        onTap: () {
+          Navigator.of(ctx).maybePop();
+          ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+            backgroundColor: AC.navy3,
+            content: Text(
+              comingSoonMessage,
+              style: TextStyle(color: AC.tp),
+              textAlign: TextAlign.right,
+            ),
+          ));
+        },
+      ),
+    );
+  }
+
   Widget _filtersList() {
+    final hasActive = onClearAllFilters != null;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final group in filterGroups) ...[
-            if (group.labelAr.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 6, 12, 2),
-                child: Text(
-                  group.labelAr,
-                  style: TextStyle(
-                    color: AC.td,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.4,
-                  ),
-                  textAlign: TextAlign.right,
-                ),
+          // ── Each filter dimension as its own section ───────────────
+          for (int i = 0; i < filterGroups.length; i++) ...[
+            if (i > 0) _sectionDivider(),
+            if (filterGroups[i].labelAr.isNotEmpty)
+              _sectionHeader(
+                labelAr: filterGroups[i].labelAr,
+                icon: filterGroups[i].icon,
+                iconColor: AC.purple,
               ),
-            for (final opt in group.options)
-              _filterRow(group, opt),
-            const SizedBox(height: 4),
+            for (final opt in filterGroups[i].options)
+              _filterRow(filterGroups[i], opt),
           ],
-          if (onClearAllFilters != null) ...[
-            Divider(height: 1, color: AC.bdr),
-            InkWell(
-              onTap: onClearAllFilters,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                // RTL row: clear icon LEFT, "مسح كل الفلاتر" RIGHT.
-                child: Row(
-                  children: [
-                    Icon(Icons.clear_all_rounded,
-                        color: AC.warn, size: 14),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        'مسح كل الفلاتر',
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                            color: AC.warn,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          // ── "Add custom filter" placeholder (Odoo pattern) ─────────
+          _sectionDivider(),
+          _addCustomPlaceholder(
+            icon: Icons.add_rounded,
+            labelAr: 'إضافة عامل تصفية مخصّص',
+            comingSoonMessage:
+                'منشئ الفلاتر المخصّصة قيد التطوير — سيتوفر قريباً',
+          ),
+          // ── "Clear all filters" — only when something is active ────
+          if (hasActive) ...[
+            _sectionDivider(),
+            _footerActionRow(
+              icon: Icons.clear_all_rounded,
+              labelAr: 'مسح كل الفلاتر',
+              color: AC.warn,
+              onTap: onClearAllFilters!,
             ),
           ],
         ],
@@ -961,6 +1047,12 @@ class _FilterPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // ── Section 1: Group dimensions ────────────────────────────
+          _sectionHeader(
+            labelAr: 'المجموعات',
+            icon: Icons.layers_rounded,
+            iconColor: AC.info,
+          ),
           for (final o in groupOptions)
             InkWell(
               onTap: () => onChangeGroup(o.key),
@@ -1001,21 +1093,13 @@ class _FilterPanel extends StatelessWidget {
                 ),
               ),
             ),
+          // ── Section 2: Sort (when provided) ────────────────────────
           if (sortOptions.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Divider(height: 1, color: AC.bdr),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 2),
-              child: Text(
-                'الترتيب',
-                style: TextStyle(
-                  color: AC.td,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.4,
-                ),
-                textAlign: TextAlign.right,
-              ),
+            _sectionDivider(),
+            _sectionHeader(
+              labelAr: 'الترتيب',
+              icon: Icons.sort_rounded,
+              iconColor: AC.info,
             ),
             for (final o in sortOptions)
               InkWell(
@@ -1052,6 +1136,14 @@ class _FilterPanel extends StatelessWidget {
                 ),
               ),
           ],
+          // ── Footer: "Add custom group" placeholder ─────────────────
+          _sectionDivider(),
+          _addCustomPlaceholder(
+            icon: Icons.add_rounded,
+            labelAr: 'إضافة مجموعة مخصّصة',
+            comingSoonMessage:
+                'منشئ التجميع المخصّص قيد التطوير — سيتوفر قريباً',
+          ),
         ],
       ),
     );
@@ -1063,14 +1155,33 @@ class _FilterPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // ── Section: Saved searches ────────────────────────────────
+          _sectionHeader(
+            labelAr: 'البحوث المحفوظة',
+            icon: Icons.bookmark_rounded,
+            iconColor: AC.gold,
+          ),
           if (favorites.isEmpty)
             Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              child: Text(
-                'لا يوجد بحث محفوظ',
-                style: TextStyle(color: AC.td, fontSize: 11.5),
-                textAlign: TextAlign.right,
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              child: Column(
+                children: [
+                  Icon(Icons.bookmarks_outlined,
+                      color: AC.td, size: 24),
+                  const SizedBox(height: 6),
+                  Text(
+                    'لا يوجد بحث محفوظ',
+                    style: TextStyle(color: AC.td, fontSize: 11.5),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'اضبط الفلتر/التجميع ثم احفظه',
+                    style: TextStyle(color: AC.td, fontSize: 10),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             )
           else
@@ -1079,8 +1190,8 @@ class _FilterPanel extends StatelessWidget {
                 onTap: f.onApply,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 5),
-                  // RTL row: delete-icon LEFT, favorite name RIGHT.
+                      horizontal: 12, vertical: 6),
+                  // RTL row: delete-icon LEFT, dot, favorite name RIGHT.
                   child: Row(
                     children: [
                       if (f.onDelete != null)
@@ -1091,6 +1202,8 @@ class _FilterPanel extends StatelessWidget {
                         )
                       else
                         const SizedBox(width: 14),
+                      const SizedBox(width: 8),
+                      Icon(Icons.circle, color: AC.gold, size: 6),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -1103,32 +1216,14 @@ class _FilterPanel extends StatelessWidget {
                   ),
                 ),
               ),
+          // ── Footer: Save current search action ─────────────────────
           if (onSaveFavorite != null) ...[
-            Divider(height: 1, color: AC.bdr),
-            InkWell(
-              onTap: onSaveFavorite,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                // RTL row: bookmark icon LEFT, label RIGHT.
-                child: Row(
-                  children: [
-                    Icon(Icons.bookmark_add_rounded,
-                        color: AC.gold, size: 14),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        'حفظ البحث الحالي',
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                            color: AC.gold,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            _sectionDivider(),
+            _footerActionRow(
+              icon: Icons.bookmark_add_rounded,
+              labelAr: 'حفظ البحث الحالي',
+              color: AC.gold,
+              onTap: onSaveFavorite!,
             ),
           ],
         ],
