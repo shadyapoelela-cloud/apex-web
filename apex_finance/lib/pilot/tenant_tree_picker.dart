@@ -275,7 +275,7 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
           'legal_name_en': 'APEX Test Group',
           'trade_name': 'APEX Test',
           'primary_country': 'SA',
-          'primary_email': 'test+$shortTs@apex.local',
+          'primary_email': 'apex-test-$shortTs@example.com',
           'primary_phone': '0500000000',
           'tier': 'starter',
           'base_currency': 'SAR',
