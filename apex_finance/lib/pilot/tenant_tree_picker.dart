@@ -14,7 +14,6 @@
 ///   [+ تثبيت بيانات اختبار]   [إدارة الكيانات]
 library;
 
-import 'dart:async';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 
@@ -83,9 +82,10 @@ class _Recents {
 // ─────────────────────────────────────────────────────────────────────
 Future<void> showTenantTreePicker(BuildContext context,
     {VoidCallback? onChanged, Rect? anchorRect}) async {
-  // Popup geometry — compact rectangle (Linear / Notion style)
-  const double popupWidth = 380;
-  const double popupHeight = 460;
+  // Popup expands/shrinks with content — bounded by min/max for sanity
+  const double minWidth = 220;
+  const double maxWidth = 520;
+  const double maxHeight = 480;
   const double gap = 6; // gap between chip bottom and popup top
   const double margin = 8; // viewport margin
 
@@ -95,42 +95,42 @@ Future<void> showTenantTreePicker(BuildContext context,
     barrierDismissible: true,
     builder: (dialogCtx) {
       final screen = MediaQuery.of(dialogCtx).size;
-      double top, right;
+      double top;
+      double right;
       if (anchorRect != null) {
-        // Below the chip
         top = anchorRect.bottom + gap;
         // RTL: align popup's right edge to chip's right edge
         right = (screen.width - anchorRect.right).clamp(margin, screen.width - margin);
-        // If overflow at bottom, shift up
-        if (top + popupHeight > screen.height - margin) {
-          // Try above the chip
-          final aboveTop = anchorRect.top - gap - popupHeight;
+        // Vertical clamp — flip above if needed, else clamp to viewport
+        if (top + maxHeight > screen.height - margin) {
+          final aboveTop = anchorRect.top - gap - maxHeight;
           if (aboveTop >= margin) {
             top = aboveTop;
           } else {
-            // Clamp: place at bottom of viewport with margin
-            top = (screen.height - popupHeight - margin).clamp(margin, screen.height);
+            top = (screen.height - maxHeight - margin).clamp(margin, screen.height);
           }
         }
-        // If popup right would push it off the LEFT edge, align to viewport
-        if (right + popupWidth > screen.width - margin) {
-          right = margin;
-        }
       } else {
-        // Fallback: top-right corner under topbar
         top = 60;
         right = margin;
       }
       return Stack(children: [
-        // Tap outside to dismiss (transparent backdrop already handled by barrier)
         Positioned(
           top: top,
           right: right,
-          width: popupWidth,
-          height: popupHeight,
+          // No fixed width/height — child sizes itself within constraints
           child: Material(
             color: Colors.transparent,
-            child: TenantTreePicker(onChanged: onChanged),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                minWidth: minWidth,
+                maxWidth: maxWidth,
+                maxHeight: maxHeight,
+              ),
+              child: IntrinsicWidth(
+                child: TenantTreePicker(onChanged: onChanged),
+              ),
+            ),
           ),
         ),
       ]);
@@ -154,11 +154,6 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
   /// expanded entity ids
   final Set<String> _expanded = {};
 
-  // Search
-  final _searchCtrl = TextEditingController();
-  Timer? _searchDebounce;
-  String _query = '';
-
   bool _loading = false;
   bool _seedingTest = false;
   String? _error;
@@ -166,29 +161,12 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
   @override
   void initState() {
     super.initState();
-    _searchCtrl.addListener(_onSearch);
     if (PilotSession.hasTenant) {
       _loadAll();
     }
     if (PilotSession.hasEntity) {
       _expanded.add(PilotSession.entityId!);
     }
-  }
-
-  @override
-  void dispose() {
-    _searchDebounce?.cancel();
-    _searchCtrl.dispose();
-    super.dispose();
-  }
-
-  void _onSearch() {
-    _searchDebounce?.cancel();
-    _searchDebounce = Timer(const Duration(milliseconds: 150), () {
-      if (mounted) {
-        setState(() => _query = _searchCtrl.text.trim().toLowerCase());
-      }
-    });
   }
 
   Future<void> _loadAll() async {
@@ -407,23 +385,24 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
   }
 
   Widget _buildHeader() => Container(
-        padding: const EdgeInsets.fromLTRB(10, 8, 6, 8),
+        padding: const EdgeInsetsDirectional.fromSTEB(10, 8, 6, 8),
         decoration: BoxDecoration(
           color: core_theme.AC.navy3,
           border: Border(bottom: BorderSide(color: core_theme.AC.bdr)),
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Row(children: [
-            Icon(Icons.account_tree_outlined,
-                color: core_theme.AC.gold, size: 14),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text('اختيار النطاق',
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(Icons.account_tree_outlined,
+                  color: core_theme.AC.gold, size: 14),
+              const SizedBox(width: 6),
+              Text('اختيار النطاق',
                   style: TextStyle(
                       color: core_theme.AC.gold,
                       fontSize: 12,
                       fontWeight: FontWeight.w800)),
-            ),
+            ]),
             InkWell(
               borderRadius: BorderRadius.circular(4),
               onTap: () => Navigator.of(context).maybePop(),
@@ -432,38 +411,8 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
                 child: Icon(Icons.close, color: core_theme.AC.ts, size: 14),
               ),
             ),
-          ]),
-          const SizedBox(height: 6),
-          SizedBox(
-            height: 32,
-            child: TextField(
-              controller: _searchCtrl,
-              autofocus: true,
-              style: TextStyle(color: core_theme.AC.tp, fontSize: 13),
-              decoration: InputDecoration(
-                hintText: 'بحث في الأكواد والأسماء…',
-                hintStyle:
-                    TextStyle(color: core_theme.AC.ts, fontSize: 12),
-                prefixIcon: Icon(Icons.search,
-                    color: core_theme.AC.ts, size: 18),
-                isDense: true,
-                filled: true,
-                fillColor: core_theme.AC.navy,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: core_theme.AC.bdr)),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: core_theme.AC.bdr)),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: core_theme.AC.gold)),
-              ),
-            ),
-          ),
-        ]),
+          ],
+        ),
       );
 
   Widget _buildErrorBanner() => Container(
@@ -514,51 +463,27 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
         ),
       );
     }
-    final filteredEntities = _filteredEntities();
-    return ListView(
+    return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 6),
-      shrinkWrap: true,
-      children: [
-        _tenantRow(),
-        if (filteredEntities.isEmpty)
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Center(
-              child: Text(
-                  _query.isEmpty
-                      ? 'لا توجد شركات تحت هذا الكيان'
-                      : 'لا توجد نتائج لـ "$_query"',
-                  style: TextStyle(
-                      color: core_theme.AC.ts, fontSize: 12)),
-            ),
-          )
-        else
-          for (final e in filteredEntities) ..._entityWithBranches(e),
-      ],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _tenantRow(),
+          if (_entities.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Center(
+                child: Text('لا توجد شركات تحت هذا الكيان',
+                    style: TextStyle(
+                        color: core_theme.AC.ts, fontSize: 12)),
+              ),
+            )
+          else
+            for (final e in _entities) ..._entityWithBranches(e),
+        ],
+      ),
     );
-  }
-
-  List<Map<String, dynamic>> _filteredEntities() {
-    if (_query.isEmpty) return _entities;
-    return _entities.where((e) {
-      final hay = [
-        e['code'],
-        e['name_ar'],
-        e['name_en'],
-        e['city'],
-      ].whereType<Object>().map((x) => x.toString().toLowerCase()).join(' ');
-      if (hay.contains(_query)) return true;
-      // Also match if any branch matches
-      final branches = _branchesByEntity[e['id']] ?? [];
-      return branches.any((b) {
-        final bh = [
-          b['code'],
-          b['name_ar'],
-          b['city'],
-        ].whereType<Object>().map((x) => x.toString().toLowerCase()).join(' ');
-        return bh.contains(_query);
-      });
-    }).toList();
   }
 
   Widget _tenantRow() {
@@ -596,32 +521,18 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
     final isExpanded = _expanded.contains(eid);
     final isActive = PilotSession.entityId == eid;
     final branches = _branchesByEntity[eid] ?? [];
-    final filteredBranches = _query.isEmpty
-        ? branches
-        : branches.where((b) {
-            final bh = [
-              b['code'],
-              b['name_ar'],
-              b['city'],
-            ].whereType<Object>().map((x) => x.toString().toLowerCase()).join(' ');
-            return bh.contains(_query);
-          }).toList();
-
     return [
       _entityRow(e, isExpanded, isActive, branches.length),
       if (isExpanded)
-        if (filteredBranches.isEmpty)
+        if (branches.isEmpty)
           Padding(
             padding: const EdgeInsetsDirectional.only(start: 56, top: 4, bottom: 4),
             child: Text(
-                _branchesByEntity[eid] == null
-                    ? 'تحميل…'
-                    : 'لا توجد فروع',
-                style: TextStyle(
-                    color: core_theme.AC.ts, fontSize: 11)),
+                _branchesByEntity[eid] == null ? 'تحميل…' : 'لا توجد فروع',
+                style: TextStyle(color: core_theme.AC.ts, fontSize: 11)),
           )
         else
-          ...filteredBranches.map((b) => _branchRow(e, b)),
+          ...branches.map((b) => _branchRow(e, b)),
     ];
   }
 
