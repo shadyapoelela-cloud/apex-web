@@ -553,9 +553,17 @@ class _SearchBarWithMenu extends StatelessWidget {
           width: activeFilterCount > 0 ? 1.4 : 1.0,
         ),
       ),
+      // Force RTL on this Row + put the chevron FIRST so it renders on
+      // the visual RIGHT (RTL start). Previously the chevron was on the
+      // visual LEFT — the user asked to move it to the other side.
+      // Order:
+      //   children[0] (chevron _PanelOpener) → visual RIGHT (start in RTL)
+      //   children[Expanded](TextField)       → MIDDLE
+      //   children[last] (search icon)        → visual LEFT (end in RTL)
       child: Row(
+        textDirection: TextDirection.rtl,
         children: [
-          // [▼] menu opener — leftmost in RTL = OPENS the panel.
+          // ── Chevron at the RTL start (visual RIGHT) ───────────────
           _PanelOpener(
             filterGroups: filterGroups,
             groupOptions: groupOptions,
@@ -569,11 +577,7 @@ class _SearchBarWithMenu extends StatelessWidget {
             onClearAllFilters: onClearAllFilters,
             activeFilterCount: activeFilterCount,
           ),
-          // [⚙] gear — opens "settings" submenu (sort, density, etc.)
-          //  For now wired to the same panel opener but visually it sits
-          //  to the right of the chevron, mimicking Odoo.
-          //  (Removed for v1 — keeping toolbar clean. Uncomment if needed.)
-          // ── Search field ───────────────────────────────────────────
+          // ── Search field — fills middle ────────────────────────────
           Expanded(
             child: ValueListenableBuilder<TextEditingValue>(
               valueListenable: searchCtl,
@@ -592,7 +596,7 @@ class _SearchBarWithMenu extends StatelessWidget {
                     hintText: searchHint,
                     hintStyle: TextStyle(color: AC.td, fontSize: 12.5),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 8),
+                        horizontal: 4, vertical: 8),
                     suffixIcon: v.text.isEmpty
                         ? null
                         : InkWell(
@@ -610,8 +614,9 @@ class _SearchBarWithMenu extends StatelessWidget {
               },
             ),
           ),
+          // ── Search icon at the RTL end (visual LEFT) ──────────────
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Icon(Icons.search_rounded, color: AC.ts, size: 16),
           ),
         ],
@@ -624,7 +629,7 @@ class _SearchBarWithMenu extends StatelessWidget {
 // The chevron+filter+group+favorites panel (3-column, Odoo-style)
 // ─────────────────────────────────────────────────────────────────────────
 
-class _PanelOpener extends StatelessWidget {
+class _PanelOpener extends StatefulWidget {
   final List<ApexFilterGroup> filterGroups;
   final List<ApexGroupOption> groupOptions;
   final String activeGroupKey;
@@ -652,86 +657,114 @@ class _PanelOpener extends StatelessWidget {
   });
 
   @override
+  State<_PanelOpener> createState() => _PanelOpenerState();
+}
+
+class _PanelOpenerState extends State<_PanelOpener> {
+  // Owned controller so we can call `close()` from inside menuChildren
+  // (option-tap closes the panel). Lives as long as the widget.
+  final MenuController _menuCtrl = MenuController();
+
+  @override
   Widget build(BuildContext context) {
-    return PopupMenuButton<int>(
-      tooltip: 'فلاتر · تجميع · مفضلات',
-      offset: const Offset(0, 40),
-      color: AC.navy2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AC.bdr),
+    // Use MenuAnchor instead of PopupMenuButton because Material's
+    // PopupMenu hardcodes maxWidth to 280px (5 * _kMenuWidthStep) which
+    // squeezes our 3-column panel into a narrow strip and forces text
+    // to wrap awkwardly. MenuAnchor respects the child's width.
+    return MenuAnchor(
+      controller: _menuCtrl,
+      style: MenuStyle(
+        backgroundColor: WidgetStateProperty.all(AC.navy2),
+        shape: WidgetStateProperty.all(RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: AC.bdr),
+        )),
+        padding: WidgetStateProperty.all(EdgeInsets.zero),
+        // No upper bound on width — let the panel size itself.
+        maximumSize: WidgetStateProperty.all(Size.infinite),
       ),
-      // Custom child = the chevron pill at the leftmost edge of search bar.
-      itemBuilder: (ctx) => [
-        PopupMenuItem<int>(
-          enabled: false,
-          padding: EdgeInsets.zero,
+      alignmentOffset: const Offset(0, 6),
+      builder: (ctx, controller, _) => Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () =>
+              controller.isOpen ? controller.close() : controller.open(),
+          child: Tooltip(
+            message: 'فلاتر · تجميع · مفضلات',
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: widget.activeFilterCount > 0
+                    ? AC.gold.withValues(alpha: 0.12)
+                    : Colors.transparent,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.expand_more_rounded,
+                      color: widget.activeFilterCount > 0 ? AC.gold : AC.ts,
+                      size: 18),
+                  if (widget.activeFilterCount > 0) ...[
+                    const SizedBox(width: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: AC.gold,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${widget.activeFilterCount}',
+                        style: TextStyle(
+                          color: AC.navy,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      menuChildren: [
+        SizedBox(
+          width: 880,
           child: _FilterPanel(
-            filterGroups: filterGroups,
-            groupOptions: groupOptions,
-            activeGroupKey: activeGroupKey,
+            filterGroups: widget.filterGroups,
+            groupOptions: widget.groupOptions,
+            activeGroupKey: widget.activeGroupKey,
             onChangeGroup: (k) {
-              onChangeGroup(k);
-              Navigator.of(ctx).pop();
+              widget.onChangeGroup(k);
+              _menuCtrl.close();
             },
-            sortOptions: sortOptions,
-            activeSortKey: activeSortKey,
+            sortOptions: widget.sortOptions,
+            activeSortKey: widget.activeSortKey,
             onChangeSort: (k) {
-              onChangeSort(k);
-              Navigator.of(ctx).pop();
+              widget.onChangeSort(k);
+              _menuCtrl.close();
             },
-            favorites: favorites,
-            onSaveFavorite: () {
-              onSaveFavorite?.call();
-              Navigator.of(ctx).pop();
-            },
-            onClearAllFilters: onClearAllFilters == null
+            favorites: widget.favorites,
+            onSaveFavorite: widget.onSaveFavorite == null
                 ? null
                 : () {
-                    onClearAllFilters!();
-                    Navigator.of(ctx).pop();
+                    widget.onSaveFavorite!();
+                    _menuCtrl.close();
+                  },
+            onClearAllFilters: widget.onClearAllFilters == null
+                ? null
+                : () {
+                    widget.onClearAllFilters!();
+                    _menuCtrl.close();
                   },
           ),
         ),
       ],
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(10),
-            bottomLeft: Radius.circular(10),
-          ),
-          color: activeFilterCount > 0
-              ? AC.gold.withValues(alpha: 0.12)
-              : Colors.transparent,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.expand_more_rounded,
-                color: activeFilterCount > 0 ? AC.gold : AC.ts, size: 18),
-            if (activeFilterCount > 0) ...[
-              const SizedBox(width: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  color: AC.gold,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '$activeFilterCount',
-                  style: TextStyle(
-                    color: AC.navy,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
     );
   }
 }
@@ -766,8 +799,11 @@ class _FilterPanel extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: ConstrainedBox(
+      // Wider panel so each of the 3 columns has ~290px breathing room —
+      // long Arabic option labels (e.g. "إضافة عامل تصفية مخصّص") used
+      // to wrap awkwardly into 2 lines at 540px total width.
       constraints: const BoxConstraints(
-          minWidth: 540, maxWidth: 640, maxHeight: 520),
+          minWidth: 880, maxWidth: 980, maxHeight: 560),
       child: SingleChildScrollView(
         child: IntrinsicHeight(
           child: Row(
