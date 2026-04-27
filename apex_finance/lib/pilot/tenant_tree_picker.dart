@@ -1,21 +1,18 @@
 /// APEX — Tenant/Entity/Branch tree picker
 /// ═══════════════════════════════════════════════════════════════════════
-/// Replaces the old flat ChoiceChip dialog with a hierarchical
-/// search-first tree (Sage Intacct + Odoo + SAP Fiori synthesis):
+/// Hierarchical scope switcher anchored under the "اختيار الشركة" chip.
+/// Single canonical entry-point for entity creation routes through the
+/// unified onboarding wizard at /app/erp/finance/onboarding (which
+/// covers entity → branches → warehouses → CoA → fiscal periods → ZATCA).
 ///
-///   [🔎 بحث في الكيانات والشركات والفروع]
-///   ▾ 🏢 المجموعة (الكيان الأم)
-///       ▾ 🏛️ شركة الرياض للمقاولات        ●  ← active entity
-///           • 🏪 فرع الرياض الرئيسي         ●  ← active branch
+///   ▾ 🏢 الكيان الأم (active tenant)
+///       ▾ 🏛️ شركة س         ● ← active entity
+///           • 🏪 فرع الرياض   ●
 ///           • 🏪 فرع جدة
-///       ▸ 🏛️ شركة الخليج التجارية        (٢ فروع)
 ///   ─────────────────────────────────────────
-///   الأخيرة: [الرياض] [جدة] [الخليج/الدمام]
-///   [+ تثبيت بيانات اختبار]   [إدارة الكيانات]
+///   الكيانات المرتبطة سابقاً: [✓ الحالي] [الكيان أ ×] [الكيان ب ×]
+///   [+ إعداد شركة جديدة]
 library;
-
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,56 +21,6 @@ import 'package:go_router/go_router.dart';
 import '../core/theme.dart' as core_theme;
 import 'api/pilot_client.dart';
 import 'session.dart';
-
-// ─────────────────────────────────────────────────────────────────────
-// Recents store — persist last-used scopes (entity_id + branch_id)
-// ─────────────────────────────────────────────────────────────────────
-class _Recents {
-  static const _key = 'pilot.scope_recents';
-  static const _max = 5;
-
-  static List<Map<String, String>> load() {
-    try {
-      final raw = html.window.localStorage[_key];
-      if (raw == null || raw.isEmpty) return [];
-      final list = (raw.split('|'))
-          .where((s) => s.contains(':'))
-          .map((s) {
-            final parts = s.split('::');
-            return {
-              'entity_id': parts.isNotEmpty ? parts[0] : '',
-              'branch_id': parts.length > 1 ? parts[1] : '',
-              'label': parts.length > 2 ? parts[2] : '',
-            };
-          })
-          .toList();
-      return list;
-    } catch (_) {
-      return [];
-    }
-  }
-
-  static void push(String entityId, String? branchId, String label) {
-    try {
-      final current = load();
-      current.removeWhere((r) =>
-          r['entity_id'] == entityId && r['branch_id'] == (branchId ?? ''));
-      current.insert(0, {
-        'entity_id': entityId,
-        'branch_id': branchId ?? '',
-        'label': label,
-      });
-      while (current.length > _max) {
-        current.removeLast();
-      }
-      final encoded = current
-          .map((r) =>
-              '${r['entity_id']}::${r['branch_id']}::${r['label']}:flag')
-          .join('|');
-      html.window.localStorage[_key] = encoded;
-    } catch (_) {}
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────
 // Public entry — show as popover anchored just below the trigger chip.
@@ -155,7 +102,6 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
   final Set<String> _expanded = {};
 
   bool _loading = false;
-  bool _seedingTest = false;
   String? _error;
 
   @override
@@ -185,6 +131,11 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
       return;
     }
     _tenant = tRes.data as Map<String, dynamic>?;
+    // Cache tenant display name in history so the recents strip shows it.
+    final tName = (_tenant?['legal_name_ar'] ?? _tenant?['trade_name'] ?? '').toString();
+    if (tName.isNotEmpty) {
+      PilotSession.rememberTenantName(PilotSession.tenantId!, tName);
+    }
     final eRes = await pilotClient.listEntities(PilotSession.tenantId!);
     if (!mounted) return;
     final entities = (eRes.success && eRes.data is List)
@@ -229,7 +180,6 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
     if (id == null) return;
     PilotSession.entityId = id;
     PilotSession.clearBranch();
-    _Recents.push(id, null, '${entity['code'] ?? ''} — ${entity['name_ar'] ?? ''}');
     widget.onChanged?.call();
     setState(() {
       _expanded.add(id);
@@ -246,105 +196,25 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
     if (eid == null || bid == null) return;
     PilotSession.entityId = eid;
     PilotSession.branchId = bid;
-    _Recents.push(
-        eid,
-        bid,
-        '${entity['code'] ?? ''} / ${branch['code'] ?? ''} — ${branch['city'] ?? branch['name_ar'] ?? ''}');
     widget.onChanged?.call();
     setState(() {});
   }
 
-  Future<void> _seedTestScope() async {
-    setState(() {
-      _seedingTest = true;
-      _error = null;
-    });
-    final ts = DateTime.now().millisecondsSinceEpoch;
-    final shortTs = ts.toString().substring(7);
+  /// Switch the active tenant — reset entity/branch and reload tree.
+  Future<void> _switchTenant(String newTenantId) async {
+    if (newTenantId.isEmpty || newTenantId == PilotSession.tenantId) return;
+    PilotSession.tenantId = newTenantId;
+    PilotSession.clearEntityAndBranch();
+    _tenant = null;
+    _branchesByEntity.clear();
+    _expanded.clear();
+    widget.onChanged?.call();
+    await _loadAll();
+  }
 
-    String? tenantId = PilotSession.tenantId;
-    String? entityId;
-    String? branchId;
-
-    try {
-      // ── 1) Tenant if missing ─────────────────────────────────────
-      if (tenantId == null || tenantId.isEmpty) {
-        final tRes = await pilotClient.createTenant({
-          'slug': 'apex-test-$shortTs',
-          'legal_name_ar': 'مجموعة الاختبار للأعمال',
-          'legal_name_en': 'APEX Test Group',
-          'trade_name': 'APEX Test',
-          'primary_country': 'SA',
-          'primary_email': 'apex-test-$shortTs@example.com',
-          'primary_phone': '0500000000',
-          'tier': 'starter',
-          'base_currency': 'SAR',
-          'fiscal_year_start_month': 1,
-          'default_timezone': 'Asia/Riyadh',
-        });
-        if (!tRes.success) {
-          throw Exception('tenant: ${tRes.error}');
-        }
-        tenantId = (tRes.data as Map?)?['id'] as String?;
-        if (tenantId == null) throw Exception('tenant: no id');
-        PilotSession.tenantId = tenantId;
-      }
-
-      // ── 2) Entity ────────────────────────────────────────────────
-      final eRes = await pilotClient.createEntity(tenantId, {
-        'code': 'TEST-$shortTs',
-        'name_ar': 'شركة الاختبار للتجارة',
-        'name_en': 'Test Trading Co.',
-        'type': 'main',
-        'country': 'SA',
-        'functional_currency': 'SAR',
-        'fiscal_year_start_month': 1,
-        'icon_emoji': '🧪',
-      });
-      if (!eRes.success) {
-        throw Exception('entity: ${eRes.error}');
-      }
-      entityId = (eRes.data as Map?)?['id'] as String?;
-      if (entityId == null) throw Exception('entity: no id');
-      PilotSession.entityId = entityId;
-
-      // ── 3) Branch ────────────────────────────────────────────────
-      final bRes = await pilotClient.createBranch(entityId, {
-        'code': 'BR-$shortTs',
-        'name_ar': 'فرع الرياض الرئيسي',
-        'name_en': 'Riyadh HQ',
-        'short_name': 'الرياض',
-        'type': 'retail_store',
-        'city': 'الرياض',
-        'district': 'العليا',
-        'pos_station_count': 1,
-        'accepts_returns': true,
-        'supports_pickup': true,
-      });
-      if (!bRes.success) {
-        throw Exception('branch: ${bRes.error}');
-      }
-      branchId = (bRes.data as Map?)?['id'] as String?;
-      if (branchId != null) PilotSession.branchId = branchId;
-
-      _Recents.push(entityId, branchId, 'TEST-$shortTs / BR-$shortTs — الرياض');
-      widget.onChanged?.call();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: core_theme.AC.ok,
-          content:
-              const Text('تم تثبيت كيان + شركة + فرع للاختبار بنجاح'),
-        ));
-      }
-      // Reload tree
-      await _loadAll();
-    } catch (e) {
-      if (mounted) {
-        setState(() => _error = 'فشل التثبيت: $e');
-      }
-    } finally {
-      if (mounted) setState(() => _seedingTest = false);
-    }
+  void _openSetupWizard() {
+    Navigator.of(context).pop();
+    context.go('/app/erp/finance/onboarding');
   }
 
   // ── UI ──────────────────────────────────────────────────────────────
@@ -456,7 +326,7 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
                 style: TextStyle(
                     color: core_theme.AC.tp, fontSize: 13)),
             const SizedBox(height: 4),
-            Text('اضغط "تثبيت بيانات اختبار" أدناه للبدء فوراً',
+            Text('اضغط "إعداد شركة جديدة" أدناه لفتح المعالج',
                 style: TextStyle(
                     color: core_theme.AC.ts, fontSize: 11)),
           ],
@@ -653,119 +523,104 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
   }
 
   Widget _buildFooter() {
-    final recents = _Recents.load();
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        if (recents.isNotEmpty) ...[
-          Row(children: [
-            Icon(Icons.history, color: core_theme.AC.ts, size: 13),
-            const SizedBox(width: 4),
-            Text('الأخيرة',
-                style: TextStyle(
-                    color: core_theme.AC.ts,
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w700)),
-          ]),
-          const SizedBox(height: 6),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: recents.take(4).map((r) {
-              final lbl = (r['label'] ?? '').toString();
-              return InkWell(
-                onTap: () {
-                  final eid = r['entity_id'];
-                  final bid = r['branch_id'];
-                  if (eid != null && eid.isNotEmpty) {
-                    PilotSession.entityId = eid;
-                    if (bid != null && bid.isNotEmpty) {
-                      PilotSession.branchId = bid;
-                    } else {
-                      PilotSession.clearBranch();
-                    }
-                    widget.onChanged?.call();
-                    setState(() {});
-                  }
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: core_theme.AC.navy3,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: core_theme.AC.bdr),
-                  ),
-                  child: Text(lbl,
-                      style: TextStyle(
-                          color: core_theme.AC.tp, fontSize: 10.5)),
-                ),
-              );
-            }).toList(),
+        // Tenant history strip — switch between previously-bound tenants.
+        ..._buildTenantHistorySection(),
+        // Single primary action: open the unified setup wizard
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: _openSetupWizard,
+            icon: const Icon(Icons.add_business, size: 16),
+            label: const Text('إعداد شركة جديدة'),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: core_theme.AC.gold,
+                foregroundColor: core_theme.AC.navy,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                textStyle: const TextStyle(
+                    fontSize: 12, fontWeight: FontWeight.w800)),
           ),
-          const SizedBox(height: 10),
-        ],
-        Row(children: [
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: _seedingTest ? null : _seedTestScope,
-              icon: _seedingTest
-                  ? const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Icon(Icons.science_outlined, size: 16),
-              label: Text(_seedingTest
-                  ? 'جارٍ الإنشاء…'
-                  : 'تثبيت كيان + شركة + فرع للاختبار'),
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: core_theme.AC.gold,
-                  foregroundColor: core_theme.AC.navy,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
-                  textStyle: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w700)),
-            ),
-          ),
-          const SizedBox(width: 8),
-          OutlinedButton.icon(
-            onPressed: () {
-              Navigator.of(context).pop();
-              context.go('/app/erp/finance/entity-setup');
-            },
-            icon: Icon(Icons.settings_outlined,
-                size: 14, color: core_theme.AC.gold),
-            label: Text('إدارة',
-                style: TextStyle(
-                    color: core_theme.AC.gold, fontSize: 11.5)),
-            style: OutlinedButton.styleFrom(
-                side: BorderSide(color: core_theme.AC.gold),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 10)),
-          ),
-        ]),
-        if (PilotSession.hasTenant) ...[
-          const SizedBox(height: 6),
-          TextButton.icon(
-            onPressed: () {
-              PilotSession.clear();
-              widget.onChanged?.call();
-              setState(() {
-                _tenant = null;
-                _entities = [];
-                _branchesByEntity.clear();
-                _expanded.clear();
-              });
-            },
-            icon: Icon(Icons.logout,
-                size: 13, color: core_theme.AC.err),
-            label: Text('إلغاء الربط ومسح النطاق',
-                style: TextStyle(
-                    color: core_theme.AC.err, fontSize: 11)),
-          ),
-        ],
+        ),
       ]),
     );
+  }
+
+  List<Widget> _buildTenantHistorySection() {
+    final hist = PilotSession.tenantHistory;
+    if (hist.isEmpty) return const [];
+    return [
+      Row(children: [
+        Icon(Icons.layers_outlined, color: core_theme.AC.ts, size: 13),
+        const SizedBox(width: 4),
+        Text('الكيانات المرتبطة سابقاً',
+            style: TextStyle(
+                color: core_theme.AC.ts,
+                fontSize: 10.5,
+                fontWeight: FontWeight.w700)),
+      ]),
+      const SizedBox(height: 6),
+      Wrap(
+        spacing: 6,
+        runSpacing: 6,
+        children: hist.map((h) {
+          final id = h['id'] ?? '';
+          final name = (h['name'] ?? '').isEmpty
+              ? '${id.substring(0, id.length.clamp(0, 8))}…'
+              : h['name']!;
+          final isActive = id == PilotSession.tenantId;
+          return InkWell(
+            onTap: isActive ? null : () => _switchTenant(id),
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: isActive
+                    ? core_theme.AC.gold.withValues(alpha: 0.15)
+                    : core_theme.AC.navy3,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                    color: isActive
+                        ? core_theme.AC.gold
+                        : core_theme.AC.bdr),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                if (isActive)
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(end: 4),
+                    child: Icon(Icons.check_circle,
+                        color: core_theme.AC.ok, size: 11),
+                  ),
+                Text(name,
+                    style: TextStyle(
+                        color: isActive
+                            ? core_theme.AC.tp
+                            : core_theme.AC.tp,
+                        fontSize: 10.5,
+                        fontWeight: isActive
+                            ? FontWeight.w700
+                            : FontWeight.w500)),
+                if (!isActive)
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(start: 4),
+                    child: InkWell(
+                      onTap: () {
+                        PilotSession.forgetTenant(id);
+                        setState(() {});
+                      },
+                      child: Icon(Icons.close,
+                          color: core_theme.AC.ts, size: 11),
+                    ),
+                  ),
+              ]),
+            ),
+          );
+        }).toList(),
+      ),
+      const SizedBox(height: 10),
+    ];
   }
 }

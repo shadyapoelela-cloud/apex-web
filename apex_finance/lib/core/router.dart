@@ -7,7 +7,9 @@ import '../screens/whats_new/uae_corp_tax_screen.dart';
 import '../screens/whats_new/startup_metrics_screen.dart';
 import '../screens/whats_new/industry_packs_screen.dart';
 import '../screens/whats_new/feature_demos_screen.dart';
-import '../screens/whats_new/onboarding_wizard_screen.dart';
+// Onboarding wizard variants deprecated — all routes redirect to the
+// unified /app/erp/finance/onboarding (PilotOnboardingWizard).
+// import '../screens/whats_new/onboarding_wizard_screen.dart';
 import '../screens/whats_new/sprint35_foundation_screen.dart';
 import '../screens/whats_new/sprint37_experience_screen.dart';
 import '../screens/whats_new/sprint38_composable_screen.dart';
@@ -45,7 +47,7 @@ import '../screens/compliance/audit_workflow_screen.dart' show AiAuditWorkflowSc
 import '../screens/compliance/islamic_finance_screen.dart';
 // import '../screens/compliance/depreciation_ai_screen.dart';  // redirects to existing /compliance/depreciation
 // import '../screens/compliance/multi_currency_screen.dart'; // deduplicated → /analytics/multi-currency-v2
-import '../screens/onboarding/onboarding_wizard_screen.dart' as onboarding_ai;
+// import '../screens/onboarding/onboarding_wizard_screen.dart' as onboarding_ai;
 import '../screens/admin/audit_chain_viewer_screen.dart';
 // Operations duplicates kept as files for reference but unmounted —
 // their routes now redirect to the pre-existing /compliance/* + /financial-ops screens.
@@ -401,9 +403,12 @@ final appRouter = GoRouter(
       path: '/whatsapp-demo',
       pageBuilder: (c, s) => _apexPage(const WhatsAppDemoScreen(), s),
     ),
+    // Single canonical onboarding path — all variants redirect here.
+    // The wizard at /app/erp/finance/onboarding (PilotOnboardingWizard)
+    // is the only place users create new tenants/entities/branches.
     GoRoute(
       path: '/onboarding',
-      pageBuilder: (c, s) => _apexPage(const OnboardingWizardScreen(), s),
+      redirect: (c, s) => '/app/erp/finance/onboarding',
     ),
 
     // ── Compliance (ZATCA / IFRS / SOCPA) ──
@@ -583,7 +588,7 @@ final appRouter = GoRouter(
     //    pre-existing /compliance/depreciation + /compliance/fixed-assets screens.
     GoRoute(path: '/compliance/depreciation-ai', redirect: (c, s) => '/compliance/depreciation'),
     GoRoute(path: '/compliance/multi-currency', redirect: (c, s) => '/analytics/multi-currency-v2'),
-    GoRoute(path: '/onboarding/wizard', pageBuilder: (c, s) => _apexPage(const onboarding_ai.OnboardingWizardScreen(), s)),
+    GoRoute(path: '/onboarding/wizard', redirect: (c, s) => '/app/erp/finance/onboarding'),
     GoRoute(path: '/admin/audit-chain', pageBuilder: (c, s) => _apexPage(const AuditChainViewerScreen(), s)),
     // ── Operations routes redirect to pre-existing screens (avoid duplication) ──
     GoRoute(path: '/operations/hub', redirect: (c, s) => '/financial-ops'),
