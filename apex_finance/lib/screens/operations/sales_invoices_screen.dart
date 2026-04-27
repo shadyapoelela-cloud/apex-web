@@ -586,19 +586,26 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // LayoutBuilder + horizontal scroll so the toolbar never collapses
-          // its title or hides icons when the viewport is narrow (e.g. user
-          // has DevTools / sidebar / split view eating into page width). At
-          // wider widths the inner Row fills the visible space and Spacer
-          // distributes leftover; at narrow widths the user can scroll
-          // horizontally and every element stays at its natural size.
+          // LayoutBuilder + horizontal scroll, with a BOUNDED inner SizedBox
+          // so Spacer/Flexible inside the Row still get a finite mainAxis
+          // budget. Without the bounded SizedBox, Spacer collapses to 0
+          // (Row inside an unbounded scroll view has no maxWidth to spread
+          // across) and the CTAs slam against the help icon. Pattern:
+          //   • If viewport ≥ 1100px → toolbar fills the viewport width,
+          //     Spacer distributes leftover (looks identical to JE).
+          //   • If viewport < 1100px → toolbar locked to 1100px, user
+          //     scrolls horizontally; every element stays at natural size,
+          //     Spacer still pushes the action cluster to the left edge.
           LayoutBuilder(
             builder: (ctx, constraints) {
+              const minToolbarWidth = 1100.0;
+              final w = constraints.maxWidth < minToolbarWidth
+                  ? minToolbarWidth
+                  : constraints.maxWidth;
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: ConstrainedBox(
-                  constraints:
-                      BoxConstraints(minWidth: constraints.maxWidth),
+                child: SizedBox(
+                  width: w,
                   child: Row(children: [
             // ── Gradient pill icon (matches JE) ─────────────────────
             Container(
@@ -750,6 +757,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       ),
     );
   }
+
 
   // ── Compact search (ported from JE pattern) ──────────────────────────
   Widget _compactSearchField() {
