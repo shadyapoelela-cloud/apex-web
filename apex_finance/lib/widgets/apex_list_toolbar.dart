@@ -742,11 +742,11 @@ class _PanelOpenerState extends State<_PanelOpener> {
       ),
       menuChildren: [
         SizedBox(
-          // 720px — three columns of ~230px each. Reasonable size on
-          // desktop, no awkward wrapping for typical option labels
-          // ("هذا الأسبوع", "تاريخ الإصدار (الأحدث)", etc.). The earlier
-          // 880px was too wide and dominated the screen per user feedback.
-          width: 720,
+          // 620px — compact panel. With filter sections collapsed by
+          // default (accordion), height stays ~280-320px when nothing is
+          // expanded. Each column gets ~205px, enough for typical
+          // labels without wrapping.
+          width: 620,
           child: _FilterPanel(
             filterGroups: widget.filterGroups,
             groupOptions: widget.groupOptions,
@@ -781,7 +781,7 @@ class _PanelOpenerState extends State<_PanelOpener> {
   }
 }
 
-class _FilterPanel extends StatelessWidget {
+class _FilterPanel extends StatefulWidget {
   final List<ApexFilterGroup> filterGroups;
   final List<ApexGroupOption> groupOptions;
   final String activeGroupKey;
@@ -807,15 +807,63 @@ class _FilterPanel extends StatelessWidget {
   });
 
   @override
+  State<_FilterPanel> createState() => _FilterPanelState();
+}
+
+class _FilterPanelState extends State<_FilterPanel> {
+  // Which filter sections are expanded right now. Sections collapse by
+  // default — keeps the panel short. Tapping a header toggles its body.
+  final Set<String> _expanded = <String>{};
+
+  // Convenience aliases so the rest of the file (which referenced bare
+  // field names when this was a StatelessWidget) keeps reading naturally.
+  List<ApexFilterGroup> get filterGroups => widget.filterGroups;
+  List<ApexGroupOption> get groupOptions => widget.groupOptions;
+  String get activeGroupKey => widget.activeGroupKey;
+  void Function(String) get onChangeGroup => widget.onChangeGroup;
+  List<ApexFilterOption> get sortOptions => widget.sortOptions;
+  String get activeSortKey => widget.activeSortKey;
+  void Function(String) get onChangeSort => widget.onChangeSort;
+  List<ApexFavorite> get favorites => widget.favorites;
+  VoidCallback? get onSaveFavorite => widget.onSaveFavorite;
+  VoidCallback? get onClearAllFilters => widget.onClearAllFilters;
+
+  bool _isOpen(String key) => _expanded.contains(key);
+
+  void _toggle(String key) {
+    setState(() {
+      if (!_expanded.add(key)) _expanded.remove(key);
+    });
+  }
+
+  /// Compact summary shown beside the section header when the section
+  /// is collapsed. For radio (single-select) groups it shows the
+  /// selected option's label; for multi-select it shows a count.
+  String _summary(ApexFilterGroup g) {
+    if (!g.multi) {
+      if (g.selected.isEmpty) return '—';
+      final key = g.selected.first;
+      if (key == 'all') return 'الكل';
+      final opt = g.options.firstWhere(
+        (o) => o.key == key,
+        orElse: () => ApexFilterOption(key: key, labelAr: key),
+      );
+      return opt.labelAr;
+    }
+    if (g.selected.isEmpty) return 'الكل';
+    return '${g.selected.length}';
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: ConstrainedBox(
-      // 680-720px — keeps each of 3 columns at ~225px (enough for typical
-      // Arabic option labels) without dominating the screen. User found
-      // 880-980 too wide.
+      // 580-640px — much more compact now that filter sections are
+      // collapsed by default (Odoo-style accordion). Each column gets
+      // ~205px, enough for typical Arabic labels without wrapping.
       constraints: const BoxConstraints(
-          minWidth: 680, maxWidth: 720, maxHeight: 540),
+          minWidth: 580, maxWidth: 640, maxHeight: 480),
       child: SingleChildScrollView(
         child: IntrinsicHeight(
           child: Row(
@@ -913,18 +961,20 @@ class _FilterPanel extends StatelessWidget {
 
   // ─── Reusable section header (group name + icon, RTL).
   // Used by every dropdown column so spacing/typography stay identical.
+  // Tighter vertical padding (6/3) keeps section labels close to their
+  // content and avoids unnecessary whitespace stacking up.
   Widget _sectionHeader({
     required String labelAr,
     IconData? icon,
     Color? iconColor,
   }) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+      padding: const EdgeInsets.fromLTRB(10, 6, 10, 3),
       child: Row(
         children: [
           if (icon != null) ...[
-            Icon(icon, color: iconColor ?? AC.ts, size: 12),
-            const SizedBox(width: 6),
+            Icon(icon, color: iconColor ?? AC.ts, size: 11),
+            const SizedBox(width: 5),
           ],
           Expanded(
             child: Text(
@@ -932,7 +982,7 @@ class _FilterPanel extends StatelessWidget {
               textAlign: TextAlign.right,
               style: TextStyle(
                 color: AC.ts,
-                fontSize: 11,
+                fontSize: 10.5,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.3,
               ),
@@ -1013,17 +1063,10 @@ class _FilterPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── Each filter dimension as its own section ───────────────
+          // ── Each filter dimension as a collapsible accordion ───────
           for (int i = 0; i < filterGroups.length; i++) ...[
             if (i > 0) _sectionDivider(),
-            if (filterGroups[i].labelAr.isNotEmpty)
-              _sectionHeader(
-                labelAr: filterGroups[i].labelAr,
-                icon: filterGroups[i].icon,
-                iconColor: AC.purple,
-              ),
-            for (final opt in filterGroups[i].options)
-              _filterRow(filterGroups[i], opt),
+            _expandableFilterSection(filterGroups[i]),
           ],
           // ── "Add custom filter" placeholder (Odoo pattern) ─────────
           _sectionDivider(),
@@ -1048,6 +1091,94 @@ class _FilterPanel extends StatelessWidget {
     );
   }
 
+  /// Collapsible accordion entry for one filter dimension.
+  /// Header row (always visible): chevron + icon + label + summary badge.
+  /// Body (visible only when this section is expanded): the options list.
+  ///
+  /// Default: ALL sections start collapsed. The user opens what they need —
+  /// keeps the panel compact even with 4-5 filter dimensions.
+  Widget _expandableFilterSection(ApexFilterGroup g) {
+    final open = _isOpen(g.labelAr);
+    final summary = _summary(g);
+    final hasSelection = g.multi
+        ? g.selected.isNotEmpty
+        : (g.selected.isNotEmpty && g.selected.first != 'all');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // ── Header (clickable) ─────────────────────────────────────
+        InkWell(
+          onTap: () => _toggle(g.labelAr),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+            child: Row(
+              children: [
+                // Chevron — rotates 90° when collapsed (points right)
+                RotatedBox(
+                  quarterTurns: open ? 0 : -1,
+                  child: Icon(Icons.expand_more_rounded,
+                      color: AC.ts, size: 16),
+                ),
+                const SizedBox(width: 6),
+                if (g.icon != null) ...[
+                  Icon(g.icon, color: AC.purple, size: 13),
+                  const SizedBox(width: 6),
+                ],
+                Expanded(
+                  child: Text(
+                    g.labelAr,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      color: AC.tp,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                // Selection summary badge — shows current value (radio)
+                // or count (multi). Hidden if section is "all" / empty.
+                if (hasSelection) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 7, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AC.gold.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                          color: AC.gold.withValues(alpha: 0.4)),
+                    ),
+                    child: Text(
+                      summary,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AC.gold,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        // ── Body (expanded options) ────────────────────────────────
+        if (open)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final opt in g.options) _filterRow(g, opt),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget _filterRow(ApexFilterGroup g, ApexFilterOption o) {
     final selected = g.selected.contains(o.key);
     final tickIcon = g.multi
@@ -1060,17 +1191,19 @@ class _FilterPanel extends StatelessWidget {
     return InkWell(
       onTap: () => g.onToggle(o.key),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        // Indented from the section header (24px) so options visually
+        // belong to their parent section. Vertical pad tightened to 4.
+        padding: const EdgeInsets.fromLTRB(24, 4, 10, 4),
         // RTL row: check on the LEFT, optional type-icon next to it,
         // text label fills the rest with right alignment.
         child: Row(
           children: [
             Icon(tickIcon,
-                color: selected ? (o.color ?? AC.gold) : AC.td, size: 14),
-            const SizedBox(width: 8),
+                color: selected ? (o.color ?? AC.gold) : AC.td, size: 13),
+            const SizedBox(width: 6),
             if (o.icon != null) ...[
-              Icon(o.icon, color: o.color ?? AC.ts, size: 13),
-              const SizedBox(width: 6),
+              Icon(o.icon, color: o.color ?? AC.ts, size: 12),
+              const SizedBox(width: 5),
             ],
             Expanded(
               child: Text(
@@ -1078,7 +1211,7 @@ class _FilterPanel extends StatelessWidget {
                 textAlign: TextAlign.right,
                 style: TextStyle(
                   color: selected ? AC.gold : AC.tp,
-                  fontSize: 12.5,
+                  fontSize: 12,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
