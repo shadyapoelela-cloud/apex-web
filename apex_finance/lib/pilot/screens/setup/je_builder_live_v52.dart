@@ -504,7 +504,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           builder: (_) => _buildActiveViewBody(),
         ),
       ],
-      chatterEntries: _buildChatterEntries(),
       onBack: () => Navigator.of(context).maybePop(),
     );
   }
@@ -2057,38 +2056,4 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     );
   }
 
-  // ─────────────────────────────────────────────────────────────────
-  // CHATTER
-  // ─────────────────────────────────────────────────────────────────
-  List<ChatterEntry> _buildChatterEntries() {
-    final entries = <ChatterEntry>[];
-    if (_aiDocFilename != null && _aiDocConfidence != null) {
-      entries.add(ChatterEntry(
-        authorAr: 'AI Copilot',
-        contentAr:
-            'تم استخراج القيد من المستند "$_aiDocFilename" بثقة ${(_aiDocConfidence! * 100).toStringAsFixed(0)}% — راجع قبل الحفظ.',
-        timestamp: DateTime.now().subtract(const Duration(minutes: 1)),
-        kind: ChatterKind.logNote,
-      ));
-    }
-    for (final w in _aiWarnings) {
-      entries.add(ChatterEntry(
-        authorAr: 'AI Copilot',
-        contentAr: w,
-        timestamp: DateTime.now(),
-        kind: ChatterKind.activity,
-      ));
-    }
-    if (entries.isEmpty) {
-      entries.add(ChatterEntry(
-        authorAr: 'AI Copilot',
-        contentAr: _je == null
-            ? 'النموذج جاهز — استعمل "قراءة مستند" لتعبئة القيد تلقائياً، أو أدخل السطور يدوياً.'
-            : 'هذا القيد في حالة "${_statusLabel(_je!['status']?.toString() ?? 'draft')}".',
-        timestamp: DateTime.now(),
-        kind: ChatterKind.logNote,
-      ));
-    }
-    return entries;
-  }
 }
