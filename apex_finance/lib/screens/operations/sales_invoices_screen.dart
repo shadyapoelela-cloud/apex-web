@@ -586,27 +586,13 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // LayoutBuilder + horizontal scroll, with a BOUNDED inner SizedBox
-          // so Spacer/Flexible inside the Row still get a finite mainAxis
-          // budget. Without the bounded SizedBox, Spacer collapses to 0
-          // (Row inside an unbounded scroll view has no maxWidth to spread
-          // across) and the CTAs slam against the help icon. Pattern:
-          //   • If viewport ≥ 1100px → toolbar fills the viewport width,
-          //     Spacer distributes leftover (looks identical to JE).
-          //   • If viewport < 1100px → toolbar locked to 1100px, user
-          //     scrolls horizontally; every element stays at natural size,
-          //     Spacer still pushes the action cluster to the left edge.
-          LayoutBuilder(
-            builder: (ctx, constraints) {
-              const minToolbarWidth = 1100.0;
-              final w = constraints.maxWidth < minToolbarWidth
-                  ? minToolbarWidth
-                  : constraints.maxWidth;
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: w,
-                  child: Row(children: [
+          // Plain Row — no LayoutBuilder/scroll wrapper. Earlier version
+          // tried to add horizontal scroll for narrow viewports but caused
+          // a render failure in Firefox (blank page on /sales-invoices).
+          // Reverted to the simple bounded-Row pattern. The title now
+          // takes its natural width (no Flexible wrapper) so it never
+          // collapses to invisible — that was the user's original gripe.
+          Row(children: [
             // ── Gradient pill icon (matches JE) ─────────────────────
             Container(
               padding: const EdgeInsets.all(10),
@@ -664,11 +650,14 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
               ],
             ),
             const SizedBox(width: 12),
-            // ── Compact search (fixed 200px — no Flexible to keep
-            //    layout deterministic inside the scrollable Row) ─────
-            SizedBox(
-              width: 200,
-              child: _compactSearchField(),
+            // ── Compact search (RTL, 120-220px flex:2) ──────────────
+            Flexible(
+              flex: 2,
+              child: ConstrainedBox(
+                constraints:
+                    const BoxConstraints(maxWidth: 220, minWidth: 120),
+                child: _compactSearchField(),
+              ),
             ),
             const SizedBox(width: 6),
             // ── Combined Filter / Group-by / View toggle ────────────
@@ -748,11 +737,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
                 style: TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
-                  ]),
-                ),
-              );
-            },
-          ),
+          ]),
         ],
       ),
     );
