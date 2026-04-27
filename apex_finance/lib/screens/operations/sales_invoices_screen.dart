@@ -15,9 +15,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../api_service.dart';
+import '../../core/apex_saved_views_v2.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../widgets/apex_list_toolbar.dart';
+
+const String _kScreenKey = '/sales/invoices';
 
 class SalesInvoicesScreen extends StatefulWidget {
   const SalesInvoicesScreen({super.key});
@@ -360,6 +363,136 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   }
 
   // ─────────────────────────────────────────────────────────────────────
+  //  Saved views (favorites) — persisted to localStorage via
+  //  `ApexSavedViewsRepo`. Each view stores the full filter/group/sort/
+  //  view-mode state for this screen so the user can recall a named
+  //  combination ("My overdue VIP customers") with one click.
+  // ─────────────────────────────────────────────────────────────────────
+  Map<String, dynamic> _captureFiltersAsMap() => {
+        'search': _searchCtl.text,
+        'status': _statusMulti.toList(),
+        'customer': _customerMulti.toList(),
+        'date_preset': _datePreset,
+        'date_from': _dateFrom?.toIso8601String(),
+        'date_to': _dateTo?.toIso8601String(),
+        'amount_bucket': _amountBucket,
+        'group_by': _groupBy,
+        'sort_key': _sortKey,
+        'view_mode': _viewMode,
+      };
+
+  void _restoreFiltersFromMap(Map<String, dynamic> m) {
+    setState(() {
+      _searchCtl.text = (m['search'] as String?) ?? '';
+      _statusMulti
+        ..clear()
+        ..addAll(((m['status'] as List?) ?? []).cast<String>());
+      _customerMulti
+        ..clear()
+        ..addAll(((m['customer'] as List?) ?? []).cast<String>());
+      _datePreset = (m['date_preset'] as String?) ?? 'all';
+      _dateFrom = m['date_from'] is String
+          ? DateTime.tryParse(m['date_from'])
+          : null;
+      _dateTo =
+          m['date_to'] is String ? DateTime.tryParse(m['date_to']) : null;
+      _amountBucket = (m['amount_bucket'] as String?) ?? 'all';
+      _groupBy = (m['group_by'] as String?) ?? 'none';
+      _sortKey = (m['sort_key'] as String?) ?? 'date_desc';
+      _viewMode = (m['view_mode'] as String?) ?? 'list';
+    });
+  }
+
+  Future<void> _onSaveCurrentView() async {
+    final name = await _promptForViewName();
+    if (name == null || name.trim().isEmpty) return;
+    ApexSavedViewsRepo.add(ApexSavedView(
+      id: 'view_${DateTime.now().millisecondsSinceEpoch}',
+      name: name.trim(),
+      screen: _kScreenKey,
+      filters: _captureFiltersAsMap(),
+      createdAt: DateTime.now(),
+      icon: Icons.bookmark_rounded,
+    ));
+    if (mounted) {
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.navy3,
+        content: Text('تم حفظ البحث "$name"',
+            style: TextStyle(color: AC.tp), textAlign: TextAlign.right),
+      ));
+    }
+  }
+
+  Future<String?> _promptForViewName() async {
+    final ctrl = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AC.navy2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: AC.bdr),
+        ),
+        title: Row(children: [
+          Icon(Icons.bookmark_add_rounded, color: AC.gold, size: 20),
+          const SizedBox(width: 8),
+          Text('حفظ البحث الحالي',
+              style: TextStyle(color: AC.gold, fontWeight: FontWeight.w800)),
+        ]),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          textDirection: TextDirection.rtl,
+          style: TextStyle(color: AC.tp),
+          decoration: InputDecoration(
+            hintText: 'اسم البحث (مثال: فواتير VIP المتأخرة)',
+            hintStyle: TextStyle(color: AC.td),
+            filled: true,
+            fillColor: AC.navy3,
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AC.bdr)),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AC.bdr)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AC.gold)),
+          ),
+          onSubmitted: (v) => Navigator.pop(ctx, v),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('إلغاء', style: TextStyle(color: AC.td))),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, ctrl.text),
+            style: FilledButton.styleFrom(
+                backgroundColor: AC.gold, foregroundColor: AC.navy),
+            child: const Text('حفظ'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<ApexFavorite> _loadFavorites() {
+    return ApexSavedViewsRepo.all()
+        .where((v) => v.screen == _kScreenKey)
+        .map((v) => ApexFavorite(
+              key: v.id,
+              labelAr: v.name,
+              onApply: () => _restoreFiltersFromMap(v.filters),
+              onDelete: () {
+                ApexSavedViewsRepo.remove(v.id);
+                setState(() {});
+              },
+            ))
+        .toList();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
   //  CTA actions
   // ─────────────────────────────────────────────────────────────────────
   void _onCreate() => context.go('/sales/invoices/new');
@@ -524,6 +657,8 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
       createLabelAr: 'جديد',
       onAiCreate: _onAiCreate,
       aiCreateLabelAr: 'ذكاء',
+      favorites: _loadFavorites(),
+      onSaveFavorite: _onSaveCurrentView,
       shortcuts: const [
         ApexShortcut('N', 'فاتورة جديدة'),
         ApexShortcut('A', 'فاتورة بالذكاء'),
@@ -531,6 +666,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
         ApexShortcut('F', 'فلتر'),
         ApexShortcut('G', 'تجميع'),
         ApexShortcut('R', 'تحديث'),
+        ApexShortcut('S', 'حفظ البحث الحالي'),
         ApexShortcut('Esc', 'مسح الفلتر / إغلاق'),
       ],
     );
