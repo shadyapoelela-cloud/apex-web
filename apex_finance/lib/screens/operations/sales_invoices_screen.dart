@@ -387,6 +387,15 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   void _onCreate() => context.go('/sales/invoices/new');
   void _onReports() => context.go('/sales/aging');
 
+  /// AI-powered invoice creation — mirrors JE Builder's "ذكاء" button.
+  /// Routes to the same create screen with `?ai=1` so the form can boot
+  /// in AI-assisted mode (OCR / natural-language draft) when wired.
+  void _onAiCreate() {
+    // Forward-compat route param. If the create screen doesn't yet handle
+    // ai=1, it simply renders the manual form — no broken link.
+    context.go('/sales/invoices/new?ai=1');
+  }
+
   Future<void> _onImportExport() async {
     final action = await showModalBottomSheet<String>(
       context: context,
@@ -457,116 +466,190 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
     );
   }
 
-  // ── Toolbar (JE-pattern ribbon) ──────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════════
+  //  Toolbar — STRICT mirror of قيود اليومية ribbon (apex_finance/lib/
+  //  pilot/screens/setup/je_builder_screen.dart, lines ~590-745).
+  //
+  //  Layout order (RTL-aware Row), identical slot-by-slot to JE:
+  //    [Gradient pill icon] [Title + counter (Flexible)]
+  //    [Compact search 120-220px (Flexible flex:2)]
+  //    [Combined Filter ▾]  [Group-by ▾]  [View toggle]
+  //    ⟶ Spacer ⟶
+  //    [Refresh] [Export ios_share] [Screen-specific 3rd slot]
+  //    [Outlined "جديد" gold]  [Filled "ذكاء" purple]
+  //
+  //  Per-screen variation lives in:
+  //    • Filter dimensions  → _buildFilterMenu (date·status·customer·amount·sort)
+  //    • Group-by options   → _groupByButton  (status/customer/month/quarter/due-week)
+  //    • 3rd icon slot      → reports (sales-specific replacement of JE's help)
+  //    • CTA labels         → "جديد" / "ذكاء"
+  //  Container styling, slot order, spacings, button shapes — IDENTICAL.
+  // ══════════════════════════════════════════════════════════════════════
   Widget _buildToolbar() {
     final visibleCount = _visible.length;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: AC.navy2,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AC.navy2,
+            Color.lerp(AC.navy2, AC.gold, 0.05) ?? AC.navy2,
+          ],
+        ),
         border: Border(bottom: BorderSide(color: AC.bdr)),
       ),
-      child: Row(children: [
-        // Title block — icon + label + counter
-        Icon(Icons.receipt_long_rounded, color: AC.gold, size: 22),
-        const SizedBox(width: 10),
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'فواتير المبيعات',
-                softWrap: false,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: AC.tp,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.2,
-                  height: 1.1,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(children: [
+            // ── Gradient pill icon (matches JE) ─────────────────────
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AC.gold.withValues(alpha: 0.22),
+                    AC.gold.withValues(alpha: 0.10),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                border:
+                    Border.all(color: AC.gold.withValues(alpha: 0.45)),
+                boxShadow: [
+                  BoxShadow(
+                    color: AC.gold.withValues(alpha: 0.18),
+                    blurRadius: 12,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Icon(Icons.receipt_long_rounded,
+                  color: AC.gold, size: 22),
+            ),
+            const SizedBox(width: 14),
+            // ── Title + counter ─────────────────────────────────────
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'فواتير المبيعات',
+                    softWrap: false,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: AC.tp,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.2,
+                      height: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    _activeFilterCount > 0
+                        ? '$visibleCount / ${_all.length}'
+                        : '${_all.length} فاتورة',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                        TextStyle(color: AC.ts, fontSize: 11, height: 1.1),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            // ── Compact search (RTL, 120-220px flex:2) ──────────────
+            Flexible(
+              flex: 2,
+              child: ConstrainedBox(
+                constraints:
+                    const BoxConstraints(maxWidth: 220, minWidth: 120),
+                child: _compactSearchField(),
+              ),
+            ),
+            const SizedBox(width: 6),
+            // ── Combined Filter / Group-by / View toggle ────────────
+            _combinedFilterButton(),
+            const SizedBox(width: 4),
+            _groupByButton(),
+            const SizedBox(width: 4),
+            _compactViewToggle(),
+            const Spacer(),
+            // ── Actions cluster (3 icon slots — same as JE) ─────────
+            Tooltip(
+              message: 'تحديث',
+              child: IconButton(
+                onPressed: _load,
+                icon: Icon(Icons.refresh_rounded, color: AC.ts, size: 18),
+                style: IconButton.styleFrom(
+                  backgroundColor: AC.navy3.withValues(alpha: 0.5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(color: AC.bdr),
+                  ),
+                  padding: const EdgeInsets.all(8),
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                _activeFilterCount > 0
-                    ? '$visibleCount / ${_all.length}'
-                    : '${_all.length} فاتورة',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: AC.ts, fontSize: 11, height: 1.1),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        // Compact search (always visible)
-        Flexible(
-          flex: 2,
-          child: ConstrainedBox(
-            constraints:
-                const BoxConstraints(maxWidth: 220, minWidth: 120),
-            child: _compactSearchField(),
-          ),
-        ),
-        const SizedBox(width: 6),
-        // Combined Filter (date + status + customer + amount + sort)
-        _combinedFilterButton(),
-        const SizedBox(width: 4),
-        _groupByButton(),
-        const SizedBox(width: 4),
-        _compactViewToggle(),
-        const Spacer(),
-        // Actions cluster
-        Tooltip(
-          message: 'تحديث',
-          child: IconButton(
-            onPressed: _load,
-            icon: Icon(Icons.refresh_rounded, color: AC.ts, size: 18),
-            style: IconButton.styleFrom(
-              backgroundColor: AC.navy3.withValues(alpha: 0.5),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: BorderSide(color: AC.bdr),
-              ),
-              padding: const EdgeInsets.all(8),
             ),
-          ),
-        ),
-        const SizedBox(width: 4),
-        _headerIconBtn(
-          icon: Icons.ios_share_rounded,
-          tooltip: 'استيراد / تصدير',
-          onTap: _onImportExport,
-        ),
-        const SizedBox(width: 4),
-        _headerIconBtn(
-          icon: Icons.bar_chart_rounded,
-          tooltip: 'تقارير المبيعات',
-          onTap: _onReports,
-        ),
-        const SizedBox(width: 12),
-        // Primary CTA — إنشاء فاتورة
-        FilledButton.icon(
-          style: FilledButton.styleFrom(
-            backgroundColor: AC.gold,
-            foregroundColor: AC.navy,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
+            const SizedBox(width: 4),
+            _headerIconBtn(
+              icon: Icons.ios_share_rounded,
+              tooltip: 'استيراد / تصدير',
+              onTap: _onImportExport,
             ),
-            elevation: 0,
-          ),
-          onPressed: _onCreate,
-          icon: const Icon(Icons.add_rounded, size: 18),
-          label: const Text(
-            'إنشاء فاتورة',
-            style: TextStyle(fontWeight: FontWeight.w800),
-          ),
-        ),
-      ]),
+            const SizedBox(width: 4),
+            // 3rd slot — JE has help, sales-invoices uses reports
+            _headerIconBtn(
+              icon: Icons.bar_chart_rounded,
+              tooltip: 'تقارير المبيعات',
+              onTap: _onReports,
+            ),
+            const SizedBox(width: 12),
+            // ── زر 1: إنشاء فاتورة يدوية (Outlined gold) ──
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AC.tp,
+                side: BorderSide(color: AC.gold.withValues(alpha: 0.6)),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: _onCreate,
+              icon: Icon(Icons.add_rounded, size: 18, color: AC.gold),
+              label: const Text(
+                'جديد',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+            const SizedBox(width: 8),
+            // ── زر 2: إنشاء بالذكاء الاصطناعي (Filled purple) ──
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: AC.purple,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 0,
+              ),
+              onPressed: _onAiCreate,
+              icon: const Icon(Icons.auto_awesome_rounded, size: 18),
+              label: const Text(
+                'ذكاء',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ]),
+        ],
+      ),
     );
   }
 
