@@ -553,11 +553,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       return [
         _aiReadDocButton(),
         const SizedBox(width: 8),
-        OutlinedButton.icon(
+        IconButton(
           onPressed: _submitting ? null : () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.close_rounded, size: 16),
-          label: const Text('إلغاء'),
-          style: OutlinedButton.styleFrom(foregroundColor: _ts),
+          icon: const Icon(Icons.replay_rounded, size: 20),
+          color: _ts,
+          tooltip: 'إلغاء (إهمال)',
         ),
         const SizedBox(width: 8),
         OutlinedButton.icon(
