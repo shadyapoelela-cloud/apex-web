@@ -1,11 +1,19 @@
-// APEX — Network-only Service Worker (no caching).
+// APEX — No-op Service Worker (no caching, no fetch interception).
 //
-// Purpose: replace Flutter's default cache-everything SW with one that:
-//   1. Activates IMMEDIATELY (skipWaiting → no "close tab and reopen" UX trap).
-//   2. Claims all open tabs on activate (existing tabs get the new SW).
-//   3. Purges every existing cache the moment it activates (kills the
-//      stale main.dart.js that prior SW had cached).
-//   4. Passes every fetch straight through to the network — never caches.
+// Purpose: replace Flutter's default cache-everything SW with one that
+// does NOTHING for network — the browser's native fetch handles every
+// request directly. The SW exists only to:
+//   1. Activate IMMEDIATELY (skipWaiting → no "close tab and reopen" UX trap).
+//   2. Claim all open tabs on activate (replaces any older SW instantly).
+//   3. Purge every existing cache the moment it activates (kills the
+//      stale main.dart.js that prior SW had stashed).
+//
+// No fetch handler — the browser fetches everything from the network
+// natively. This is critical for Firefox: an active fetch handler that
+// just calls `event.respondWith(fetch(event.request))` was causing blank
+// pages on /sales-invoices in Firefox (CORS/credentials handling
+// differs subtly between fetch invocations). Removing the handler lets
+// Firefox use its default — works in every browser.
 //
 // Result: live deploys on GitHub Pages reach the user on the next reload,
 // no DevTools dance required. Trade-off: no offline support — acceptable
@@ -32,9 +40,6 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
-self.addEventListener('fetch', (event) => {
-  // Network-only. No cache lookups, no cache writes.
-  // (Letting fetch fall through to the browser default would also
-  // bypass the cache, but explicitly responding signals intent.)
-  event.respondWith(fetch(event.request));
-});
+// NO fetch handler — browser handles network natively. Critical for
+// Firefox compatibility (event.respondWith(fetch(...)) was causing the
+// page to blank on /sales-invoices).
