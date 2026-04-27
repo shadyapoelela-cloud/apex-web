@@ -1157,37 +1157,62 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
 
   Widget _localTabsStrip() {
     final linesCount = _je != null ? _jeLines.length : _lines.length;
-    final tabs = <(String id, String label, IconData icon)>[
-      ('lines', 'البنود ($linesCount)', Icons.list_alt_rounded),
-      ('other_info', 'معلومات أخرى', Icons.info_outline_rounded),
+    final tabs = <(String id, String tooltip, IconData icon, int? badge)>[
+      ('lines', 'البنود', Icons.list_alt_rounded, linesCount),
+      ('other_info', 'معلومات أخرى', Icons.info_outline_rounded, null),
     ];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: tabs.map((t) {
           final active = t.$1 == _activeView;
-          return InkWell(
-            onTap: () => setState(() => _activeView = t.$1),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: active ? _gold : Colors.transparent,
-                    width: 3,
+          return Tooltip(
+            message: t.$2,
+            child: InkWell(
+              onTap: () => setState(() => _activeView = t.$1),
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: active ? _gold : Colors.transparent,
+                      width: 3,
+                    ),
                   ),
                 ),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(t.$3,
+                        size: 20, color: active ? _gold : _ts),
+                    if (t.$4 != null && t.$4! > 0)
+                      PositionedDirectional(
+                        top: -4,
+                        end: -8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: active ? _gold : _ts,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          constraints: const BoxConstraints(minWidth: 16),
+                          child: Text(
+                            '${t.$4}',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(t.$3, size: 14, color: active ? _gold : _ts),
-                const SizedBox(width: 6),
-                Text(t.$2,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: active ? FontWeight.w800 : FontWeight.w500,
-                      color: active ? _navy : _tp,
-                    )),
-              ]),
             ),
           );
         }).toList(),
