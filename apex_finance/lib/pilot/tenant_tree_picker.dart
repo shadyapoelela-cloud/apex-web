@@ -159,9 +159,6 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
   Timer? _searchDebounce;
   String _query = '';
 
-  // Manual tenant ID (when no tenant bound)
-  final _tidCtrl = TextEditingController(text: PilotSession.tenantId ?? '');
-
   bool _loading = false;
   bool _seedingTest = false;
   String? _error;
@@ -182,7 +179,6 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
   void dispose() {
     _searchDebounce?.cancel();
     _searchCtrl.dispose();
-    _tidCtrl.dispose();
     super.dispose();
   }
 
@@ -248,28 +244,6 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
             : [];
       });
     }
-  }
-
-  Future<void> _bindTenantManually() async {
-    final id = _tidCtrl.text.trim();
-    if (id.isEmpty) return;
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    final r = await pilotClient.getTenant(id);
-    if (!mounted) return;
-    if (!r.success) {
-      setState(() {
-        _loading = false;
-        _error = r.error ?? 'فشل تحميل المستأجر';
-      });
-      return;
-    }
-    PilotSession.tenantId = id;
-    PilotSession.clearEntityAndBranch();
-    widget.onChanged?.call();
-    await _loadAll();
   }
 
   void _selectEntity(Map<String, dynamic> entity) {
@@ -385,7 +359,6 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
         ));
       }
       // Reload tree
-      _tidCtrl.text = tenantId;
       await _loadAll();
     } catch (e) {
       if (mounted) {
@@ -421,7 +394,6 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildHeader(),
-                if (!PilotSession.hasTenant) _buildTenantBindRow(),
                 if (_error != null) _buildErrorBanner(),
                 Flexible(child: _buildTree()),
                 const Divider(height: 1),
@@ -491,73 +463,6 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
               ),
             ),
           ),
-        ]),
-      );
-
-  Widget _buildTenantBindRow() => Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: core_theme.AC.warn.withValues(alpha: 0.08),
-          border: Border(bottom: BorderSide(color: core_theme.AC.bdr)),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Icon(Icons.warning_amber, color: core_theme.AC.warn, size: 16),
-            const SizedBox(width: 6),
-            Text('لا يوجد كيان مرتبط — الصق Tenant ID أو ثبّت بيانات اختبار',
-                style: TextStyle(
-                    color: core_theme.AC.warn,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w700)),
-          ]),
-          const SizedBox(height: 8),
-          Row(children: [
-            Expanded(
-              child: SizedBox(
-                height: 36,
-                child: TextField(
-                  controller: _tidCtrl,
-                  style: TextStyle(
-                      color: core_theme.AC.tp,
-                      fontSize: 11.5,
-                      fontFamily: 'monospace'),
-                  decoration: InputDecoration(
-                    hintText:
-                        'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-                    hintStyle: TextStyle(
-                        color: core_theme.AC.ts,
-                        fontSize: 11,
-                        fontFamily: 'monospace'),
-                    isDense: true,
-                    filled: true,
-                    fillColor: core_theme.AC.navy,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 8),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: BorderSide(color: core_theme.AC.bdr)),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-            ElevatedButton(
-              onPressed: _loading ? null : _bindTenantManually,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: core_theme.AC.gold,
-                foregroundColor: core_theme.AC.navy,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              ),
-              child: _loading
-                  ? const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child:
-                          CircularProgressIndicator(strokeWidth: 2))
-                  : const Text('ربط', style: TextStyle(fontSize: 12)),
-            ),
-          ]),
         ]),
       );
 
