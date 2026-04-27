@@ -22,6 +22,7 @@ class _TenantChipState extends State<TenantChip> {
   String? _tenantName;
   String? _entityCode;
   String? _branchCode;
+  final GlobalKey _anchorKey = GlobalKey();
 
   @override
   void initState() {
@@ -60,6 +61,7 @@ class _TenantChipState extends State<TenantChip> {
           ].join(' / ')
         : 'اختيار الشركة';
     return InkWell(
+      key: _anchorKey,
       borderRadius: BorderRadius.circular(20),
       onTap: () => _open(context),
       child: Container(
@@ -98,8 +100,16 @@ class _TenantChipState extends State<TenantChip> {
   }
 
   Future<void> _open(BuildContext ctx) async {
+    // Compute anchor rect (chip position) so picker can render under it.
+    Rect? anchorRect;
+    final box = _anchorKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box != null && box.hasSize) {
+      final topLeft = box.localToGlobal(Offset.zero);
+      anchorRect = topLeft & box.size;
+    }
     await showTenantTreePicker(
       ctx,
+      anchorRect: anchorRect,
       onChanged: () {
         _tenantName = null;
         _entityCode = null;

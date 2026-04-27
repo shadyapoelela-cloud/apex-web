@@ -77,21 +77,64 @@ class _Recents {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Public entry — show as popover anchored to a chip
+// Public entry — show as popover anchored just below the trigger chip.
+// `anchorRect` is the global rect of the chip; the popup hangs from its
+// bottom edge, aligned to its right (RTL) edge, and clamps to viewport.
 // ─────────────────────────────────────────────────────────────────────
 Future<void> showTenantTreePicker(BuildContext context,
-    {VoidCallback? onChanged}) async {
+    {VoidCallback? onChanged, Rect? anchorRect}) async {
+  // Popup geometry — compact rectangle (Linear / Notion style)
+  const double popupWidth = 380;
+  const double popupHeight = 460;
+  const double gap = 6; // gap between chip bottom and popup top
+  const double margin = 8; // viewport margin
+
   await showDialog(
     context: context,
-    barrierColor: Colors.black54,
-    builder: (_) => Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.all(40),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560, maxHeight: 640),
-        child: TenantTreePicker(onChanged: onChanged),
-      ),
-    ),
+    barrierColor: Colors.black26,
+    barrierDismissible: true,
+    builder: (dialogCtx) {
+      final screen = MediaQuery.of(dialogCtx).size;
+      double top, right;
+      if (anchorRect != null) {
+        // Below the chip
+        top = anchorRect.bottom + gap;
+        // RTL: align popup's right edge to chip's right edge
+        right = (screen.width - anchorRect.right).clamp(margin, screen.width - margin);
+        // If overflow at bottom, shift up
+        if (top + popupHeight > screen.height - margin) {
+          // Try above the chip
+          final aboveTop = anchorRect.top - gap - popupHeight;
+          if (aboveTop >= margin) {
+            top = aboveTop;
+          } else {
+            // Clamp: place at bottom of viewport with margin
+            top = (screen.height - popupHeight - margin).clamp(margin, screen.height);
+          }
+        }
+        // If popup right would push it off the LEFT edge, align to viewport
+        if (right + popupWidth > screen.width - margin) {
+          right = margin;
+        }
+      } else {
+        // Fallback: top-right corner under topbar
+        top = 60;
+        right = margin;
+      }
+      return Stack(children: [
+        // Tap outside to dismiss (transparent backdrop already handled by barrier)
+        Positioned(
+          top: top,
+          right: right,
+          width: popupWidth,
+          height: popupHeight,
+          child: Material(
+            color: Colors.transparent,
+            child: TenantTreePicker(onChanged: onChanged),
+          ),
+        ),
+      ]);
+    },
   );
 }
 
@@ -360,8 +403,13 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
       textDirection: TextDirection.rtl,
       child: Material(
         color: core_theme.AC.navy2,
-        borderRadius: BorderRadius.circular(14),
-        elevation: 16,
+        borderRadius: BorderRadius.circular(8),
+        elevation: 12,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: core_theme.AC.bdr),
+        ),
         child: CallbackShortcuts(
           bindings: {
             const SingleActivator(LogicalKeyboardKey.escape): () =>
@@ -387,32 +435,35 @@ class _TenantTreePickerState extends State<TenantTreePicker> {
   }
 
   Widget _buildHeader() => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.fromLTRB(10, 8, 6, 8),
         decoration: BoxDecoration(
           color: core_theme.AC.navy3,
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(14)),
+          border: Border(bottom: BorderSide(color: core_theme.AC.bdr)),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
             Icon(Icons.account_tree_outlined,
-                color: core_theme.AC.gold, size: 18),
-            const SizedBox(width: 8),
-            Text('اختيار النطاق — الكيان / الشركة / الفرع',
-                style: TextStyle(
-                    color: core_theme.AC.gold,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800)),
-            const Spacer(),
-            IconButton(
-              tooltip: 'إغلاق (Esc)',
-              icon: Icon(Icons.close, color: core_theme.AC.ts, size: 18),
-              onPressed: () => Navigator.of(context).maybePop(),
+                color: core_theme.AC.gold, size: 14),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text('اختيار النطاق',
+                  style: TextStyle(
+                      color: core_theme.AC.gold,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800)),
+            ),
+            InkWell(
+              borderRadius: BorderRadius.circular(4),
+              onTap: () => Navigator.of(context).maybePop(),
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Icon(Icons.close, color: core_theme.AC.ts, size: 14),
+              ),
             ),
           ]),
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
           SizedBox(
-            height: 38,
+            height: 32,
             child: TextField(
               controller: _searchCtrl,
               autofocus: true,
