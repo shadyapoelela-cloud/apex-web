@@ -658,8 +658,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 18),
-        _sectionCard(title: 'ملخّص القيد', child: _summaryRow()),
-        const SizedBox(height: 18),
         _sectionCard(title: 'السجل', child: _buildHistoryTimeline()),
         if (_error != null) ...[
           const SizedBox(height: 14),
@@ -1148,60 +1146,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     );
   }
 
-  Widget _summaryRow() {
-    return Row(children: [
-      Expanded(
-        child: _summaryPill(
-            'إجمالي المدين', _fmt(_totalDebit), _ok, Icons.arrow_circle_up),
-      ),
-      const SizedBox(width: 12),
-      Expanded(
-        child: _summaryPill('إجمالي الدائن', _fmt(_totalCredit), _gold,
-            Icons.arrow_circle_down),
-      ),
-      const SizedBox(width: 12),
-      Expanded(
-        child: _summaryPill(
-          'الفرق',
-          _fmt((_totalDebit - _totalCredit).abs()),
-          _balanced ? _ok : _err,
-          _balanced ? Icons.check_circle : Icons.warning,
-        ),
-      ),
-    ]);
-  }
-
-  Widget _summaryPill(
-      String label, String value, Color color, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
-      ),
-      child: Row(children: [
-        Icon(icon, color: color, size: 22),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label,
-                  style: TextStyle(
-                      fontSize: 11, color: color.withValues(alpha: 0.9))),
-              Text('$value ر.س',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: color)),
-            ],
-          ),
-        ),
-      ]),
-    );
-  }
-
   // ─────────────────────────────────────────────────────────────────
   // TAB: LINES — also hosts the AI quick bar + البيانات الأساسية at
   // the top so the user can fill the header and rows on a single tab.
@@ -1341,11 +1285,16 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                 ),
                 child: Row(children: [
                   Expanded(
-                      child: Text('الإجمالي',
+                    child: Row(children: [
+                      Text('الإجمالي',
                           style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
-                              color: _navy))),
+                              color: _navy)),
+                      const SizedBox(width: 10),
+                      _balanceChip(),
+                    ]),
+                  ),
                   SizedBox(
                       width: 110,
                       child: Text(_fmt(_totalDebit),
@@ -1475,6 +1424,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                     .entries
                     .map((e) => _lineEditRow(e.key, e.value)),
                 _addLineFooterRow(),
+                _totalsFooterRow(),
               ]),
         ),
         _buildSummaryAndTimelineSection(),
@@ -1892,6 +1842,72 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // Column-settings button (⚙️) — Odoo-style toggle for optional
   // line-item columns: partner / cost-center / VAT.
   // ─────────────────────────────────────────────────────────────────
+  // Totals footer — debit total under debit column, credit total under credit
+  // column, balance chip on the right. Mirrors the view-mode totals row.
+  Widget _totalsFooterRow() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: _navy3.withValues(alpha: 0.3),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(7)),
+      ),
+      child: Row(children: [
+        Expanded(
+          child: Row(children: [
+            Text('الإجمالي',
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: _navy)),
+            const SizedBox(width: 10),
+            _balanceChip(),
+          ]),
+        ),
+        SizedBox(
+            width: 110,
+            child: Text(_fmt(_totalDebit),
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: _navy,
+                    fontFamily: 'monospace'),
+                textAlign: TextAlign.end)),
+        SizedBox(
+            width: 110,
+            child: Text(_fmt(_totalCredit),
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: _navy,
+                    fontFamily: 'monospace'),
+                textAlign: TextAlign.end)),
+        const SizedBox(width: 30),
+      ]),
+    );
+  }
+
+  Widget _balanceChip() {
+    final diff = (_totalDebit - _totalCredit).abs();
+    final color = _balanced ? _ok : _err;
+    final icon = _balanced ? Icons.check_circle : Icons.warning_amber_rounded;
+    final label = _balanced ? 'متوازن' : 'فرق ${_fmt(diff)} ر.س';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, color: color, size: 12),
+        const SizedBox(width: 4),
+        Text(label,
+            style: TextStyle(
+                fontSize: 10, fontWeight: FontWeight.w700, color: color)),
+      ]),
+    );
+  }
+
   // Odoo-style "Add a line" affordance — sits as the last row inside the table.
   Widget _addLineFooterRow() {
     return InkWell(
