@@ -17,10 +17,16 @@ class PilotSession {
   static const _historyKey = 'pilot.tenant_history';
   static const int _historyMax = 8;
 
+  // Mirror keys — kept in sync with the older `S` session (core/session.dart)
+  // so screens reading either system see the same active scope.
+  static const _legacyTenantKey = 'apex_tenant_id';
+  static const _legacyEntityKey = 'apex_entity_id';
+
   // ── Tenant ──────────────────────────────────────────────────
   static String? get tenantId => _get(_tenantKey);
   static set tenantId(String? v) {
     _set(_tenantKey, v);
+    _set(_legacyTenantKey, v); // keep S.savedTenantId in sync
     if (v != null && v.isNotEmpty) _pushHistory(v);
   }
   static bool get hasTenant => tenantId != null && tenantId!.isNotEmpty;
@@ -87,7 +93,10 @@ class PilotSession {
 
   // ── Entity ──────────────────────────────────────────────────
   static String? get entityId => _get(_entityKey);
-  static set entityId(String? v) => _set(_entityKey, v);
+  static set entityId(String? v) {
+    _set(_entityKey, v);
+    _set(_legacyEntityKey, v); // keep S.savedEntityId in sync
+  }
   static bool get hasEntity => entityId != null && entityId!.isNotEmpty;
 
   // ── Branch ──────────────────────────────────────────────────
@@ -97,7 +106,7 @@ class PilotSession {
 
   // ── Reset ──────────────────────────────────────────────────
   static void clear() {
-    for (final k in [_tenantKey, _entityKey, _branchKey]) {
+    for (final k in [_tenantKey, _entityKey, _branchKey, _legacyTenantKey, _legacyEntityKey]) {
       _set(k, null);
     }
   }
@@ -105,6 +114,7 @@ class PilotSession {
   static void clearEntityAndBranch() {
     _set(_entityKey, null);
     _set(_branchKey, null);
+    _set(_legacyEntityKey, null);
   }
 
   static void clearBranch() => _set(_branchKey, null);
