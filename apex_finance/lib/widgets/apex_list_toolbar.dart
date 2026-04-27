@@ -258,10 +258,16 @@ class ApexListToolbar extends StatelessWidget {
 
   // ─────────────────────────────────────────────────────────────────
   //  Build
+  //  Wrapped in Directionality.rtl so the Row's children render in the
+  //  user-specified order regardless of ambient direction (some shells
+  //  render this widget inside an LTR Material context, which flipped
+  //  right ↔ left in the user's earlier reports).
   // ─────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -276,6 +282,7 @@ class ApexListToolbar extends StatelessWidget {
       ),
       child: IntrinsicHeight(
         child: Row(
+          textDirection: TextDirection.rtl,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // ── RIGHT: title above CTAs ─────────────────────────────
@@ -340,6 +347,7 @@ class ApexListToolbar extends StatelessWidget {
             ],
           ],
         ),
+      ),
       ),
     );
   }
@@ -755,12 +763,15 @@ class _FilterPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: ConstrainedBox(
       constraints: const BoxConstraints(
           minWidth: 540, maxWidth: 640, maxHeight: 520),
       child: SingleChildScrollView(
         child: IntrinsicHeight(
           child: Row(
+            textDirection: TextDirection.rtl,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ── Column 1: Favorites (leftmost in RTL = visually right)
@@ -798,6 +809,7 @@ class _FilterPanel extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
