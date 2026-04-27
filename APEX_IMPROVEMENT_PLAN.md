@@ -87,17 +87,17 @@
 
 ## ٦. الموجات (Waves) — الترتيب التنفيذي
 
-### 🌊 موجة ١ — توحيد الـ Toolbar + الـ wins السريعة (٣-٥ أيام) — **بدأت**
+### 🌊 موجة ١ — توحيد الـ Toolbar + الـ wins السريعة (٣-٥ أيام) — **شبه مكتملة**
 
 **الهدف:** كل شاشة قائمة تستخدم `ApexListToolbar` بسلوك متّسق، مع المفضلات المحفوظة، وbulk actions.
 
-- [ ] ١-١. حفظ هذه الخطة كـ `APEX_IMPROVEMENT_PLAN.md` ✅
-- [ ] ١-٢. **A1**: localStorage persistence للمفضلات في `ApexListToolbar`
-- [ ] ١-٣. **A2**: Bulk-select infrastructure (checkbox + select-all + bulk action chips في الـ toolbar)
-- [ ] ١-٤. تطبيق `ApexListToolbar` على شاشة العملاء
-- [ ] ١-٥. تطبيق `ApexListToolbar` على شاشة الموردين
-- [ ] ١-٦. ربط زر "ذكاء" → drawer `AiCopilotScreen` مع `screenContext`
-- [ ] ١-٧. Build + push + verify live
+- [x] ١-١. حفظ هذه الخطة كـ `APEX_IMPROVEMENT_PLAN.md` ✅
+- [x] ١-٢. **A1**: localStorage persistence للمفضلات في `ApexListToolbar` ✅ — commit `8617bdb`
+- [x] ١-٣. **A2**: Bulk-select infrastructure ✅ — commit `8ea1857`
+- [x] ١-٤. ربط زر "ذكاء" → drawer `ApexCopilotDrawer` مع `screenContext` ✅ — commit `637fac1`
+- [ ] ١-٥. تطبيق `ApexListToolbar` على شاشة العملاء (مؤجَّل لموجة ٢)
+- [ ] ١-٦. تطبيق `ApexListToolbar` على شاشة الموردين (مؤجَّل لموجة ٢)
+- [x] ١-٧. Build + push + verify live ✅ — commit `c51637b`
 
 ### 🌊 موجة ٢ — تكامل AI الحقيقي + شاشات مستهدفة (٤-٦ أيام)
 
