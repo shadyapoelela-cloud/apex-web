@@ -492,12 +492,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       primaryActions: _buildPrimaryActions(status),
       tabs: [
         ObjectPageTab(
-          id: 'overview',
-          labelAr: 'نظرة عامة',
-          icon: Icons.dashboard_rounded,
-          builder: (_) => _buildOverviewTab(),
-        ),
-        ObjectPageTab(
           id: 'lines',
           labelAr: _je != null
               ? 'البنود (${_jeLines.length})'
@@ -506,16 +500,16 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           builder: (_) => _buildLinesTab(),
         ),
         ObjectPageTab(
+          id: 'overview',
+          labelAr: 'ملاحظات عامة',
+          icon: Icons.dashboard_rounded,
+          builder: (_) => _buildOverviewTab(),
+        ),
+        ObjectPageTab(
           id: 'other_info',
           labelAr: 'معلومات أخرى',
           icon: Icons.info_outline_rounded,
           builder: (_) => _buildOtherInfoTab(),
-        ),
-        ObjectPageTab(
-          id: 'attachments',
-          labelAr: 'مرفقات',
-          icon: Icons.attach_file_rounded,
-          builder: (_) => _buildAttachmentsTab(),
         ),
         ObjectPageTab(
           id: 'audit',
@@ -1867,34 +1861,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     if (selected != null) {
       setState(() => _lines[idx].accountId = selected['id']);
     }
-  }
-
-  // ─────────────────────────────────────────────────────────────────
-  // TAB: ATTACHMENTS
-  // ─────────────────────────────────────────────────────────────────
-  Widget _buildAttachmentsTab() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Icon(Icons.attach_file_rounded, size: 56, color: _td),
-          const SizedBox(height: 12),
-          Text('المرفقات',
-              style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w800, color: _navy)),
-          const SizedBox(height: 8),
-          Text('لا توجد مرفقات بعد',
-              style: TextStyle(color: _ts, fontSize: 13)),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.upload_file_rounded, size: 16),
-            style: FilledButton.styleFrom(backgroundColor: _gold),
-            label: const Text('رفع مرفق'),
-          ),
-        ]),
-      ),
-    );
   }
 
   // ─────────────────────────────────────────────────────────────────
