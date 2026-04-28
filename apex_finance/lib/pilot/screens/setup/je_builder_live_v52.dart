@@ -560,14 +560,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           tooltip: 'إلغاء (إهمال)',
         ),
         const SizedBox(width: 8),
-        OutlinedButton.icon(
+        IconButton(
           onPressed: _submitting ? null : () => _submit(autoPost: false),
-          icon: const Icon(Icons.save_outlined, size: 16),
-          label: const Text('حفظ كمسودة'),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: _tp,
-            side: BorderSide(color: _bdr),
-          ),
+          icon: const Icon(Icons.save_outlined, size: 20),
+          color: _tp,
+          tooltip: 'حفظ كمسودة',
         ),
         const SizedBox(width: 8),
         FilledButton.icon(
