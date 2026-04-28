@@ -1999,93 +1999,62 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       },
       optionsViewBuilder: (ctx, onSelected, options) {
         final list = options.toList();
+        // Compute responsive dimensions: width adapts to the cell-
+        // width range (240–360); maxHeight adapts to 60% of viewport
+        // so very small windows or rows near the page bottom still
+        // get a usable dropdown rather than getting clipped.
+        final mq = MediaQuery.of(ctx);
+        final maxHeight =
+            (mq.size.height * 0.6).clamp(160.0, 320.0);
         return Align(
           alignment: AlignmentDirectional.topStart,
-          child: Material(
-            elevation: 12,
-            shadowColor: _navy.withValues(alpha: 0.18),
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.white,
-            child: Container(
-              width: 320,
-              // Tighter ceiling so the dropdown fits within the
-              // body container even on smaller viewports — 6 rows
-              // of 32px + a 12px buffer.
-              constraints: const BoxConstraints(maxHeight: 220),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                    color: _bdr.withValues(alpha: 0.55)),
+          child: LayoutBuilder(builder: (ctx, parentConstraints) {
+            final maxWidth = parentConstraints.maxWidth.isFinite
+                ? parentConstraints.maxWidth
+                : 360.0;
+            final width = maxWidth.clamp(240.0, 360.0);
+            return Material(
+              elevation: 12,
+              shadowColor: _navy.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.white,
+              child: Container(
+                width: width,
+                constraints: BoxConstraints(maxHeight: maxHeight),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                      color: _bdr.withValues(alpha: 0.55)),
+                ),
+                child: list.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Text('لا توجد نتائج',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: _td, fontSize: 11)),
+                      )
+                    : ListView.separated(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        itemCount: list.length,
+                        separatorBuilder: (_, __) => Divider(
+                            height: 1,
+                            color: _bdr.withValues(alpha: 0.25)),
+                        itemBuilder: (ctx, idx) =>
+                            _AccountOptionRow(
+                          account: list[idx],
+                          onTap: () => onSelected(list[idx]),
+                          navy: _navy,
+                          navy3: _navy3,
+                          tp: _tp,
+                          td: _td,
+                        ),
+                      ),
               ),
-              child: list.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Text('لا توجد نتائج',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: _td, fontSize: 11)),
-                    )
-                  : ListView.separated(
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      itemCount: list.length,
-                      separatorBuilder: (_, __) => Divider(
-                          height: 1,
-                          color: _bdr.withValues(alpha: 0.25)),
-                      itemBuilder: (ctx, idx) {
-                        final a = list[idx];
-                        return InkWell(
-                          onTap: () => onSelected(a),
-                          hoverColor:
-                              _navy3.withValues(alpha: 0.22),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            child: Row(children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 1),
-                                decoration: BoxDecoration(
-                                  color:
-                                      _navy.withValues(alpha: 0.08),
-                                  borderRadius:
-                                      BorderRadius.circular(3),
-                                ),
-                                child: Text(a['code'] ?? '',
-                                    style: TextStyle(
-                                        color: _navy,
-                                        fontFamily: 'monospace',
-                                        fontSize: 9.5,
-                                        fontWeight:
-                                            FontWeight.w800)),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(a['name_ar'] ?? '',
-                                    style: TextStyle(
-                                        fontSize: 11.5,
-                                        color: _tp,
-                                        fontWeight:
-                                            FontWeight.w600),
-                                    overflow:
-                                        TextOverflow.ellipsis),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                  '${a['category']} · ${a['normal_balance']}',
-                                  style: TextStyle(
-                                      color: _td.withValues(
-                                          alpha: 0.55),
-                                      fontSize: 8.5,
-                                      letterSpacing: 0.2)),
-                            ]),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ),
+            );
+          }),
         );
       },
     );
@@ -2613,6 +2582,104 @@ class _ChevronClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(covariant _ChevronClipper old) =>
       old.isFirst != isFirst || old.isLast != isLast;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// One option row inside the account autocomplete dropdown. Lives as
+// its own StatefulWidget so each row tracks its own hover state and
+// can render a clear navy-tinted highlight + a thin trailing accent
+// bar that animates in. Replaces the bare InkWell hoverColor which
+// was too subtle to read at a glance.
+// ─────────────────────────────────────────────────────────────────────
+class _AccountOptionRow extends StatefulWidget {
+  final Map<String, dynamic> account;
+  final VoidCallback onTap;
+  final Color navy;
+  final Color navy3;
+  final Color tp;
+  final Color td;
+
+  const _AccountOptionRow({
+    required this.account,
+    required this.onTap,
+    required this.navy,
+    required this.navy3,
+    required this.tp,
+    required this.td,
+  });
+
+  @override
+  State<_AccountOptionRow> createState() => _AccountOptionRowState();
+}
+
+class _AccountOptionRowState extends State<_AccountOptionRow> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final a = widget.account;
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOut,
+          decoration: BoxDecoration(
+            color: _hover
+                ? widget.navy3.withValues(alpha: 0.45)
+                : Colors.transparent,
+            border: Border(
+              right: BorderSide(
+                color: _hover ? widget.navy : Colors.transparent,
+                width: 3,
+              ),
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(
+              horizontal: 10, vertical: 5),
+          child: Row(children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 120),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(
+                color: _hover
+                    ? widget.navy.withValues(alpha: 0.18)
+                    : widget.navy.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(3),
+              ),
+              child: Text(a['code'] ?? '',
+                  style: TextStyle(
+                      color: widget.navy,
+                      fontFamily: 'monospace',
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800)),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(a['name_ar'] ?? '',
+                  style: TextStyle(
+                      fontSize: 11.5,
+                      color: widget.tp,
+                      fontWeight: FontWeight.w600),
+                  overflow: TextOverflow.ellipsis),
+            ),
+            const SizedBox(width: 6),
+            Text('${a['category']} · ${a['normal_balance']}',
+                style: TextStyle(
+                    color:
+                        widget.td.withValues(alpha: 0.55),
+                    fontSize: 8.5,
+                    letterSpacing: 0.2)),
+          ]),
+        ),
+      ),
+    );
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────
