@@ -1108,61 +1108,83 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     }
   }
 
+  // ─────────────────────────────────────────────────────────────────
+  // Local tabs strip — rectangular tabs with icon + label + count
+  // badge, sitting on top of the body table. The active tab visually
+  // connects to the table below it: white fill, no visible bottom
+  // border, top corners rounded.
+  // ─────────────────────────────────────────────────────────────────
   Widget _localTabsStrip() {
     final linesCount = _je != null ? _jeLines.length : _lines.length;
-    final tabs = <(String id, String tooltip, IconData icon, int? badge)>[
+    final tabs = <(String id, String label, IconData icon, int? badge)>[
       ('lines', 'البنود', Icons.list_alt_rounded, linesCount),
       ('other_info', 'معلومات أخرى', Icons.info_outline_rounded, null),
     ];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: tabs.map((t) {
           final active = t.$1 == _activeView;
-          return Tooltip(
-            message: t.$2,
+          return Padding(
+            padding: const EdgeInsetsDirectional.only(end: 4),
             child: InkWell(
               onTap: () => setState(() => _activeView = t.$1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(8),
+                topRight: Radius.circular(8),
+              ),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 9),
                 decoration: BoxDecoration(
+                  color: active ? Colors.white : _navy3.withValues(alpha: 0.35),
                   border: Border(
-                    bottom: BorderSide(
-                      color: active ? _gold : Colors.transparent,
-                      width: 3,
-                    ),
+                    top: BorderSide(color: active ? _bdr : Colors.transparent),
+                    left: BorderSide(color: active ? _bdr : Colors.transparent),
+                    right:
+                        BorderSide(color: active ? _bdr : Colors.transparent),
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
                   ),
                 ),
-                child: Stack(
-                  clipBehavior: Clip.none,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(t.$3,
-                        size: 20, color: active ? _gold : _ts),
-                    if (t.$4 != null && t.$4! > 0)
-                      PositionedDirectional(
-                        top: -4,
-                        end: -8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: active ? _gold : _ts,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          constraints: const BoxConstraints(minWidth: 16),
-                          child: Text(
-                            '${t.$4}',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
-                            ),
+                    Icon(t.$3, size: 16, color: active ? _navy : _ts),
+                    const SizedBox(width: 6),
+                    Text(
+                      t.$2,
+                      style: TextStyle(
+                        color: active ? _navy : _ts,
+                        fontSize: 12,
+                        fontWeight:
+                            active ? FontWeight.w800 : FontWeight.w600,
+                      ),
+                    ),
+                    if (t.$4 != null && t.$4! > 0) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: active ? _navy : _ts,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        constraints: const BoxConstraints(minWidth: 16),
+                        child: Text(
+                          '${t.$4}',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
                       ),
+                    ],
                   ],
                 ),
               ),
@@ -1284,24 +1306,24 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         ),
         const SizedBox(height: 6),
         _sectionCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _localTabsStrip(),
-              const SizedBox(height: 14),
-              _viewBasicFields(),
-            ],
-          ),
+          child: _viewBasicFields(),
         ),
-        const SizedBox(height: 18),
-        _sectionCard(
-          title: 'بنود القيد',
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: _bdr),
+        const SizedBox(height: 12),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: _localTabsStrip(),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(8),
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(8),
             ),
-            child: Column(children: [
+            border: Border.all(color: _bdr),
+          ),
+          child: Column(children: [
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1447,7 +1469,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               ),
             ]),
           ),
-        ),
         _buildSummaryAndTimelineSection(),
       ],
     );
@@ -1469,19 +1490,21 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         ),
         const SizedBox(height: 6),
         _sectionCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _localTabsStrip(),
-              const SizedBox(height: 14),
-              _createBasicFields(),
-            ],
-          ),
+          child: _createBasicFields(),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 12),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: _localTabsStrip(),
+        ),
         Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(8),
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(8),
+            ),
             border: Border.all(color: _bdr),
           ),
           child: Column(children: [
@@ -1909,14 +1932,26 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   Widget _buildOtherInfoTab() {
     final isCreateMode = _je == null;
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       children: [
-        _sectionCard(
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: _localTabsStrip(),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(10),
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10),
+            ),
+            border: Border.all(color: _bdr),
+          ),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _localTabsStrip(),
-              const SizedBox(height: 14),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text('الترحيل التلقائي',
