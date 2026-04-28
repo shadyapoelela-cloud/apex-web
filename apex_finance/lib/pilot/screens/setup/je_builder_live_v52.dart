@@ -483,8 +483,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
 
     return ObjectPageTemplate(
       titleAr: _je != null
-          ? 'قيد يومية ${_je!['je_number'] ?? ""}'
-          : 'قيد يومية جديد',
+          ? 'قيد اليومية ${_je!['je_number'] ?? ""}'
+          : 'قيد اليومية',
       subtitleAr: _je != null
           ? '${_kindLabel(_je!['kind'] as String? ?? 'manual')} · ${_fmt(_totalDebit)} ر.س · ${_balanced ? "متوازن" : "غير متوازن"}'
           : 'وضع الإنشاء · ${_accounts.length} حساب · ${_balanced ? "متوازن" : "غير متوازن"}',
