@@ -975,23 +975,20 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     );
   }
 
+  // Anchor key for the custom date popover — measured at tap-time
+  // to position the popover under the field.
+  final GlobalKey _dateFieldKey = GlobalKey();
+
   Widget _dateField() {
     return Column(
+      key: _dateFieldKey,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Text('تاريخ المحاسبة', style: _formLabelStyle),
         const SizedBox(height: 4),
         InkWell(
-          onTap: () async {
-            final d = await showDatePicker(
-              context: context,
-              initialDate: _date,
-              firstDate: DateTime.now().subtract(const Duration(days: 365 * 3)),
-              lastDate: DateTime.now().add(const Duration(days: 30)),
-            );
-            if (d != null) setState(() => _date = d);
-          },
+          onTap: () => _openDatePopover(),
           borderRadius: BorderRadius.circular(6),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
@@ -1014,6 +1011,47 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         ),
       ],
     );
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // Custom date popover — anchors directly under the date field
+  // instead of the full-screen Material modal. Compact (~280px),
+  // brand colors (navy selected, gold "today"), Arabic month nav,
+  // quick-action chips (اليوم / أمس / بداية الشهر).
+  // ─────────────────────────────────────────────────────────────────
+  void _openDatePopover() {
+    final ctx = _dateFieldKey.currentContext;
+    if (ctx == null) return;
+    final renderBox = ctx.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+    final overlay = Overlay.of(ctx);
+    final overlayBox = overlay.context.findRenderObject() as RenderBox;
+    final fieldOffset = renderBox.localToGlobal(Offset.zero,
+        ancestor: overlayBox);
+    final fieldSize = renderBox.size;
+    late OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (ctx2) => _DatePopover(
+        anchorTopLeft: fieldOffset,
+        anchorSize: fieldSize,
+        overlaySize: overlayBox.size,
+        initial: _date,
+        firstDate: DateTime.now().subtract(const Duration(days: 365 * 3)),
+        lastDate: DateTime.now().add(const Duration(days: 30)),
+        navy: _navy,
+        gold: _gold,
+        navy3: _navy3,
+        bdr: _bdr,
+        td: _td,
+        ts: _ts,
+        tp: _tp,
+        onPicked: (d) {
+          entry.remove();
+          if (d != null) setState(() => _date = d);
+        },
+      ),
+    );
+    overlay.insert(entry);
   }
 
   Widget _referenceField() {
@@ -2377,4 +2415,368 @@ class _ChevronClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(covariant _ChevronClipper old) =>
       old.isFirst != isFirst || old.isLast != isLast;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Compact, brand-styled date popover — anchored under the date field,
+// dismisses on outside-tap, fades + slides in. ~280 px wide, designed
+// to feel like a Notion / Linear inline picker rather than a Material
+// modal. Quick-pick chips (اليوم / أمس / بداية الشهر) cover the most
+// common JE dates in one tap.
+// ─────────────────────────────────────────────────────────────────────
+class _DatePopover extends StatefulWidget {
+  final Offset anchorTopLeft;
+  final Size anchorSize;
+  final Size overlaySize;
+  final DateTime initial;
+  final DateTime firstDate;
+  final DateTime lastDate;
+  final Color navy;
+  final Color gold;
+  final Color navy3;
+  final Color bdr;
+  final Color td;
+  final Color ts;
+  final Color tp;
+  final ValueChanged<DateTime?> onPicked;
+
+  const _DatePopover({
+    required this.anchorTopLeft,
+    required this.anchorSize,
+    required this.overlaySize,
+    required this.initial,
+    required this.firstDate,
+    required this.lastDate,
+    required this.navy,
+    required this.gold,
+    required this.navy3,
+    required this.bdr,
+    required this.td,
+    required this.ts,
+    required this.tp,
+    required this.onPicked,
+  });
+
+  @override
+  State<_DatePopover> createState() => _DatePopoverState();
+}
+
+class _DatePopoverState extends State<_DatePopover>
+    with SingleTickerProviderStateMixin {
+  late DateTime _viewMonth; // first day of the displayed month
+  late DateTime _selected;
+  late final AnimationController _anim;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
+
+  static const _arMonths = [
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
+  ];
+  // Saturday-first week (matches the Material picker the user just saw).
+  static const _arDayNames = ['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'];
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = widget.initial;
+    _viewMonth = DateTime(widget.initial.year, widget.initial.month, 1);
+    _anim = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 180));
+    _fade = CurvedAnimation(parent: _anim, curve: Curves.easeOutCubic);
+    _slide = Tween<Offset>(
+            begin: const Offset(0, -0.04), end: Offset.zero)
+        .animate(_fade);
+    _anim.forward();
+  }
+
+  @override
+  void dispose() {
+    _anim.dispose();
+    super.dispose();
+  }
+
+  Future<void> _close([DateTime? d]) async {
+    await _anim.reverse();
+    if (mounted) widget.onPicked(d);
+  }
+
+  void _shiftMonth(int delta) {
+    setState(() {
+      _viewMonth =
+          DateTime(_viewMonth.year, _viewMonth.month + delta, 1);
+    });
+  }
+
+  bool _inRange(DateTime d) =>
+      !d.isBefore(DateTime(widget.firstDate.year, widget.firstDate.month,
+          widget.firstDate.day)) &&
+      !d.isAfter(DateTime(
+          widget.lastDate.year, widget.lastDate.month, widget.lastDate.day));
+
+  @override
+  Widget build(BuildContext context) {
+    const popWidth = 290.0;
+    const popHeight = 348.0;
+    // Position popover under the field; flip above if it would overflow.
+    final spaceBelow = widget.overlaySize.height -
+        (widget.anchorTopLeft.dy + widget.anchorSize.height);
+    final placeAbove = spaceBelow < popHeight + 16 &&
+        widget.anchorTopLeft.dy > popHeight + 16;
+    final top = placeAbove
+        ? widget.anchorTopLeft.dy - popHeight - 6
+        : widget.anchorTopLeft.dy + widget.anchorSize.height + 6;
+    // Right-align to the field (RTL layout) but clamp to viewport.
+    var left = widget.anchorTopLeft.dx +
+        widget.anchorSize.width -
+        popWidth;
+    left = left.clamp(8.0, widget.overlaySize.width - popWidth - 8);
+
+    return Stack(children: [
+      // Tap-outside barrier — fully transparent, just captures hits.
+      Positioned.fill(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => _close(),
+          child: const SizedBox.expand(),
+        ),
+      ),
+      Positioned(
+        top: top,
+        left: left,
+        width: popWidth,
+        child: FadeTransition(
+          opacity: _fade,
+          child: SlideTransition(
+            position: _slide,
+            child: Material(
+              elevation: 16,
+              shadowColor: widget.navy.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                      color: widget.bdr.withValues(alpha: 0.55)),
+                ),
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+                child: Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildHeader(),
+                      const SizedBox(height: 10),
+                      _buildQuickChips(),
+                      const SizedBox(height: 10),
+                      _buildWeekdayRow(),
+                      const SizedBox(height: 4),
+                      _buildGrid(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _buildHeader() {
+    return Row(children: [
+      _navIcon(Icons.chevron_right_rounded,
+          tooltip: 'الشهر السابق', onTap: () => _shiftMonth(-1)),
+      Expanded(
+        child: Center(
+          child: Text(
+            '${_arMonths[_viewMonth.month - 1]} ${_viewMonth.year}',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              color: widget.navy,
+            ),
+          ),
+        ),
+      ),
+      _navIcon(Icons.chevron_left_rounded,
+          tooltip: 'الشهر التالي', onTap: () => _shiftMonth(1)),
+    ]);
+  }
+
+  Widget _navIcon(IconData icon,
+      {required String tooltip, required VoidCallback onTap}) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          padding: const EdgeInsets.all(4),
+          child: Icon(icon, size: 18, color: widget.ts),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickChips() {
+    final today = DateTime.now();
+    final yest = today.subtract(const Duration(days: 1));
+    final monthStart = DateTime(today.year, today.month, 1);
+    return Row(children: [
+      _quickChip('اليوم', today),
+      const SizedBox(width: 6),
+      _quickChip('أمس', yest),
+      const SizedBox(width: 6),
+      _quickChip('بداية الشهر', monthStart),
+    ]);
+  }
+
+  Widget _quickChip(String label, DateTime date) {
+    final enabled = _inRange(date);
+    return Expanded(
+      child: InkWell(
+        onTap: enabled
+            ? () {
+                setState(() {
+                  _selected = date;
+                  _viewMonth = DateTime(date.year, date.month, 1);
+                });
+                _close(date);
+              }
+            : null,
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          decoration: BoxDecoration(
+            color: enabled
+                ? widget.navy3.withValues(alpha: 0.18)
+                : widget.navy3.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+              color: enabled
+                  ? widget.tp
+                  : widget.td.withValues(alpha: 0.5),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWeekdayRow() {
+    return Row(
+      children: _arDayNames
+          .map((d) => Expanded(
+                child: SizedBox(
+                  height: 22,
+                  child: Center(
+                    child: Text(
+                      d,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: widget.td.withValues(alpha: 0.6),
+                        letterSpacing: 0.4,
+                      ),
+                    ),
+                  ),
+                ),
+              ))
+          .toList(),
+    );
+  }
+
+  Widget _buildGrid() {
+    // Build the 6×7 grid for the displayed month, Saturday-first.
+    final firstOfMonth = DateTime(_viewMonth.year, _viewMonth.month, 1);
+    // Dart weekday: Mon=1..Sun=7. Saturday=6, so offset (weekday-6) mod 7.
+    final leading = (firstOfMonth.weekday - DateTime.saturday + 7) % 7;
+    final daysInMonth =
+        DateTime(_viewMonth.year, _viewMonth.month + 1, 0).day;
+    final today = DateTime.now();
+    final cells = <Widget>[];
+    for (var i = 0; i < 42; i++) {
+      final dayNum = i - leading + 1;
+      if (dayNum < 1 || dayNum > daysInMonth) {
+        cells.add(const SizedBox(height: 32));
+      } else {
+        final date =
+            DateTime(_viewMonth.year, _viewMonth.month, dayNum);
+        final isSelected = _selected.year == date.year &&
+            _selected.month == date.month &&
+            _selected.day == date.day;
+        final isToday = today.year == date.year &&
+            today.month == date.month &&
+            today.day == date.day;
+        final inRange = _inRange(date);
+        cells.add(_buildDayCell(date, dayNum, isSelected, isToday, inRange));
+      }
+    }
+    return Column(
+      children: List.generate(6, (rowIdx) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 1),
+          child: Row(
+            children: List.generate(7, (colIdx) {
+              return Expanded(child: cells[rowIdx * 7 + colIdx]);
+            }),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildDayCell(
+      DateTime date, int dayNum, bool isSelected, bool isToday, bool inRange) {
+    final bg = isSelected
+        ? widget.navy
+        : (isToday
+            ? widget.gold.withValues(alpha: 0.12)
+            : Colors.transparent);
+    final fg = isSelected
+        ? Colors.white
+        : (isToday
+            ? widget.navy
+            : (inRange
+                ? widget.tp
+                : widget.td.withValues(alpha: 0.35)));
+    final border = isToday && !isSelected
+        ? Border.all(color: widget.gold.withValues(alpha: 0.5), width: 1)
+        : null;
+    return InkWell(
+      onTap: inRange ? () => _close(date) : null,
+      borderRadius: BorderRadius.circular(6),
+      hoverColor: widget.navy3.withValues(alpha: 0.3),
+      child: Container(
+        height: 32,
+        margin: const EdgeInsets.symmetric(horizontal: 1),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(6),
+          border: border,
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          '$dayNum',
+          style: TextStyle(
+            fontSize: 12,
+            fontFamily: 'monospace',
+            fontWeight: isSelected
+                ? FontWeight.w800
+                : (isToday ? FontWeight.w700 : FontWeight.w500),
+            color: fg,
+          ),
+        ),
+      ),
+    );
+  }
 }
