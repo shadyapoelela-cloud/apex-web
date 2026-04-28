@@ -1276,13 +1276,13 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
 
   Widget _buildLinesViewTable() {
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       children: [
         Align(
           alignment: AlignmentDirectional.centerEnd,
           child: _statusFlowChevrons(),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 6),
         _sectionCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1455,7 +1455,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
 
   Widget _buildLinesEditTable() {
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       children: [
         if (_aiWarnings.isNotEmpty) _aiWarningsStrip(),
         if (_aiWarnings.isNotEmpty) const SizedBox(height: 18),
@@ -1467,7 +1467,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             _statusFlowChevrons(),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 6),
         _sectionCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
