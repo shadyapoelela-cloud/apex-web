@@ -545,31 +545,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           color: _tp,
           tooltip: 'حفظ كمسودة',
         ),
-        const SizedBox(width: 8),
-        _submitting
-            ? FilledButton.icon(
-                onPressed: null,
-                icon: const SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: Colors.black),
-                ),
-                style: FilledButton.styleFrom(
-                  backgroundColor: _balanced ? _gold : _navy3,
-                  foregroundColor: _balanced ? core_theme.AC.btnFg : _td,
-                ),
-                label: const Text('جاري الحفظ...'),
-              )
-            : FilledButton(
-                onPressed:
-                    !_balanced ? null : () => _submit(autoPost: true),
-                style: FilledButton.styleFrom(
-                  backgroundColor: _balanced ? _gold : _navy3,
-                  foregroundColor: _balanced ? core_theme.AC.btnFg : _td,
-                ),
-                child: const Text('ترحيل'),
-              ),
       ];
     }
     // VIEW mode — based on status
@@ -1199,6 +1174,38 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   }
 
   // ─────────────────────────────────────────────────────────────────
+  // Post button — moved out of the screen header into the content area,
+  // sits above the basic-fields section card (RTL start) so it lives
+  // right above the journal-book tab icon, outside the lines table.
+  // ─────────────────────────────────────────────────────────────────
+  Widget _postButton() {
+    if (_submitting) {
+      return FilledButton.icon(
+        onPressed: null,
+        icon: const SizedBox(
+          width: 14,
+          height: 14,
+          child: CircularProgressIndicator(
+              strokeWidth: 2, color: Colors.black),
+        ),
+        style: FilledButton.styleFrom(
+          backgroundColor: _balanced ? _gold : _navy3,
+          foregroundColor: _balanced ? core_theme.AC.btnFg : _td,
+        ),
+        label: const Text('جاري الحفظ...'),
+      );
+    }
+    return FilledButton(
+      onPressed: !_balanced ? null : () => _submit(autoPost: true),
+      style: FilledButton.styleFrom(
+        backgroundColor: _balanced ? _gold : _navy3,
+        foregroundColor: _balanced ? core_theme.AC.btnFg : _td,
+      ),
+      child: const Text('ترحيل'),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────
   // Odoo-style chevron status flow — sits above the lines table on the
   // right (RTL start). Auto-post mode skips the approval steps.
   // ─────────────────────────────────────────────────────────────────
@@ -1451,6 +1458,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       children: [
         if (_aiWarnings.isNotEmpty) _aiWarningsStrip(),
         if (_aiWarnings.isNotEmpty) const SizedBox(height: 18),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: _postButton(),
+        ),
+        const SizedBox(height: 12),
         _sectionCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
