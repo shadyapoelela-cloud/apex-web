@@ -1464,11 +1464,13 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           SizedBox(
               width: 110,
               child: Text('مدين',
-                  style: _colHeaderStyle, textAlign: TextAlign.end)),
+                  style: _colHeaderStyle,
+                  textAlign: TextAlign.center)),
           SizedBox(
               width: 110,
               child: Text('دائن',
-                  style: _colHeaderStyle, textAlign: TextAlign.end)),
+                  style: _colHeaderStyle,
+                  textAlign: TextAlign.center)),
         ]),
       ),
       ..._jeLines.asMap().entries.map((e) {
@@ -1515,7 +1517,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                             : FontWeight.w400,
                         color: debit > 0 ? _ok : _td,
                         fontFamily: 'monospace'),
-                    textAlign: TextAlign.end)),
+                    textAlign: TextAlign.center)),
             SizedBox(
                 width: 110,
                 child: Text(credit > 0 ? _fmt(credit) : '—',
@@ -1526,7 +1528,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                             : FontWeight.w400,
                         color: credit > 0 ? _gold : _td,
                         fontFamily: 'monospace'),
-                    textAlign: TextAlign.end)),
+                    textAlign: TextAlign.center)),
           ]),
         );
       }),
@@ -1556,7 +1558,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                       fontWeight: FontWeight.w800,
                       color: _navy,
                       fontFamily: 'monospace'),
-                  textAlign: TextAlign.end)),
+                  textAlign: TextAlign.center)),
           SizedBox(
               width: 110,
               child: Text(_fmt(_totalCredit),
@@ -1565,7 +1567,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                       fontWeight: FontWeight.w800,
                       color: _navy,
                       fontFamily: 'monospace'),
-                  textAlign: TextAlign.end)),
+                  textAlign: TextAlign.center)),
         ]),
       ),
     ]);
@@ -1696,11 +1698,13 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           SizedBox(
               width: 110,
               child: Text('مدين',
-                  style: _colHeaderStyle, textAlign: TextAlign.end)),
+                  style: _colHeaderStyle,
+                  textAlign: TextAlign.center)),
           SizedBox(
               width: 110,
               child: Text('دائن',
-                  style: _colHeaderStyle, textAlign: TextAlign.end)),
+                  style: _colHeaderStyle,
+                  textAlign: TextAlign.center)),
           SizedBox(width: 30, child: _columnSettingsButton()),
         ]),
       ),
@@ -1841,7 +1845,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                 borderSide: BorderSide(color: _ok, width: 1.5),
               ),
             ),
-            textAlign: TextAlign.end,
+            textAlign: TextAlign.center,
           ),
         ),
         const SizedBox(width: 6),
@@ -1883,7 +1887,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                 borderSide: BorderSide(color: _gold, width: 1.5),
               ),
             ),
-            textAlign: TextAlign.end,
+            textAlign: TextAlign.center,
           ),
         ),
         SizedBox(
@@ -2267,11 +2271,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           SizedBox(
               width: 110,
               child: _animatedAmount(_totalDebit,
-                  align: TextAlign.end)),
+                  align: TextAlign.center)),
           SizedBox(
               width: 110,
               child: _animatedAmount(_totalCredit,
-                  align: TextAlign.end)),
+                  align: TextAlign.center)),
           const SizedBox(width: 30),
         ]),
       ),
@@ -2283,7 +2287,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // the prior `end` and tweens from there to the new `end` whenever
   // value changes, so the user sees digits roll up instead of snap.
   Widget _animatedAmount(double value,
-      {TextAlign align = TextAlign.end}) {
+      {TextAlign align = TextAlign.center}) {
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 280),
       curve: Curves.easeOutCubic,
