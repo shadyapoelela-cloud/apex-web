@@ -1530,6 +1530,30 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         letterSpacing: 0.3,
       );
 
+  // Spreadsheet-cell InputDecoration — explicitly strips every Material
+  // default (filled fill, enabledBorder underline, etc.) so empty cells
+  // render as pure text with no surrounding chrome. The colored
+  // underline only appears on focus.
+  InputDecoration _cellInputDecoration({
+    required String hint,
+    required Color focusColor,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(
+          color: _td.withValues(alpha: 0.5), fontSize: 10),
+      isDense: true,
+      filled: false,
+      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+      border: InputBorder.none,
+      enabledBorder: InputBorder.none,
+      disabledBorder: InputBorder.none,
+      focusedBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: focusColor, width: 1.5),
+      ),
+    );
+  }
+
   Widget _linesEditTableBody() {
     return Column(children: [
       Container(
@@ -1649,13 +1673,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               controller: l.partnerCtrl,
               onChanged: (v) => l.partnerLabel = v,
               style: TextStyle(color: _tp, fontSize: 11),
-              decoration: InputDecoration(
-                hintText: 'مورد / عميل',
-                hintStyle: TextStyle(color: _td, fontSize: 10),
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                border: InputBorder.none,
-              ),
+              decoration: _cellInputDecoration(
+                  hint: 'مورد / عميل', focusColor: _navy),
             ),
           ),
         ],
@@ -1666,13 +1685,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             controller: l.descCtrl,
             onChanged: (v) => l.description = v,
             style: TextStyle(color: _tp, fontSize: 11),
-            decoration: InputDecoration(
-              hintText: 'اختياري',
-              hintStyle: TextStyle(color: _td, fontSize: 10),
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(vertical: 10),
-              border: InputBorder.none,
-            ),
+            decoration: _cellInputDecoration(
+                hint: 'اختياري', focusColor: _navy),
           ),
         ),
         if (_showCostCenter) ...[
@@ -1683,13 +1697,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               controller: l.costCenterCtrl,
               onChanged: (v) => l.costCenterLabel = v,
               style: TextStyle(color: _tp, fontSize: 11),
-              decoration: InputDecoration(
-                hintText: 'مركز تكلفة',
-                hintStyle: TextStyle(color: _td, fontSize: 10),
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                border: InputBorder.none,
-              ),
+              decoration: _cellInputDecoration(
+                  hint: 'مركز تكلفة', focusColor: _navy),
             ),
           ),
         ],
