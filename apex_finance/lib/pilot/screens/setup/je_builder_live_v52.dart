@@ -1220,6 +1220,65 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   }
 
   // ─────────────────────────────────────────────────────────────────
+  // Odoo-style chevron status flow — sits above the lines table on the
+  // right (RTL start). Auto-post mode skips the approval steps.
+  // ─────────────────────────────────────────────────────────────────
+  Widget _statusFlowChevrons() {
+    final isCreate = _je == null;
+    final currentKey = isCreate
+        ? 'draft'
+        : (_je!['status']?.toString() ?? 'draft');
+    final showApproval = isCreate ? !_autoPost : true;
+    final steps = <(String key, String label)>[
+      ('draft', 'مسودة'),
+      if (showApproval) ('submitted', 'قيد الاعتماد'),
+      if (showApproval) ('approved', 'معتمد'),
+      ('posted', 'تم الترحيل'),
+    ];
+    final currentIdx = steps.indexWhere((s) => s.$1 == currentKey);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(steps.length, (i) {
+        final isPassed = currentIdx >= 0 && i < currentIdx;
+        final isCurrent = i == currentIdx;
+        final isFirst = i == 0;
+        final isLast = i == steps.length - 1;
+        final bg = isCurrent
+            ? Colors.white
+            : (isPassed
+                ? _navy.withValues(alpha: 0.06)
+                : _navy3.withValues(alpha: 0.25));
+        final fg = isCurrent
+            ? _navy
+            : (isPassed ? _navy.withValues(alpha: 0.7) : _td);
+        final border = isCurrent
+            ? _ok
+            : (isPassed ? _navy.withValues(alpha: 0.25) : _bdr);
+        return ClipPath(
+          clipper: _ChevronClipper(isFirst: isFirst, isLast: isLast),
+          child: Container(
+            margin: EdgeInsetsDirectional.only(start: isFirst ? 0 : -6),
+            padding: EdgeInsets.fromLTRB(
+                isLast ? 14 : 18, 6, isFirst ? 14 : 18, 6),
+            decoration: BoxDecoration(
+              color: bg,
+              border: Border.all(color: border, width: isCurrent ? 1.5 : 1),
+            ),
+            child: Text(
+              steps[i].$2,
+              style: TextStyle(
+                color: fg,
+                fontSize: 11,
+                fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────
   // TAB: LINES — also hosts the AI quick bar + البيانات الأساسية at
   // the top so the user can fill the header and rows on a single tab.
   // ─────────────────────────────────────────────────────────────────
@@ -1243,6 +1302,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           ),
         ),
         const SizedBox(height: 18),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: _statusFlowChevrons(),
+        ),
+        const SizedBox(height: 10),
         _sectionCard(
           title: 'بنود القيد',
           child: Container(
@@ -1419,6 +1483,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           ),
         ),
         const SizedBox(height: 18),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: _statusFlowChevrons(),
+        ),
+        const SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
@@ -2056,4 +2125,43 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     );
   }
 
+}
+
+// Chevron shape for the Odoo-style status flow strip. The pill points
+// in the LTR-positive direction (right) and notches on its left to
+// receive the previous chevron's tip. In RTL (this app's default), the
+// visual flow reads right-to-left so the rightmost pill is the first
+// status and each tip points toward the next status on its left.
+class _ChevronClipper extends CustomClipper<Path> {
+  final bool isFirst;
+  final bool isLast;
+  static const double _tip = 8;
+
+  const _ChevronClipper({required this.isFirst, required this.isLast});
+
+  @override
+  Path getClip(Size size) {
+    final w = size.width;
+    final h = size.height;
+    final path = Path();
+    // Top-left
+    path.moveTo(0, 0);
+    // Top edge to top-right
+    path.lineTo(w - (isLast ? 0 : _tip), 0);
+    // Right edge — tip out (or flat for last)
+    if (!isLast) path.lineTo(w, h / 2);
+    path.lineTo(w - (isLast ? 0 : _tip), h);
+    // Bottom edge to bottom-left
+    path.lineTo(0, h);
+    // Left edge — notch in (or flat for first)
+    if (!isFirst) {
+      path.lineTo(_tip, h / 2);
+    }
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant _ChevronClipper old) =>
+      old.isFirst != isFirst || old.isLast != isLast;
 }
