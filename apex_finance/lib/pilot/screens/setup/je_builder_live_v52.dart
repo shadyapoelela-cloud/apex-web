@@ -224,7 +224,10 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     final docNum = (extracted['document_number'] ?? '').toString();
     if (docNum.isNotEmpty) _reference.text = docNum;
     final parsedDate = DateTime.tryParse((extracted['date'] ?? '').toString());
-    if (parsedDate != null) _date = parsedDate;
+    if (parsedDate != null) {
+      _date = parsedDate;
+      _dateCtrl.text = _formatDate(parsedDate);
+    }
 
     // Rebuild lines
     for (final l in _lines) {
@@ -978,6 +981,32 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // Anchor key for the custom date popover — measured at tap-time
   // to position the popover under the field.
   final GlobalKey _dateFieldKey = GlobalKey();
+  late final TextEditingController _dateCtrl =
+      TextEditingController(text: _formatDate(_date));
+
+  String _formatDate(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  // Try to parse `YYYY-MM-DD` from the text field. Silently no-op on
+  // invalid input so the user can finish typing — only commits to
+  // _date when the string is a complete, valid, in-range date.
+  void _trySetDateFromText(String text) {
+    final m = RegExp(r'^(\d{4})-(\d{1,2})-(\d{1,2})$').firstMatch(text);
+    if (m == null) return;
+    try {
+      final y = int.parse(m.group(1)!);
+      final mo = int.parse(m.group(2)!);
+      final d = int.parse(m.group(3)!);
+      final parsed = DateTime(y, mo, d);
+      // Reject if the components got rounded (e.g. month 13 → next year).
+      if (parsed.year != y || parsed.month != mo || parsed.day != d) return;
+      final firstDate =
+          DateTime.now().subtract(const Duration(days: 365 * 3));
+      final lastDate = DateTime.now().add(const Duration(days: 30));
+      if (parsed.isBefore(firstDate) || parsed.isAfter(lastDate)) return;
+      setState(() => _date = parsed);
+    } catch (_) {}
+  }
 
   Widget _dateField() {
     return Column(
@@ -987,26 +1016,44 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       children: [
         Text('تاريخ المحاسبة', style: _formLabelStyle),
         const SizedBox(height: 4),
-        InkWell(
-          onTap: () => _openDatePopover(),
-          borderRadius: BorderRadius.circular(6),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: _bdr.withValues(alpha: 0.55)),
+        TextField(
+          controller: _dateCtrl,
+          style: TextStyle(
+              color: _tp,
+              fontSize: 13,
+              fontFamily: 'monospace',
+              letterSpacing: 0.4),
+          textDirection: TextDirection.ltr,
+          textAlign: TextAlign.start,
+          keyboardType: TextInputType.datetime,
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9\-]')),
+            LengthLimitingTextInputFormatter(10),
+          ],
+          onChanged: _trySetDateFromText,
+          decoration: InputDecoration(
+            hintText: 'YYYY-MM-DD',
+            hintStyle: TextStyle(
+                color: _td.withValues(alpha: 0.45),
+                fontSize: 12,
+                fontFamily: 'monospace'),
+            isDense: true,
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            prefixIcon: IconButton(
+              tooltip: 'افتح التقويم',
+              icon: Icon(Icons.calendar_today_rounded,
+                  color: _ts.withValues(alpha: 0.85), size: 16),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(
+                  minWidth: 36, minHeight: 36),
+              onPressed: () => _openDatePopover(),
             ),
-            child: Row(children: [
-              Icon(Icons.calendar_today_rounded,
-                  color: _ts.withValues(alpha: 0.85), size: 14),
-              const SizedBox(width: 8),
-              Text(
-                '${_date.year}-${_date.month.toString().padLeft(2, '0')}-${_date.day.toString().padLeft(2, '0')}',
-                style: TextStyle(
-                    color: _tp, fontSize: 13, fontFamily: 'monospace'),
-              ),
-            ]),
+            border: _formFieldBorder,
+            enabledBorder: _formFieldBorder,
+            focusedBorder: _formFieldFocusBorder,
           ),
         ),
       ],
@@ -1047,7 +1094,10 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         tp: _tp,
         onPicked: (d) {
           entry.remove();
-          if (d != null) setState(() => _date = d);
+          if (d != null) {
+            setState(() => _date = d);
+            _dateCtrl.text = _formatDate(d);
+          }
         },
       ),
     );
@@ -1681,43 +1731,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                 textAlign: TextAlign.center)),
         Expanded(
           flex: 3,
-          child: InkWell(
-            onTap: () => _pickAccount(i),
-            borderRadius: BorderRadius.circular(4),
-            hoverColor: _navy3.withValues(alpha: 0.25),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-              child: Row(children: [
-                Icon(
-                  acc.isEmpty
-                      ? (l.aiHint.isNotEmpty
-                          ? Icons.auto_awesome_rounded
-                          : Icons.search_rounded)
-                      : Icons.check_circle_rounded,
-                  color: acc.isEmpty
-                      ? (l.aiHint.isNotEmpty ? _warn : _td.withValues(alpha: 0.5))
-                      : _ok,
-                  size: 12,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    acc.isEmpty
-                        ? (l.aiHint.isNotEmpty
-                            ? '⚠ ${l.aiHint}'
-                            : 'اختر حساباً')
-                        : '${acc['code']} — ${acc['name_ar']}',
-                    style: TextStyle(
-                        color:
-                            acc.isEmpty ? (l.aiHint.isNotEmpty ? _warn : _td) : _tp,
-                        fontSize: 11,
-                        fontFamily: acc.isEmpty ? null : 'monospace'),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ]),
-            ),
-          ),
+          child: _accountAutocomplete(i, l, acc),
         ),
         if (_showPartner) ...[
           const SizedBox(width: 8),
@@ -1890,6 +1904,187 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           ),
         ),
       ]),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // Inline account autocomplete — type-to-search dropdown anchored
+  // to the cell. Filters by code OR Arabic name on every keystroke.
+  // Empty input shows the first 30 detail accounts so the field still
+  // feels useful before typing. Selecting an option commits the
+  // accountId and replaces the text with `code — name`.
+  // ─────────────────────────────────────────────────────────────────
+  Widget _accountAutocomplete(
+      int i, _LineState l, Map<String, dynamic> acc) {
+    final initial = acc.isEmpty
+        ? const TextEditingValue()
+        : TextEditingValue(
+            text: '${acc['code']} — ${acc['name_ar']}',
+            selection: TextSelection.collapsed(
+                offset: '${acc['code']} — ${acc['name_ar']}'.length));
+    return RawAutocomplete<Map<String, dynamic>>(
+      key: ValueKey('acct-${i}-${l.accountId ?? "empty"}'),
+      initialValue: initial,
+      displayStringForOption: (a) => '${a['code']} — ${a['name_ar']}',
+      optionsBuilder: (text) {
+        final detail =
+            _accounts.where((a) => a['type'] == 'detail');
+        final q = text.text.trim().toLowerCase();
+        if (q.isEmpty) return detail.take(30);
+        return detail.where((a) {
+          final code = (a['code'] ?? '').toString().toLowerCase();
+          final name = (a['name_ar'] ?? '').toString().toLowerCase();
+          return code.contains(q) || name.contains(q);
+        });
+      },
+      onSelected: (a) {
+        setState(() => _lines[i].accountId = a['id']);
+      },
+      fieldViewBuilder: (ctx, ctrl, focusNode, onSubmit) {
+        // If the user clears the field manually, drop the selection.
+        ctrl.addListener(() {
+          final txt = ctrl.text;
+          if (txt.isEmpty && l.accountId != null) {
+            setState(() => _lines[i].accountId = null);
+          }
+        });
+        return TextField(
+          controller: ctrl,
+          focusNode: focusNode,
+          style: TextStyle(
+              color: _tp,
+              fontSize: 11,
+              fontFamily:
+                  acc.isEmpty ? null : 'monospace'),
+          decoration: InputDecoration(
+            hintText: l.aiHint.isNotEmpty
+                ? '⚠ ${l.aiHint}'
+                : 'اختر حساباً',
+            hintStyle: TextStyle(
+                color: l.aiHint.isNotEmpty
+                    ? _warn
+                    : _td.withValues(alpha: 0.55),
+                fontSize: 11),
+            isDense: true,
+            filled: false,
+            prefixIcon: Padding(
+              padding: const EdgeInsetsDirectional.only(start: 4, end: 4),
+              child: Icon(
+                acc.isEmpty
+                    ? (l.aiHint.isNotEmpty
+                        ? Icons.auto_awesome_rounded
+                        : Icons.search_rounded)
+                    : Icons.check_circle_rounded,
+                color: acc.isEmpty
+                    ? (l.aiHint.isNotEmpty
+                        ? _warn
+                        : _td.withValues(alpha: 0.5))
+                    : _ok,
+                size: 14,
+              ),
+            ),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 22, minHeight: 22),
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 10),
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: _navy, width: 1.5),
+            ),
+          ),
+          onSubmitted: (_) => onSubmit(),
+        );
+      },
+      optionsViewBuilder: (ctx, onSelected, options) {
+        final list = options.toList();
+        return Align(
+          alignment: AlignmentDirectional.topStart,
+          child: Material(
+            elevation: 12,
+            shadowColor: _navy.withValues(alpha: 0.18),
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.white,
+            child: Container(
+              width: 360,
+              constraints: const BoxConstraints(maxHeight: 320),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                    color: _bdr.withValues(alpha: 0.55)),
+              ),
+              child: list.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text('لا توجد نتائج',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: _td, fontSize: 12)),
+                    )
+                  : ListView.separated(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      itemCount: list.length,
+                      separatorBuilder: (_, __) => Divider(
+                          height: 1,
+                          color: _bdr.withValues(alpha: 0.3)),
+                      itemBuilder: (ctx, idx) {
+                        final a = list[idx];
+                        return InkWell(
+                          onTap: () => onSelected(a),
+                          hoverColor:
+                              _navy3.withValues(alpha: 0.22),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
+                            child: Row(children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color:
+                                      _navy.withValues(alpha: 0.08),
+                                  borderRadius:
+                                      BorderRadius.circular(4),
+                                ),
+                                child: Text(a['code'] ?? '',
+                                    style: TextStyle(
+                                        color: _navy,
+                                        fontFamily: 'monospace',
+                                        fontSize: 10,
+                                        fontWeight:
+                                            FontWeight.w800)),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(a['name_ar'] ?? '',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: _tp,
+                                        fontWeight:
+                                            FontWeight.w600),
+                                    overflow:
+                                        TextOverflow.ellipsis),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                  '${a['category']} · ${a['normal_balance']}',
+                                  style: TextStyle(
+                                      color: _td.withValues(
+                                          alpha: 0.6),
+                                      fontSize: 9,
+                                      letterSpacing: 0.2)),
+                            ]),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ),
+        );
+      },
     );
   }
 
