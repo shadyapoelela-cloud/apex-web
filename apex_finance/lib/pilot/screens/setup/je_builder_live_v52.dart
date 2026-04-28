@@ -411,18 +411,25 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // ─────────────────────────────────────────────────────────────────
   // COMPUTED
   // ─────────────────────────────────────────────────────────────────
+
+  // Backend uses `debit_amount` / `credit_amount` on saved lines but
+  // the create-side payload posts `debit` / `credit`. Read both so
+  // either shape parses correctly.
+  double _lineDebit(Map<String, dynamic> l) =>
+      double.tryParse('${l['debit_amount'] ?? l['debit'] ?? 0}') ?? 0;
+  double _lineCredit(Map<String, dynamic> l) =>
+      double.tryParse('${l['credit_amount'] ?? l['credit'] ?? 0}') ?? 0;
+
   double get _totalDebit {
     if (_je != null) {
-      return _jeLines.fold(0.0,
-          (t, l) => t + (double.tryParse('${l['debit'] ?? 0}') ?? 0));
+      return _jeLines.fold(0.0, (t, l) => t + _lineDebit(l));
     }
     return _lines.fold(0.0, (t, l) => t + l.debit);
   }
 
   double get _totalCredit {
     if (_je != null) {
-      return _jeLines.fold(0.0,
-          (t, l) => t + (double.tryParse('${l['credit'] ?? 0}') ?? 0));
+      return _jeLines.fold(0.0, (t, l) => t + _lineCredit(l));
     }
     return _lines.fold(0.0, (t, l) => t + l.credit);
   }
@@ -1478,8 +1485,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         final acc = _accounts.firstWhere(
             (a) => a['id'] == l['account_id'],
             orElse: () => {});
-        final debit = double.tryParse('${l['debit'] ?? 0}') ?? 0;
-        final credit = double.tryParse('${l['credit'] ?? 0}') ?? 0;
+        final debit = _lineDebit(l);
+        final credit = _lineCredit(l);
         return Container(
           padding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
