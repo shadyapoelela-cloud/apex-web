@@ -546,25 +546,30 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           tooltip: 'حفظ كمسودة',
         ),
         const SizedBox(width: 8),
-        FilledButton.icon(
-          onPressed: (_submitting || !_balanced)
-              ? null
-              : () => _submit(autoPost: true),
-          icon: _submitting
-              ? const SizedBox(
+        _submitting
+            ? FilledButton.icon(
+                onPressed: null,
+                icon: const SizedBox(
                   width: 14,
                   height: 14,
-                  child:
-                      CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
-                )
-              : const Icon(Icons.rocket_launch_rounded, size: 16),
-          style: FilledButton.styleFrom(
-            backgroundColor: _balanced ? _gold : _navy3,
-            foregroundColor:
-                _balanced ? core_theme.AC.btnFg : _td,
-          ),
-          label: Text(_submitting ? 'جاري الحفظ...' : 'حفظ + ترحيل'),
-        ),
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Colors.black),
+                ),
+                style: FilledButton.styleFrom(
+                  backgroundColor: _balanced ? _gold : _navy3,
+                  foregroundColor: _balanced ? core_theme.AC.btnFg : _td,
+                ),
+                label: const Text('جاري الحفظ...'),
+              )
+            : FilledButton(
+                onPressed:
+                    !_balanced ? null : () => _submit(autoPost: true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: _balanced ? _gold : _navy3,
+                  foregroundColor: _balanced ? core_theme.AC.btnFg : _td,
+                ),
+                child: const Text('ترحيل'),
+              ),
       ];
     }
     // VIEW mode — based on status
