@@ -479,7 +479,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     }
 
     final status = (_je?['status'] as String?) ?? 'draft';
-    final stageInfo = _stageInfo(status);
 
     return ObjectPageTemplate(
       titleAr: _je != null
@@ -488,11 +487,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       subtitleAr: _je != null
           ? '${_kindLabel(_je!['kind'] as String? ?? 'manual')} · ${_fmt(_totalDebit)} ر.س · ${_balanced ? "متوازن" : "غير متوازن"}'
           : 'وضع الإنشاء · ${_accounts.length} حساب · ${_balanced ? "متوازن" : "غير متوازن"}',
-      statusLabelAr: _statusLabel(status),
-      statusColor: stageInfo.color,
-      // Stepper (4-stage) and smart-buttons strip removed — they took ~200px
-      // for info already conveyed via the status pill + summary card +
-      // new timeline section in the overview tab.
+      // Status pill removed — the chevron status flow above the lines
+      // table now carries this info.
       tabsAtTop: true,
       hideTabsBar: true,
       primaryActions: _buildPrimaryActions(status),
@@ -506,23 +502,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       ],
       onBack: () => Navigator.of(context).maybePop(),
     );
-  }
-
-  ({int index, Color color}) _stageInfo(String status) {
-    switch (status) {
-      case 'draft':
-        return (index: 0, color: _td);
-      case 'submitted':
-        return (index: 1, color: _warn);
-      case 'approved':
-        return (index: 2, color: _gold);
-      case 'posted':
-        return (index: 3, color: _ok);
-      case 'reversed':
-        return (index: 3, color: _err);
-      default:
-        return (index: 0, color: _td);
-    }
   }
 
   String _statusLabel(String s) => const {
