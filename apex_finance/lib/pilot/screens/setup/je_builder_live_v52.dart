@@ -526,22 +526,23 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // ─────────────────────────────────────────────────────────────────
   List<Widget> _buildPrimaryActions(String status) {
     if (_je == null) {
-      // CREATE mode
+      // CREATE mode — keep all toolbar icons visually consistent: same
+      // 36×36 footprint, same rounded-rect, same subtle hover state.
       return [
         _aiReadDocButton(),
-        const SizedBox(width: 8),
-        IconButton(
-          onPressed: _submitting ? null : () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.replay_rounded, size: 20),
-          color: _ts,
-          tooltip: 'إلغاء (إهمال)',
-        ),
-        const SizedBox(width: 8),
-        IconButton(
-          onPressed: _submitting ? null : () => _submit(autoPost: false),
-          icon: const Icon(Icons.save_outlined, size: 20),
-          color: _tp,
+        const SizedBox(width: 6),
+        _toolbarIconButton(
+          icon: Icons.save_outlined,
           tooltip: 'حفظ كمسودة',
+          onPressed:
+              _submitting ? null : () => _submit(autoPost: false),
+        ),
+        const SizedBox(width: 6),
+        _toolbarIconButton(
+          icon: Icons.replay_rounded,
+          tooltip: 'إلغاء (إهمال)',
+          onPressed:
+              _submitting ? null : () => Navigator.of(context).pop(),
         ),
       ];
     }
@@ -757,6 +758,31 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // Generic toolbar icon — 36×36 rounded-rect, neutral muted icon
+  // color, subtle hover. Use for save / undo / cancel etc. so all
+  // top-bar icons share one footprint with the AI button.
+  Widget _toolbarIconButton({
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback? onPressed,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: IconButton(
+        style: IconButton.styleFrom(
+          foregroundColor: _tp,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.all(8),
+          minimumSize: const Size(36, 36),
+        ),
+        onPressed: onPressed,
+        icon: Icon(icon, size: 18),
       ),
     );
   }
@@ -1579,13 +1605,10 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           flex: 3,
           child: InkWell(
             onTap: () => _pickAccount(i),
+            borderRadius: BorderRadius.circular(4),
+            hoverColor: _navy3.withValues(alpha: 0.25),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: _bdr),
-              ),
               child: Row(children: [
                 Icon(
                   acc.isEmpty
@@ -1594,7 +1617,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                           : Icons.search_rounded)
                       : Icons.check_circle_rounded,
                   color: acc.isEmpty
-                      ? (l.aiHint.isNotEmpty ? _warn : _gold)
+                      ? (l.aiHint.isNotEmpty ? _warn : _td.withValues(alpha: 0.5))
                       : _ok,
                   size: 12,
                 ),
@@ -1684,13 +1707,10 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                 isDense: true,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(4),
-                  borderSide: BorderSide(color: _bdr),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(4),
-                  borderSide: BorderSide(color: _bdr),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: _navy, width: 1.5),
                 ),
               ),
               items: const [
@@ -1719,25 +1739,25 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               });
             },
             style: TextStyle(
-                color: _ok,
+                color: l.debit > 0 ? _ok : _td,
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
                 fontFamily: 'monospace'),
             decoration: InputDecoration(
               isDense: true,
-              filled: true,
-              fillColor: l.debit > 0
-                  ? _ok.withValues(alpha: 0.08)
-                  : Colors.white,
+              hintText: '0.00',
+              hintStyle: TextStyle(
+                  color: _td.withValues(alpha: 0.4),
+                  fontSize: 12,
+                  fontFamily: 'monospace'),
+              filled: l.debit > 0,
+              fillColor: _ok.withValues(alpha: 0.08),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: BorderSide(color: _bdr),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: BorderSide(color: _bdr),
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: _ok, width: 1.5),
               ),
             ),
             textAlign: TextAlign.end,
@@ -1761,25 +1781,25 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               });
             },
             style: TextStyle(
-                color: _gold,
+                color: l.credit > 0 ? _gold : _td,
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
                 fontFamily: 'monospace'),
             decoration: InputDecoration(
               isDense: true,
-              filled: true,
-              fillColor: l.credit > 0
-                  ? _gold.withValues(alpha: 0.08)
-                  : Colors.white,
+              hintText: '0.00',
+              hintStyle: TextStyle(
+                  color: _td.withValues(alpha: 0.4),
+                  fontSize: 12,
+                  fontFamily: 'monospace'),
+              filled: l.credit > 0,
+              fillColor: _gold.withValues(alpha: 0.08),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: BorderSide(color: _bdr),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: BorderSide(color: _bdr),
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: _gold, width: 1.5),
               ),
             ),
             textAlign: TextAlign.end,
