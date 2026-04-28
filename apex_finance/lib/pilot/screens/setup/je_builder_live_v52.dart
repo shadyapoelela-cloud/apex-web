@@ -1320,48 +1320,26 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: _navy3.withValues(alpha: 0.4),
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(7)),
+          border: Border(
+              bottom: BorderSide(color: _bdr.withValues(alpha: 0.6))),
         ),
         child: Row(children: [
           SizedBox(
               width: 30,
               child: Text('#',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: _td))),
+                  style: _colHeaderStyle, textAlign: TextAlign.center)),
           Expanded(
-              flex: 3,
-              child: Text('الحساب',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: _td))),
+              flex: 3, child: Text('الحساب', style: _colHeaderStyle)),
           Expanded(
-              flex: 3,
-              child: Text('البيان',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: _td))),
+              flex: 3, child: Text('البيان', style: _colHeaderStyle)),
           SizedBox(
               width: 110,
               child: Text('مدين',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: _td),
-                  textAlign: TextAlign.end)),
+                  style: _colHeaderStyle, textAlign: TextAlign.end)),
           SizedBox(
               width: 110,
               child: Text('دائن',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: _td),
-                  textAlign: TextAlign.end)),
+                  style: _colHeaderStyle, textAlign: TextAlign.end)),
         ]),
       ),
       ..._jeLines.asMap().entries.map((e) {
@@ -1373,13 +1351,18 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         final credit = double.tryParse('${l['credit'] ?? 0}') ?? 0;
         return Container(
           padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            border: Border(
-                top: BorderSide(color: _bdr.withValues(alpha: 0.5))),
+            color: e.key.isOdd
+                ? _navy3.withValues(alpha: 0.18)
+                : Colors.transparent,
           ),
           child: Row(children: [
-            SizedBox(width: 30, child: Text('${e.key + 1}')),
+            SizedBox(
+                width: 30,
+                child: Text('${e.key + 1}',
+                    style: TextStyle(fontSize: 11, color: _td),
+                    textAlign: TextAlign.center)),
             Expanded(
                 flex: 3,
                 child: Text(
@@ -1419,11 +1402,10 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         );
       }),
       Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          color: _navy3.withValues(alpha: 0.3),
-          borderRadius:
-              const BorderRadius.vertical(bottom: Radius.circular(7)),
+          border: Border(
+              top: BorderSide(color: _bdr.withValues(alpha: 0.6), width: 1)),
         ),
         child: Row(children: [
           Expanded(
@@ -1441,7 +1423,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               width: 110,
               child: Text(_fmt(_totalDebit),
                   style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w800,
                       color: _navy,
                       fontFamily: 'monospace'),
@@ -1450,7 +1432,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               width: 110,
               child: Text(_fmt(_totalCredit),
                   style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w800,
                       color: _navy,
                       fontFamily: 'monospace'),
@@ -1514,83 +1496,58 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     );
   }
 
+  // Header column-label style — small, muted, slight letter-spacing
+  // for a cleaner spreadsheet look without shouting navy3 fills.
+  TextStyle get _colHeaderStyle => TextStyle(
+        fontSize: 10.5,
+        fontWeight: FontWeight.w700,
+        color: _td.withValues(alpha: 0.75),
+        letterSpacing: 0.3,
+      );
+
   Widget _linesEditTableBody() {
     return Column(children: [
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: _navy3.withValues(alpha: 0.4),
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(7)),
+          border: Border(
+              bottom: BorderSide(color: _bdr.withValues(alpha: 0.6))),
         ),
         child: Row(children: [
           SizedBox(
               width: 30,
               child: Text('#',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: _td))),
+                  style: _colHeaderStyle, textAlign: TextAlign.center)),
           Expanded(
-              flex: 3,
-              child: Text('الحساب',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: _td))),
+              flex: 3, child: Text('الحساب', style: _colHeaderStyle)),
           if (_showPartner) ...[
             const SizedBox(width: 8),
             Expanded(
-                flex: 2,
-                child: Text('الشريك',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: _td))),
+                flex: 2, child: Text('الشريك', style: _colHeaderStyle)),
           ],
           Expanded(
-              flex: 3,
-              child: Text('البيان',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: _td))),
+              flex: 3, child: Text('البيان', style: _colHeaderStyle)),
           if (_showCostCenter) ...[
             const SizedBox(width: 8),
             Expanded(
                 flex: 2,
-                child: Text('التوزيع التحليلي',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: _td))),
+                child: Text('التوزيع التحليلي', style: _colHeaderStyle)),
           ],
           if (_showVat) ...[
             const SizedBox(width: 8),
             SizedBox(
                 width: 100,
-                child: Text('شبكات الضرائب',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: _td))),
+                child:
+                    Text('شبكات الضرائب', style: _colHeaderStyle)),
           ],
           SizedBox(
               width: 110,
               child: Text('مدين',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: _td),
-                  textAlign: TextAlign.end)),
+                  style: _colHeaderStyle, textAlign: TextAlign.end)),
           SizedBox(
               width: 110,
               child: Text('دائن',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: _td),
-                  textAlign: TextAlign.end)),
+                  style: _colHeaderStyle, textAlign: TextAlign.end)),
           SizedBox(width: 30, child: _columnSettingsButton()),
         ]),
       ),
@@ -1607,9 +1564,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     final acc = _accounts.firstWhere((a) => a['id'] == l.accountId,
         orElse: () => {});
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: _bdr.withValues(alpha: 0.5))),
+        color: i.isOdd
+            ? _navy3.withValues(alpha: 0.18)
+            : Colors.transparent,
       ),
       child: Row(children: [
         SizedBox(
@@ -1833,7 +1792,9 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
             tooltip: 'حذف',
-            icon: Icon(Icons.delete_outline_rounded, color: _err, size: 16),
+            icon: Icon(Icons.delete_outline_rounded,
+                color: _td.withValues(alpha: 0.55), size: 16),
+            hoverColor: Colors.transparent,
             onPressed: _lines.length > 2
                 ? () => setState(() {
                       _lines[i].dispose();
@@ -2000,10 +1961,10 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // column, balance chip on the right. Mirrors the view-mode totals row.
   Widget _totalsFooterRow() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: _navy3.withValues(alpha: 0.3),
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(7)),
+        border: Border(
+            top: BorderSide(color: _bdr.withValues(alpha: 0.6), width: 1)),
       ),
       child: Row(children: [
         Expanded(
@@ -2021,7 +1982,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             width: 110,
             child: Text(_fmt(_totalDebit),
                 style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: _navy,
                     fontFamily: 'monospace'),
@@ -2030,7 +1991,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             width: 110,
             child: Text(_fmt(_totalCredit),
                 style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: _navy,
                     fontFamily: 'monospace'),
@@ -2066,17 +2027,14 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   Widget _addLineFooterRow() {
     return InkWell(
       onTap: () => setState(() => _lines.add(_LineState())),
-      child: Container(
+      child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: _bdr.withValues(alpha: 0.5))),
-        ),
         child: Row(children: [
-          Icon(Icons.add_rounded, size: 14, color: _gold),
+          Icon(Icons.add_rounded, size: 14, color: _navy),
           const SizedBox(width: 6),
           Text('إضافة بند',
               style: TextStyle(
-                  color: _gold,
+                  color: _navy,
                   fontSize: 12,
                   fontWeight: FontWeight.w700)),
         ]),
