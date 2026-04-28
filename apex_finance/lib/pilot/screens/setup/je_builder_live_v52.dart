@@ -82,7 +82,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   String _kind = 'manual';
   bool _autoPost = true;
   bool _toCheck = false;
-  final List<_LineState> _lines = [_LineState(), _LineState()];
+  List<_LineState> _lines = [_LineState(), _LineState()];
   bool _submitting = false;
 
   // ─── Optional column visibility (Odoo-style ⚙️ toggle) ───
@@ -590,14 +590,10 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           ),
         ];
       case 'posted':
-        return [
-          OutlinedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.history_rounded, size: 16),
-            label: const Text('عكس القيد'),
-            style: OutlinedButton.styleFrom(foregroundColor: _warn),
-          ),
-        ];
+        // Posted-mode actions (تعديل + عكس القيد) now live in
+        // _postedActionBar above the entry-number card so they sit
+        // next to the data they affect rather than the global toolbar.
+        return const [];
       default:
         return const [];
     }
@@ -1429,9 +1425,12 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   }
 
   Widget _buildLinesViewTable() {
+    final status = (_je?['status'] as String?) ?? 'draft';
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       children: [
+        if (status == 'posted') _postedActionBar(),
+        if (status == 'posted') const SizedBox(height: 6),
         Align(
           alignment: AlignmentDirectional.centerEnd,
           child: _statusFlowChevrons(),
@@ -1449,6 +1448,242 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         if (_activeView == 'lines') _buildSummaryAndTimelineSection(),
       ],
     );
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // Posted-entry inline action bar — sits above everything else on
+  // the view screen so the two destructive-ish actions (تعديل + عكس
+  // القيد) live on the same horizontal band as the entry-number
+  // header. Brand colors: تعديل = navy filled (active intent),
+  // عكس القيد = warn outlined (cautionary intent). Both have a
+  // subtle scale-on-hover via _ActionPillButton.
+  // ─────────────────────────────────────────────────────────────────
+  Widget _postedActionBar() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          _ActionPillButton(
+            label: 'تعديل',
+            icon: Icons.edit_note_rounded,
+            background: _navy,
+            foreground: Colors.white,
+            onPressed: _submitting ? null : _editPostedEntry,
+          ),
+          const SizedBox(width: 8),
+          _ActionPillButton(
+            label: 'عكس القيد',
+            icon: Icons.history_rounded,
+            background: Colors.transparent,
+            foreground: _warn,
+            border: _warn.withValues(alpha: 0.5),
+            onPressed: _submitting ? null : _reversePostedEntry,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Copy the posted entry's lines into the editable _lines list and
+  // flip into create mode locally — no backend call. The original
+  // posted entry stays untouched. The user gets a fresh draft they
+  // can edit and post separately. Standard accounting practice is
+  // never to mutate posted entries; this is the safe path.
+  Future<void> _editPostedEntry() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Text('تعديل قيد مرحَّل',
+              style: TextStyle(fontWeight: FontWeight.w800)),
+          content: const Text(
+              'لا يُسمح بتعديل القيود المرحَّلة مباشرة لحماية سلامة دفتر الأستاذ.\n\n'
+              'سيتم نسخ بنود هذا القيد إلى مسودة جديدة قابلة للتعديل. القيد الأصلي سيبقى كما هو.\n\n'
+              'هل تريد المتابعة؟'),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('إلغاء')),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: _navy),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('متابعة'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (ok != true) return;
+    // Hydrate _lines from _jeLines, then reset _je so the screen
+    // re-renders in create mode with the data pre-filled.
+    final hydrated = <_LineState>[];
+    for (final l in _jeLines) {
+      final ls = _LineState();
+      ls.accountId = l['account_id'] as String?;
+      final d = _lineDebit(l);
+      final c = _lineCredit(l);
+      ls.debit = d;
+      ls.credit = c;
+      if (d > 0) ls.debitCtrl.text = _fmt(d);
+      if (c > 0) ls.creditCtrl.text = _fmt(c);
+      ls.description = (l['description_ar'] ??
+              l['description'] ??
+              '')
+          .toString();
+      ls.descCtrl.text = ls.description;
+      hydrated.add(ls);
+    }
+    final originalMemo =
+        (_je?['memo_ar'] ?? _je?['memo'] ?? '').toString();
+    final originalKind = (_je?['kind'] as String?) ?? 'manual';
+    setState(() {
+      // Dispose current edit lines (probably empty placeholders) and swap.
+      for (final l in _lines) {
+        l.dispose();
+      }
+      _lines = hydrated.isNotEmpty
+          ? hydrated
+          : [_LineState(), _LineState()];
+      _memo.text = originalMemo;
+      _kind = originalKind;
+      _je = null; // back to create mode
+      _jeLines = [];
+    });
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: _ok,
+        content: const Text(
+            'تم نسخ بنود القيد إلى مسودة جديدة — عدّل ثم اضغط ترحيل'),
+      ));
+    }
+  }
+
+  Future<void> _reversePostedEntry() async {
+    final je = _je;
+    if (je == null) return;
+    final memoCtrl = TextEditingController(
+        text: 'عكس قيد ${je['je_number'] ?? ''}');
+    DateTime date = DateTime.now();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSt) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: Row(children: [
+              Icon(Icons.history_rounded, color: _warn, size: 18),
+              const SizedBox(width: 8),
+              const Text('عكس القيد',
+                  style: TextStyle(fontWeight: FontWeight.w800)),
+            ]),
+            content: SizedBox(
+              width: 380,
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Text(
+                    'سيتم إنشاء قيد مقابل بنفس المبالغ بعكس الطرفين.',
+                    style: TextStyle(color: _td, fontSize: 12)),
+                const SizedBox(height: 14),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text('تاريخ العكس',
+                      style: _formLabelStyle),
+                ),
+                const SizedBox(height: 4),
+                InkWell(
+                  borderRadius: BorderRadius.circular(6),
+                  onTap: () async {
+                    final d = await showDatePicker(
+                      context: ctx,
+                      initialDate: date,
+                      firstDate: DateTime.now()
+                          .subtract(const Duration(days: 365)),
+                      lastDate: DateTime.now(),
+                    );
+                    if (d != null) setSt(() => date = d);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 11),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                          color: _bdr.withValues(alpha: 0.55)),
+                    ),
+                    child: Row(children: [
+                      Icon(Icons.calendar_today_rounded,
+                          color: _ts.withValues(alpha: 0.85),
+                          size: 14),
+                      const SizedBox(width: 8),
+                      Text(_formatDate(date),
+                          style: TextStyle(
+                              color: _tp,
+                              fontSize: 13,
+                              fontFamily: 'monospace')),
+                    ]),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text('سبب العكس',
+                      style: _formLabelStyle),
+                ),
+                const SizedBox(height: 4),
+                TextField(
+                  controller: memoCtrl,
+                  style: TextStyle(color: _tp, fontSize: 13),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 12),
+                    border: _formFieldBorder,
+                    enabledBorder: _formFieldBorder,
+                    focusedBorder: _formFieldFocusBorder,
+                  ),
+                ),
+              ]),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('إلغاء')),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                    backgroundColor: _warn,
+                    foregroundColor: Colors.white),
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('عكس القيد'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (ok != true) {
+      memoCtrl.dispose();
+      return;
+    }
+    setState(() => _submitting = true);
+    final resp = await _client.reverseJournalEntry(je['id'], {
+      'reversal_date': _formatDate(date),
+      'memo_ar': memoCtrl.text.trim(),
+    });
+    memoCtrl.dispose();
+    if (!mounted) return;
+    setState(() => _submitting = false);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: resp.success ? _ok : _err,
+      content: Text(resp.success
+          ? 'تم إنشاء القيد العكسي ✓'
+          : (resp.error ?? 'فشل عكس القيد')),
+    ));
+    if (resp.success && mounted) {
+      Navigator.of(context).maybePop(true);
+    }
   }
 
   Widget _linesViewTableBody() {
@@ -2593,6 +2828,111 @@ class _ChevronClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(covariant _ChevronClipper old) =>
       old.isFirst != isFirst || old.isLast != isLast;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Brand-styled action pill — used by the posted-entry inline action
+// bar (تعديل + عكس القيد). Tracks its own hover state so the surface
+// brightens slightly + the icon nudges by 2px on hover. Disabled state
+// dims the foreground and drops the cursor affordance.
+// ─────────────────────────────────────────────────────────────────────
+class _ActionPillButton extends StatefulWidget {
+  final String label;
+  final IconData icon;
+  final Color background;
+  final Color foreground;
+  final Color? border;
+  final VoidCallback? onPressed;
+
+  const _ActionPillButton({
+    required this.label,
+    required this.icon,
+    required this.background,
+    required this.foreground,
+    this.border,
+    required this.onPressed,
+  });
+
+  @override
+  State<_ActionPillButton> createState() => _ActionPillButtonState();
+}
+
+class _ActionPillButtonState extends State<_ActionPillButton> {
+  bool _hover = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = widget.onPressed != null;
+    final isFilled = widget.background != Colors.transparent;
+    final hoverBg = isFilled
+        ? Color.lerp(widget.background, Colors.black, 0.08) ??
+            widget.background
+        : widget.foreground.withValues(alpha: 0.08);
+    return MouseRegion(
+      cursor: enabled
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
+      onEnter: (_) {
+        if (enabled) setState(() => _hover = true);
+      },
+      onExit: (_) {
+        if (enabled) setState(() => _hover = false);
+      },
+      child: GestureDetector(
+        onTap: enabled ? widget.onPressed : null,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 140),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(
+              horizontal: 14, vertical: 9),
+          decoration: BoxDecoration(
+            color: !enabled
+                ? widget.background.withValues(alpha: 0.4)
+                : (_hover ? hoverBg : widget.background),
+            borderRadius: BorderRadius.circular(8),
+            border: widget.border != null
+                ? Border.all(
+                    color: _hover
+                        ? widget.foreground.withValues(alpha: 0.7)
+                        : widget.border!,
+                    width: 1.2)
+                : null,
+            boxShadow: isFilled && _hover && enabled
+                ? [
+                    BoxShadow(
+                      color: widget.background.withValues(alpha: 0.25),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedSlide(
+                duration: const Duration(milliseconds: 140),
+                offset:
+                    _hover && enabled ? const Offset(-0.08, 0) : Offset.zero,
+                child: Icon(widget.icon,
+                    color: widget.foreground.withValues(
+                        alpha: enabled ? 1 : 0.5),
+                    size: 16),
+              ),
+              const SizedBox(width: 6),
+              Text(widget.label,
+                  style: TextStyle(
+                      color: widget.foreground.withValues(
+                          alpha: enabled ? 1 : 0.5),
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────
