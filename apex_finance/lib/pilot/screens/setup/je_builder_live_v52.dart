@@ -600,11 +600,17 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // render at the bottom of the البنود tab so the full JE lives on one
   // scrollable surface.
   Widget _buildSummaryAndTimelineSection() {
+    final isCreateMode = _je == null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 18),
-        _sectionCard(title: 'السجل', child: _buildHistoryTimeline()),
+        // History timeline only carries useful info once the JE has
+        // been saved — in create mode it would just say "لم يُحفظ بعد"
+        // which the مسودة chevron already conveys. Skip the whole card.
+        if (!isCreateMode) ...[
+          const SizedBox(height: 18),
+          _sectionCard(title: 'السجل', child: _buildHistoryTimeline()),
+        ],
         if (_error != null) ...[
           const SizedBox(height: 14),
           _errorStrip(),
@@ -878,7 +884,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: _bdr),
+        border: Border.all(color: _bdr.withValues(alpha: 0.55)),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -1522,7 +1528,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           bottomLeft: Radius.circular(8),
           bottomRight: Radius.circular(8),
         ),
-        border: Border.all(color: _bdr),
+        border: Border.all(color: _bdr.withValues(alpha: 0.55)),
       ),
       padding: isOtherInfo ? const EdgeInsets.all(16) : EdgeInsets.zero,
       child: isOtherInfo
