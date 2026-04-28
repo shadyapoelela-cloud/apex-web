@@ -484,9 +484,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       titleAr: _je != null
           ? 'قيد اليومية ${_je!['je_number'] ?? ""}'
           : 'قيد اليومية',
-      subtitleAr: _je != null
-          ? '${_kindLabel(_je!['kind'] as String? ?? 'manual')} · ${_fmt(_totalDebit)} ر.س · ${_balanced ? "متوازن" : "غير متوازن"}'
-          : 'وضع الإنشاء · ${_accounts.length} حساب · ${_balanced ? "متوازن" : "غير متوازن"}',
+      subtitleAr: null,
       // Status pill removed — the chevron status flow above the lines
       // table now carries this info.
       tabsAtTop: true,
