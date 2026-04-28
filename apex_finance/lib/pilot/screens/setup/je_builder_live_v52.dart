@@ -1098,15 +1098,10 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // البيانات الأساسية title used to sit. The tab strip is rendered as
   // the heading of the first section card on every view.
   // ─────────────────────────────────────────────────────────────────
-  Widget _buildActiveViewBody() {
-    switch (_activeView) {
-      case 'other_info':
-        return _buildOtherInfoTab();
-      case 'lines':
-      default:
-        return _buildLinesTab();
-    }
-  }
+  // Top section (post button row + chevron + header form card + tabs)
+  // is always rendered the same way. Only the body container under the
+  // tabs swaps based on _activeView ('lines' vs 'other_info').
+  Widget _buildActiveViewBody() => _buildLinesTab();
 
   // ─────────────────────────────────────────────────────────────────
   // Local tabs strip — rectangular tabs with icon + label + count
@@ -1316,165 +1311,155 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           alignment: AlignmentDirectional.centerStart,
           child: _localTabsStrip(),
         ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.only(
-              topRight: Radius.circular(8),
-              bottomLeft: Radius.circular(8),
-              bottomRight: Radius.circular(8),
-            ),
-            border: Border.all(color: _bdr),
-          ),
-          child: Column(children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: _navy3.withValues(alpha: 0.4),
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(7)),
-                ),
-                child: Row(children: [
-                  SizedBox(
-                      width: 30,
-                      child: Text('#',
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: _td))),
-                  Expanded(
-                      flex: 3,
-                      child: Text('الحساب',
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: _td))),
-                  Expanded(
-                      flex: 3,
-                      child: Text('البيان',
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: _td))),
-                  SizedBox(
-                      width: 110,
-                      child: Text('مدين',
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: _td),
-                          textAlign: TextAlign.end)),
-                  SizedBox(
-                      width: 110,
-                      child: Text('دائن',
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: _td),
-                          textAlign: TextAlign.end)),
-                ]),
-              ),
-              ..._jeLines.asMap().entries.map((e) {
-                final l = e.value;
-                final acc = _accounts.firstWhere(
-                    (a) => a['id'] == l['account_id'],
-                    orElse: () => {});
-                final debit = double.tryParse('${l['debit'] ?? 0}') ?? 0;
-                final credit = double.tryParse('${l['credit'] ?? 0}') ?? 0;
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(
-                    border:
-                        Border(top: BorderSide(color: _bdr.withValues(alpha: 0.5))),
-                  ),
-                  child: Row(children: [
-                    SizedBox(width: 30, child: Text('${e.key + 1}')),
-                    Expanded(
-                        flex: 3,
-                        child: Text(
-                          acc.isEmpty
-                              ? (l['account_id'] ?? '—').toString()
-                              : '${acc['code']} — ${acc['name_ar']}',
-                          style:
-                              const TextStyle(fontFamily: 'monospace', fontSize: 12),
-                        )),
-                    Expanded(
-                        flex: 3,
-                        child: Text(
-                            (l['description'] ?? '—').toString(),
-                            style: const TextStyle(fontSize: 12))),
-                    SizedBox(
-                        width: 110,
-                        child: Text(debit > 0 ? _fmt(debit) : '—',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: debit > 0
-                                    ? FontWeight.w800
-                                    : FontWeight.w400,
-                                color: debit > 0 ? _ok : _td,
-                                fontFamily: 'monospace'),
-                            textAlign: TextAlign.end)),
-                    SizedBox(
-                        width: 110,
-                        child: Text(credit > 0 ? _fmt(credit) : '—',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: credit > 0
-                                    ? FontWeight.w800
-                                    : FontWeight.w400,
-                                color: credit > 0 ? _gold : _td,
-                                fontFamily: 'monospace'),
-                            textAlign: TextAlign.end)),
-                  ]),
-                );
-              }),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: _navy3.withValues(alpha: 0.3),
-                  borderRadius:
-                      const BorderRadius.vertical(bottom: Radius.circular(7)),
-                ),
-                child: Row(children: [
-                  Expanded(
-                    child: Row(children: [
-                      Text('الإجمالي',
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              color: _navy)),
-                      const SizedBox(width: 10),
-                      _balanceChip(),
-                    ]),
-                  ),
-                  SizedBox(
-                      width: 110,
-                      child: Text(_fmt(_totalDebit),
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              color: _navy,
-                              fontFamily: 'monospace'),
-                          textAlign: TextAlign.end)),
-                  SizedBox(
-                      width: 110,
-                      child: Text(_fmt(_totalCredit),
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              color: _navy,
-                              fontFamily: 'monospace'),
-                          textAlign: TextAlign.end)),
-                ]),
-              ),
-            ]),
-          ),
-        _buildSummaryAndTimelineSection(),
+        _buildBodyContainer(isCreate: false),
+        if (_activeView == 'lines') _buildSummaryAndTimelineSection(),
       ],
     );
+  }
+
+  Widget _linesViewTableBody() {
+    return Column(children: [
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: _navy3.withValues(alpha: 0.4),
+          borderRadius:
+              const BorderRadius.vertical(top: Radius.circular(7)),
+        ),
+        child: Row(children: [
+          SizedBox(
+              width: 30,
+              child: Text('#',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: _td))),
+          Expanded(
+              flex: 3,
+              child: Text('الحساب',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: _td))),
+          Expanded(
+              flex: 3,
+              child: Text('البيان',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: _td))),
+          SizedBox(
+              width: 110,
+              child: Text('مدين',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: _td),
+                  textAlign: TextAlign.end)),
+          SizedBox(
+              width: 110,
+              child: Text('دائن',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: _td),
+                  textAlign: TextAlign.end)),
+        ]),
+      ),
+      ..._jeLines.asMap().entries.map((e) {
+        final l = e.value;
+        final acc = _accounts.firstWhere(
+            (a) => a['id'] == l['account_id'],
+            orElse: () => {});
+        final debit = double.tryParse('${l['debit'] ?? 0}') ?? 0;
+        final credit = double.tryParse('${l['credit'] ?? 0}') ?? 0;
+        return Container(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            border: Border(
+                top: BorderSide(color: _bdr.withValues(alpha: 0.5))),
+          ),
+          child: Row(children: [
+            SizedBox(width: 30, child: Text('${e.key + 1}')),
+            Expanded(
+                flex: 3,
+                child: Text(
+                  acc.isEmpty
+                      ? (l['account_id'] ?? '—').toString()
+                      : '${acc['code']} — ${acc['name_ar']}',
+                  style: const TextStyle(
+                      fontFamily: 'monospace', fontSize: 12),
+                )),
+            Expanded(
+                flex: 3,
+                child: Text((l['description'] ?? '—').toString(),
+                    style: const TextStyle(fontSize: 12))),
+            SizedBox(
+                width: 110,
+                child: Text(debit > 0 ? _fmt(debit) : '—',
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: debit > 0
+                            ? FontWeight.w800
+                            : FontWeight.w400,
+                        color: debit > 0 ? _ok : _td,
+                        fontFamily: 'monospace'),
+                    textAlign: TextAlign.end)),
+            SizedBox(
+                width: 110,
+                child: Text(credit > 0 ? _fmt(credit) : '—',
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: credit > 0
+                            ? FontWeight.w800
+                            : FontWeight.w400,
+                        color: credit > 0 ? _gold : _td,
+                        fontFamily: 'monospace'),
+                    textAlign: TextAlign.end)),
+          ]),
+        );
+      }),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: _navy3.withValues(alpha: 0.3),
+          borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(7)),
+        ),
+        child: Row(children: [
+          Expanded(
+            child: Row(children: [
+              Text('الإجمالي',
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: _navy)),
+              const SizedBox(width: 10),
+              _balanceChip(),
+            ]),
+          ),
+          SizedBox(
+              width: 110,
+              child: Text(_fmt(_totalDebit),
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: _navy,
+                      fontFamily: 'monospace'),
+                  textAlign: TextAlign.end)),
+          SizedBox(
+              width: 110,
+              child: Text(_fmt(_totalCredit),
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: _navy,
+                      fontFamily: 'monospace'),
+                  textAlign: TextAlign.end)),
+        ]),
+      ),
+    ]);
   }
 
   Widget _buildLinesEditTable() {
@@ -1500,107 +1485,124 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           alignment: AlignmentDirectional.centerStart,
           child: _localTabsStrip(),
         ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.only(
-              topRight: Radius.circular(8),
-              bottomLeft: Radius.circular(8),
-              bottomRight: Radius.circular(8),
-            ),
-            border: Border.all(color: _bdr),
-          ),
-          child: Column(children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: _navy3.withValues(alpha: 0.4),
-                    borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(7)),
-                  ),
-                  child: Row(children: [
-                    SizedBox(
-                        width: 30,
-                        child: Text('#',
-                            style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                color: _td))),
-                    Expanded(
-                        flex: 3,
-                        child: Text('الحساب',
-                            style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                color: _td))),
-                    if (_showPartner) ...[
-                      const SizedBox(width: 8),
-                      Expanded(
-                          flex: 2,
-                          child: Text('الشريك',
-                              style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  color: _td))),
-                    ],
-                    Expanded(
-                        flex: 3,
-                        child: Text('البيان',
-                            style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                color: _td))),
-                    if (_showCostCenter) ...[
-                      const SizedBox(width: 8),
-                      Expanded(
-                          flex: 2,
-                          child: Text('التوزيع التحليلي',
-                              style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  color: _td))),
-                    ],
-                    if (_showVat) ...[
-                      const SizedBox(width: 8),
-                      SizedBox(
-                          width: 100,
-                          child: Text('شبكات الضرائب',
-                              style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  color: _td))),
-                    ],
-                    SizedBox(
-                        width: 110,
-                        child: Text('مدين',
-                            style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                color: _td),
-                            textAlign: TextAlign.end)),
-                    SizedBox(
-                        width: 110,
-                        child: Text('دائن',
-                            style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                color: _td),
-                            textAlign: TextAlign.end)),
-                    SizedBox(width: 30, child: _columnSettingsButton()),
-                  ]),
-                ),
-                ..._lines
-                    .asMap()
-                    .entries
-                    .map((e) => _lineEditRow(e.key, e.value)),
-                _addLineFooterRow(),
-                _totalsFooterRow(),
-              ]),
-        ),
-        _buildSummaryAndTimelineSection(),
+        _buildBodyContainer(isCreate: true),
+        if (_activeView == 'lines') _buildSummaryAndTimelineSection(),
       ],
     );
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // Body container — sits under the local tabs and swaps content
+  // between البنود (lines table) and معلومات أخرى (autopost +
+  // internal-note form). Top-left corner stays square so the active
+  // tab attaches; the other three corners are rounded.
+  // ─────────────────────────────────────────────────────────────────
+  Widget _buildBodyContainer({required bool isCreate}) {
+    final isOtherInfo = _activeView == 'other_info';
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
+        border: Border.all(color: _bdr),
+      ),
+      padding: isOtherInfo ? const EdgeInsets.all(16) : EdgeInsets.zero,
+      child: isOtherInfo
+          ? _otherInfoBody(isCreate: isCreate)
+          : (isCreate ? _linesEditTableBody() : _linesViewTableBody()),
+    );
+  }
+
+  Widget _linesEditTableBody() {
+    return Column(children: [
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: _navy3.withValues(alpha: 0.4),
+          borderRadius:
+              const BorderRadius.vertical(top: Radius.circular(7)),
+        ),
+        child: Row(children: [
+          SizedBox(
+              width: 30,
+              child: Text('#',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: _td))),
+          Expanded(
+              flex: 3,
+              child: Text('الحساب',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: _td))),
+          if (_showPartner) ...[
+            const SizedBox(width: 8),
+            Expanded(
+                flex: 2,
+                child: Text('الشريك',
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: _td))),
+          ],
+          Expanded(
+              flex: 3,
+              child: Text('البيان',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: _td))),
+          if (_showCostCenter) ...[
+            const SizedBox(width: 8),
+            Expanded(
+                flex: 2,
+                child: Text('التوزيع التحليلي',
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: _td))),
+          ],
+          if (_showVat) ...[
+            const SizedBox(width: 8),
+            SizedBox(
+                width: 100,
+                child: Text('شبكات الضرائب',
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: _td))),
+          ],
+          SizedBox(
+              width: 110,
+              child: Text('مدين',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: _td),
+                  textAlign: TextAlign.end)),
+          SizedBox(
+              width: 110,
+              child: Text('دائن',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: _td),
+                  textAlign: TextAlign.end)),
+          SizedBox(width: 30, child: _columnSettingsButton()),
+        ]),
+      ),
+      ..._lines
+          .asMap()
+          .entries
+          .map((e) => _lineEditRow(e.key, e.value)),
+      _addLineFooterRow(),
+      _totalsFooterRow(),
+    ]);
   }
 
   Widget _lineEditRow(int i, _LineState l) {
@@ -1932,90 +1934,60 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // Auto-post toggle, To-check flag, internal note. Read-only when
   // viewing an existing entry; editable in create mode.
   // ─────────────────────────────────────────────────────────────────
-  Widget _buildOtherInfoTab() {
-    final isCreateMode = _je == null;
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+  Widget _otherInfoBody({required bool isCreate}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: _localTabsStrip(),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text('الترحيل التلقائي',
+              style: TextStyle(
+                  color: _tp, fontSize: 13, fontWeight: FontWeight.w700)),
+          subtitle: Text(
+              'عند الحفظ، يتم ترحيل القيد مباشرة إلى GL Postings.',
+              style: TextStyle(color: _ts, fontSize: 11)),
+          value: _autoPost,
+          activeColor: _gold,
+          onChanged:
+              isCreate ? (v) => setState(() => _autoPost = v) : null,
         ),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.only(
-              topRight: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10),
+        Divider(color: _bdr.withValues(alpha: 0.5)),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text('للتحقق منه',
+              style: TextStyle(
+                  color: _tp, fontSize: 13, fontWeight: FontWeight.w700)),
+          subtitle: Text(
+              'تمييز القيد لمراجعة لاحقة قبل الترحيل.',
+              style: TextStyle(color: _ts, fontSize: 11)),
+          value: _toCheck,
+          activeColor: _warn,
+          onChanged:
+              isCreate ? (v) => setState(() => _toCheck = v) : null,
+        ),
+        Divider(color: _bdr.withValues(alpha: 0.5)),
+        const SizedBox(height: 12),
+        Text('ملاحظة داخلية',
+            style: TextStyle(
+                color: _td, fontSize: 12, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 6),
+        TextField(
+          controller: _internalNote,
+          enabled: isCreate,
+          maxLines: 4,
+          style: TextStyle(color: _tp, fontSize: 12),
+          decoration: InputDecoration(
+            hintText: 'ملاحظة لا تظهر للعميل — للسجل الداخلي فقط…',
+            hintStyle: TextStyle(color: _td, fontSize: 11),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide(color: _bdr),
             ),
-            border: Border.all(color: _bdr),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text('الترحيل التلقائي',
-                    style: TextStyle(
-                        color: _tp,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700)),
-                subtitle: Text(
-                    'عند الحفظ، يتم ترحيل القيد مباشرة إلى GL Postings.',
-                    style: TextStyle(color: _ts, fontSize: 11)),
-                value: _autoPost,
-                activeColor: _gold,
-                onChanged: isCreateMode
-                    ? (v) => setState(() => _autoPost = v)
-                    : null,
-              ),
-              Divider(color: _bdr.withValues(alpha: 0.5)),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text('للتحقق منه',
-                    style: TextStyle(
-                        color: _tp,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700)),
-                subtitle: Text(
-                    'تمييز القيد لمراجعة لاحقة قبل الترحيل.',
-                    style: TextStyle(color: _ts, fontSize: 11)),
-                value: _toCheck,
-                activeColor: _warn,
-                onChanged: isCreateMode
-                    ? (v) => setState(() => _toCheck = v)
-                    : null,
-              ),
-              Divider(color: _bdr.withValues(alpha: 0.5)),
-              const SizedBox(height: 12),
-              Text('ملاحظة داخلية',
-                  style: TextStyle(
-                      color: _td,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700)),
-              const SizedBox(height: 6),
-              TextField(
-                controller: _internalNote,
-                enabled: isCreateMode,
-                maxLines: 4,
-                style: TextStyle(color: _tp, fontSize: 12),
-                decoration: InputDecoration(
-                  hintText: 'ملاحظة لا تظهر للعميل — للسجل الداخلي فقط…',
-                  hintStyle: TextStyle(color: _td, fontSize: 11),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    borderSide: BorderSide(color: _bdr),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    borderSide: BorderSide(color: _bdr),
-                  ),
-                  contentPadding: const EdgeInsets.all(10),
-                ),
-              ),
-            ],
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide(color: _bdr),
+            ),
+            contentPadding: const EdgeInsets.all(10),
           ),
         ),
       ],
