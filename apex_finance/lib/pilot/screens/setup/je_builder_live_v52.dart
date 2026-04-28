@@ -2076,7 +2076,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         child: Row(children: [
           Icon(Icons.add_rounded, size: 14, color: _gold),
           const SizedBox(width: 6),
-          Text('إضافة سطر',
+          Text('إضافة بند',
               style: TextStyle(
                   color: _gold,
                   fontSize: 12,
