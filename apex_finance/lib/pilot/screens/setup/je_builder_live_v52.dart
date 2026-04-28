@@ -806,32 +806,30 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
 
   // ─── AI quick bar (create mode only) ───
   // Violet AI document-read button — lives in the top action bar.
+  // Icon-only: AI sparkle icon on a violet circular background.
   Widget _aiReadDocButton() {
     final hasDoc = _aiDocFilename != null;
     final tooltip = hasDoc
-        ? 'قُرئ من: $_aiDocFilename · ثقة ${((_aiDocConfidence ?? 0) * 100).toStringAsFixed(0)}%'
-        : 'ارفع فاتورة / إيصال / PDF — Claude يستخرج الحقول والسطور تلقائياً';
+        ? 'قُرئ من: $_aiDocFilename · ثقة ${((_aiDocConfidence ?? 0) * 100).toStringAsFixed(0)}% — اضغط لإعادة القراءة'
+        : 'قراءة مستند بالذكاء الاصطناعي — ارفع فاتورة / إيصال / PDF';
     return Tooltip(
       message: tooltip,
-      child: FilledButton.icon(
-        style: FilledButton.styleFrom(
+      child: IconButton(
+        style: IconButton.styleFrom(
           backgroundColor: _purple,
           foregroundColor: Colors.white,
+          shape: const CircleBorder(),
+          padding: const EdgeInsets.all(10),
         ),
         onPressed: _aiDocLoading ? null : _aiReadDocument,
         icon: _aiDocLoading
             ? const SizedBox(
-                width: 14,
-                height: 14,
+                width: 18,
+                height: 18,
                 child: CircularProgressIndicator(
                     strokeWidth: 2, color: Colors.white),
               )
-            : Icon(
-                hasDoc ? Icons.refresh_rounded : Icons.upload_file_rounded,
-                size: 16),
-        label: Text(_aiDocLoading
-            ? 'جاري...'
-            : (hasDoc ? 'إعادة القراءة' : 'قراءة مستند')),
+            : const Icon(Icons.auto_awesome_rounded, size: 20),
       ),
     );
   }
