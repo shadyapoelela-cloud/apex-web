@@ -1930,7 +1930,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         final detail =
             _accounts.where((a) => a['type'] == 'detail');
         final q = text.text.trim().toLowerCase();
-        if (q.isEmpty) return detail.take(30);
+        if (q.isEmpty) return detail.take(20);
         return detail.where((a) {
           final code = (a['code'] ?? '').toString().toLowerCase();
           final name = (a['name_ar'] ?? '').toString().toLowerCase();
@@ -2007,8 +2007,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             borderRadius: BorderRadius.circular(8),
             color: Colors.white,
             child: Container(
-              width: 360,
-              constraints: const BoxConstraints(maxHeight: 320),
+              width: 320,
+              // Tighter ceiling so the dropdown fits within the
+              // body container even on smaller viewports — 6 rows
+              // of 32px + a 12px buffer.
+              constraints: const BoxConstraints(maxHeight: 220),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
@@ -2017,11 +2020,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               ),
               child: list.isEmpty
                   ? Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(12),
                       child: Text('لا توجد نتائج',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              color: _td, fontSize: 12)),
+                              color: _td, fontSize: 11)),
                     )
                   : ListView.separated(
                       padding: EdgeInsets.zero,
@@ -2029,7 +2032,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                       itemCount: list.length,
                       separatorBuilder: (_, __) => Divider(
                           height: 1,
-                          color: _bdr.withValues(alpha: 0.3)),
+                          color: _bdr.withValues(alpha: 0.25)),
                       itemBuilder: (ctx, idx) {
                         final a = list[idx];
                         return InkWell(
@@ -2038,22 +2041,22 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                               _navy3.withValues(alpha: 0.22),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 8),
+                                horizontal: 10, vertical: 5),
                             child: Row(children: [
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 2),
+                                    horizontal: 5, vertical: 1),
                                 decoration: BoxDecoration(
                                   color:
                                       _navy.withValues(alpha: 0.08),
                                   borderRadius:
-                                      BorderRadius.circular(4),
+                                      BorderRadius.circular(3),
                                 ),
                                 child: Text(a['code'] ?? '',
                                     style: TextStyle(
                                         color: _navy,
                                         fontFamily: 'monospace',
-                                        fontSize: 10,
+                                        fontSize: 9.5,
                                         fontWeight:
                                             FontWeight.w800)),
                               ),
@@ -2061,7 +2064,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                               Expanded(
                                 child: Text(a['name_ar'] ?? '',
                                     style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 11.5,
                                         color: _tp,
                                         fontWeight:
                                             FontWeight.w600),
@@ -2073,8 +2076,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                                   '${a['category']} · ${a['normal_balance']}',
                                   style: TextStyle(
                                       color: _td.withValues(
-                                          alpha: 0.6),
-                                      fontSize: 9,
+                                          alpha: 0.55),
+                                      fontSize: 8.5,
                                       letterSpacing: 0.2)),
                             ]),
                           ),
