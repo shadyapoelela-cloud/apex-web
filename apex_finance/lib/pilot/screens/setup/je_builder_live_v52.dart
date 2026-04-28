@@ -1206,9 +1206,9 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // Odoo-style chevron status flow — sits above the lines table on the
-  // LEFT (RTL end), opposite the ترحيل button which lives on the right.
-  // Auto-post mode skips the approval steps.
+  // Odoo-style chevron status flow — sits at the top of the lines tab
+  // on the LEFT (RTL end), opposite the ترحيل button which lives on
+  // the right of the same row. Auto-post mode skips the approval steps.
   // ─────────────────────────────────────────────────────────────────
   Widget _statusFlowChevrons() {
     final isCreate = _je == null;
@@ -1278,6 +1278,11 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
+        Align(
+          alignment: AlignmentDirectional.centerEnd,
+          child: _statusFlowChevrons(),
+        ),
+        const SizedBox(height: 12),
         _sectionCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1289,11 +1294,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           ),
         ),
         const SizedBox(height: 18),
-        Align(
-          alignment: AlignmentDirectional.centerEnd,
-          child: _statusFlowChevrons(),
-        ),
-        const SizedBox(height: 10),
         _sectionCard(
           title: 'بنود القيد',
           child: Container(
@@ -1459,9 +1459,13 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       children: [
         if (_aiWarnings.isNotEmpty) _aiWarningsStrip(),
         if (_aiWarnings.isNotEmpty) const SizedBox(height: 18),
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: _postButton(),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _postButton(),
+            const Spacer(),
+            _statusFlowChevrons(),
+          ],
         ),
         const SizedBox(height: 12),
         _sectionCard(
@@ -1475,11 +1479,6 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           ),
         ),
         const SizedBox(height: 18),
-        Align(
-          alignment: AlignmentDirectional.centerEnd,
-          child: _statusFlowChevrons(),
-        ),
-        const SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
