@@ -762,8 +762,9 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   }
 
   // ─── AI quick bar (create mode only) ───
-  // Violet AI document-read button — lives in the top action bar.
-  // Icon-only: AI sparkle icon on a violet circular background.
+  // AI document-read button — sized to match the surrounding toolbar
+  // icons (⋮ / save / undo). Ghost style with a subtle purple tint
+  // so it reads as an action-with-AI without shouting.
   Widget _aiReadDocButton() {
     final hasDoc = _aiDocFilename != null;
     final tooltip = hasDoc
@@ -773,20 +774,24 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       message: tooltip,
       child: IconButton(
         style: IconButton.styleFrom(
-          backgroundColor: _purple,
-          foregroundColor: Colors.white,
-          shape: const CircleBorder(),
-          padding: const EdgeInsets.all(10),
+          backgroundColor: _purple.withValues(alpha: 0.10),
+          foregroundColor: _purple,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.all(8),
+          minimumSize: const Size(36, 36),
         ),
         onPressed: _aiDocLoading ? null : _aiReadDocument,
         icon: _aiDocLoading
-            ? const SizedBox(
-                width: 18,
-                height: 18,
+            ? SizedBox(
+                width: 16,
+                height: 16,
                 child: CircularProgressIndicator(
-                    strokeWidth: 2, color: Colors.white),
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation(_purple)),
               )
-            : const Icon(Icons.auto_awesome_rounded, size: 20),
+            : const Icon(Icons.auto_awesome_rounded, size: 18),
       ),
     );
   }
@@ -1014,15 +1019,9 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               child: InkWell(
                 onTap: _aiMemoLoading ? null : _aiSuggestMemo,
                 borderRadius: BorderRadius.circular(6),
-                child: Container(
-                  margin: const EdgeInsets.all(5),
+                child: Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: _purple.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: _purple.withValues(alpha: 0.4)),
-                  ),
+                      horizontal: 8, vertical: 6),
                   child: _aiMemoLoading
                       ? SizedBox(
                           width: 14,
@@ -1040,7 +1039,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                               style: TextStyle(
                                   color: _purple,
                                   fontSize: 11,
-                                  fontWeight: FontWeight.w800)),
+                                  fontWeight: FontWeight.w700)),
                         ]),
                 ),
               ),
@@ -1899,6 +1898,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       children: [
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
+          dense: true,
           title: Text('الترحيل التلقائي',
               style: TextStyle(
                   color: _tp, fontSize: 13, fontWeight: FontWeight.w700)),
@@ -1910,9 +1910,10 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           onChanged:
               isCreate ? (v) => setState(() => _autoPost = v) : null,
         ),
-        Divider(color: _bdr.withValues(alpha: 0.5)),
+        Divider(color: _bdr.withValues(alpha: 0.35), height: 1),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
+          dense: true,
           title: Text('للتحقق منه',
               style: TextStyle(
                   color: _tp, fontSize: 13, fontWeight: FontWeight.w700)),
@@ -1920,20 +1921,20 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               'تمييز القيد لمراجعة لاحقة قبل الترحيل.',
               style: TextStyle(color: _ts, fontSize: 11)),
           value: _toCheck,
-          activeColor: _warn,
+          activeColor: _navy,
           onChanged:
               isCreate ? (v) => setState(() => _toCheck = v) : null,
         ),
-        Divider(color: _bdr.withValues(alpha: 0.5)),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         Text('ملاحظة داخلية',
             style: TextStyle(
-                color: _td, fontSize: 12, fontWeight: FontWeight.w700)),
+                color: _td, fontSize: 11, fontWeight: FontWeight.w700)),
         const SizedBox(height: 6),
         TextField(
           controller: _internalNote,
           enabled: isCreate,
-          maxLines: 4,
+          minLines: 2,
+          maxLines: 6,
           style: TextStyle(color: _tp, fontSize: 12),
           decoration: InputDecoration(
             hintText: 'ملاحظة لا تظهر للعميل — للسجل الداخلي فقط…',
