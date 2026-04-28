@@ -121,6 +121,27 @@ List<RouteBase> v5Routes() => [
           );
         },
       ),
+      // JE view/edit — same builder as create, but pre-loaded with the
+      // entry data via jeId. Replaces the legacy modal _JeDetailDialog
+      // that the list screen used to pop up on row click.
+      GoRoute(
+        path: '/app/erp/finance/je-builder/:id',
+        builder: (ctx, state) {
+          final svc = v5ServiceById('erp');
+          final main = svc?.mainModuleById('finance');
+          final chip = main?.chipById('je-builder');
+          if (svc == null || main == null || chip == null) {
+            return const _V5NotFound();
+          }
+          return ApexV5ServiceShell(
+            service: svc,
+            mainModule: main,
+            activeChip: chip,
+            bodyOverride: JeBuilderLiveV52Screen(
+                jeId: state.pathParameters['id']),
+          );
+        },
+      ),
       GoRoute(
         path: '/workspace/:id',
         builder: (ctx, state) {

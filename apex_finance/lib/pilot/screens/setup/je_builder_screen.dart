@@ -501,13 +501,12 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
   }
 
   Future<void> _showDetail(String id) async {
-    final r = await _client.getJournalEntry(id);
-    if (!r.success || !mounted) return;
-    await showDialog(
-      context: context,
-      builder: (_) => _JeDetailDialog(
-          data: Map<String, dynamic>.from(r.data), accounts: _accounts),
-    );
+    // Used to open the legacy _JeDetailDialog modal. Now navigates to
+    // the v5.2 live builder so clicking a row opens the same screen
+    // used for create/edit, with the entry preloaded via jeId.
+    final saved = await context.push<bool>(
+        '/app/erp/finance/je-builder/$id');
+    if (saved == true && mounted) _load();
   }
 
   @override
