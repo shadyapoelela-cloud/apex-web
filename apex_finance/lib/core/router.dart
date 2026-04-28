@@ -66,7 +66,8 @@ import '../screens/home/apex_launchpad_screen.dart';
 import '../screens/home/apex_service_hub_screen.dart';
 import '../screens/home/apex_services_screen.dart';
 import '../screens/operations/customer_360_screen.dart';
-import '../screens/compliance/journal_entry_detail_screen.dart' as je_detail_v2;
+import '../pilot/screens/setup/je_builder_live_v52.dart'
+    as je_builder_live_v52;
 import '../screens/audit/audit_engagement_workspace_screen.dart';
 import '../screens/operations/vendor_360_screen.dart';
 import '../screens/operations/receipt_capture_screen.dart';
@@ -716,10 +717,16 @@ final appRouter = GoRouter(
     GoRoute(path: '/compliance/kyc-aml', pageBuilder: (c, s) => _apexPage(const KycAmlScreen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
+    // Redirect the legacy JE-detail route into the new v5.2 live
+    // builder so clicking a row in قيود اليومية opens the same
+    // screen used for create — same visual identity, same balance
+    // assistant, same chevron status flow — pre-loaded with the
+    // entry data via the jeId parameter.
     GoRoute(
       path: '/compliance/journal-entry/:id',
       pageBuilder: (c, s) => _apexPage(
-        je_detail_v2.JournalEntryDetailScreen(jeId: s.pathParameters['id']!),
+        je_builder_live_v52.JeBuilderLiveV52Screen(
+            jeId: s.pathParameters['id']!),
         s,
       ),
     ),
