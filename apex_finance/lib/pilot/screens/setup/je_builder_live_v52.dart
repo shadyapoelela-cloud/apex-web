@@ -1252,33 +1252,36 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
         final isCurrent = i == currentIdx;
         final isFirst = i == 0;
         final isLast = i == steps.length - 1;
-        final bg = isCurrent
-            ? Colors.white
-            : (isPassed
-                ? _navy.withValues(alpha: 0.06)
-                : _navy3.withValues(alpha: 0.25));
-        final fg = isCurrent
-            ? _navy
-            : (isPassed ? _navy.withValues(alpha: 0.7) : _td);
-        final border = isCurrent
-            ? _ok
-            : (isPassed ? _navy.withValues(alpha: 0.25) : _bdr);
+        final Color bg;
+        final Color fg;
+        final FontWeight weight;
+        if (isCurrent) {
+          bg = _navy;
+          fg = Colors.white;
+          weight = FontWeight.w800;
+        } else if (isPassed) {
+          bg = _navy.withValues(alpha: 0.08);
+          fg = _navy.withValues(alpha: 0.85);
+          weight = FontWeight.w700;
+        } else {
+          bg = _navy3.withValues(alpha: 0.18);
+          fg = _td.withValues(alpha: 0.7);
+          weight = FontWeight.w600;
+        }
         return ClipPath(
           clipper: _ChevronClipper(isFirst: isFirst, isLast: isLast),
           child: Container(
             margin: EdgeInsetsDirectional.only(start: isFirst ? 0 : -6),
             padding: EdgeInsets.fromLTRB(
-                isLast ? 14 : 18, 6, isFirst ? 14 : 18, 6),
-            decoration: BoxDecoration(
-              color: bg,
-              border: Border.all(color: border, width: isCurrent ? 1.5 : 1),
-            ),
+                isLast ? 16 : 20, 8, isFirst ? 16 : 20, 8),
+            decoration: BoxDecoration(color: bg),
             child: Text(
               steps[i].$2,
               style: TextStyle(
                 color: fg,
-                fontSize: 11,
-                fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
+                fontSize: 11.5,
+                fontWeight: weight,
+                letterSpacing: 0.1,
               ),
             ),
           ),
