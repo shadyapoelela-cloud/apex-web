@@ -914,27 +914,46 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     );
   }
 
+  // Shared style for form-field labels (دفتر اليومية, تاريخ ...).
+  TextStyle get _formLabelStyle => TextStyle(
+        color: _td.withValues(alpha: 0.85),
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+      );
+
+  // Shared form-field border — lighter than the table cell border so
+  // the top form card feels airy rather than boxed-in.
+  OutlineInputBorder get _formFieldBorder => OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: BorderSide(color: _bdr.withValues(alpha: 0.55)),
+      );
+
+  OutlineInputBorder get _formFieldFocusBorder => OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: BorderSide(color: _navy, width: 1.4),
+      );
+
   Widget _journalDropdown() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('دفتر اليومية',
-            style: TextStyle(color: _td, fontSize: 11, fontWeight: FontWeight.w600)),
+        Text('دفتر اليومية', style: _formLabelStyle),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: _bdr),
+            border: Border.all(color: _bdr.withValues(alpha: 0.55)),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: _kind,
               isExpanded: true,
               style: TextStyle(color: _tp, fontSize: 13),
-              icon: Icon(Icons.expand_more_rounded, color: _ts),
+              icon: Icon(Icons.expand_more_rounded,
+                  color: _ts.withValues(alpha: 0.8)),
               items: const [
                 DropdownMenuItem(value: 'manual', child: Text('يدوي عام')),
                 DropdownMenuItem(
@@ -955,8 +974,7 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('تاريخ المحاسبة',
-            style: TextStyle(color: _td, fontSize: 11, fontWeight: FontWeight.w600)),
+        Text('تاريخ المحاسبة', style: _formLabelStyle),
         const SizedBox(height: 4),
         InkWell(
           onTap: () async {
@@ -968,15 +986,17 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             );
             if (d != null) setState(() => _date = d);
           },
+          borderRadius: BorderRadius.circular(6),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: _bdr),
+              border: Border.all(color: _bdr.withValues(alpha: 0.55)),
             ),
             child: Row(children: [
-              Icon(Icons.calendar_today_rounded, color: _gold, size: 14),
+              Icon(Icons.calendar_today_rounded,
+                  color: _ts.withValues(alpha: 0.85), size: 14),
               const SizedBox(width: 8),
               Text(
                 '${_date.year}-${_date.month.toString().padLeft(2, '0')}-${_date.day.toString().padLeft(2, '0')}',
@@ -995,28 +1015,23 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('الرقم المرجعي',
-            style: TextStyle(color: _td, fontSize: 11, fontWeight: FontWeight.w600)),
+        Text('الرقم المرجعي', style: _formLabelStyle),
         const SizedBox(height: 4),
         TextField(
           controller: _reference,
           style: TextStyle(color: _tp, fontSize: 13),
           decoration: InputDecoration(
             hintText: 'INV-123 (اختياري)',
-            hintStyle: TextStyle(color: _td, fontSize: 12),
+            hintStyle: TextStyle(
+                color: _td.withValues(alpha: 0.55), fontSize: 12),
             isDense: true,
             filled: true,
             fillColor: Colors.white,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(color: _bdr),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(color: _bdr),
-            ),
+            border: _formFieldBorder,
+            enabledBorder: _formFieldBorder,
+            focusedBorder: _formFieldFocusBorder,
           ),
         ),
       ],
@@ -1028,15 +1043,15 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('البيان *',
-            style: TextStyle(color: _td, fontSize: 11, fontWeight: FontWeight.w600)),
+        Text('البيان *', style: _formLabelStyle),
         const SizedBox(height: 4),
         TextField(
           controller: _memo,
           style: TextStyle(color: _tp, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'مثال: إثبات فاتورة مشتريات من مورد X',
-            hintStyle: TextStyle(color: _td, fontSize: 12),
+            hintStyle: TextStyle(
+                color: _td.withValues(alpha: 0.55), fontSize: 12),
             filled: true,
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.all(12),
@@ -1070,14 +1085,9 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                 ),
               ),
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(color: _bdr),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(color: _bdr),
-            ),
+            border: _formFieldBorder,
+            enabledBorder: _formFieldBorder,
+            focusedBorder: _formFieldFocusBorder,
           ),
         ),
       ],
@@ -1710,14 +1720,18 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               value: l.vatCode.isEmpty ? null : l.vatCode,
               isDense: true,
               isExpanded: true,
-              hint: Text('VAT', style: TextStyle(color: _td, fontSize: 10)),
+              hint: Text('VAT',
+                  style: TextStyle(
+                      color: _td.withValues(alpha: 0.5), fontSize: 10)),
               style: TextStyle(color: _tp, fontSize: 11),
               decoration: InputDecoration(
                 isDense: true,
+                filled: false,
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(color: _navy, width: 1.5),
                 ),
