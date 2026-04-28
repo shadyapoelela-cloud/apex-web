@@ -8,6 +8,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -65,6 +66,19 @@ class ApexApp extends ConsumerWidget {
         routerConfig: appRouter,
         theme: theme,
         locale: isAr ? const Locale('ar') : const Locale('en'),
+        // Pull in Material/Widgets/Cupertino localizations so the
+        // built-in date picker, dropdown menus, etc. render in Arabic
+        // when the app's locale is 'ar' (was showing English month
+        // names + S/M/T/W/T/F/S day labels).
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('ar'),
+          Locale('en'),
+        ],
         builder: (context, child) {
           // Wrap every route in a global Cmd+K / Ctrl+K handler so the command
           // palette is reachable from anywhere in the app, plus Alt+1..9 for

@@ -1872,10 +1872,16 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
             }).toList();
             return AlertDialog(
               title: Row(children: [
-                Icon(Icons.search_rounded, color: _gold),
+                Icon(Icons.search_rounded, color: _navy, size: 18),
                 const SizedBox(width: 8),
-                const Text('اختر حساباً'),
+                const Text('اختر حساباً',
+                    style:
+                        TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
               ]),
+              titlePadding:
+                  const EdgeInsets.fromLTRB(20, 18, 20, 8),
+              contentPadding:
+                  const EdgeInsets.fromLTRB(20, 0, 20, 16),
               content: SizedBox(
                 width: 520,
                 height: 500,
@@ -1884,40 +1890,61 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                     controller: search,
                     autofocus: true,
                     onChanged: (_) => setSt(() {}),
-                    decoration: const InputDecoration(
+                    style: TextStyle(color: _tp, fontSize: 13),
+                    decoration: InputDecoration(
                       hintText: 'ابحث بالكود أو الاسم...',
-                      prefixIcon: Icon(Icons.search_rounded),
-                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(
+                          color: _td.withValues(alpha: 0.55),
+                          fontSize: 12),
+                      prefixIcon: Icon(Icons.search_rounded,
+                          size: 18,
+                          color: _td.withValues(alpha: 0.7)),
+                      border: _formFieldBorder,
+                      enabledBorder: _formFieldBorder,
+                      focusedBorder: _formFieldFocusBorder,
                       isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 12),
                     ),
                   ),
                   const SizedBox(height: 10),
                   Expanded(
-                    child: ListView.builder(
+                    child: ListView.separated(
                       itemCount: filtered.length,
+                      separatorBuilder: (_, __) => Divider(
+                          height: 1,
+                          color: _bdr.withValues(alpha: 0.35)),
                       itemBuilder: (_, i) {
                         final a = filtered[i];
                         return ListTile(
                           dense: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
                           leading: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 3),
+                                horizontal: 7, vertical: 3),
                             decoration: BoxDecoration(
-                              color: _gold.withValues(alpha: 0.15),
+                              color: _navy.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(a['code'] ?? '',
                                 style: TextStyle(
-                                    color: _gold,
+                                    color: _navy,
                                     fontFamily: 'monospace',
                                     fontSize: 11,
                                     fontWeight: FontWeight.w800)),
                           ),
                           title: Text(a['name_ar'] ?? '',
-                              style: const TextStyle(fontSize: 13)),
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: _tp,
+                                  fontWeight: FontWeight.w600)),
                           subtitle: Text(
                               '${a['category']} · ${a['normal_balance']}',
-                              style: TextStyle(color: _td, fontSize: 10)),
+                              style: TextStyle(
+                                  color: _td.withValues(alpha: 0.7),
+                                  fontSize: 10,
+                                  letterSpacing: 0.2)),
                           onTap: () => Navigator.pop(ctx, a),
                         );
                       },
