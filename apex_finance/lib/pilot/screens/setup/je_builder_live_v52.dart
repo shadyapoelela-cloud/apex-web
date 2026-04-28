@@ -2031,54 +2031,233 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // Column-settings button (⚙️) — Odoo-style toggle for optional
-  // line-item columns: partner / cost-center / VAT.
+  // Totals footer — debit total under debit column, credit total under
+  // credit column, smart balance assistant on the right. Numbers tween
+  // smoothly between values; the balance widget either pulses green
+  // when freshly balanced or offers a one-tap "موازنة تلقائية" action
+  // that drops in a pre-filled offsetting line when there's a gap.
   // ─────────────────────────────────────────────────────────────────
-  // Totals footer — debit total under debit column, credit total under credit
-  // column, balance chip on the right. Mirrors the view-mode totals row.
   Widget _totalsFooterRow() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      decoration: BoxDecoration(
-        border: Border(
-            top: BorderSide(color: _bdr.withValues(alpha: 0.6), width: 1)),
-      ),
-      child: Row(children: [
-        Expanded(
-          child: Row(children: [
-            Text('الإجمالي',
-                style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    color: _navy)),
-            const SizedBox(width: 10),
-            _balanceChip(),
-          ]),
+    return Column(children: [
+      _balanceProgressBar(),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border(
+              top: BorderSide(
+                  color: _bdr.withValues(alpha: 0.6), width: 1)),
         ),
-        SizedBox(
-            width: 110,
-            child: Text(_fmt(_totalDebit),
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: _navy,
-                    fontFamily: 'monospace'),
-                textAlign: TextAlign.end)),
-        SizedBox(
-            width: 110,
-            child: Text(_fmt(_totalCredit),
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: _navy,
-                    fontFamily: 'monospace'),
-                textAlign: TextAlign.end)),
-        const SizedBox(width: 30),
-      ]),
+        child: Row(children: [
+          Expanded(
+            child: Row(children: [
+              Text('الإجمالي',
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: _navy)),
+              const SizedBox(width: 10),
+              _balanceAssistant(),
+            ]),
+          ),
+          SizedBox(
+              width: 110,
+              child: _animatedAmount(_totalDebit,
+                  align: TextAlign.end)),
+          SizedBox(
+              width: 110,
+              child: _animatedAmount(_totalCredit,
+                  align: TextAlign.end)),
+          const SizedBox(width: 30),
+        ]),
+      ),
+    ]);
+  }
+
+  // Smooth-tween number — animates from the previously-rendered value
+  // to the current one over 280ms. TweenAnimationBuilder remembers
+  // the prior `end` and tweens from there to the new `end` whenever
+  // value changes, so the user sees digits roll up instead of snap.
+  Widget _animatedAmount(double value,
+      {TextAlign align = TextAlign.end}) {
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+      tween: Tween<double>(begin: 0, end: value),
+      builder: (_, v, __) => Text(
+        _fmt(v),
+        textAlign: align,
+        style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            color: _navy,
+            fontFamily: 'monospace'),
+      ),
     );
   }
 
+  // Thin horizontal bar above the totals row — visualizes how
+  // debit and credit relate. When balanced both halves are equal-
+  // length green segments meeting at center. When unbalanced the
+  // larger side extends and a subtle gap shows the deficit.
+  Widget _balanceProgressBar() {
+    final total = _totalDebit + _totalCredit;
+    final debitPct =
+        total <= 0 ? 0.5 : (_totalDebit / total).clamp(0.0, 1.0);
+    final creditPct = 1.0 - debitPct;
+    final isBalanced = _balanced && total > 0;
+    final restingColor = isBalanced
+        ? _ok.withValues(alpha: 0.55)
+        : _navy3.withValues(alpha: 0.5);
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+      height: 3,
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(2),
+        child: Row(children: [
+          Expanded(
+            flex: (debitPct * 1000).round().clamp(1, 1000),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 280),
+              color: total <= 0
+                  ? _bdr.withValues(alpha: 0.4)
+                  : (isBalanced
+                      ? restingColor
+                      : _ok.withValues(alpha: 0.5)),
+            ),
+          ),
+          if (!isBalanced && total > 0)
+            const SizedBox(width: 2),
+          Expanded(
+            flex: (creditPct * 1000).round().clamp(1, 1000),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 280),
+              color: total <= 0
+                  ? _bdr.withValues(alpha: 0.4)
+                  : (isBalanced
+                      ? restingColor
+                      : _gold.withValues(alpha: 0.5)),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  // Smart balance widget — replaces the static chip. Two states:
+  //  • balanced  → soft green chip with a celebratory pulse
+  //  • imbalanced → outlined chip showing the gap + one-tap action
+  //    that drops in a pre-filled offsetting line. The user just
+  //    picks the account and the entry self-completes.
+  Widget _balanceAssistant() {
+    final diff = (_totalDebit - _totalCredit).abs();
+    if (_balanced && (_totalDebit + _totalCredit) > 0) {
+      return TweenAnimationBuilder<double>(
+        // Pulse once whenever the balanced state mounts/refreshes.
+        key: ValueKey('balanced-${_totalDebit.toStringAsFixed(2)}'),
+        tween: Tween(begin: 0.85, end: 1.0),
+        duration: const Duration(milliseconds: 360),
+        curve: Curves.elasticOut,
+        builder: (_, scale, child) =>
+            Transform.scale(scale: scale, child: child),
+        child: Container(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: _ok.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(10),
+            border:
+                Border.all(color: _ok.withValues(alpha: 0.4)),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(Icons.check_circle, color: _ok, size: 12),
+            const SizedBox(width: 4),
+            Text('متوازن',
+                style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: _ok)),
+          ]),
+        ),
+      );
+    }
+    if ((_totalDebit + _totalCredit) <= 0) {
+      // No data yet — neutral muted hint, no action.
+      return Container(
+        padding:
+            const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: _navy3.withValues(alpha: 0.25),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text('في الانتظار',
+            style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: _td.withValues(alpha: 0.7))),
+      );
+    }
+    // Imbalanced — show the gap + one-tap auto-balance action.
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _autoBalance(),
+        borderRadius: BorderRadius.circular(10),
+        hoverColor: _warn.withValues(alpha: 0.08),
+        child: Container(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: _warn.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: _warn.withValues(alpha: 0.4)),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(Icons.balance_rounded, color: _warn, size: 12),
+            const SizedBox(width: 4),
+            Text('فرق ${_fmt(diff)}',
+                style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: _warn)),
+            const SizedBox(width: 6),
+            Container(
+              width: 1,
+              height: 10,
+              color: _warn.withValues(alpha: 0.3),
+            ),
+            const SizedBox(width: 6),
+            Text('موازنة تلقائية',
+                style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: _navy)),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  // Drop in a new line with the offsetting amount pre-filled on the
+  // side that's short. The user only needs to pick the account.
+  void _autoBalance() {
+    final diff = _totalDebit - _totalCredit; // + → credit short, − → debit short
+    if (diff.abs() < 0.005) return;
+    final newLine = _LineState();
+    if (diff > 0) {
+      newLine.credit = diff;
+      newLine.creditCtrl.text = _fmt(diff);
+    } else {
+      newLine.debit = -diff;
+      newLine.debitCtrl.text = _fmt(-diff);
+    }
+    setState(() => _lines.add(newLine));
+  }
+
   Widget _balanceChip() {
+    // Kept for view-mode totals row (read-only) — shorter version
+    // without the auto-balance affordance.
     final diff = (_totalDebit - _totalCredit).abs();
     final color = _balanced ? _ok : _err;
     final icon = _balanced ? Icons.check_circle : Icons.warning_amber_rounded;
