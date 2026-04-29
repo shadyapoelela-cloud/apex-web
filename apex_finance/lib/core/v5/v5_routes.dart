@@ -11,11 +11,11 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
 import '../apex_ask_panel.dart';
 import '../apex_news_ticker.dart';
 import '../theme.dart' as core_theme;
-import 'package:go_router/go_router.dart';
-
 import '../../screens/v5_showcase/v5_showcase_screen.dart';
 import '../../pilot/screens/setup/je_builder_live_v52.dart';
 import 'apex_v5_service_shell.dart';
@@ -26,6 +26,7 @@ import 'v5_data.dart';
 import 'v5_models.dart';
 import 'v5_wired_screens.dart';
 
+
 /// List of routes to be spread into the top-level GoRouter.routes.
 List<RouteBase> v5Routes() => [
       // Phase 27.5: V5 Launchpad is the home again — user wants this as the
@@ -35,11 +36,13 @@ List<RouteBase> v5Routes() => [
       GoRoute(path: '/home', redirect: (ctx, state) => '/app'),
       GoRoute(
         path: '/app',
-        builder: (ctx, state) => const V5Launchpad(),
+        builder: (ctx, state) =>
+            const V5Launchpad(),
       ),
       GoRoute(
         path: '/showcase',
-        builder: (ctx, state) => const V5ShowcaseScreen(),
+        builder: (ctx, state) =>
+            const V5ShowcaseScreen(),
       ),
       GoRoute(
         path: '/app/:service',
