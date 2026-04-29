@@ -252,6 +252,50 @@ _CATALOG: list[EventDefinition] = [
         label_en="User account suspended",
         category=EventCategory.user,
     ),
+    # ─ Universal Comments + Mentions ─
+    EventDefinition(
+        name="comment.added",
+        label_ar="تعليق جديد",
+        label_en="Comment added",
+        category=EventCategory.system,
+        payload_schema={
+            "comment_id": "uuid",
+            "object_type": "string",
+            "object_id": "string",
+            "author_user_id": "user_id",
+            "mention_count": "int",
+        },
+    ),
+    EventDefinition(
+        name="comment.edited",
+        label_ar="تم تعديل تعليق",
+        label_en="Comment edited",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="comment.deleted",
+        label_ar="تم حذف تعليق",
+        label_en="Comment deleted",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="mention.received",
+        label_ar="تمّت الإشارة لك في تعليق",
+        label_en="You were mentioned",
+        category=EventCategory.system,
+        payload_schema={
+            "comment_id": "uuid",
+            "mentioned_user_id": "user_id",
+            "by_user_id": "user_id",
+            "object_type": "string",
+            "object_id": "string",
+        },
+        description_ar=(
+            "يطلَق لكل @mention في تعليق. اربطه بقاعدة workflow ترسل إشعار "
+            "للمستخدم المذكور (Slack DM، email، إلخ)."
+        ),
+    ),
+
     # ─ Email Intake ─
     EventDefinition(
         name="email.received",

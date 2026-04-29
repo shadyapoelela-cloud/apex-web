@@ -851,6 +851,15 @@ try:
 except Exception as _e:
     logging.warning(f"Webhook subscriptions router not mounted: {_e}")
 
+# Universal Comments + @Mentions — discuss any APEX entity.
+try:
+    from app.core import comments  # noqa: F401  ensures _load() runs
+    from app.core.comment_routes import router as comment_router
+    app.include_router(comment_router)
+    logging.info("Comments router mounted at /api/v1/comments + /admin/comments")
+except Exception as _e:
+    logging.warning(f"Comments router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router
