@@ -907,6 +907,14 @@ try:
 except Exception as _e:
     logging.warning(f"Industry Packs router not mounted: {_e}")
 
+# Tenant Directory — registry of onboarded tenants + onboarding wizard endpoint.
+try:
+    from app.core.tenant_directory_routes import router as tenant_dir_router
+    app.include_router(tenant_dir_router)
+    logging.info("Tenant Directory router mounted at /api/v1/tenants + /admin/tenants")
+except Exception as _e:
+    logging.warning(f"Tenant Directory router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

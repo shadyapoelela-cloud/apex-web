@@ -919,6 +919,27 @@ class ApiService {
         '/admin/industry-packs/$packId/provision?tenant_id=${Uri.encodeQueryComponent(tenantId)}',
       );
 
+  // ── Tenant Directory + Onboarding (Wave 1N Phase TT) ──
+  static Future<ApiResult> tenantsList({String? status}) =>
+      _get('/api/v1/tenants${status != null ? "?status=$status" : ""}');
+  static Future<ApiResult> tenantGet(String tenantId) =>
+      _get('/api/v1/tenants/$tenantId');
+  static Future<ApiResult> tenantsStats() => _adminGet('/admin/tenants/stats');
+  static Future<ApiResult> tenantRegister(Map body) =>
+      _adminPost('/admin/tenants', body);
+  static Future<ApiResult> tenantUpdate(String tenantId, Map body) =>
+      _adminPatch('/admin/tenants/$tenantId', body);
+  static Future<ApiResult> tenantDelete(String tenantId) =>
+      _adminDelete('/admin/tenants/$tenantId');
+  static Future<ApiResult> tenantDeactivate(String tenantId, {String? reason}) =>
+      _adminPost(
+        '/admin/tenants/$tenantId/deactivate${reason != null ? "?reason=${Uri.encodeQueryComponent(reason)}" : ""}',
+      );
+  static Future<ApiResult> tenantActivate(String tenantId) =>
+      _adminPost('/admin/tenants/$tenantId/activate');
+  static Future<ApiResult> tenantOnboard(Map body) =>
+      _adminPost('/admin/tenants/onboard', body);
+
   // ── Webhook Subscriptions (Wave 1E Phase T) ──
   static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
     final qs = <String>[];

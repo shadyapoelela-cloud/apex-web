@@ -353,6 +353,32 @@ _CATALOG: list[EventDefinition] = [
         },
     ),
 
+    # ─ Tenant Directory (Wave 1N Phase TT) ─
+    EventDefinition(
+        name="tenant.registered",
+        label_ar="تم تسجيل مستأجر جديد",
+        label_en="New tenant registered in directory",
+        category=EventCategory.system,
+        payload_schema={
+            "tenant_id": "string",
+            "display_name": "string",
+            "industry_pack_id": "string?",
+            "created_by": "user_id?",
+        },
+    ),
+    EventDefinition(
+        name="tenant.updated",
+        label_ar="تم تحديث بيانات مستأجر",
+        label_en="Tenant directory record updated",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="tenant.deactivated",
+        label_ar="تم تعطيل مستأجر",
+        label_en="Tenant deactivated",
+        category=EventCategory.system,
+    ),
+
     # ─ Module Manager (per-tenant enable/disable) ─
     EventDefinition(
         name="module.enabled",

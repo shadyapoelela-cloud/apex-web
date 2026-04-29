@@ -480,6 +480,8 @@ class _AdminHealthDashboardState extends State<AdminHealthDashboard> {
           _link('الشذوذ الحيّ', Icons.radar, '/admin/anomaly'),
           _link('بريد الفواتير', Icons.mark_email_unread, '/admin/email-inbox'),
           _link('حزم القطاعات', Icons.business_center, '/admin/industry-packs'),
+          _link('دليل المستأجرين', Icons.business, '/admin/tenants'),
+          _link('استقبال جديد', Icons.rocket_launch, '/admin/tenant-onboarding'),
         ]),
       ]),
     );

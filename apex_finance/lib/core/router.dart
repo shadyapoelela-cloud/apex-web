@@ -63,6 +63,8 @@ import '../screens/admin/anomaly_monitor_screen.dart';
 import '../screens/admin/email_inbox_screen.dart';
 import '../screens/admin/industry_packs_screen.dart';
 import '../screens/admin/workflow_rule_builder_screen.dart';
+import '../screens/admin/tenant_onboarding_screen.dart';
+import '../screens/admin/tenants_directory_screen.dart';
 // Operations duplicates kept as files for reference but unmounted —
 // their routes now redirect to the pre-existing /compliance/* + /financial-ops screens.
 // import '../screens/operations/financial_ops_hub_screen.dart';
@@ -698,6 +700,16 @@ final appRouter = GoRouter(
       path: '/admin/workflow/rules/new',
       redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const WorkflowRuleBuilderScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/tenant-onboarding',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const TenantOnboardingScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/tenants',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const TenantsDirectoryScreen(), s),
     ),
     // ── Operations routes redirect to pre-existing screens (avoid duplication) ──
     GoRoute(path: '/operations/hub', redirect: (c, s) => '/financial-ops'),
