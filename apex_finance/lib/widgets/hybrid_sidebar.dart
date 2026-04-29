@@ -213,6 +213,13 @@ class _HybridSidebarState extends State<HybridSidebar> {
           requiredRoles: ['platform_admin', 'super_admin'],
         ),
         _NavItem(
+          'سجلّ تنفيذ القواعد',
+          '/admin/workflow/runs',
+          Icons.history_rounded,
+          keywords: ['runs', 'history', 'سجل', 'تنفيذ', 'audit'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
           'إدارة الوحدات',
           '/admin/modules',
           Icons.extension_rounded,

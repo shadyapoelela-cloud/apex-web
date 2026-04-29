@@ -915,6 +915,14 @@ try:
 except Exception as _e:
     logging.warning(f"Tenant Directory router not mounted: {_e}")
 
+# Workflow Run History — per-execution audit trail for the engine.
+try:
+    from app.core.workflow_run_history_routes import router as workflow_runs_router
+    app.include_router(workflow_runs_router)
+    logging.info("Workflow Run History router mounted at /admin/workflow/runs")
+except Exception as _e:
+    logging.warning(f"Workflow Run History router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

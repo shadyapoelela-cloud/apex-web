@@ -940,6 +940,32 @@ class ApiService {
   static Future<ApiResult> tenantOnboard(Map body) =>
       _adminPost('/admin/tenants/onboard', body);
 
+  // ── Workflow Run History (Wave 1O Phase VV) ──
+  static Future<ApiResult> workflowRunsList({
+    String? ruleId,
+    String? tenantId,
+    String? eventName,
+    String? status,
+    int limit = 100,
+    int offset = 0,
+  }) {
+    final qs = <String>[
+      'limit=$limit',
+      'offset=$offset',
+    ];
+    if (ruleId != null) qs.add('rule_id=${Uri.encodeQueryComponent(ruleId)}');
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (eventName != null) qs.add('event_name=${Uri.encodeQueryComponent(eventName)}');
+    if (status != null) qs.add('status=$status');
+    return _adminGet('/admin/workflow/runs?${qs.join('&')}');
+  }
+  static Future<ApiResult> workflowRunGet(String runId) =>
+      _adminGet('/admin/workflow/runs/$runId');
+  static Future<ApiResult> workflowRunsStats() =>
+      _adminGet('/admin/workflow/runs/stats');
+  static Future<ApiResult> workflowRunsClear({String? ruleId}) =>
+      _adminDelete('/admin/workflow/runs${ruleId != null ? "?rule_id=${Uri.encodeQueryComponent(ruleId)}" : ""}');
+
   // ── Webhook Subscriptions (Wave 1E Phase T) ──
   static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
     final qs = <String>[];

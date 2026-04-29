@@ -274,6 +274,12 @@ class _WorkflowRulesScreenState extends State<WorkflowRulesScreen> {
                 onPressed: () =>
                     GoRouter.of(context).go('/admin/workflow/rules/new'),
               ),
+              ApexToolbarAction(
+                label: 'السجلّ',
+                icon: Icons.history,
+                onPressed: () =>
+                    GoRouter.of(context).go('/admin/workflow/runs'),
+              ),
             ],
           ),
           if (_stats != null) _statsBar(_stats!),

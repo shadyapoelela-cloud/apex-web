@@ -470,6 +470,7 @@ class _AdminHealthDashboardState extends State<AdminHealthDashboard> {
         const SizedBox(height: 8),
         Wrap(spacing: 8, runSpacing: 8, children: [
           _link('قوالب الأتمتة', Icons.auto_awesome, '/admin/workflow/templates'),
+          _link('سجلّ التنفيذ', Icons.history, '/admin/workflow/runs'),
           _link('إدارة الوحدات', Icons.extension, '/admin/modules'),
           _link('Webhooks', Icons.webhook, '/admin/webhooks'),
           _link('مفاتيح API', Icons.vpn_key, '/admin/api-keys'),
