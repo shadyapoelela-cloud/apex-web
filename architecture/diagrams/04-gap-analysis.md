@@ -2,6 +2,24 @@
 
 > قائمة عملية بكل ما يحتاج تحسين/تكميل، مرتّبة حسب الأولوية والتأثير.
 
+> **تحديث 2026-04-29**: جلسة migration نُفِّذت (8 commits). تركّزت على **codebase cleanup** (تنظيف 1700+ سطر dead code، أرشفة 30+ شاشة orphan، إضافة RBAC للـ demos). الـ **P0/P1 Backend Hardening** أدناه لسه مفتوح ويحتاج جلسة backend منفصلة. تفاصيل الـ executed work في [`../MIGRATION_SUMMARY.md`](../MIGRATION_SUMMARY.md).
+
+---
+
+## ✅ المُنفَّذ في جلسة 2026-04-29
+
+| الإجراء | الـ commit | الحالة |
+|---------|-----------|--------|
+| Bug fix `/financial-statements` route | `ac35477` | ✅ |
+| 13 demo route gated behind `platform_admin` (Adaptive Nav partial) | `b2f2737` | ✅ |
+| GOSI + EOSB موصولين كـ production HR features | `895437b` | ✅ |
+| 30 orphan files archived (V4 drafts, V5.2 drafts) | `5ec2c10` | ✅ |
+| 8 orphan classes removed from multi-class files | `f3b2199` | ✅ |
+| Sprint 40 + 42 archived (100% production coverage) | `7c32400` | ✅ |
+| 9 architecture documents + 21 rendered Mermaid diagrams | various | ✅ |
+
+**ملاحظة**: الـ P0/P1 الباكي backend work (real OAuth, AML, Twilio, etc.). جلسة الـ migration ركزت على cleanup + governance. التفاصيل في [`../MIGRATION_SUMMARY.md`](../MIGRATION_SUMMARY.md).
+
 ---
 
 ## مصفوفة الأولويات
