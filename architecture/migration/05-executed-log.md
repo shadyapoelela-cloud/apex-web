@@ -207,6 +207,71 @@ git revert <this-commit>
 
 ---
 
+## Commit 5 — Stage 5d: Orphan Archive (28 ملف)
+
+**القرار**: تنفيذ Stage 5d-1 + 5d-2 من تقرير الـ orphan detection.
+
+### الإجراءات
+
+**1. Archive 28 ملف orphan**:
+- `apex_finance/_archive/2026-04-29/orphans/v4_erp/` — **15 ملف** (12 من القائمة الأصلية + 3 إضافية اكتشفها flutter analyze)
+- `apex_finance/_archive/2026-04-29/orphans/v5_2/` — **10 ملف** (drafts غير مكتملة من الـ ObjectPage sprint)
+- `apex_finance/_archive/2026-04-29/orphans/misc/` — **3 ملف** (journal_entry_detail, vat_return_builder, pilot/vendors)
+
+**2. تنظيف 20 dead import** في `apex_finance/lib/core/v5/v5_wired_screens.dart`:
+- 17 import مكسور (الملفات أتأرشفت)
+- 3 unused imports (الملفات لسه موجودة في مكان ثاني لكن مش مستخدمة)
+
+**3. تحديث `analysis_options.yaml`** لاستبعاد `_archive/**` من تحليل Flutter (الملفات معزولة من الكومبايل لكن محفوظة في git history).
+
+### اكتشاف إضافي أثناء التنفيذ
+
+السكربت `find_orphans_strict.sh` بيتعامل بصعوبة مع class names المتطابقة في ملفات مختلفة (مثل `JeBuilderScreen` في `v4_erp/` و `pilot/screens/setup/`). كل واحد class مستقل، لكن الـ `grep` بيحسبهم سوا.
+
+`flutter analyze` كان أدق — اكتشف 3 V4 ERP إضافية مارينة على الـ script:
+- `je_builder_screen.dart` (V4 — اسم مكرر مع pilot)
+- `onboarding_screen.dart` (V4 — اسم مكرر مع V5.2)
+- `payroll_run_screen.dart` (V4 — اسم مكرر مع V5.2)
+
+أرشفت الـ 3 الإضافية، فالعدد الإجمالي = **28 ملف** (مش 25 كما كان في التقرير الأصلي).
+
+### النتائج
+
+| المقياس | قبل | بعد |
+|---------|-----|-----|
+| ملفات `lib/screens/v4_erp/` | ~50 | 35 (15 منهم اتأرشفت) |
+| ملفات `lib/screens/v5_2/` | 31 | 21 (10 منهم اتأرشفت) |
+| Dead imports في v5_wired_screens.dart | 20 | 0 |
+| `flutter analyze` errors | 17 (broken URIs) | 0 |
+| إجمالي issues (مع _archive included) | 786 | — |
+| إجمالي issues (مع _archive excluded) | — | 307 (كلها pre-existing infos/warnings) |
+
+### Verification
+
+```bash
+$ flutter analyze 2>&1 | grep -E "^\s*error\b"
+(no output - 0 errors)
+
+$ grep -rn "<archived class names>" lib/
+(no output - all references cleaned)
+```
+
+### Rollback
+
+```bash
+git revert <this-commit>
+```
+
+أو يدوياً (لو تحب تستعيد ملف معيّن):
+
+```bash
+git mv apex_finance/_archive/2026-04-29/orphans/v4_erp/X_screen.dart \
+       apex_finance/lib/screens/v4_erp/X_screen.dart
+# + add back the import line in v5_wired_screens.dart
+```
+
+---
+
 ## ⚠️ متوقّفة — تحتاج موافقة الـ deeper changes
 
 ### Stage 5b: Demo Screens

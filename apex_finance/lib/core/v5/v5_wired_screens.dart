@@ -46,12 +46,12 @@ import '../../screens/v4_compliance/workpapers_detail_screen.dart';
 import '../../screens/v4_compliance/realtime_tax_screen.dart';
 import '../../screens/v4_erp/admin_panel_screen.dart';
 import '../../screens/v4_erp/ai_bank_reconciliation_screen.dart';
-import '../../screens/v4_erp/ai_financial_analyst_screen.dart';
+// ai_financial_analyst_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d, 2026-04-29).
 import '../../screens/v4_erp/advanced_ratios_screen.dart';
 import '../../screens/v4_erp/apex_match_screen.dart';
 import '../../screens/v4_erp/apex_studio_screen.dart';
 import '../../screens/v4_erp/asset_tracking_screen.dart';
-import '../../screens/v4_erp/budget_planning_screen.dart';
+// budget_planning_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
 import '../../screens/v4_erp/construction_screen.dart';
 import '../../screens/v4_erp/ecommerce_store_screen.dart';
 import '../../screens/v4_erp/education_lms_screen.dart';
@@ -103,12 +103,12 @@ import '../../screens/v4_compliance/whistleblower_screen.dart';
 import '../../screens/v4_compliance/tax_calendar_screen.dart';
 import '../../screens/v4_compliance/transfer_pricing_v5_screen.dart';
 import '../../screens/v4_compliance/uae_ct_screen.dart';
-import '../../screens/v4_compliance/vat_return_builder_screen.dart';
+// vat_return_builder_screen.dart archived to _archive/2026-04-29/orphans/misc/ (Stage 5d).
 import '../../screens/v4_compliance/wht_calculator_v5_screen.dart';
 import '../../screens/v4_compliance/zakat_calculator_v5_screen.dart';
 import '../../screens/v4_erp/benefits_eos_screen.dart';
 import '../../screens/v4_erp/board_pack_screen.dart';
-import '../../screens/v4_erp/budget_vs_actual_screen.dart';
+// budget_vs_actual_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
 import '../../screens/v4_erp/cap_table_screen.dart';
 import '../../screens/v4_erp/credit_notes_screen.dart';
 import '../../screens/v4_erp/credit_scoring_screen.dart';
@@ -118,11 +118,11 @@ import '../../screens/v4_erp/intercompany_screen.dart';
 import '../../screens/v4_erp/price_list_screen.dart';
 import '../../screens/v4_erp/warehouse_management_screen.dart';
 import '../../screens/v4_erp/warranty_service_screen.dart';
-import '../../screens/v4_erp/integrations_hub_screen.dart';
+// integrations_hub_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
 import '../../screens/v4_erp/performance_reviews_screen.dart';
 import '../../screens/v4_erp/recruitment_ats_screen.dart';
 import '../../screens/v4_erp/subscription_management_screen.dart';
-import '../../screens/v4_erp/cost_centers_screen.dart';
+// cost_centers_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
 import '../../screens/v4_erp/cybersecurity_dashboard_screen.dart';
 import '../../screens/v4_erp/investment_portfolio_screen.dart';
 import '../../screens/v4_erp/purchase_requisition_screen.dart';
@@ -130,28 +130,28 @@ import '../../screens/v4_erp/training_lms_screen.dart';
 import '../../screens/v4_erp/expense_claims_screen.dart';
 import '../../screens/v4_erp/cash_flow_forecast_screen.dart';
 import '../../screens/v4_erp/client_portal_screen.dart';
-import '../../screens/v4_erp/connected_planning_screen.dart';
+// connected_planning_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
 import '../../screens/v4_erp/activity_log_screen.dart';
 import '../../screens/v4_erp/ai_copilot_screen.dart';
-import '../../screens/v4_erp/anomaly_detector_screen.dart';
-import '../../screens/v4_erp/approval_workflows_screen.dart';
+// anomaly_detector_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
+// approval_workflows_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
 import '../../screens/v4_erp/break_even_screen.dart';
 import '../../screens/v4_erp/commission_engine_screen.dart';
 import '../../screens/v4_erp/esg_dashboard_screen.dart';
-import '../../screens/v4_erp/scenario_planning_screen.dart';
+// scenario_planning_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
 import '../../screens/v4_erp/bank_guarantees_screen.dart';
 import '../../screens/v4_erp/close_checklist_screen.dart';
 import '../../screens/v4_erp/okrs_scorecard_screen.dart';
 import '../../screens/v4_erp/project_profitability_screen.dart';
 import '../../screens/v4_erp/contract_management_screen.dart';
 import '../../screens/v4_erp/crm_screen.dart';
-import '../../screens/v4_erp/document_vault_screen.dart';
+// document_vault_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
 import '../../screens/v4_erp/employee_self_service_screen.dart';
 import '../../screens/v4_erp/executive_dashboard_v5_screen.dart';
 import '../../screens/v4_erp/customer_360_screen.dart';
 import '../../screens/v4_erp/fixed_assets_register_screen.dart';
 import '../../screens/v4_erp/fx_management_screen.dart';
-import '../../screens/v4_erp/general_ledger_screen.dart';
+// general_ledger_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
 import '../../screens/v4_erp/helpdesk_tickets_screen.dart';
 import '../../screens/v4_erp/knowledge_base_screen.dart';
 import '../../screens/v4_erp/leave_management_screen.dart';
@@ -161,12 +161,12 @@ import '../../screens/v4_erp/financial_statements_screen.dart';
 import '../../screens/v4_erp/hr_employees_screen.dart';
 import '../../screens/v4_erp/industry_packs_screen.dart';
 import '../../screens/v4_erp/marketplace_deep_screen.dart';
-import '../../screens/v4_erp/invoices_multi_view_screen.dart';
-import '../../screens/v4_erp/je_builder_screen.dart';
+// invoices_multi_view_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
+// je_builder_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
 import '../../screens/v4_erp/sales_workflow_screen.dart';
 import '../../screens/v4_erp/mobile_receipt_screen.dart';
-import '../../screens/v4_erp/onboarding_screen.dart';
-import '../../screens/v4_erp/payroll_run_screen.dart';
+// onboarding_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
+// payroll_run_screen.dart archived to _archive/2026-04-29/orphans/v4_erp/ (Stage 5d).
 import '../../screens/v4_erp/projects_screen.dart';
 import '../../screens/v4_erp/purchasing_ap_screen.dart';
 import '../../screens/v4_erp/sales_pipeline_screen.dart';
@@ -175,7 +175,7 @@ import '../../screens/v4_erp/vendor_onboarding_screen.dart';
 
 // V5.2 Reference Implementations (using unified templates)
 import '../../screens/v5_2/invoices_v52_screen.dart';
-import '../../screens/v5_2/onboarding_v52_screen.dart';
+// onboarding_v52_screen.dart archived to _archive/2026-04-29/orphans/v5_2/ (Stage 5d).
 import '../../screens/v5_2/customer_360_v52_screen.dart';
 import '../../screens/v5_2/crm_v52_screen.dart';
 import '../../screens/v5_2/vat_return_v52_screen.dart';
@@ -187,10 +187,10 @@ import '../../screens/v5_2/expense_claims_v52_screen.dart';
 import '../../screens/v5_2/risk_register_v52_screen.dart';
 import '../../screens/v5_2/ma_deal_room_v52_screen.dart';
 import '../../screens/v5_2/ai_analyst_v52_screen.dart';
-import '../../screens/v5_2/financial_statements_v52_screen.dart';
+// financial_statements_v52_screen.dart archived to _archive/2026-04-29/orphans/v5_2/ (Stage 5d).
 import '../../screens/v5_2/fixed_assets_v52_screen.dart';
 import '../../screens/v5_2/workpapers_v52_screen.dart';
-import '../../screens/v5_2/period_close_v52_screen.dart';
+// period_close_v52_screen.dart archived to _archive/2026-04-29/orphans/v5_2/ (Stage 5d).
 import '../../screens/v5_2/payroll_run_v52_screen.dart';
 import '../../screens/v5_2/budget_planning_v52_screen.dart';
 import '../../screens/v5_2/hotel_pms_v52_screen.dart';
@@ -212,7 +212,7 @@ import '../../screens/v5_2/breakeven_v52_screen.dart';
 import '../../pilot/screens/setup/pilot_onboarding_wizard.dart';
 import '../../pilot/screens/setup/company_settings_screen.dart';
 import '../../pilot/screens/setup/coa_editor_screen.dart' as pilot_coa;
-import '../../pilot/screens/setup/vendors_screen.dart' as pilot_vendors;
+// pilot/setup/vendors_screen.dart archived to _archive/2026-04-29/orphans/misc/ (Stage 5d) — replaced by VendorsListScreen.
 import '../../pilot/screens/setup/products_screen.dart' as pilot_products;
 import '../../pilot/screens/setup/stock_movements_screen.dart' as pilot_stock;
 import '../../pilot/screens/setup/purchasing_screen.dart' as pilot_purch;

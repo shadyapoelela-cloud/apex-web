@@ -9,6 +9,12 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  # Archived screens preserved for git history but excluded from analysis.
+  # See architecture/migration/06-orphan-detection.md for the archive process.
+  exclude:
+    - _archive/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`
