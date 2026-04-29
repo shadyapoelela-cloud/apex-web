@@ -81,9 +81,9 @@ class ApexWhatsNewHub extends StatelessWidget {
                     ),
                     _Item(
                       icon: Icons.auto_graph,
-                      title: 'Sprint 42 — Q3-Q4 2026',
-                      subtitle: 'AI توقع + توحيد مجموعة + تصنيع BOM',
-                      route: '/sprint42-longterm',
+                      title: 'توقع التدفق النقدي + التوحيد + BOM',
+                      subtitle: 'Sprint 42 graduated — اضغط للمنتج',
+                      route: '/app/erp/treasury/cashflow',
                       status: _Status.done,
                     ),
                     _Item(
@@ -95,9 +95,9 @@ class ApexWhatsNewHub extends StatelessWidget {
                     ),
                     _Item(
                       icon: Icons.analytics_outlined,
-                      title: 'Sprint 40 — رواتب + تقارير',
-                      subtitle: 'GOSI/WPS + بانِي تقارير Drag-drop',
-                      route: '/sprint40-payroll',
+                      title: 'تشغيل الرواتب + بانِي التقارير',
+                      subtitle: 'Sprint 40 graduated — اضغط للمنتج',
+                      route: '/app/erp/hr/payroll',
                       status: _Status.done,
                     ),
                     _Item(

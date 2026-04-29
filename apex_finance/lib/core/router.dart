@@ -14,9 +14,9 @@ import '../screens/whats_new/sprint35_foundation_screen.dart';
 import '../screens/whats_new/sprint37_experience_screen.dart';
 import '../screens/whats_new/sprint38_composable_screen.dart';
 import '../screens/whats_new/sprint39_erp_screen.dart';
-import '../screens/whats_new/sprint40_payroll_reports_screen.dart';
+// sprint40_payroll_reports_screen.dart archived (Stage 5e) — /sprint40-payroll redirects to /app/erp/hr/payroll.
 import '../screens/whats_new/sprint41_procurement_screen.dart';
-import '../screens/whats_new/sprint42_longterm_screen.dart';
+// sprint42_longterm_screen.dart archived (Stage 5e) — /sprint42-longterm redirects to /app/erp/treasury/cashflow.
 import '../screens/whats_new/sprint43_platform_screen.dart';
 import '../screens/whats_new/sprint44_operations_screen.dart';
 import '../screens/whats_new/apex_map_screen.dart';
@@ -341,21 +341,18 @@ final appRouter = GoRouter(
       path: '/sprint39-erp',
       pageBuilder: (c, s) => _apexPage(const Sprint39ErpScreen(), s),
     ),
-    GoRoute(
-      path: '/sprint40-payroll',
-      pageBuilder: (c, s) =>
-          _apexPage(const Sprint40PayrollReportsScreen(), s),
-    ),
+    // sprint40 features (Payroll + Reports) graduated to production:
+    // /app/erp/hr/payroll + /app/erp/reports-bi/custom-reports.
+    // Sprint screen archived to _archive/2026-04-29/orphans/whats_new/ (Stage 5e).
+    GoRoute(path: '/sprint40-payroll', redirect: (c, s) => '/app/erp/hr/payroll'),
     GoRoute(
       path: '/sprint41-procurement',
       pageBuilder: (c, s) =>
           _apexPage(const Sprint41ProcurementScreen(), s),
     ),
-    GoRoute(
-      path: '/sprint42-longterm',
-      pageBuilder: (c, s) =>
-          _apexPage(const Sprint42LongTermScreen(), s),
-    ),
+    // sprint42 features (Cashflow + Consolidation + BOM/MRP) all graduated to
+    // production. Sprint screen archived to _archive/2026-04-29/ (Stage 5e).
+    GoRoute(path: '/sprint42-longterm', redirect: (c, s) => '/app/erp/treasury/cashflow'),
     GoRoute(
       path: '/sprint43-platform',
       pageBuilder: (c, s) =>
