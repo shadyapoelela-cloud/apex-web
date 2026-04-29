@@ -86,11 +86,12 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   bool _submitting = false;
 
   // ─── Optional column visibility (Odoo-style ⚙️ toggle) ───
-  // All default OFF — keep first impression simple. User toggles via
-  // the column-settings popup in the lines table header.
-  bool _showPartner = false;
-  bool _showCostCenter = false;
-  bool _showVat = false;
+  // Default ON — accountants asked for the partner / cost-center / VAT
+  // columns to be visible from the first interaction so they do not have
+  // to discover the column-settings popup. Toggle still available there.
+  bool _showPartner = true;
+  bool _showCostCenter = true;
+  bool _showVat = true;
 
   // ─── AI state ───
   bool _aiDocLoading = false;
@@ -1664,16 +1665,56 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           const SizedBox(width: 8),
           Expanded(
             flex: 2,
-            child: TextField(
-              controller: l.partnerCtrl,
-              onChanged: (v) => l.partnerLabel = v,
-              style: TextStyle(color: _tp, fontSize: 11),
-              decoration: InputDecoration(
-                hintText: 'مورد / عميل',
-                hintStyle: TextStyle(color: _td, fontSize: 10),
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                border: InputBorder.none,
+            child: InkWell(
+              onTap: () async {
+                final pick = await showJePartnerPicker(
+                  context,
+                  currentLabel: l.partnerLabel.isEmpty ? null : l.partnerLabel,
+                );
+                if (pick == null) return;
+                setState(() {
+                  l.partnerLabel = pick;
+                  l.partnerCtrl.text = pick;
+                });
+              },
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8, vertical: 9),
+                decoration: BoxDecoration(
+                  border: Border.all(color: _bdr),
+                  borderRadius: BorderRadius.circular(4),
+                  color: l.partnerLabel.isEmpty
+                      ? Colors.white
+                      : _gold.withValues(alpha: 0.05),
+                ),
+                child: Row(children: [
+                  Icon(
+                    l.partnerLabel.isEmpty
+                        ? Icons.person_add_alt_rounded
+                        : Icons.person_rounded,
+                    size: 13,
+                    color:
+                        l.partnerLabel.isEmpty ? _td : _gold,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      l.partnerLabel.isEmpty
+                          ? 'عميل / مورد / موظف'
+                          : l.partnerLabel,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: l.partnerLabel.isEmpty ? _td : _tp,
+                          fontSize: 11,
+                          fontWeight: l.partnerLabel.isEmpty
+                              ? FontWeight.w400
+                              : FontWeight.w600),
+                    ),
+                  ),
+                  Icon(Icons.expand_more_rounded,
+                      size: 13, color: _td),
+                ]),
               ),
             ),
           ),
@@ -1748,8 +1789,14 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           width: 110,
           child: TextField(
             controller: l.debitCtrl,
-            keyboardType:
-                const TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(
+                decimal: true, signed: false),
+            // Allow only digits + a single decimal point. Reject letters,
+            // commas (UI shows English digits), or a second dot.
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+              _SingleDotFormatter(),
+            ],
             onChanged: (v) {
               final p = double.tryParse(v) ?? 0;
               setState(() {
@@ -1759,6 +1806,14 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                   l.creditCtrl.text = '';
                 }
               });
+            },
+            // When the user leaves the field, render the value with 2
+            // decimal places so amounts always read like 1,200.00.
+            onEditingComplete: () {
+              if (l.debit > 0) {
+                l.debitCtrl.text = l.debit.toStringAsFixed(2);
+              }
+              FocusScope.of(context).nextFocus();
             },
             style: TextStyle(
                 color: _ok,
@@ -1771,6 +1826,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               fillColor: l.debit > 0
                   ? _ok.withValues(alpha: 0.08)
                   : Colors.white,
+              hintText: '0.00',
+              hintStyle: TextStyle(color: _td, fontSize: 11),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
               border: OutlineInputBorder(
@@ -1790,8 +1847,12 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           width: 110,
           child: TextField(
             controller: l.creditCtrl,
-            keyboardType:
-                const TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(
+                decimal: true, signed: false),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+              _SingleDotFormatter(),
+            ],
             onChanged: (v) {
               final p = double.tryParse(v) ?? 0;
               setState(() {
@@ -1801,6 +1862,12 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
                   l.debitCtrl.text = '';
                 }
               });
+            },
+            onEditingComplete: () {
+              if (l.credit > 0) {
+                l.creditCtrl.text = l.credit.toStringAsFixed(2);
+              }
+              FocusScope.of(context).nextFocus();
             },
             style: TextStyle(
                 color: _gold,
@@ -1813,6 +1880,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               fillColor: l.credit > 0
                   ? _gold.withValues(alpha: 0.08)
                   : Colors.white,
+              hintText: '0.00',
+              hintStyle: TextStyle(color: _td, fontSize: 11),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
               border: OutlineInputBorder(
@@ -2163,4 +2232,286 @@ class _ChevronClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(covariant _ChevronClipper old) =>
       old.isFirst != isFirst || old.isLast != isLast;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// _SingleDotFormatter — keeps decimal inputs clean by rejecting any input
+// that contains more than one '.' character. Pairs with FilteringTextInput
+// Formatter(allow digits + dot) on the debit/credit fields.
+// ─────────────────────────────────────────────────────────────────────────
+class _SingleDotFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    final dots = '.'.allMatches(newValue.text).length;
+    if (dots > 1) return oldValue;
+    return newValue;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Partner picker — opens a tabbed bottom sheet that lets the user choose
+// a partner across three populations: Customers, Vendors, Employees. The
+// data is mocked here so the picker works without backend wiring; swap in
+// real lookups once the customer / vendor / employee endpoints expose a
+// list method that returns names + ids.
+// ─────────────────────────────────────────────────────────────────────────
+
+class _PartnerOption {
+  final String label;
+  final String? subtitle;
+  const _PartnerOption(this.label, [this.subtitle]);
+}
+
+const Map<String, List<_PartnerOption>> _kPartnerCatalog = {
+  'عملاء': [
+    _PartnerOption('شركة المعرفة المتقدمة', 'CUS-001 · الرياض'),
+    _PartnerOption('مؤسسة الجودة الذهبية', 'CUS-002 · جدة'),
+    _PartnerOption('مجموعة الإبداع التجارية', 'CUS-003 · الدمام'),
+    _PartnerOption('شركة المستقبل للأنظمة', 'CUS-004 · الرياض'),
+    _PartnerOption('عميل نقدي', 'CUS-Walk-in'),
+  ],
+  'موردون': [
+    _PartnerOption('Amazon Web Services', 'VEN-101 · USD'),
+    _PartnerOption('شركة تقنية المعدات', 'VEN-102 · ر.س'),
+    _PartnerOption('مكتب المحاسب القانوني', 'VEN-103 · ر.س'),
+    _PartnerOption('شركة الإمداد للوازم', 'VEN-104 · ر.س'),
+    _PartnerOption('مزوّد الانترنت', 'VEN-105 · ر.س'),
+  ],
+  'موظفون': [
+    _PartnerOption('أحمد العمري', 'EMP-001 · المالية'),
+    _PartnerOption('سارة الحارثي', 'EMP-002 · المبيعات'),
+    _PartnerOption('محمد الزهراني', 'EMP-003 · العمليات'),
+    _PartnerOption('فاطمة العتيبي', 'EMP-004 · الموارد البشرية'),
+    _PartnerOption('خالد القحطاني', 'EMP-005 · IT'),
+  ],
+};
+
+/// Opens the partner picker and returns the selected label (or null on
+/// dismiss). Public-API safe: hides the private [_PartnerOption] type by
+/// only surfacing its display label.
+Future<String?> showJePartnerPicker(BuildContext context,
+    {String? currentLabel}) async {
+  final pick = await showModalBottomSheet<_PartnerOption>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    builder: (_) => Directionality(
+      textDirection: TextDirection.rtl,
+      child: _PartnerPickerSheet(currentLabel: currentLabel),
+    ),
+  );
+  return pick?.label;
+}
+
+class _PartnerPickerSheet extends StatefulWidget {
+  final String? currentLabel;
+  const _PartnerPickerSheet({this.currentLabel});
+
+  @override
+  State<_PartnerPickerSheet> createState() => _PartnerPickerSheetState();
+}
+
+class _PartnerPickerSheetState extends State<_PartnerPickerSheet>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabs;
+  final _searchCtl = TextEditingController();
+  String _q = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _tabs = TabController(length: _kPartnerCatalog.length, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabs.dispose();
+    _searchCtl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.45,
+      maxChildSize: 0.92,
+      expand: false,
+      builder: (_, ctl) => Container(
+        decoration: BoxDecoration(
+          color: core_theme.AC.navy2,
+          borderRadius:
+              const BorderRadius.vertical(top: Radius.circular(18)),
+          border: Border.all(color: core_theme.AC.bdr),
+        ),
+        child: Column(children: [
+          // Drag handle
+          Container(
+            margin: const EdgeInsets.only(top: 8),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: core_theme.AC.navy4,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 12, 8),
+            child: Row(children: [
+              Icon(Icons.handshake_rounded,
+                  color: core_theme.AC.gold, size: 20),
+              const SizedBox(width: 10),
+              Text('اختر الشريك',
+                  style: TextStyle(
+                      color: core_theme.AC.tp,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800)),
+              const Spacer(),
+              IconButton(
+                icon: Icon(Icons.close_rounded, color: core_theme.AC.ts),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ]),
+          ),
+          // Search
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: TextField(
+              controller: _searchCtl,
+              autofocus: true,
+              onChanged: (v) => setState(() => _q = v.trim()),
+              style: TextStyle(color: core_theme.AC.tp, fontSize: 13),
+              decoration: InputDecoration(
+                hintText: 'ابحث بالاسم أو رقم الكود…',
+                hintStyle: TextStyle(color: core_theme.AC.ts, fontSize: 12),
+                isDense: true,
+                filled: true,
+                fillColor: core_theme.AC.navy3,
+                prefixIcon: Icon(Icons.search_rounded,
+                    color: core_theme.AC.ts, size: 18),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          // Tabs
+          TabBar(
+            controller: _tabs,
+            isScrollable: false,
+            labelColor: core_theme.AC.gold,
+            unselectedLabelColor: core_theme.AC.ts,
+            indicatorColor: core_theme.AC.gold,
+            indicatorWeight: 2.5,
+            labelStyle:
+                const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800),
+            unselectedLabelStyle:
+                const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500),
+            tabs: [
+              for (final group in _kPartnerCatalog.keys) Tab(text: group),
+            ],
+          ),
+          Divider(height: 1, color: core_theme.AC.bdr),
+          // Lists
+          Expanded(
+            child: TabBarView(
+              controller: _tabs,
+              children: [
+                for (final entry in _kPartnerCatalog.entries)
+                  _buildList(entry.value, scroll: ctl),
+              ],
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _buildList(List<_PartnerOption> items, {required ScrollController scroll}) {
+    final q = _q.toLowerCase();
+    final filtered = q.isEmpty
+        ? items
+        : items
+            .where((it) =>
+                it.label.toLowerCase().contains(q) ||
+                (it.subtitle?.toLowerCase().contains(q) ?? false))
+            .toList();
+    if (filtered.isEmpty) {
+      return Center(
+        child: Text('لا توجد نتائج',
+            style: TextStyle(color: core_theme.AC.ts, fontSize: 13)),
+      );
+    }
+    return ListView.builder(
+      controller: scroll,
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      itemCount: filtered.length,
+      itemBuilder: (ctx, i) {
+        final it = filtered[i];
+        final isCurrent = it.label == widget.currentLabel;
+        return InkWell(
+          onTap: () => Navigator.pop(context, it),
+          child: Container(
+            margin:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: isCurrent
+                  ? core_theme.AC.gold.withValues(alpha: 0.10)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+              border: isCurrent
+                  ? Border.all(
+                      color: core_theme.AC.gold.withValues(alpha: 0.40),
+                      width: 1)
+                  : null,
+            ),
+            child: Row(children: [
+              CircleAvatar(
+                radius: 14,
+                backgroundColor:
+                    core_theme.AC.gold.withValues(alpha: 0.16),
+                child: Text(
+                  it.label.characters.first,
+                  style: TextStyle(
+                      color: core_theme.AC.gold,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(it.label,
+                          style: TextStyle(
+                              color: core_theme.AC.tp,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700)),
+                      if (it.subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(it.subtitle!,
+                            style: TextStyle(
+                                color: core_theme.AC.ts,
+                                fontSize: 11)),
+                      ],
+                    ]),
+              ),
+              if (isCurrent)
+                Icon(Icons.check_circle_rounded,
+                    color: core_theme.AC.gold, size: 18),
+            ]),
+          ),
+        );
+      },
+    );
+  }
 }
