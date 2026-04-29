@@ -869,6 +869,69 @@ try:
 except Exception as _e:
     logging.warning(f"Module manager router not mounted: {_e}")
 
+# API Keys — programmatic access for headless integrations.
+try:
+    from app.core import api_keys  # noqa: F401  ensures _load() runs
+    from app.core.api_key_routes import router as api_key_router
+    app.include_router(api_key_router)
+    logging.info("API keys router mounted at /admin/api-keys + /api/v1/api-keys/me")
+except Exception as _e:
+    logging.warning(f"API keys router not mounted: {_e}")
+
+# Custom Role Builder — tenant-defined roles with granular permissions.
+try:
+    from app.core import custom_roles  # noqa: F401  ensures _load() runs
+    from app.core.custom_role_routes import router as custom_role_router
+    app.include_router(custom_role_router)
+    logging.info("Custom roles router mounted at /api/v1/permissions + /admin/roles")
+except Exception as _e:
+    logging.warning(f"Custom roles router not mounted: {_e}")
+
+# Proactive Suggestions — pattern detector across event stream.
+# Importing the module registers detectors on the bus.
+try:
+    from app.core import proactive_suggestions  # noqa: F401 — registers detectors
+    from app.core.proactive_suggestion_routes import router as suggestion_router
+    app.include_router(suggestion_router)
+    logging.info("Suggestions router mounted at /api/v1/suggestions")
+except Exception as _e:
+    logging.warning(f"Suggestions router not mounted: {_e}")
+
+# Industry Packs — sector-specific COA + dashboard provisioning.
+try:
+    from app.core.industry_packs_routes import router as industry_packs_router
+    app.include_router(industry_packs_router)
+    # Importing the provisioner registers its listener on industry_pack.applied.
+    from app.core import industry_pack_provisioner  # noqa: F401
+    logging.info("Industry Packs router mounted at /api/v1/industry-packs + /admin/industry-packs (auto-provisioner active)")
+except Exception as _e:
+    logging.warning(f"Industry Packs router not mounted: {_e}")
+
+# Tenant Directory — registry of onboarded tenants + onboarding wizard endpoint.
+try:
+    from app.core.tenant_directory_routes import router as tenant_dir_router
+    app.include_router(tenant_dir_router)
+    logging.info("Tenant Directory router mounted at /api/v1/tenants + /admin/tenants")
+except Exception as _e:
+    logging.warning(f"Tenant Directory router not mounted: {_e}")
+
+# Workflow Run History — per-execution audit trail for the engine.
+try:
+    from app.core.workflow_run_history_routes import router as workflow_runs_router
+    app.include_router(workflow_runs_router)
+    logging.info("Workflow Run History router mounted at /admin/workflow/runs")
+except Exception as _e:
+    logging.warning(f"Workflow Run History router not mounted: {_e}")
+
+# Activity Feed — per-user "what's happening" stream from event bus.
+try:
+    from app.core import activity_feed  # noqa: F401  — registers listeners
+    from app.core.activity_feed_routes import router as activity_feed_router
+    app.include_router(activity_feed_router)
+    logging.info("Activity Feed router mounted at /api/v1/activity + /admin/activity (listeners registered)")
+except Exception as _e:
+    logging.warning(f"Activity Feed router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

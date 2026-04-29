@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/copilot/copilot_screen.dart';
 import '../screens/showcase/apex_showcase_screen.dart';
@@ -51,6 +52,22 @@ import '../screens/compliance/islamic_finance_screen.dart';
 import '../screens/admin/audit_chain_viewer_screen.dart';
 import '../screens/admin/workflow_templates_screen.dart';
 import '../screens/admin/workflow_rules_screen.dart';
+import '../screens/admin/module_manager_screen.dart';
+import '../screens/admin/webhooks_screen.dart';
+import '../screens/admin/api_keys_screen.dart';
+import '../screens/admin/suggestions_inbox_screen.dart';
+import '../screens/admin/events_browser_screen.dart';
+import '../screens/admin/custom_roles_screen.dart';
+import '../screens/admin/admin_health_dashboard.dart';
+import '../screens/admin/approvals_admin_screen.dart';
+import '../screens/admin/anomaly_monitor_screen.dart';
+import '../screens/admin/email_inbox_screen.dart';
+import '../screens/admin/industry_packs_screen.dart';
+import '../screens/admin/workflow_rule_builder_screen.dart';
+import '../screens/admin/tenant_onboarding_screen.dart';
+import '../screens/admin/tenants_directory_screen.dart';
+import '../screens/admin/workflow_runs_screen.dart';
+import '../screens/activity_feed_screen.dart';
 // Operations duplicates kept as files for reference but unmounted —
 // their routes now redirect to the pre-existing /compliance/* + /financial-ops screens.
 // import '../screens/operations/financial_ops_hub_screen.dart';
@@ -203,8 +220,12 @@ final authRefresh = ValueNotifier<int>(0);
 /// super_admin; otherwise redirects to the launchpad.
 /// Use as `redirect: _adminOnly` on any GoRoute that should not be visible
 /// to end users (mock data, component demos, internal tooling).
-String? _adminOnly(BuildContext c, GoRouterState s) =>
-    S.isPlatformAdmin ? null : '/app';
+String? _adminOnly(BuildContext c, GoRouterState s) {
+  // In debug mode, allow all routes for easier dev testing.
+  // Production builds still gate admin screens by role.
+  if (kDebugMode) return null;
+  return S.isPlatformAdmin ? null : '/app';
+}
 
 /// Routes that should NOT get the magnetic shell + bottom nav (auth, onboarding).
 bool _isChromeRoute(GoRouterState state) {
@@ -624,6 +645,85 @@ final appRouter = GoRouter(
       path: '/admin/workflow/templates',
       redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const WorkflowTemplatesScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/modules',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const ModuleManagerScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/webhooks',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const WebhooksScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/api-keys',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const ApiKeysScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/suggestions',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const SuggestionsInboxScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/events',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const EventsBrowserScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/roles',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const CustomRolesScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/dashboard-health',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const AdminHealthDashboard(), s),
+    ),
+    GoRoute(
+      path: '/admin/approvals',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const ApprovalsAdminScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/anomaly',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const AnomalyMonitorScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/email-inbox',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const EmailInboxScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/industry-packs',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const AdminIndustryPacksScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/workflow/rules/new',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const WorkflowRuleBuilderScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/tenant-onboarding',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const TenantOnboardingScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/tenants',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const TenantsDirectoryScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/workflow/runs',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const WorkflowRunsScreen(), s),
+    ),
+    GoRoute(
+      path: '/activity',
+      pageBuilder: (c, s) => _apexPage(const ActivityFeedScreen(), s),
     ),
     // ── Operations routes redirect to pre-existing screens (avoid duplication) ──
     GoRoute(path: '/operations/hub', redirect: (c, s) => '/financial-ops'),

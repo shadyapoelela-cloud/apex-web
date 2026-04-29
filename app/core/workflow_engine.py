@@ -489,6 +489,8 @@ def _matches_pattern(pattern: str, name: str) -> bool:
 
 def process_event(event_name: str, payload: dict) -> list[dict]:
     """Find every matching enabled rule and execute. Returns audit results."""
+    import time as _time
+
     results: list[dict] = []
     with _LOCK:
         rules = list(_RULES.values())
@@ -507,7 +509,10 @@ def process_event(event_name: str, payload: dict) -> list[dict]:
             continue
 
         # Execute actions sequentially.
+        run_started_at = datetime.now(timezone.utc).isoformat()
+        t0 = _time.perf_counter()
         action_results = [execute_action(a, payload, rule) for a in rule.actions]
+        duration_ms = int((_time.perf_counter() - t0) * 1000)
 
         with _LOCK:
             rule.run_count += 1
@@ -519,6 +524,23 @@ def process_event(event_name: str, payload: dict) -> list[dict]:
                 else "; ".join(str(f.get("error", "unknown")) for f in failed[:3])
             )
             _save()
+
+        # Record per-execution audit trail (Wave 1O Phase VV).
+        # Best-effort: errors here must never break the engine.
+        try:
+            from app.core.workflow_run_history import record_run
+            record_run(
+                rule_id=rule.id,
+                rule_name=rule.name,
+                event_name=event_name,
+                payload=payload,
+                action_results=action_results,
+                tenant_id=rule.tenant_id,
+                started_at=run_started_at,
+                duration_ms=duration_ms,
+            )
+        except Exception:  # noqa: BLE001
+            logger.exception("run_history record failed (non-fatal)")
 
         results.append(
             {

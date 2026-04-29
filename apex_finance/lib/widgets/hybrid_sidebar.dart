@@ -21,6 +21,7 @@
 /// ════════════════════════════════════════════════════════════════════
 library;
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -91,6 +92,8 @@ class _HybridSidebarState extends State<HybridSidebar> {
     _NavGroup('لوحات القيادة', Icons.dashboard_rounded, [
       _NavItem('الرئيسية', '/dashboard', Icons.home_rounded,
           keywords: ['home', 'start', 'landing']),
+      _NavItem('تيار نشاطي', '/activity', Icons.notifications_rounded,
+          keywords: ['activity', 'feed', 'تيار', 'نشاط', 'إشعارات']),
       _NavItem('لوحة CFO', '/compliance/executive',
           Icons.admin_panel_settings_rounded),
       _NavItem('مركز الامتثال', '/compliance', Icons.shield_rounded),
@@ -212,15 +215,115 @@ class _HybridSidebarState extends State<HybridSidebar> {
           keywords: ['templates', 'قوالب'],
           requiredRoles: ['platform_admin', 'super_admin'],
         ),
+        _NavItem(
+          'سجلّ تنفيذ القواعد',
+          '/admin/workflow/runs',
+          Icons.history_rounded,
+          keywords: ['runs', 'history', 'سجل', 'تنفيذ', 'audit'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'إدارة الوحدات',
+          '/admin/modules',
+          Icons.extension_rounded,
+          keywords: ['modules', 'وحدات', 'tenant'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'اشتراكات Webhooks',
+          '/admin/webhooks',
+          Icons.webhook_rounded,
+          keywords: ['webhooks', 'اشتراكات', 'integrations'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'مفاتيح API',
+          '/admin/api-keys',
+          Icons.vpn_key_rounded,
+          keywords: ['api', 'keys', 'مفاتيح'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'اقتراحات المنصة',
+          '/admin/suggestions',
+          Icons.tips_and_updates_rounded,
+          keywords: ['suggestions', 'اقتراحات', 'proactive'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'مراقب الأحداث',
+          '/admin/events',
+          Icons.timeline_rounded,
+          keywords: ['events', 'monitor', 'أحداث'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'الأدوار المخصّصة',
+          '/admin/roles',
+          Icons.shield_rounded,
+          keywords: ['roles', 'rbac', 'أدوار', 'صلاحيات'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'لوحة صحة المنصة',
+          '/admin/dashboard-health',
+          Icons.health_and_safety_rounded,
+          keywords: ['health', 'dashboard', 'صحة', 'لوحة', 'overview'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'إدارة الموافقات',
+          '/admin/approvals',
+          Icons.task_alt_rounded,
+          keywords: ['approvals', 'admin', 'موافقات', 'إدارة'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'مراقب الشذوذ',
+          '/admin/anomaly',
+          Icons.radar_rounded,
+          keywords: ['anomaly', 'monitor', 'شذوذ', 'مراقبة', 'fraud'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'صندوق البريد للفواتير',
+          '/admin/email-inbox',
+          Icons.mark_email_unread_rounded,
+          keywords: ['email', 'inbox', 'imap', 'بريد', 'فواتير'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'حزم القطاعات',
+          '/admin/industry-packs',
+          Icons.business_center_rounded,
+          keywords: ['industry', 'packs', 'sector', 'حزم', 'قطاعات', 'fnb', 'medical'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'دليل المستأجرين',
+          '/admin/tenants',
+          Icons.business_rounded,
+          keywords: ['tenants', 'directory', 'مستأجرين', 'دليل'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'استقبال مستأجر جديد',
+          '/admin/tenant-onboarding',
+          Icons.rocket_launch_rounded,
+          keywords: ['onboarding', 'wizard', 'استقبال', 'تشغيل'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
       ],
       requiredRoles: ['platform_admin', 'super_admin', 'reviewer'],
     ),
   ];
 
   /// True when `userRoles` intersects `required` — empty `required` means
-  /// "no role gate, visible to everyone".
+  /// "no role gate, visible to everyone". In debug mode every group is
+  /// visible so devs can navigate without granting themselves admin roles.
   bool _hasAnyRole(List<String> required) {
     if (required.isEmpty) return true;
+    if (kDebugMode) return true;
     final userRoles = S.roles;
     if (userRoles.isEmpty) return false;
     for (final r in required) {

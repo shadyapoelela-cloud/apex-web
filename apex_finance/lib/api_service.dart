@@ -827,6 +827,268 @@ class ApiService {
       _get('/api/v1/events/list${category != null ? "?category=$category" : ""}');
   static Future<ApiResult> eventsCategories() => _get('/api/v1/events/categories');
 
+  // ── Proactive Suggestions (Wave 1G Phase EE) ──
+  static Future<ApiResult> suggestionsList({String? tenantId, String? status}) {
+    final qs = <String>[];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (status != null) qs.add('status=$status');
+    final s = qs.isEmpty ? '' : '?${qs.join('&')}';
+    return _get('/api/v1/suggestions$s');
+  }
+  static Future<ApiResult> suggestionsDismiss(String id) =>
+      _post('/api/v1/suggestions/$id/dismiss', const {});
+  static Future<ApiResult> suggestionsApply(String id) =>
+      _post('/api/v1/suggestions/$id/apply', const {});
+  static Future<ApiResult> suggestionsStats() =>
+      _adminGet('/admin/suggestions/stats');
+
+  // ── Custom Roles + Permissions (Wave 1F Phase Y) ──
+  static Future<ApiResult> permissionsCatalog({String? category}) =>
+      _get('/api/v1/permissions/catalog${category != null ? "?category=$category" : ""}');
+  static Future<ApiResult> permissionsCategories() =>
+      _get('/api/v1/permissions/categories');
+  static Future<ApiResult> rolesList(String tenantId) =>
+      _adminGet('/admin/roles?tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+  static Future<ApiResult> rolesCreate(Map body) => _adminPost('/admin/roles', body);
+  static Future<ApiResult> rolesUpdate(String id, Map body) => _adminPatch('/admin/roles/$id', body);
+  static Future<ApiResult> rolesDelete(String id) => _adminDelete('/admin/roles/$id');
+  static Future<ApiResult> rolesAssign(String id, String userId) =>
+      _adminPost('/admin/roles/$id/assign', {'user_id': userId});
+  static Future<ApiResult> rolesRevoke(String id, String userId) =>
+      _adminPost('/admin/roles/$id/revoke', {'user_id': userId});
+  static Future<ApiResult> rolesEffective(String userId, String tenantId) =>
+      _adminGet('/admin/roles/effective?user_id=$userId&tenant_id=$tenantId');
+
+  // ── Recent Events (Wave 1A Phase F admin debug) ──
+  static Future<ApiResult> eventsRecent({int limit = 50}) =>
+      _adminGet('/admin/events/recent?limit=$limit');
+
+  // ── Approvals Admin Console (Wave 1J Phase MM) ──
+  static Future<ApiResult> approvalsAdminList({String? tenantId, String? userId, String? state}) {
+    final qs = <String>[];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (userId != null) qs.add('user_id=${Uri.encodeQueryComponent(userId)}');
+    if (state != null) qs.add('state=$state');
+    final s = qs.isEmpty ? '' : '?${qs.join('&')}';
+    return _adminGet('/admin/approvals$s');
+  }
+  static Future<ApiResult> approvalsAdminCreate(Map body) => _adminPost('/admin/approvals', body);
+  static Future<ApiResult> approvalsAdminCancel(String id, {String? reason}) =>
+      _adminDelete('/admin/approvals/$id${reason != null ? "?reason=${Uri.encodeQueryComponent(reason)}" : ""}');
+  static Future<ApiResult> approvalsAdminStats() => _adminGet('/admin/approvals/stats');
+
+  // ── Anomaly Live Monitor (Wave 1J Phase NN) ──
+  static Future<ApiResult> anomalyBuffer({String? tenantId}) =>
+      _adminGet('/admin/anomaly/buffer${tenantId != null ? "?tenant_id=${Uri.encodeQueryComponent(tenantId)}" : ""}');
+  static Future<ApiResult> anomalyScan(String tenantId, {bool emitEvents = true}) =>
+      _adminPost('/admin/anomaly/scan?tenant_id=${Uri.encodeQueryComponent(tenantId)}&emit_events=$emitEvents');
+  static Future<ApiResult> anomalyScanAll({bool emitEvents = true}) =>
+      _adminPost('/admin/anomaly/scan-all?emit_events=$emitEvents');
+  static Future<ApiResult> anomalyClearBuffer({String? tenantId}) =>
+      _adminPost('/admin/anomaly/clear-buffer${tenantId != null ? "?tenant_id=${Uri.encodeQueryComponent(tenantId)}" : ""}');
+
+  // ── Email Inbox Status (Wave 1J Phase OO) ──
+  static Future<ApiResult> emailInboxStatus() => _adminGet('/admin/email-inbox/status');
+  static Future<ApiResult> emailInboxPoll({int? maxMessages}) =>
+      _adminPost('/admin/email-inbox/poll${maxMessages != null ? "?max_messages=$maxMessages" : ""}');
+
+  // ── Industry Packs (Wave 1K Phase PP) ──
+  static Future<ApiResult> industryPacksList() => _get('/api/v1/industry-packs');
+  static Future<ApiResult> industryPackDetail(String id) =>
+      _get('/api/v1/industry-packs/$id');
+  static Future<ApiResult> industryPackApplied(String tenantId) =>
+      _get('/api/v1/industry-packs/applied?tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+  static Future<ApiResult> industryPackApply(String packId, String tenantId,
+          {String? appliedBy, String? notes}) =>
+      _adminPost(
+        '/admin/industry-packs/$packId/apply?tenant_id=${Uri.encodeQueryComponent(tenantId)}',
+        {
+          if (appliedBy != null) 'applied_by': appliedBy,
+          if (notes != null) 'notes': notes,
+        },
+      );
+  static Future<ApiResult> industryPackRemove(String tenantId) =>
+      _adminDelete('/admin/industry-packs/applied/$tenantId');
+  static Future<ApiResult> industryPackAssignments() =>
+      _adminGet('/admin/industry-packs/assignments');
+  static Future<ApiResult> industryPackStats() => _adminGet('/admin/industry-packs/stats');
+  static Future<ApiResult> industryPackTemplateMap() =>
+      _get('/api/v1/industry-packs/template-map');
+  static Future<ApiResult> industryPackProvision(String packId, String tenantId) =>
+      _adminPost(
+        '/admin/industry-packs/$packId/provision?tenant_id=${Uri.encodeQueryComponent(tenantId)}',
+      );
+
+  // ── Tenant Directory + Onboarding (Wave 1N Phase TT) ──
+  static Future<ApiResult> tenantsList({String? status}) =>
+      _get('/api/v1/tenants${status != null ? "?status=$status" : ""}');
+  static Future<ApiResult> tenantGet(String tenantId) =>
+      _get('/api/v1/tenants/$tenantId');
+  static Future<ApiResult> tenantsStats() => _adminGet('/admin/tenants/stats');
+  static Future<ApiResult> tenantRegister(Map body) =>
+      _adminPost('/admin/tenants', body);
+  static Future<ApiResult> tenantUpdate(String tenantId, Map body) =>
+      _adminPatch('/admin/tenants/$tenantId', body);
+  static Future<ApiResult> tenantDelete(String tenantId) =>
+      _adminDelete('/admin/tenants/$tenantId');
+  static Future<ApiResult> tenantDeactivate(String tenantId, {String? reason}) =>
+      _adminPost(
+        '/admin/tenants/$tenantId/deactivate${reason != null ? "?reason=${Uri.encodeQueryComponent(reason)}" : ""}',
+      );
+  static Future<ApiResult> tenantActivate(String tenantId) =>
+      _adminPost('/admin/tenants/$tenantId/activate');
+  static Future<ApiResult> tenantOnboard(Map body) =>
+      _adminPost('/admin/tenants/onboard', body);
+
+  // ── Workflow Run History (Wave 1O Phase VV) ──
+  static Future<ApiResult> workflowRunsList({
+    String? ruleId,
+    String? tenantId,
+    String? eventName,
+    String? status,
+    int limit = 100,
+    int offset = 0,
+  }) {
+    final qs = <String>[
+      'limit=$limit',
+      'offset=$offset',
+    ];
+    if (ruleId != null) qs.add('rule_id=${Uri.encodeQueryComponent(ruleId)}');
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (eventName != null) qs.add('event_name=${Uri.encodeQueryComponent(eventName)}');
+    if (status != null) qs.add('status=$status');
+    return _adminGet('/admin/workflow/runs?${qs.join('&')}');
+  }
+  static Future<ApiResult> workflowRunGet(String runId) =>
+      _adminGet('/admin/workflow/runs/$runId');
+  static Future<ApiResult> workflowRunsStats() =>
+      _adminGet('/admin/workflow/runs/stats');
+  static Future<ApiResult> workflowRunsClear({String? ruleId}) =>
+      _adminDelete('/admin/workflow/runs${ruleId != null ? "?rule_id=${Uri.encodeQueryComponent(ruleId)}" : ""}');
+
+  // ── Activity Feed (Wave 1P Phase WW) ──
+  static Future<ApiResult> activityList({
+    required String userId,
+    String? tenantId,
+    bool onlyUnread = false,
+    int limit = 50,
+    int offset = 0,
+  }) {
+    final qs = <String>[
+      'user_id=${Uri.encodeQueryComponent(userId)}',
+      'limit=$limit',
+      'offset=$offset',
+    ];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (onlyUnread) qs.add('only_unread=true');
+    return _get('/api/v1/activity?${qs.join('&')}');
+  }
+  static Future<ApiResult> activityMarkRead({
+    required String userId,
+    String? tenantId,
+  }) {
+    final qs = <String>['user_id=${Uri.encodeQueryComponent(userId)}'];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    return _post('/api/v1/activity/mark-read?${qs.join('&')}', const {});
+  }
+  static Future<ApiResult> activityStats() => _adminGet('/admin/activity/stats');
+
+  // ── Webhook Subscriptions (Wave 1E Phase T) ──
+  static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
+    final qs = <String>[];
+    if (tenantId != null) qs.add('tenant_id=$tenantId');
+    if (enabled != null) qs.add('enabled=$enabled');
+    final s = qs.isEmpty ? '' : '?${qs.join('&')}';
+    return _adminGet('/admin/webhooks$s');
+  }
+  static Future<ApiResult> webhooksCreate(Map body) => _adminPost('/admin/webhooks', body);
+  static Future<ApiResult> webhooksUpdate(String id, Map body) => _adminPatch('/admin/webhooks/$id', body);
+  static Future<ApiResult> webhooksDelete(String id) => _adminDelete('/admin/webhooks/$id');
+  static Future<ApiResult> webhooksReset(String id) => _adminPost('/admin/webhooks/$id/reset');
+  static Future<ApiResult> webhooksTest(String id, {String event = 'webhook.test', Map? payload}) =>
+      _adminPost('/admin/webhooks/$id/test', {'event': event, 'payload': payload ?? const {}});
+  static Future<ApiResult> webhooksStats() => _adminGet('/admin/webhooks/stats');
+
+  // ── API Keys (Wave 1F Phase X) ──
+  static Future<ApiResult> apiKeysList({String? tenantId, bool includeRevoked = false}) {
+    final qs = <String>['include_revoked=$includeRevoked'];
+    if (tenantId != null) qs.add('tenant_id=$tenantId');
+    return _adminGet('/admin/api-keys?${qs.join('&')}');
+  }
+  static Future<ApiResult> apiKeysCreate(Map body) => _adminPost('/admin/api-keys', body);
+  static Future<ApiResult> apiKeysUpdate(String id, Map body) => _adminPatch('/admin/api-keys/$id', body);
+  static Future<ApiResult> apiKeysRevoke(String id, {String? reason}) =>
+      _adminPost('/admin/api-keys/$id/revoke', {'reason': reason});
+  static Future<ApiResult> apiKeysStats() => _adminGet('/admin/api-keys/stats');
+
+  // ── Comments (Wave 1E Phase U) ──
+  static Future<ApiResult> commentsList({
+    required String objectType,
+    required String objectId,
+    String? tenantId,
+    bool includeDeleted = false,
+  }) {
+    final qs = <String>[
+      'object_type=${Uri.encodeQueryComponent(objectType)}',
+      'object_id=${Uri.encodeQueryComponent(objectId)}',
+      'include_deleted=$includeDeleted',
+    ];
+    if (tenantId != null) qs.add('tenant_id=$tenantId');
+    return _get('/api/v1/comments?${qs.join('&')}');
+  }
+  static Future<ApiResult> commentsAdd({
+    required String objectType,
+    required String objectId,
+    required String authorUserId,
+    required String body,
+    String? parentId,
+    String? tenantId,
+    List<String>? extraMentions,
+  }) =>
+      _post('/api/v1/comments', {
+        'object_type': objectType,
+        'object_id': objectId,
+        'author_user_id': authorUserId,
+        'body': body,
+        if (parentId != null) 'parent_id': parentId,
+        if (tenantId != null) 'tenant_id': tenantId,
+        if (extraMentions != null) 'extra_mentions': extraMentions,
+      });
+  static Future<ApiResult> commentsEdit(String id, String byUserId, String body) =>
+      _patch('/api/v1/comments/$id', {'by_user_id': byUserId, 'body': body});
+  static Future<ApiResult> commentsDelete(String id, String byUserId) async {
+    // Delete with body — re-implement here since _delete doesn't support body.
+    try {
+      final res = await _httpClient.delete(
+        Uri.parse('$_base/api/v1/comments/$id'),
+        headers: _h,
+        body: jsonEncode({'by_user_id': byUserId}),
+      );
+      if (res.statusCode >= 200 && res.statusCode < 300) return ApiResult.ok(jsonDecode(res.body));
+      return ApiResult.error(_parseErr(res.body, res.statusCode));
+    } catch (e) {
+      return ApiResult.error('خطأ: $e');
+    }
+  }
+  static Future<ApiResult> commentsReact(String id, String userId, String emoji) =>
+      _post('/api/v1/comments/$id/react', {'user_id': userId, 'emoji': emoji});
+
+  // ── Module Manager (Wave 1E Phase V) ──
+  static Future<ApiResult> modulesCatalog({String? category}) =>
+      _get('/api/v1/modules/catalog${category != null ? "?category=$category" : ""}');
+  static Future<ApiResult> modulesCategories() => _get('/api/v1/modules/categories');
+  static Future<ApiResult> modulesEffective(String tenantId) =>
+      _get('/api/v1/modules/effective?tenant_id=$tenantId');
+  static Future<ApiResult> modulesSet(String tenantId, String moduleId, bool enabled) =>
+      _adminPost('/admin/modules/set', {
+        'tenant_id': tenantId,
+        'module_id': moduleId,
+        'enabled': enabled,
+      });
+  static Future<ApiResult> modulesReset(String tenantId) =>
+      _adminPost('/admin/modules/reset', {'tenant_id': tenantId});
+  static Future<ApiResult> modulesStats() => _adminGet('/admin/modules/stats');
+
   // ── Approval Chains (Wave 1B Phase J) ──
   // /api/v1/approvals/inbox?user_id=...
   // /api/v1/approvals/{id}/approve  {user_id, comment}

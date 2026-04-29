@@ -252,6 +252,133 @@ _CATALOG: list[EventDefinition] = [
         label_en="User account suspended",
         category=EventCategory.user,
     ),
+    # ─ Proactive Suggestions (Wave 1G Phase EE) ─
+    EventDefinition(
+        name="suggestion.proposed",
+        label_ar="اقتراح من المنصة",
+        label_en="Proactive suggestion proposed",
+        category=EventCategory.system,
+        payload_schema={
+            "suggestion_id": "uuid",
+            "code": "string",
+            "severity": "string",
+            "title_ar": "string",
+            "action": "string",
+            "action_target": "string",
+            "tenant_id": "uuid",
+        },
+        description_ar=(
+            "يُطلق عند اكتشاف نمط يستحق إجراء (مثل تكرار فواتير متأخرة). "
+            "اربطه بـ workflow rule لإرسال الاقتراح لـ Slack."
+        ),
+    ),
+    EventDefinition(
+        name="suggestion.dismissed",
+        label_ar="تم تجاهل اقتراح",
+        label_en="Suggestion dismissed",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="suggestion.applied",
+        label_ar="تم تطبيق اقتراح",
+        label_en="Suggestion applied",
+        category=EventCategory.system,
+    ),
+
+    # ─ Custom Roles (Wave 1F Phase Y) ─
+    EventDefinition(
+        name="role.created",
+        label_ar="تم إنشاء دور مخصّص",
+        label_en="Custom role created",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="role.deleted",
+        label_ar="تم حذف دور مخصّص",
+        label_en="Custom role deleted",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="role.assigned",
+        label_ar="تم منح دور لمستخدم",
+        label_en="Role assigned to user",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="role.revoked",
+        label_ar="تم سحب دور من مستخدم",
+        label_en="Role revoked from user",
+        category=EventCategory.system,
+    ),
+
+    # ─ Industry Packs (Wave 1K Phase PP) ─
+    EventDefinition(
+        name="industry_pack.applied",
+        label_ar="تم تطبيق حزمة قطاع",
+        label_en="Industry pack applied to tenant",
+        category=EventCategory.system,
+        payload_schema={
+            "tenant_id": "uuid",
+            "pack_id": "string",
+            "pack_name_ar": "string",
+            "applied_by": "user_id?",
+            "coa_account_count": "int",
+            "widget_count": "int",
+        },
+    ),
+    EventDefinition(
+        name="industry_pack.refreshed",
+        label_ar="تم تحديث حزمة القطاع",
+        label_en="Industry pack reapplied (timestamp refresh)",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="industry_pack.removed",
+        label_ar="تم إلغاء تخصيص الحزمة",
+        label_en="Industry pack assignment removed",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="industry_pack.provisioned",
+        label_ar="اكتمل التهيئة التلقائية لحزمة القطاع",
+        label_en="Industry pack auto-provisioning completed",
+        category=EventCategory.system,
+        payload_schema={
+            "tenant_id": "uuid",
+            "pack_id": "string",
+            "workflows_installed": "int",
+            "workflows_failed": "int",
+            "coa_seeded": "bool",
+            "widgets_provisioned": "bool",
+        },
+    ),
+
+    # ─ Tenant Directory (Wave 1N Phase TT) ─
+    EventDefinition(
+        name="tenant.registered",
+        label_ar="تم تسجيل مستأجر جديد",
+        label_en="New tenant registered in directory",
+        category=EventCategory.system,
+        payload_schema={
+            "tenant_id": "string",
+            "display_name": "string",
+            "industry_pack_id": "string?",
+            "created_by": "user_id?",
+        },
+    ),
+    EventDefinition(
+        name="tenant.updated",
+        label_ar="تم تحديث بيانات مستأجر",
+        label_en="Tenant directory record updated",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="tenant.deactivated",
+        label_ar="تم تعطيل مستأجر",
+        label_en="Tenant deactivated",
+        category=EventCategory.system,
+    ),
+
     # ─ Module Manager (per-tenant enable/disable) ─
     EventDefinition(
         name="module.enabled",
