@@ -212,6 +212,13 @@ class _HybridSidebarState extends State<HybridSidebar> {
           keywords: ['templates', 'قوالب'],
           requiredRoles: ['platform_admin', 'super_admin'],
         ),
+        _NavItem(
+          'إدارة الوحدات',
+          '/admin/modules',
+          Icons.extension_rounded,
+          keywords: ['modules', 'وحدات', 'tenant'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
       ],
       requiredRoles: ['platform_admin', 'super_admin', 'reviewer'],
     ),

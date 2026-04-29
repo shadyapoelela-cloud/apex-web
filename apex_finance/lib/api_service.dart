@@ -827,6 +827,22 @@ class ApiService {
       _get('/api/v1/events/list${category != null ? "?category=$category" : ""}');
   static Future<ApiResult> eventsCategories() => _get('/api/v1/events/categories');
 
+  // ── Module Manager (Wave 1E Phase V) ──
+  static Future<ApiResult> modulesCatalog({String? category}) =>
+      _get('/api/v1/modules/catalog${category != null ? "?category=$category" : ""}');
+  static Future<ApiResult> modulesCategories() => _get('/api/v1/modules/categories');
+  static Future<ApiResult> modulesEffective(String tenantId) =>
+      _get('/api/v1/modules/effective?tenant_id=$tenantId');
+  static Future<ApiResult> modulesSet(String tenantId, String moduleId, bool enabled) =>
+      _adminPost('/admin/modules/set', {
+        'tenant_id': tenantId,
+        'module_id': moduleId,
+        'enabled': enabled,
+      });
+  static Future<ApiResult> modulesReset(String tenantId) =>
+      _adminPost('/admin/modules/reset', {'tenant_id': tenantId});
+  static Future<ApiResult> modulesStats() => _adminGet('/admin/modules/stats');
+
   // ── Approval Chains (Wave 1B Phase J) ──
   // /api/v1/approvals/inbox?user_id=...
   // /api/v1/approvals/{id}/approve  {user_id, comment}
