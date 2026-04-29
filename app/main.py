@@ -788,6 +788,16 @@ try:
 except Exception as _e:
     logging.warning(f"Event registry router not mounted: {_e}")
 
+# Workflow Rules Engine — declarative no-code automation (Wave 3 target).
+# Importing the engine module also registers a global event-bus listener.
+try:
+    from app.core import workflow_engine  # noqa: F401 — import registers listener
+    from app.core.workflow_routes import router as workflow_router
+    app.include_router(workflow_router)
+    logging.info("Workflow engine + routes mounted at /admin/workflow")
+except Exception as _e:
+    logging.warning(f"Workflow engine not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

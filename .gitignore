@@ -88,3 +88,4 @@ _backups/
 phase1.ps1
 .claude/
 apex_audit.txt
+workflow_rules.json
