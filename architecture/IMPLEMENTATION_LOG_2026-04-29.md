@@ -30,12 +30,15 @@
 | M | `b6efe5c` | 3 (Workflow) | Workflow Templates Library — 12 pre-built rules across 5 categories (approvals, alerts, automations, compliance, ops) with parameter substitution | +600 |
 | N | `504012e` | 9 (Adaptive UX) | ApprovalsInboxScreen wired to live backend — replaces 5 hardcoded sample rows with `/api/v1/approvals/inbox` + functional approve/reject buttons + retry on error | +180 |
 | O | `48a9ec2` | 7 (Forecast UX) | Live Forecast card on /analytics/cash-flow-forecast — KPI chips + per-week projection table from `/api/v1/forecast/cashflow`. Synthetic chart kept on top for empty-tenant fallback | +204 |
+| 📚 | `b470517` | (docs) | Implementation log v3 (added L/M/N/O) | +17 |
+| P+Q+S | `d644f8c` | 3+9 (Admin UX) | Workflow Templates Browser + Workflow Rules Console (Flutter screens) — admin-secret-gated, full CRUD UI for the workflow engine. New `_adminGet/_adminPost/_adminPatch/_adminDelete` helpers in api_service. Admin sidebar gains "محرّك الأتمتة" + "قوالب الأتمتة" entries. Routes mounted under `/admin/workflow/rules` and `/admin/workflow/templates`. | +1056 |
 
-**Total LOC added (Wave 1A + 1B + 1C)**: ~5,150 (code) + this doc.
+**Total LOC added (Wave 1A + 1B + 1C + 1D)**: ~6,200 (code) + this doc.
 **Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
 **Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
 **Wave 1C (commits L–O)**: 4 commits, ~1,350 LOC.
-**Time elapsed**: ~7 hours of continuous Claude work.
+**Wave 1D (commit P+Q+S)**: 1 combined commit, ~1,056 LOC.
+**Time elapsed**: ~9 hours of continuous Claude work.
 
 ---
 
