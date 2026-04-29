@@ -736,6 +736,44 @@ class ApiService {
     } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
 
+  // ── Approval Chains (Wave 1B Phase J) ──
+  // /api/v1/approvals/inbox?user_id=...
+  // /api/v1/approvals/{id}/approve  {user_id, comment}
+  // /api/v1/approvals/{id}/reject   {user_id, comment}
+  static Future<ApiResult> approvalsInbox(String userId, {String? tenantId}) {
+    final qs = <String>['user_id=${Uri.encodeQueryComponent(userId)}'];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    return _get('/api/v1/approvals/inbox?${qs.join('&')}');
+  }
+  static Future<ApiResult> approvalsGet(String approvalId) =>
+      _get('/api/v1/approvals/$approvalId');
+  static Future<ApiResult> approvalsApprove(String approvalId, String userId, {String? comment}) =>
+      _post('/api/v1/approvals/$approvalId/approve', {
+        'user_id': userId,
+        if (comment != null && comment.isNotEmpty) 'comment': comment,
+      });
+  static Future<ApiResult> approvalsReject(String approvalId, String userId, {String? comment}) =>
+      _post('/api/v1/approvals/$approvalId/reject', {
+        'user_id': userId,
+        if (comment != null && comment.isNotEmpty) 'comment': comment,
+      });
+
+  // ── Cash-Flow Forecast (Wave 1B Phase I) ──
+  static Future<ApiResult> forecastCashflow({
+    required String tenantId,
+    String? entityId,
+    int weeks = 4,
+    int historyWeeks = 12,
+  }) {
+    final qs = <String>[
+      'tenant_id=${Uri.encodeQueryComponent(tenantId)}',
+      'weeks=$weeks',
+      'history_weeks=$historyWeeks',
+    ];
+    if (entityId != null) qs.add('entity_id=${Uri.encodeQueryComponent(entityId)}');
+    return _get('/api/v1/forecast/cashflow?${qs.join('&')}');
+  }
+
   // ── Phase 1: Client Readiness + Documents + Approval Gate ──
   static Future<ApiResult> getClientReadiness(String clientId) => _get('/clients/$clientId/readiness');
   static Future<ApiResult> getClientDocuments(String clientId) => _get('/clients/$clientId/documents');

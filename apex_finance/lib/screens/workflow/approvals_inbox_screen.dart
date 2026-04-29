@@ -1,11 +1,17 @@
 /// APEX — Workflow Approvals Inbox
-/// /workflow/approvals — multi-step approval queue per user
+/// /workflow/approvals — multi-step approval queue per user.
+///
+/// Wired to the live Approval Chains backend (Wave 1B Phase J) at
+/// /api/v1/approvals/inbox + approve/reject endpoints. Replaces the
+/// hardcoded sample data that was here for the Sprint 41 demo.
 library;
 
 import 'package:flutter/material.dart';
 
+import '../../api_service.dart';
 import '../../core/apex_empty_state.dart';
 import '../../core/apex_list_shell.dart';
+import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../widgets/apex_output_chips.dart';
 
@@ -17,44 +23,108 @@ class ApprovalsInboxScreen extends StatefulWidget {
 
 class _ApprovalsInboxScreenState extends State<ApprovalsInboxScreen> {
   String _filter = 'pending';
+  bool _loading = true;
+  String? _error;
+  List<Map<String, dynamic>> _items = [];
 
-  final List<Map<String, dynamic>> _items = [
-    {
-      'id': 'APR-001', 'title': 'فاتورة شراء كبيرة',
-      'object': 'BILL-2026-0142', 'amount': 95000.0,
-      'requester': 'أحمد العتيبي', 'submitted_at': 'منذ 2 ساعة',
-      'step': '2 من 3 — مدير مالي',
-      'kind': 'bill', 'status': 'pending',
-    },
-    {
-      'id': 'APR-002', 'title': 'تجاوز الموازنة — قسم التسويق',
-      'object': 'BUDGET-MKT-04', 'amount': 12500.0,
-      'requester': 'سارة المطيري', 'submitted_at': 'منذ 4 ساعات',
-      'step': '1 من 2 — مدير العمليات',
-      'kind': 'budget', 'status': 'pending',
-    },
-    {
-      'id': 'APR-003', 'title': 'قيد جردي يدوي',
-      'object': 'JE-2026-0142', 'amount': 50000.0,
-      'requester': 'محمد القحطاني', 'submitted_at': 'منذ يوم',
-      'step': '3 من 3 — الشريك',
-      'kind': 'je', 'status': 'pending',
-    },
-    {
-      'id': 'APR-004', 'title': 'مصروف سفر',
-      'object': 'EXP-2026-0042', 'amount': 1250.0,
-      'requester': 'أحمد العتيبي', 'submitted_at': 'منذ 3 أيام',
-      'step': '2 من 2 — مدير مالي',
-      'kind': 'expense', 'status': 'approved',
-    },
-    {
-      'id': 'APR-005', 'title': 'إقرار VAT — أبريل',
-      'object': 'VAT-2026-04', 'amount': 1725.0,
-      'requester': 'النظام', 'submitted_at': 'منذ ساعة',
-      'step': '1 من 1 — مالك',
-      'kind': 'vat', 'status': 'pending',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final uid = S.uid;
+    if (uid == null || uid.isEmpty) {
+      setState(() {
+        _loading = false;
+        _error = 'يجب تسجيل الدخول لعرض صندوق الموافقات';
+      });
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    final res = await ApiService.approvalsInbox(uid);
+    if (!mounted) return;
+    if (res.success) {
+      final data = res.data;
+      final raw = data is Map ? (data['approvals'] ?? const []) : const [];
+      _items = (raw as List)
+          .cast<Map<String, dynamic>>()
+          .map(_normalize)
+          .toList(growable: false);
+      _loading = false;
+    } else {
+      _loading = false;
+      _error = res.error ?? 'فشل تحميل صندوق الموافقات';
+    }
+    setState(() {});
+  }
+
+  Map<String, dynamic> _normalize(Map<String, dynamic> a) {
+    // Adapt the backend payload (id, title_ar, stages[], state, meta) to
+    // the shape the existing card UI expects (title, object, amount,
+    // step, kind, status). Lossless: original kept under "_raw".
+    final stages = (a['stages'] as List?) ?? const [];
+    final currentStage = a['current_stage'] is int ? a['current_stage'] as int : 0;
+    final totalStages = stages.length;
+    final meta = a['meta'] is Map ? a['meta'] as Map : const {};
+    final triggerPayload = meta['trigger_payload'] is Map ? meta['trigger_payload'] as Map : const {};
+
+    final amount = (triggerPayload['total_amount'] ??
+        triggerPayload['amount'] ??
+        triggerPayload['total'] ??
+        0)
+        .toDouble();
+
+    final state = (a['state'] ?? 'pending').toString();
+    final filterStatus = state == 'pending' ? 'pending'
+        : state == 'approved' ? 'approved'
+        : state == 'rejected' ? 'rejected'
+        : 'pending';
+
+    return {
+      'id': a['id'],
+      'title': a['title_ar'] ?? a['title_en'] ?? 'موافقة',
+      'object': a['object_id']?.toString() ?? '',
+      'amount': amount is double ? amount : (amount as num).toDouble(),
+      'requester': a['requested_by']?.toString() ?? 'النظام',
+      'submitted_at': a['created_at']?.toString().substring(0, 10) ?? '',
+      'step': totalStages > 0
+          ? '${currentStage + 1} من $totalStages'
+          : '—',
+      'kind': a['object_type']?.toString() ?? 'task',
+      'status': filterStatus,
+      '_raw': a,
+    };
+  }
+
+  Future<void> _decide(Map<String, dynamic> i, bool approve) async {
+    final id = (i['id'] ?? '').toString();
+    if (id.isEmpty) return;
+    final res = approve
+        ? await ApiService.approvalsApprove(id, S.uid ?? '')
+        : await ApiService.approvalsReject(id, S.uid ?? '');
+    if (!mounted) return;
+    if (res.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: approve ? AC.ok : AC.warn,
+          content: Text(approve ? 'تمت الموافقة' : 'تم الرفض'),
+        ),
+      );
+      _load();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AC.err,
+          content: Text(res.error ?? 'حدث خطأ'),
+        ),
+      );
+    }
+  }
 
   IconData _kindIcon(String k) => switch (k) {
         'bill' => Icons.receipt,
@@ -84,6 +154,38 @@ class _ApprovalsInboxScreenState extends State<ApprovalsInboxScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return Scaffold(
+        backgroundColor: AC.navy,
+        body: Center(child: CircularProgressIndicator(color: AC.gold)),
+      );
+    }
+    if (_error != null) {
+      return Scaffold(
+        backgroundColor: AC.navy,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, color: AC.err, size: 48),
+                const SizedBox(height: 16),
+                Text(_error!,
+                    style: TextStyle(color: AC.tp, fontSize: 14),
+                    textAlign: TextAlign.center),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: _load,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('إعادة المحاولة'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return ApexListShell<Map<String, dynamic>>(
       title: 'صندوق الموافقات',
       subtitle: 'بانتظار قرارك: ${_pendingTotal.toStringAsFixed(0)} SAR',
@@ -113,7 +215,7 @@ class _ApprovalsInboxScreenState extends State<ApprovalsInboxScreen> {
             count: _items.length),
       ],
       items: _filtered,
-      onRefresh: () async {},
+      onRefresh: _load,
       listFooter: const ApexOutputChips(items: [
         ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
         ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
@@ -174,7 +276,7 @@ class _ApprovalsInboxScreenState extends State<ApprovalsInboxScreen> {
               Row(children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () {},
+                    onPressed: () => _decide(i, false),
                     icon: Icon(Icons.close, color: AC.err, size: 14),
                     label: Text('رفض', style: TextStyle(color: AC.err)),
                     style: OutlinedButton.styleFrom(side: BorderSide(color: AC.err)),
@@ -183,7 +285,7 @@ class _ApprovalsInboxScreenState extends State<ApprovalsInboxScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () => _decide(i, true),
                     icon: const Icon(Icons.check, size: 14),
                     label: const Text('اعتمد'),
                     style: ElevatedButton.styleFrom(
