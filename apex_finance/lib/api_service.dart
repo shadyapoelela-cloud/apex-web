@@ -30,6 +30,28 @@ class ApiService {
   static bool get isAuthenticated => _token != null;
   static Map<String,String> get _h => {'Content-Type':'application/json', if((_token ?? S.token)!=null)'Authorization':'Bearer ${_token ?? S.token ?? ""}'};
 
+  // ── Admin secret (X-Admin-Secret header) ──
+  // Persisted in localStorage so the admin doesn't have to retype it every
+  // session. Cleared on logout via S.clear() side-effects elsewhere.
+  static String? _adminSecret;
+  static String? get adminSecret {
+    _adminSecret ??= html.window.localStorage['apex_admin_secret'];
+    return _adminSecret;
+  }
+  static set adminSecret(String? v) {
+    _adminSecret = v;
+    if (v != null && v.isNotEmpty) {
+      html.window.localStorage['apex_admin_secret'] = v;
+    } else {
+      html.window.localStorage.remove('apex_admin_secret');
+    }
+  }
+  static bool get hasAdminSecret => (adminSecret ?? '').isNotEmpty;
+  static Map<String,String> get _ha => {
+    ..._h,
+    if (hasAdminSecret) 'X-Admin-Secret': adminSecret!,
+  };
+
   // ── Auth ──
   static Future<ApiResult> login(String username, String password) => _post('/auth/login', {'username_or_email':username,'password':password});
   static Future<ApiResult> register({required String username, required String email, required String password, String? displayName, String? mobile, String? countryCode}) => _post('/auth/register', {'username':username,'email':email,'password':password,if(displayName!=null)'display_name':displayName,if(mobile!=null)'mobile':mobile,if(countryCode!=null)'mobile_country_code':countryCode});
@@ -735,6 +757,75 @@ class ApiService {
       return ApiResult.error(_parseErr(body, streamed.statusCode));
     } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
+
+  // ── Admin-secret-gated helpers (used by Wave 1A/1B/1C admin routes) ──
+  static Future<ApiResult> _adminGet(String path) async {
+    try {
+      final res = await _httpClient.get(Uri.parse('$_base$path'), headers: _ha);
+      if (res.statusCode == 200) return ApiResult.ok(jsonDecode(res.body));
+      return ApiResult.error(_parseErr(res.body, res.statusCode));
+    } catch (e) { return ApiResult.error('خطأ: $e'); }
+  }
+  static Future<ApiResult> _adminPost(String path, [Map? body]) async {
+    try {
+      final res = await _httpClient.post(
+        Uri.parse('$_base$path'),
+        headers: _ha,
+        body: jsonEncode(body ?? const {}),
+      );
+      if (res.statusCode >= 200 && res.statusCode < 300) return ApiResult.ok(jsonDecode(res.body));
+      return ApiResult.error(_parseErr(res.body, res.statusCode));
+    } catch (e) { return ApiResult.error('خطأ: $e'); }
+  }
+  static Future<ApiResult> _adminPatch(String path, Map body) async {
+    try {
+      final res = await _httpClient.patch(Uri.parse('$_base$path'), headers: _ha, body: jsonEncode(body));
+      if (res.statusCode >= 200 && res.statusCode < 300) return ApiResult.ok(jsonDecode(res.body));
+      return ApiResult.error(_parseErr(res.body, res.statusCode));
+    } catch (e) { return ApiResult.error('خطأ: $e'); }
+  }
+  static Future<ApiResult> _adminDelete(String path) async {
+    try {
+      final res = await _httpClient.delete(Uri.parse('$_base$path'), headers: _ha);
+      if (res.statusCode >= 200 && res.statusCode < 300) return ApiResult.ok(jsonDecode(res.body));
+      return ApiResult.error(_parseErr(res.body, res.statusCode));
+    } catch (e) { return ApiResult.error('خطأ: $e'); }
+  }
+
+  // ── Workflow Engine + Templates (Wave 1A Phase G + Wave 1C Phase M) ──
+  static Future<ApiResult> workflowListRules({String? tenantId}) =>
+      _adminGet('/admin/workflow/rules${tenantId != null ? "?tenant_id=$tenantId" : ""}');
+  static Future<ApiResult> workflowGetRule(String id) =>
+      _adminGet('/admin/workflow/rules/$id');
+  static Future<ApiResult> workflowCreateRule(Map body) =>
+      _adminPost('/admin/workflow/rules', body);
+  static Future<ApiResult> workflowUpdateRule(String id, Map body) =>
+      _adminPatch('/admin/workflow/rules/$id', body);
+  static Future<ApiResult> workflowDeleteRule(String id) =>
+      _adminDelete('/admin/workflow/rules/$id');
+  static Future<ApiResult> workflowRunRule(String id, Map payload, {bool dryRun = true}) =>
+      _adminPost('/admin/workflow/rules/$id/run', {'payload': payload, 'dry_run': dryRun});
+  static Future<ApiResult> workflowStats() => _adminGet('/admin/workflow/stats');
+  static Future<ApiResult> workflowListTemplates({String? category}) =>
+      _adminGet('/admin/workflow/templates${category != null ? "?category=$category" : ""}');
+  static Future<ApiResult> workflowGetTemplate(String id) =>
+      _adminGet('/admin/workflow/templates/$id');
+  static Future<ApiResult> workflowInstallTemplate(
+    String id, {
+    Map<String, dynamic>? parameterValues,
+    String? tenantId,
+    bool enabled = true,
+  }) =>
+      _adminPost('/admin/workflow/templates/$id/install', {
+        'parameter_values': parameterValues ?? const {},
+        if (tenantId != null) 'tenant_id': tenantId,
+        'enabled': enabled,
+      });
+
+  // ── Event Catalog (Wave 1A Phase F) — public, no admin secret needed ──
+  static Future<ApiResult> eventsList({String? category}) =>
+      _get('/api/v1/events/list${category != null ? "?category=$category" : ""}');
+  static Future<ApiResult> eventsCategories() => _get('/api/v1/events/categories');
 
   // ── Approval Chains (Wave 1B Phase J) ──
   // /api/v1/approvals/inbox?user_id=...
