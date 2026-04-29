@@ -137,6 +137,76 @@ git revert <commit-hash>
 
 ---
 
+## Commit 4 — Stage 5b Follow-up: GOSI / EOSB Promotion
+
+**القرار**: ترقية الحاسبتين (calculators حقيقيات، مش mocks) من demo path لـ production path.
+
+### التغييرات
+
+**1. `apex_finance/lib/core/router.dart`** — راوتس جديدة:
+```dart
+GoRoute(path: '/hr/gosi', pageBuilder: ... GosiCalcScreen),
+GoRoute(path: '/hr/eosb', pageBuilder: ... EosbCalcScreen),
+GoRoute(path: '/gosi-demo', redirect: (c, s) => '/hr/gosi'),  // backward compat
+GoRoute(path: '/eosb-demo', redirect: (c, s) => '/hr/eosb'),  // backward compat
+```
+
+**2. `apex_finance/lib/core/apex_commands_registry.dart`**:
+- شيل `'nav_gosi_demo'` و `'nav_eosb_demo'` من الـ `_adminOnlyCommandIds`
+- جدد الـ command IDs لـ `nav_hr_gosi`, `nav_hr_eosb` + paths لـ `/hr/gosi`, `/hr/eosb`
+- subtitle محدّث ليذكر "HR Suite"
+
+**3. `apex_finance/lib/screens/whats_new/apex_whats_new_hub.dart`**:
+- شيل `/gosi-demo` و `/eosb-demo` من `_adminOnlyRoutes`
+- tiles GOSI و EOSB الآن point لـ `/hr/gosi` و `/hr/eosb`
+
+**4. `apex_finance/lib/screens/whats_new/apex_map_screen.dart`**:
+- entries GOSI و EOSB الآن point للمسارات الجديدة
+
+**5. `apex_finance/lib/screens/home/apex_service_hub_screen.dart`** — HR hub محسّن:
+- 4 tiles جديدة في قسم "المخرجات — رواتب + GOSI"
+- 2 featured tiles مضافة: "حاسبة GOSI / GPSSA" و "مكافأة نهاية الخدمة"
+
+### النتيجة
+
+| المسار | قبل | بعد |
+|--------|-----|-----|
+| `/hr/gosi` | لا توجد | ✅ راوت جديد، public |
+| `/hr/eosb` | لا توجد | ✅ راوت جديد، public |
+| `/gosi-demo` | admin-only screen | redirect → `/hr/gosi` |
+| `/eosb-demo` | admin-only screen | redirect → `/hr/eosb` |
+| HR Hub tiles | 4 (employees, payroll, timesheet, expenses) | 6 (+ GOSI, + EOSB) |
+
+### الفائدة
+
+- ✅ كل المستخدمين (registered_user, client_user, إلخ) يقدرون يستخدموا GOSI/EOSB
+- ✅ ميزتين قيّمتين خرجوا من قائمة الـ demos
+- ✅ تجربة HR أكمل (من 4 → 6 ميزات)
+- ✅ Backward compat كاملة (الـ old URLs لسه تشتغل)
+
+### التحقق
+
+```
+$ flutter analyze lib/core/router.dart lib/core/apex_commands_registry.dart \
+                  lib/screens/whats_new/apex_whats_new_hub.dart \
+                  lib/screens/whats_new/apex_map_screen.dart \
+                  lib/screens/home/apex_service_hub_screen.dart
+1 issue found (pre-existing unused_element — not from this change)
+```
+
+```
+$ grep -rn "gosi-demo\|eosb-demo" apex_finance/lib
+# Only the 2 redirect definitions remain — all consumers updated
+```
+
+### Rollback
+
+```bash
+git revert <this-commit>
+```
+
+---
+
 ## ⚠️ متوقّفة — تحتاج موافقة الـ deeper changes
 
 ### Stage 5b: Demo Screens

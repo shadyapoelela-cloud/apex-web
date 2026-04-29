@@ -410,16 +410,19 @@ final appRouter = GoRouter(
       redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const BankOcrDemoScreen(), s),
     ),
+    // GOSI + EOSB calculators promoted to production HR features (Stage 5b
+    // follow-up, 2026-04-29). Old /*-demo paths kept as redirects for
+    // backward compatibility with bookmarks and external links.
     GoRoute(
-      path: '/gosi-demo',
-      redirect: _adminOnly,
+      path: '/hr/gosi',
       pageBuilder: (c, s) => _apexPage(const GosiCalcScreen(), s),
     ),
     GoRoute(
-      path: '/eosb-demo',
-      redirect: _adminOnly,
+      path: '/hr/eosb',
       pageBuilder: (c, s) => _apexPage(const EosbCalcScreen(), s),
     ),
+    GoRoute(path: '/gosi-demo', redirect: (c, s) => '/hr/gosi'),
+    GoRoute(path: '/eosb-demo', redirect: (c, s) => '/hr/eosb'),
     GoRoute(
       path: '/whatsapp-demo',
       redirect: _adminOnly,

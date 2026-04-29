@@ -319,11 +319,11 @@ class ApexMapScreen extends StatelessWidget {
             icon: Icons.document_scanner),
         _Item(
             title: 'GOSI',
-            route: '/gosi-demo',
+            route: '/hr/gosi',
             icon: Icons.shield_outlined),
         _Item(
             title: 'EOSB',
-            route: '/eosb-demo',
+            route: '/hr/eosb',
             icon: Icons.flight_takeoff),
         _Item(
             title: 'Onboarding Wizard',

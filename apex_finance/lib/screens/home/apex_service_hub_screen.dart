@@ -434,12 +434,16 @@ class ApexServiceHubScreen extends StatelessWidget {
           color: 0xFFFFC107,
           tiles: [
             _Tile('تشغيل الرواتب', 'GOSI + Saudization', '/hr/payroll-run', Icons.payments),
+            _Tile('حاسبة GOSI / GPSSA', 'KSA 10/12% · UAE 5/12.5%', '/hr/gosi', Icons.calculate),
+            _Tile('مكافأة نهاية الخدمة', 'EOSB — KSA Art.84-85 · UAE Art.51-52', '/hr/eosb', Icons.logout),
             _Tile('قائمة القيود', 'JE من الرواتب', '/accounting/je-list', Icons.book),
           ]),
       ],
       tiles: [
         _Tile('الموظفون', 'مع Saudization tier', '/hr/employees', Icons.badge, featured: true),
         _Tile('تشغيل الرواتب', 'GOSI + Saudization', '/hr/payroll-run', Icons.payments, featured: true),
+        _Tile('حاسبة GOSI / GPSSA', 'حساب فوري للاشتراكات', '/hr/gosi', Icons.calculate, featured: true),
+        _Tile('مكافأة نهاية الخدمة', 'EOSB Calculator', '/hr/eosb', Icons.logout, featured: true),
         _Tile('سجل ساعات العمل', 'Weekly timesheet', '/hr/timesheet', Icons.access_time),
         _Tile('تقارير المصاريف', 'Expense workflow', '/hr/expense-reports', Icons.receipt_long),
       ],

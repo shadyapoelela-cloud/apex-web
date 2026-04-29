@@ -14,6 +14,8 @@ import 'session.dart';
 
 /// Cmd+K commands gated to platform_admin (mock demos, dev tools, showcase).
 /// Non-admin sessions never see these in the palette.
+/// Note: GOSI + EOSB graduated to production HR features (`/hr/gosi`,
+/// `/hr/eosb`) and are no longer demo-gated.
 const Set<String> _adminOnlyCommandIds = {
   'nav_apex_showcase',
   'nav_uae_corp_tax',
@@ -21,8 +23,6 @@ const Set<String> _adminOnlyCommandIds = {
   'nav_payments_playground',
   'nav_ap_pipeline',
   'nav_bank_ocr',
-  'nav_gosi_demo',
-  'nav_eosb_demo',
   'nav_whatsapp_demo',
 };
 
@@ -799,20 +799,20 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (ctx) => GoRouter.of(ctx).go('/bank-ocr-demo'),
     ),
     ApexCommand(
-      id: 'nav_gosi_demo',
+      id: 'nav_hr_gosi',
       label: 'حاسبة GOSI / GPSSA',
-      subtitle: 'KSA 10/12% | UAE 5/12.5%',
+      subtitle: 'KSA 10/12% | UAE 5/12.5% — HR Suite',
       kind: ApexCommandKind.navigation,
       icon: Icons.calculate,
-      onRun: (ctx) => GoRouter.of(ctx).go('/gosi-demo'),
+      onRun: (ctx) => GoRouter.of(ctx).go('/hr/gosi'),
     ),
     ApexCommand(
-      id: 'nav_eosb_demo',
+      id: 'nav_hr_eosb',
       label: 'مكافأة نهاية الخدمة EOSB',
-      subtitle: 'KSA Art. 84-85 + UAE Art. 51-52',
+      subtitle: 'KSA Art. 84-85 + UAE Art. 51-52 — HR Suite',
       kind: ApexCommandKind.navigation,
       icon: Icons.logout,
-      onRun: (ctx) => GoRouter.of(ctx).go('/eosb-demo'),
+      onRun: (ctx) => GoRouter.of(ctx).go('/hr/eosb'),
     ),
     ApexCommand(
       id: 'nav_whatsapp_demo',

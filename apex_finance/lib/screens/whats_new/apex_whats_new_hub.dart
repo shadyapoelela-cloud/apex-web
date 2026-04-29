@@ -14,6 +14,7 @@ import '../../core/theme.dart';
 
 /// Routes that are gated to platform_admin (mock demos, dev tools, showcase).
 /// Tiles linking to these are filtered out of the Hub for non-admin users.
+/// Note: GOSI + EOSB graduated to production at `/hr/gosi` and `/hr/eosb`.
 const Set<String> _adminOnlyRoutes = {
   '/showcase',
   '/uae-corp-tax',
@@ -25,8 +26,6 @@ const Set<String> _adminOnlyRoutes = {
   '/payments-playground',
   '/ap-pipeline-demo',
   '/bank-ocr-demo',
-  '/gosi-demo',
-  '/eosb-demo',
   '/whatsapp-demo',
 };
 
@@ -194,7 +193,7 @@ class ApexWhatsNewHub extends StatelessWidget {
                       icon: Icons.calculate,
                       title: 'GOSI / GPSSA Calculator',
                       subtitle: 'KSA 10/12% → 45K cap | UAE 5/12.5% → 50K cap',
-                      route: '/gosi-demo',
+                      route: '/hr/gosi',
                       status: _Status.done,
                     ),
                     _Item(
@@ -208,7 +207,7 @@ class ApexWhatsNewHub extends StatelessWidget {
                       icon: Icons.logout,
                       title: 'EOSB Calculator',
                       subtitle: 'نظام العمل السعودي + UAE Art. 51-52',
-                      route: '/eosb-demo',
+                      route: '/hr/eosb',
                       status: _Status.done,
                     ),
                   ]),
