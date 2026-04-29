@@ -841,6 +841,16 @@ try:
 except Exception as _e:
     logging.warning(f"Workflow templates router not mounted: {_e}")
 
+# Webhook Subscriptions — third-party / internal systems subscribe to events.
+# Importing the module registers a global event_bus listener.
+try:
+    from app.core import webhook_subscriptions  # noqa: F401 — registers listener
+    from app.core.webhook_subscription_routes import router as webhook_router
+    app.include_router(webhook_router)
+    logging.info("Webhook subscriptions router mounted at /admin/webhooks")
+except Exception as _e:
+    logging.warning(f"Webhook subscriptions router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router
