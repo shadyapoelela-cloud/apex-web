@@ -887,6 +887,16 @@ try:
 except Exception as _e:
     logging.warning(f"Custom roles router not mounted: {_e}")
 
+# Proactive Suggestions — pattern detector across event stream.
+# Importing the module registers detectors on the bus.
+try:
+    from app.core import proactive_suggestions  # noqa: F401 — registers detectors
+    from app.core.proactive_suggestion_routes import router as suggestion_router
+    app.include_router(suggestion_router)
+    logging.info("Suggestions router mounted at /api/v1/suggestions")
+except Exception as _e:
+    logging.warning(f"Suggestions router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

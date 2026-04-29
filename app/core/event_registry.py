@@ -252,6 +252,39 @@ _CATALOG: list[EventDefinition] = [
         label_en="User account suspended",
         category=EventCategory.user,
     ),
+    # ─ Proactive Suggestions (Wave 1G Phase EE) ─
+    EventDefinition(
+        name="suggestion.proposed",
+        label_ar="اقتراح من المنصة",
+        label_en="Proactive suggestion proposed",
+        category=EventCategory.system,
+        payload_schema={
+            "suggestion_id": "uuid",
+            "code": "string",
+            "severity": "string",
+            "title_ar": "string",
+            "action": "string",
+            "action_target": "string",
+            "tenant_id": "uuid",
+        },
+        description_ar=(
+            "يُطلق عند اكتشاف نمط يستحق إجراء (مثل تكرار فواتير متأخرة). "
+            "اربطه بـ workflow rule لإرسال الاقتراح لـ Slack."
+        ),
+    ),
+    EventDefinition(
+        name="suggestion.dismissed",
+        label_ar="تم تجاهل اقتراح",
+        label_en="Suggestion dismissed",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="suggestion.applied",
+        label_ar="تم تطبيق اقتراح",
+        label_en="Suggestion applied",
+        category=EventCategory.system,
+    ),
+
     # ─ Custom Roles (Wave 1F Phase Y) ─
     EventDefinition(
         name="role.created",
