@@ -55,8 +55,9 @@
 | TT+UU | `3b49fe7` | 4.4+11 (Onboarding) | Tenant directory + 3-step onboarding wizard chains every Wave 1A-1M backend in one minute. **TT** (backend): `tenant_directory.py` JSON-as-DB store + 8 endpoints incl. `POST /admin/tenants/onboard` which atomically registers + applies pack (auto-provisioner takes over). 3 new events `tenant.registered/.updated/.deactivated` (51→54). **UU** (UI): wizard at `/admin/tenant-onboarding` (3 steps + success page with 4 verification quick-links) and directory list at `/admin/tenants` (status filter + stats bar + per-row actions: open rules filtered by tenant_id, open packs, deactivate, activate, delete). 9 api_service helpers, 2 routes, 2 sidebar entries, 2 dashboard quick-links. | +1,681 |
 | VV | `f2a1e7b` | 11 (Observability) | Workflow Run History closes the production-debug gap on the engine. Backend: `workflow_run_history.py` JSON-as-DB ring buffer (cap 5K) with payload truncation; `workflow_engine.process_event` now records every match w/ perf_counter timing + per-action ok/error/result_summary inside a try/except so logging never breaks live processing. 4 endpoints: list (5-way filter), get one, stats (top_rules/top_events + avg duration), clear (all or by rule). UI: `/admin/workflow/runs` w/ stats bar + status-chip filter + 3 free-text filters + expandable cards (per-action ✓/✗ + pretty-printed selectable payload). Toolbar button on Rules Console + sidebar + dashboard quick-link. | +1,041 |
 | WW | `950972b` | 10 (Collaboration) | First user-facing screen this session. `activity_feed.py` listens to comment.added / mention.received / approval.requested / approval.approved / approval.rejected / role.assigned / role.revoked and resolves each into per-user entries (mentioned users, approvers, requested_by, etc). JSON-as-DB ring buffer (cap 10K). Read-cursor per (user_id, tenant_id) for unread badging without per-entry writes. 4 endpoints (public list + mark-read, admin stats + clear). UI at `/activity` (NOT admin-gated): hero w/ unread count, "الجديد فقط" toggle, day-grouped timeline (اليوم/أمس/منذ N أيام), severity-colored entries w/ tap-to-navigate to action_url. Sidebar entry "تيار نشاطي" in the Dashboards group (no role gate). | +971 |
+| XX | `77a60f2` | 4 (Compliance) | Period Lock with auditable overrides — closes "Period Lock partial" gap from target-state section 10. Backend: `period_lock.py` (JSON-as-DB; lock_period / unlock_period / is_locked / check_posting / list_overrides / stats; reason ≥3 chars required for unlock; 3 outcomes blocked/blocked/allowed_with_override) + `period_lock_routes.py` (7 endpoints: public list + admin lock/unlock/list/get/stats/overrides/check). 3 new events period.locked/.unlocked/.lock.overridden in EventCategory.compliance (54→57). UI at `/admin/period-locks`: 3-tab layout (active/history/audit) + stats bar + lock dialog auto-suggesting prev month + unlock dialog enforcing reason + simulator dialog with override permission toggle. Cleanup of 2 leftover imports from earlier kDebugMode bypass. | +1,322 |
 
-**Total LOC added (Waves 1A–1P)**: ~21,244 (code) + this doc.
+**Total LOC added (Waves 1A–1Q)**: ~22,566 (code) + this doc.
 **Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
 **Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
 **Wave 1C (commits L–O)**: 4 commits, ~1,350 LOC.
@@ -73,7 +74,8 @@
 **Wave 1N (commit TT+UU)**: 1 combined commit, ~1,681 LOC.
 **Wave 1O (commit VV)**: 1 commit, ~1,041 LOC.
 **Wave 1P (commit WW)**: 1 commit, ~971 LOC.
-**Time elapsed**: ~31 hours of continuous Claude work.
+**Wave 1Q (commit XX)**: 1 commit, ~1,322 LOC.
+**Time elapsed**: ~33 hours of continuous Claude work.
 
 ---
 
