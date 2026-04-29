@@ -17,6 +17,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../core/apex_trust_signals.dart';
 import '../../../core/theme.dart';
 import '../../../core/theme.dart' as core_theme;
 import '../../api/pilot_client.dart';
@@ -109,6 +110,20 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
           iconTheme: IconThemeData(color: AC.tp),
         ),
         body: Column(children: [
+          // Gamified progress — motivational reinforcement at the top of the
+          // wizard. Per Wave 6 SaaS Onboarding 2026 best practice.
+          Container(
+            color: AC.navy2,
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+            child: ApexGamifiedProgress(
+              current: _step,
+              total: _stepTitles.length,
+              milestoneLabel:
+                  _step >= _stepTitles.length
+                      ? '🎉 اكتمل الإعداد — جاهز للانطلاق'
+                      : 'الخطوة ${_step + 1} من ${_stepTitles.length}: ${_stepTitles[_step]}',
+            ),
+          ),
           _stepper(),
           if (_error != null) _errorBanner(),
           Expanded(child: SingleChildScrollView(
