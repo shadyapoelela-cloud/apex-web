@@ -48,8 +48,9 @@
 | FF+II | `96a0c85` | 7.11+11 (Admin UX) | Suggestions Inbox + Events Browser screens (Flutter). Suggestions: filter chips (proposed/applied/dismissed/all), severity-coded cards, smart "تثبيت القالب" routing. Events Browser: real-time ring buffer view with JSON-payload expand, color-coded by namespace, search filter. 12 new api_service methods (suggestions/roles/events). 2 sidebar entries. | +701 |
 | JJ | `542ea74` | 9.5 (RBAC UX) | Custom Roles Screen (Flutter) — full role builder + 47-permission picker. Tenant selector, role list with role-cards (built-in vs custom), in-line role editor (name/description/permission chips grouped by category), assign-to-user dialog with effective-permissions resolver, scope hierarchy display. Wired to Wave 1F Phase Y backend. Sidebar entry "الأدوار المخصّصة". | +811 |
 | LL | `559854c` | 11 (Admin UX) | Admin Health Dashboard (Flutter) — single-pane subsystem overview at `/admin/dashboard-health`. Aggregates Wave 1A–1H telemetry: workflow rules, approvals, webhooks, api_keys, modules, suggestions, events. Hero banner + 6 click-routable KPI cards + live events strip + 8 quick links. Robust to partial failures (parallel Future.wait, "–" fallback). New `suggestionsStats()` api_service helper. Sidebar entry "لوحة صحة المنصة". | +512 |
+| MM+NN+OO | `1e2f393` | 1B/1C (Admin UX) | Three Flutter admin consoles closing UI gaps for Wave 1B–1C backends. **MM**: Approvals Admin Console (`/admin/approvals`) — system-wide list across tenants, state filter chips, tenant/user filters, stats bar, cancel-pending dialog. **NN**: Anomaly Live Monitor (`/admin/anomaly`) — buffer size hero, per-tenant + scan-all, severity-coded findings (low/medium/high/critical), transaction-id chips, clear-buffer w/ confirm. **OO**: Email Inbox Status (`/admin/email-inbox`) — configured/not banner, read-only env-var display, manual poll w/ max_messages, last-poll result card. 9 new api_service helpers, 3 routes, 3 sidebar entries. Health dashboard quick-links extended. | +1,488 |
 
-**Total LOC added (Waves 1A–1I)**: ~13,609 (code) + this doc.
+**Total LOC added (Waves 1A–1J)**: ~15,097 (code) + this doc.
 **Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
 **Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
 **Wave 1C (commits L–O)**: 4 commits, ~1,350 LOC.
@@ -59,7 +60,8 @@
 **Wave 1G (commits AA+BB, CC, EE)**: 3 commits, ~2,015 LOC.
 **Wave 1H (commit FF+II)**: 1 combined commit, ~701 LOC.
 **Wave 1I (commits JJ, LL)**: 2 commits, ~1,323 LOC.
-**Time elapsed**: ~18 hours of continuous Claude work.
+**Wave 1J (commit MM+NN+OO)**: 1 combined commit, ~1,488 LOC.
+**Time elapsed**: ~20 hours of continuous Claude work.
 
 ---
 
