@@ -869,6 +869,15 @@ try:
 except Exception as _e:
     logging.warning(f"Module manager router not mounted: {_e}")
 
+# API Keys — programmatic access for headless integrations.
+try:
+    from app.core import api_keys  # noqa: F401  ensures _load() runs
+    from app.core.api_key_routes import router as api_key_router
+    app.include_router(api_key_router)
+    logging.info("API keys router mounted at /admin/api-keys + /api/v1/api-keys/me")
+except Exception as _e:
+    logging.warning(f"API keys router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router
