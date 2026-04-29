@@ -9,7 +9,7 @@ import '../screens/whats_new/industry_packs_screen.dart';
 import '../screens/whats_new/feature_demos_screen.dart';
 // Onboarding wizard variants deprecated — all routes redirect to the
 // unified /app/erp/finance/onboarding (PilotOnboardingWizard).
-// import '../screens/whats_new/onboarding_wizard_screen.dart';
+// Files archived to _archive/2026-04-29/ (Stage 5a, 2026-04-29).
 import '../screens/whats_new/sprint35_foundation_screen.dart';
 import '../screens/whats_new/sprint37_experience_screen.dart';
 import '../screens/whats_new/sprint38_composable_screen.dart';
@@ -47,7 +47,7 @@ import '../screens/compliance/audit_workflow_screen.dart' show AiAuditWorkflowSc
 import '../screens/compliance/islamic_finance_screen.dart';
 // import '../screens/compliance/depreciation_ai_screen.dart';  // redirects to existing /compliance/depreciation
 // import '../screens/compliance/multi_currency_screen.dart'; // deduplicated → /analytics/multi-currency-v2
-// import '../screens/onboarding/onboarding_wizard_screen.dart' as onboarding_ai;
+// onboarding_wizard_screen.dart archived to _archive/2026-04-29/ (Stage 5a).
 import '../screens/admin/audit_chain_viewer_screen.dart';
 // Operations duplicates kept as files for reference but unmounted —
 // their routes now redirect to the pre-existing /compliance/* + /financial-ops screens.
@@ -607,7 +607,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/accounting/journal-entries', redirect: (c, s) => '/compliance/journal-entries'),
     GoRoute(path: '/accounting/trial-balance', redirect: (c, s) => '/compliance/financial-statements'),
     GoRoute(path: '/accounting/period-close', redirect: (c, s) => '/operations/period-close'),
-    GoRoute(path: '/financial-statements', redirect: (c, s) => '/compliance/financial-statements'),
+    // /financial-statements canonical (with optional apiData/pickedFile) defined below at line ~805 — duplicate redirect removed (Stage 1 bugfix 2026-04-29).
     GoRoute(path: '/audit/engagements', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
     GoRoute(path: '/audit/engagement-workspace', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
     GoRoute(path: '/audit/benford', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
