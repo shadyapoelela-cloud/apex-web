@@ -311,6 +311,34 @@ _CATALOG: list[EventDefinition] = [
         category=EventCategory.system,
     ),
 
+    # ─ Industry Packs (Wave 1K Phase PP) ─
+    EventDefinition(
+        name="industry_pack.applied",
+        label_ar="تم تطبيق حزمة قطاع",
+        label_en="Industry pack applied to tenant",
+        category=EventCategory.system,
+        payload_schema={
+            "tenant_id": "uuid",
+            "pack_id": "string",
+            "pack_name_ar": "string",
+            "applied_by": "user_id?",
+            "coa_account_count": "int",
+            "widget_count": "int",
+        },
+    ),
+    EventDefinition(
+        name="industry_pack.refreshed",
+        label_ar="تم تحديث حزمة القطاع",
+        label_en="Industry pack reapplied (timestamp refresh)",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="industry_pack.removed",
+        label_ar="تم إلغاء تخصيص الحزمة",
+        label_en="Industry pack assignment removed",
+        category=EventCategory.system,
+    ),
+
     # ─ Module Manager (per-tenant enable/disable) ─
     EventDefinition(
         name="module.enabled",

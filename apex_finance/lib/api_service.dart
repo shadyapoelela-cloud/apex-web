@@ -892,6 +892,27 @@ class ApiService {
   static Future<ApiResult> emailInboxPoll({int? maxMessages}) =>
       _adminPost('/admin/email-inbox/poll${maxMessages != null ? "?max_messages=$maxMessages" : ""}');
 
+  // ── Industry Packs (Wave 1K Phase PP) ──
+  static Future<ApiResult> industryPacksList() => _get('/api/v1/industry-packs');
+  static Future<ApiResult> industryPackDetail(String id) =>
+      _get('/api/v1/industry-packs/$id');
+  static Future<ApiResult> industryPackApplied(String tenantId) =>
+      _get('/api/v1/industry-packs/applied?tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+  static Future<ApiResult> industryPackApply(String packId, String tenantId,
+          {String? appliedBy, String? notes}) =>
+      _adminPost(
+        '/admin/industry-packs/$packId/apply?tenant_id=${Uri.encodeQueryComponent(tenantId)}',
+        {
+          if (appliedBy != null) 'applied_by': appliedBy,
+          if (notes != null) 'notes': notes,
+        },
+      );
+  static Future<ApiResult> industryPackRemove(String tenantId) =>
+      _adminDelete('/admin/industry-packs/applied/$tenantId');
+  static Future<ApiResult> industryPackAssignments() =>
+      _adminGet('/admin/industry-packs/assignments');
+  static Future<ApiResult> industryPackStats() => _adminGet('/admin/industry-packs/stats');
+
   // ── Webhook Subscriptions (Wave 1E Phase T) ──
   static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
     final qs = <String>[];

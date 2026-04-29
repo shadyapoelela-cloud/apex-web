@@ -282,6 +282,13 @@ class _HybridSidebarState extends State<HybridSidebar> {
           keywords: ['email', 'inbox', 'imap', 'بريد', 'فواتير'],
           requiredRoles: ['platform_admin', 'super_admin'],
         ),
+        _NavItem(
+          'حزم القطاعات',
+          '/admin/industry-packs',
+          Icons.business_center_rounded,
+          keywords: ['industry', 'packs', 'sector', 'حزم', 'قطاعات', 'fnb', 'medical'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
       ],
       requiredRoles: ['platform_admin', 'super_admin', 'reviewer'],
     ),

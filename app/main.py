@@ -897,6 +897,14 @@ try:
 except Exception as _e:
     logging.warning(f"Suggestions router not mounted: {_e}")
 
+# Industry Packs — sector-specific COA + dashboard provisioning.
+try:
+    from app.core.industry_packs_routes import router as industry_packs_router
+    app.include_router(industry_packs_router)
+    logging.info("Industry Packs router mounted at /api/v1/industry-packs + /admin/industry-packs")
+except Exception as _e:
+    logging.warning(f"Industry Packs router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

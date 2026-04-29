@@ -479,6 +479,7 @@ class _AdminHealthDashboardState extends State<AdminHealthDashboard> {
           _link('الموافقات', Icons.task_alt, '/admin/approvals'),
           _link('الشذوذ الحيّ', Icons.radar, '/admin/anomaly'),
           _link('بريد الفواتير', Icons.mark_email_unread, '/admin/email-inbox'),
+          _link('حزم القطاعات', Icons.business_center, '/admin/industry-packs'),
         ]),
       ]),
     );
