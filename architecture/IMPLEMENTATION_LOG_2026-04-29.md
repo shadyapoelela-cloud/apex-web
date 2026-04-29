@@ -36,14 +36,19 @@
 | T | `0148ecf` | 11.6 (Platform) | Webhook Subscriptions — external systems subscribe to events. HMAC signing + retry/backoff + auto-pause + per-tenant scope. CRUD admin endpoints. Registers global event_bus listener. | +624 |
 | U | `d1ce4bc` | 10.4 (Collab) | Universal Comments + @Mentions on any entity (invoice, JE, COA, etc.). Threading via parent_id, soft delete, emoji reactions. Emits 4 events incl. `mention.received` for workflow routing. | +536 |
 | V | `da2ffd2` | 8 (Platform) | Module Manager — 30+ module catalog across 8 categories. Per-tenant enable/disable with auto-pruning of unmet `requires`. Public catalog + admin set/reset/stats endpoints. Emits module.enabled/disabled events. | +474 |
+| 📚 | `ef6a887` | (docs) | Implementation log v5 (added T/U/V Wave 1E) | +7 |
+| X | `ef4f4c1` | 11.5 (Platform) | Public API Keys + scoped programmatic auth. SHA-256 hashed; raw_secret returned ONCE; HMAC-style verify with constant-time compare; scopes hierarchy ("*", "ns:*", exact); IP allowlists; rate-limit field; revoke + audit. CRUD admin endpoints + /api/v1/api-keys/me introspection. | +537 |
+| Y | `e3301f0` | 9.5 (RBAC) | Custom Role Builder + 47 atomic permissions across 6 categories. Tenants define their own roles (e.g. "Junior Bookkeeper"). Multi-role per user; effective_permissions resolution. CRUD + assign/revoke admin endpoints. Emits role.created/deleted/assigned/revoked. | +708 |
+| Z | `9df4b10` | 8 (Admin UX) | Module Manager Screen (Flutter) — toggle modules per tenant via UI. Category chips, per-module switches, auto-disabled cards with require-list warning, reset-all button. Wired to Wave 1E Phase V backend + admin-secret-gated. Sidebar entry in "الإدارة" group. | +491 |
 
-**Total LOC added (Waves 1A–1E)**: ~7,830 (code) + this doc.
+**Total LOC added (Waves 1A–1F)**: ~9,570 (code) + this doc.
 **Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
 **Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
 **Wave 1C (commits L–O)**: 4 commits, ~1,350 LOC.
 **Wave 1D (commit P+Q+S)**: 1 combined commit, ~1,056 LOC.
 **Wave 1E (commits T–V)**: 3 commits, ~1,634 LOC.
-**Time elapsed**: ~11 hours of continuous Claude work.
+**Wave 1F (commits X–Z)**: 3 commits, ~1,736 LOC.
+**Time elapsed**: ~13 hours of continuous Claude work.
 
 ---
 
