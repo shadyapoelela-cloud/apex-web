@@ -25,11 +25,17 @@
 | I | `0878a51` | 7 (AI Forecast) | Algorithmic Cash-Flow Forecast — linear-regression-on-net-cash with σ-based confidence band, weekly buckets, +12-week history → +N-week projection. `GET /api/v1/forecast/cashflow` + admin variant | +473 |
 | J | `d5b29bd` | 3 (Workflow) | Approval Chains — multi-stage sign-off + new `approval` action type for the Workflow Engine. 4 new events (requested/approved/rejected/partial) | +650 |
 | K | `ac32388` | 7 (Anomaly) | Live Anomaly Detection — bridges existing pure detector to event_bus. Per-tenant ring buffer + cron-friendly batch scan + emits `anomaly.detected` | +307 |
+| 📚 | `0e4392c` | (docs) | Implementation log v2 (added I/J/K) | +97 |
+| L | `e85ceb9` | 5 (Intake) | Email-to-Invoice IMAP listener — polls UNSEEN, saves PDF/image attachments, emits `email.received` event with attachment metadata | +369 |
+| M | `b6efe5c` | 3 (Workflow) | Workflow Templates Library — 12 pre-built rules across 5 categories (approvals, alerts, automations, compliance, ops) with parameter substitution | +600 |
+| N | `504012e` | 9 (Adaptive UX) | ApprovalsInboxScreen wired to live backend — replaces 5 hardcoded sample rows with `/api/v1/approvals/inbox` + functional approve/reject buttons + retry on error | +180 |
+| O | `48a9ec2` | 7 (Forecast UX) | Live Forecast card on /analytics/cash-flow-forecast — KPI chips + per-week projection table from `/api/v1/forecast/cashflow`. Synthetic chart kept on top for empty-tenant fallback | +204 |
 
-**Total LOC added (Wave 1A + 1B)**: ~3,800 (code) + this doc.
+**Total LOC added (Wave 1A + 1B + 1C)**: ~5,150 (code) + this doc.
 **Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
 **Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
-**Time elapsed**: ~5 hours of continuous Claude work.
+**Wave 1C (commits L–O)**: 4 commits, ~1,350 LOC.
+**Time elapsed**: ~7 hours of continuous Claude work.
 
 ---
 
@@ -205,14 +211,16 @@ session will execute Wave 2+ in full — they require:
 
 | Metric | Value |
 |--------|-------|
-| Commits (frontend + backend, Wave 1A + 1B) | 11 |
-| Total LOC added | ~3,800 |
-| New backend modules | 14 (slack, teams, external_notify_routes, notification_digest, notification_digest_routes, event_registry, event_bus, event_routes, workflow_engine, workflow_routes, cashflow_forecast, cashflow_forecast_routes, approvals, approval_routes, anomaly_live, anomaly_live_routes) |
-| New frontend widgets | 2 (ApexTrustSignals, ApexGamifiedProgress) + sidebar refactor |
-| New admin endpoints | 28 (notify×2, digest×2, events×4, workflow×8, forecast×1, approvals×7, anomaly×4) |
-| New public endpoints | 5 (events list/categories, forecast cashflow, approvals inbox/get/decide×2) |
-| New events catalogued | 31 (27 + 4 approval) |
+| Commits (frontend + backend, Waves 1A + 1B + 1C) | 15 + 3 docs = 18 |
+| Total LOC added | ~5,150 |
+| New backend modules | 18 (Wave 1A: slack, teams, external_notify_routes, notification_digest, notification_digest_routes, event_registry, event_bus, event_routes, workflow_engine, workflow_routes; Wave 1B: cashflow_forecast, cashflow_forecast_routes, approvals, approval_routes, anomaly_live, anomaly_live_routes; Wave 1C: email_inbox, email_inbox_routes, workflow_templates, workflow_templates_routes) |
+| New frontend widgets | 2 (ApexTrustSignals, ApexGamifiedProgress) + sidebar refactor + 2 screens wired (Approvals, Forecast) |
+| New admin endpoints | 35 (Wave 1A: 14, Wave 1B: 12, Wave 1C: 9) |
+| New public endpoints | 6 (events list/categories, forecast cashflow, approvals inbox/get/decide×2, email-received event) |
+| New events catalogued | 32 (27 base + 4 approval + 1 email) |
 | Action types in engine | 8 (log, slack, teams, email, notify, webhook, approval) |
+| Pre-built workflow templates | 12 (across 5 categories) |
+| Frontend screens connected to live backend | 2 (Approvals Inbox, Cashflow Forecast) |
 | `flutter analyze` errors | 0 |
 | `python ast.parse` errors | 0 |
 | Backward compatibility | 100% (no breaking changes) |
