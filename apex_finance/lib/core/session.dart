@@ -25,6 +25,12 @@ class S {
     }
   }
   static List<String> roles = [];
+
+  /// True when the current user has APEX-staff privileges.
+  /// Demo screens, admin tooling, and unfinished sprint demos are gated on this.
+  static bool get isPlatformAdmin =>
+      roles.contains('platform_admin') || roles.contains('super_admin');
+
   static String get liveToken => html.window.localStorage['apex_token'] ?? '';
   static void clear() {
     token=null; uid=null; uname=null; dname=null; plan=null; email=null; roles=[];

@@ -9,7 +9,7 @@ import '../screens/whats_new/industry_packs_screen.dart';
 import '../screens/whats_new/feature_demos_screen.dart';
 // Onboarding wizard variants deprecated — all routes redirect to the
 // unified /app/erp/finance/onboarding (PilotOnboardingWizard).
-// import '../screens/whats_new/onboarding_wizard_screen.dart';
+// Files archived to _archive/2026-04-29/ (Stage 5a, 2026-04-29).
 import '../screens/whats_new/sprint35_foundation_screen.dart';
 import '../screens/whats_new/sprint37_experience_screen.dart';
 import '../screens/whats_new/sprint38_composable_screen.dart';
@@ -47,7 +47,7 @@ import '../screens/compliance/audit_workflow_screen.dart' show AiAuditWorkflowSc
 import '../screens/compliance/islamic_finance_screen.dart';
 // import '../screens/compliance/depreciation_ai_screen.dart';  // redirects to existing /compliance/depreciation
 // import '../screens/compliance/multi_currency_screen.dart'; // deduplicated → /analytics/multi-currency-v2
-// import '../screens/onboarding/onboarding_wizard_screen.dart' as onboarding_ai;
+// onboarding_wizard_screen.dart archived to _archive/2026-04-29/ (Stage 5a).
 import '../screens/admin/audit_chain_viewer_screen.dart';
 // Operations duplicates kept as files for reference but unmounted —
 // their routes now redirect to the pre-existing /compliance/* + /financial-ops screens.
@@ -194,6 +194,14 @@ import '../screens/account/mfa_screen.dart';
 
 final authRefresh = ValueNotifier<int>(0);
 
+/// Redirect guard for demo / dev-tool / showcase routes.
+/// Returns null (allow) when the current session has platform_admin or
+/// super_admin; otherwise redirects to the launchpad.
+/// Use as `redirect: _adminOnly` on any GoRoute that should not be visible
+/// to end users (mock data, component demos, internal tooling).
+String? _adminOnly(BuildContext c, GoRouterState s) =>
+    S.isPlatformAdmin ? null : '/app';
+
 /// Routes that should be auto-wrapped with the unified [HybridSidebar]
 /// so every compliance screen shares the same 10-round-researched nav
 /// experience (journal-entries, ZATCA, ratios, etc.).
@@ -303,6 +311,7 @@ final appRouter = GoRouter(
     // Reachable via Cmd+K -> "Apex Showcase" or directly.
     GoRoute(
       path: '/showcase',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const ApexShowcaseScreen(), s),
     ),
     // What's New Hub — landing page for every backend capability added.
@@ -313,6 +322,7 @@ final appRouter = GoRouter(
     // Interactive demos of each new backend feature.
     GoRoute(
       path: '/uae-corp-tax',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const UaeCorpTaxScreen(), s),
     ),
     GoRoute(
@@ -358,22 +368,27 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/apex-map',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const ApexMapScreen(), s),
     ),
     GoRoute(
       path: '/theme-generator',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const ThemeGeneratorScreen(), s),
     ),
     GoRoute(
       path: '/white-label',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const WhiteLabelSettingsScreen(), s),
     ),
     GoRoute(
       path: '/syncfusion-grid',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const SyncfusionGridDemoScreen(), s),
     ),
     GoRoute(
       path: '/startup-metrics',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const StartupMetricsScreen(), s),
     ),
     GoRoute(
@@ -382,26 +397,35 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/payments-playground',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const PaymentsPlaygroundScreen(), s),
     ),
     GoRoute(
       path: '/ap-pipeline-demo',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const ApPipelineScreen(), s),
     ),
     GoRoute(
       path: '/bank-ocr-demo',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const BankOcrDemoScreen(), s),
     ),
+    // GOSI + EOSB calculators promoted to production HR features (Stage 5b
+    // follow-up, 2026-04-29). Old /*-demo paths kept as redirects for
+    // backward compatibility with bookmarks and external links.
     GoRoute(
-      path: '/gosi-demo',
+      path: '/hr/gosi',
       pageBuilder: (c, s) => _apexPage(const GosiCalcScreen(), s),
     ),
     GoRoute(
-      path: '/eosb-demo',
+      path: '/hr/eosb',
       pageBuilder: (c, s) => _apexPage(const EosbCalcScreen(), s),
     ),
+    GoRoute(path: '/gosi-demo', redirect: (c, s) => '/hr/gosi'),
+    GoRoute(path: '/eosb-demo', redirect: (c, s) => '/hr/eosb'),
     GoRoute(
       path: '/whatsapp-demo',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const WhatsAppDemoScreen(), s),
     ),
     // Single canonical onboarding path — all variants redirect here.
@@ -607,7 +631,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/accounting/journal-entries', redirect: (c, s) => '/compliance/journal-entries'),
     GoRoute(path: '/accounting/trial-balance', redirect: (c, s) => '/compliance/financial-statements'),
     GoRoute(path: '/accounting/period-close', redirect: (c, s) => '/operations/period-close'),
-    GoRoute(path: '/financial-statements', redirect: (c, s) => '/compliance/financial-statements'),
+    // /financial-statements canonical (with optional apiData/pickedFile) defined below at line ~805 — duplicate redirect removed (Stage 1 bugfix 2026-04-29).
     GoRoute(path: '/audit/engagements', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
     GoRoute(path: '/audit/engagement-workspace', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
     GoRoute(path: '/audit/benford', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),

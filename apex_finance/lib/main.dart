@@ -1240,59 +1240,6 @@ class _DashS extends ConsumerState<DashTab> {
       ])));
 }
 
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-// NOTIFICATIONS SCREEN (NEW)
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-class NotificationsScreen extends ConsumerStatefulWidget {
-  const NotificationsScreen({super.key});
-  @override ConsumerState<NotificationsScreen> createState() => _NotifS();
-}
-class _NotifS extends ConsumerState<NotificationsScreen> {
-  List _nots = []; bool _ld = true;
-  @override void initState() { super.initState(); _load(); }
-  Future<void> _load() async {
-    try { final r = await ApiService.getNotifications();
-      if(mounted) setState(() { final d = r.data; _nots = d is List ? d : []; _ld = false; });
-    } catch(_) { if(mounted) setState(()=> _ld=false); }
-  }
-  Future<void> _markAllRead() async {
-    await ApiService.markNotificationsReadAll();
-    _load();
-  }
-  @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: Text('\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a', style: TextStyle(color: AC.gold)),
-      actions: [TextButton(onPressed: _markAllRead, child: Text('\u0642\u0631\u0627\u0621\u0629 \u0627\u0644\u0643\u0644', style: TextStyle(color: AC.cyan, fontSize: 12)))]),
-    body: _ld ? Center(child: CircularProgressIndicator(color: AC.gold)) :
-      _nots.isEmpty ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.notifications_off_outlined, color: AC.ts, size: 60),
-        SizedBox(height: 12),
-        Text('\u0644\u0627 \u062a\u0648\u062c\u062f \u0625\u0634\u0639\u0627\u0631\u0627\u062a', style: TextStyle(color: AC.ts, fontSize: 16))])) :
-      ListView.builder(padding: const EdgeInsets.all(12), itemCount: _nots.length, itemBuilder: (_, i) {
-        final n = _nots[i];
-        final isRead = n['is_read'] == true;
-        return Container(margin: EdgeInsets.only(bottom: 8), padding: EdgeInsets.all(14),
-          decoration: BoxDecoration(color: isRead ? AC.navy3 : AC.navy4, borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isRead ? AC.bdr : AC.gold.withValues(alpha: 0.3))),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Icon(_notifIcon(n['type']??''), color: isRead ? AC.ts : AC.gold, size: 22),
-            SizedBox(width: 12),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(n['title']??n['message']??'', style: TextStyle(color: isRead ? AC.ts : AC.tp, fontWeight: isRead ? FontWeight.normal : FontWeight.bold, fontSize: 13)),
-              if(n['body']!=null) Padding(padding: EdgeInsets.only(top: 4),
-                child: Text(n['body'], style: TextStyle(color: AC.ts, fontSize: 11))),
-              Padding(padding: EdgeInsets.only(top: 6),
-                child: Text(n['created_at']?.toString().substring(0,16)??'', style: TextStyle(color: AC.ts, fontSize: 10)))])),
-            if(!isRead) Container(width: 8, height: 8, decoration: BoxDecoration(color: AC.gold, shape: BoxShape.circle))]));
-      }));
-
-  IconData _notifIcon(String t) {
-    if(t.contains('task')) return Icons.assignment;
-    if(t.contains('plan')||t.contains('subscription')) return Icons.workspace_premium;
-    if(t.contains('provider')) return Icons.verified_user;
-    if(t.contains('knowledge')) return Icons.psychology;
-    return Icons.notifications;
-  }
-}
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // UPGRADE PLAN SCREEN (NEW)
@@ -1656,46 +1603,6 @@ class _ClientsS extends ConsumerState<ClientsTab> {
   }
 }
 
-class NewClientScreen extends StatefulWidget { const NewClientScreen({super.key}); @override State<NewClientScreen> createState()=>_NewCS(); }
-class _NewCS extends State<NewClientScreen> {
-  final _n=TextEditingController(); List _types=[]; String? _t; bool _l=false; String? _e;
-  @override void initState() { super.initState(); ApiService.getClientTypes().then((r){ if(r.success && mounted) { final d = r.data; setState(()=> _types = d is List ? d : []); } }); }
-  @override
-  void dispose() {
-    _n.dispose();
-    super.dispose();
-  }
-  Future<void> _go() async {
-    if(_n.text.trim().isEmpty||_t==null){ setState(()=> _e='\u0627\u0644\u0627\u0633\u0645 \u0648\u0627\u0644\u0646\u0648\u0639 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
-    setState((){ _l=true; _e=null; });
-    try {
-      final res = await ApiService.createClient(clientCode: _n.text.trim().replaceAll(' ', '_'), name: _n.text.trim(), nameAr: _n.text.trim(), clientType: _t!);
-      if(res.success) { if(mounted) Navigator.pop(context); }
-      else { setState(()=> _e=res.error); }
-    } catch(e){ setState(()=> _e='$e'); }
-    finally { if(mounted) setState(()=> _l=false); }
-  }
-  @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: Text('\u0639\u0645\u064a\u0644 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold))),
-    body: SingleChildScrollView(padding: EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      TextField(controller:_n, decoration:_inp('\u0627\u0633\u0645 \u0627\u0644\u0634\u0631\u0643\u0629 *', ic: Icons.business)),
-      SizedBox(height: 18), Text('\u0646\u0648\u0639 \u0627\u0644\u0639\u0645\u064a\u0644 *', style: TextStyle(color: AC.ts, fontSize: 14)),
-      SizedBox(height: 8),
-      ..._types.map((t) => GestureDetector(onTap: ()=>setState(()=>_t=t['code']),
-        child: Container(margin: EdgeInsets.only(bottom: 8), padding: EdgeInsets.all(12),
-          decoration: BoxDecoration(color: _t==t['code'] ? AC.gold.withValues(alpha: 0.1) : AC.navy3,
-            borderRadius: BorderRadius.circular(10), border: Border.all(color: _t==t['code'] ? AC.gold : AC.bdr)),
-          child: Row(children: [
-            Icon(_t==t['code'] ? Icons.radio_button_checked : Icons.radio_button_off, color: _t==t['code'] ? AC.gold : AC.ts, size: 20),
-            SizedBox(width: 10),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(t['name_ar']??'', style: TextStyle(color: _t==t['code'] ? AC.gold : AC.tp, fontWeight: FontWeight.w600, fontSize: 13)),
-              if(t['knowledge_mode_eligible']==true) Text('\u0648\u0636\u0639 \u0627\u0644\u0645\u0639\u0631\u0641\u0629', style: TextStyle(color: AC.cyan, fontSize: 10))]))]))))  ,
-      if(_e!=null) Padding(padding:EdgeInsets.only(top:10), child:Text(_e!, style:TextStyle(color:AC.err))),
-      const SizedBox(height: 20),
-      SizedBox(width:double.infinity, child: ElevatedButton(onPressed:_l?null:_go,
-        child: _l ? const CircularProgressIndicator(strokeWidth:2) : const Text('\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0639\u0645\u064a\u0644')))])));
-}
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // ANALYSIS TAB â€” with Result Details Panel (!)
