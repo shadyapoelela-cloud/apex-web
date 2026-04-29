@@ -252,6 +252,25 @@ _CATALOG: list[EventDefinition] = [
         label_en="User account suspended",
         category=EventCategory.user,
     ),
+    # ─ Email Intake ─
+    EventDefinition(
+        name="email.received",
+        label_ar="بريد جديد بمرفقات",
+        label_en="Email received with attachments",
+        category=EventCategory.system,
+        payload_schema={
+            "message_id": "string",
+            "from": "string",
+            "subject": "string",
+            "attachments": "list of {filename, content_type, saved_path, size_bytes}",
+            "attachment_count": "int",
+        },
+        description_ar=(
+            "يُطلَق عند سحب رسالة جديدة من البريد عبر IMAP poller. "
+            "يُمكن للقواعد إنشاء فاتورة مسودة عبر استخراج Claude Vision."
+        ),
+    ),
+
     # ─ Approvals (multi-stage chains) ─
     EventDefinition(
         name="approval.requested",
