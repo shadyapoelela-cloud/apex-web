@@ -52,8 +52,9 @@
 | PP+QQ | `6e84b1f` | 4.4 (Industry Packs) | First-class assignment of sector packs to tenants. **PP** (backend): `industry_packs_service.py` (JSON-as-DB store, atomic writes, idempotent apply) + `industry_packs_routes.py` (7 endpoints: list/detail/applied/apply/remove/assignments/stats + mark-provisioned hook); 3 new events `industry_pack.applied/refreshed/removed`. **QQ** (UI): `AdminIndustryPacksScreen` (renamed to avoid name collision) — hero stats banner, tenant-id input, 5 pack cards w/ expandable COA preview (code + name_ar + account_type chip) + Widget list, apply dialog w/ notes, current-assignments block w/ remove. 7 api_service helpers, route, sidebar entry, dashboard quick-link. | +1,158 |
 | RR | `b6232dc` | 3 (Workflow UX) | Visual Workflow Rule Builder at `/admin/workflow/rules/new`. 5-step wizard (identity / event / conditions / actions / review) with clickable progress indicator. Step 2 includes a clickable list of all 50 registered events. Step 3 supports the engine's 9 operators with type coercion (CSV→list for `in`, numeric for gt/lt, bool for true/false). Step 4 supports 8 action types, each with its own param form (slack/teams/email/notify/webhook/approval/comment/log) and move-up + delete per row. Submission POSTs to /admin/workflow/rules. Empty-state in Rules Console now offers two CTAs (template install OR scratch builder). | +898 |
 | SS | `3e91965` | 4.4 (Industry Packs) | Auto-Provisioner closes the loop on Wave 1K — when admin clicks "Apply F&B" the listener now actually configures the tenant. `industry_pack_provisioner.py` registers on `industry_pack.applied`, installs 4 zero-param workflow templates per pack (5×4 = 20 auto-installs across packs) as tenant-scoped rules with `[tenant_id]` name prefix, flips coa_seeded + widgets_provisioned flags, and emits `industry_pack.provisioned` with install summary. 2 new endpoints: GET /template-map (public preview) + POST /provision (manual re-run). UI: pack cards show "تهيئة تلقائية: N قاعدة" chip with template-id badges; assignment rows show 2 provisioning indicators + "إعادة التهيئة" button. Events 50→51. | +398 |
+| TT+UU | `3b49fe7` | 4.4+11 (Onboarding) | Tenant directory + 3-step onboarding wizard chains every Wave 1A-1M backend in one minute. **TT** (backend): `tenant_directory.py` JSON-as-DB store + 8 endpoints incl. `POST /admin/tenants/onboard` which atomically registers + applies pack (auto-provisioner takes over). 3 new events `tenant.registered/.updated/.deactivated` (51→54). **UU** (UI): wizard at `/admin/tenant-onboarding` (3 steps + success page with 4 verification quick-links) and directory list at `/admin/tenants` (status filter + stats bar + per-row actions: open rules filtered by tenant_id, open packs, deactivate, activate, delete). 9 api_service helpers, 2 routes, 2 sidebar entries, 2 dashboard quick-links. | +1,681 |
 
-**Total LOC added (Waves 1A–1M)**: ~17,551 (code) + this doc.
+**Total LOC added (Waves 1A–1N)**: ~19,232 (code) + this doc.
 **Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
 **Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
 **Wave 1C (commits L–O)**: 4 commits, ~1,350 LOC.
@@ -67,7 +68,8 @@
 **Wave 1K (commit PP+QQ)**: 1 combined commit, ~1,158 LOC.
 **Wave 1L (commit RR)**: 1 commit, ~898 LOC.
 **Wave 1M (commit SS)**: 1 commit, ~398 LOC.
-**Time elapsed**: ~25 hours of continuous Claude work.
+**Wave 1N (commit TT+UU)**: 1 combined commit, ~1,681 LOC.
+**Time elapsed**: ~27 hours of continuous Claude work.
 
 ---
 
