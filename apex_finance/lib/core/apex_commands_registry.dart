@@ -10,12 +10,27 @@ import 'package:go_router/go_router.dart';
 
 import 'apex_ask_panel.dart';
 import 'apex_command_palette.dart';
+import 'session.dart';
+
+/// Cmd+K commands gated to platform_admin (mock demos, dev tools, showcase).
+/// Non-admin sessions never see these in the palette.
+const Set<String> _adminOnlyCommandIds = {
+  'nav_apex_showcase',
+  'nav_uae_corp_tax',
+  'nav_startup_metrics',
+  'nav_payments_playground',
+  'nav_ap_pipeline',
+  'nav_bank_ocr',
+  'nav_gosi_demo',
+  'nav_eosb_demo',
+  'nav_whatsapp_demo',
+};
 
 /// Builds the list of commands available everywhere in the app.
 List<ApexCommand> buildAppCommands(BuildContext context) {
   void go(String path) => GoRouter.of(context).go(path);
 
-  return [
+  final commands = <ApexCommand>[
     // ── Ask APEX (top of list — the highest-leverage AI surface) ──
     ApexCommand.action(
       id: 'ask_apex',
@@ -864,4 +879,10 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       onRun: (ctx) => GoRouter.of(ctx).go('/marketplace'),
     ),
   ];
+
+  // Hide admin-only commands (demos, dev tools) from non-admin users.
+  if (S.isPlatformAdmin) return commands;
+  return commands
+      .where((cmd) => !_adminOnlyCommandIds.contains(cmd.id))
+      .toList(growable: false);
 }

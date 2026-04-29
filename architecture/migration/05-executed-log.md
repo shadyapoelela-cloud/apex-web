@@ -66,6 +66,77 @@ No issues found! (ran in 6.3s)
 
 ---
 
+## Commit 3 — Stage 5b (Feature Flag للـ Demos)
+
+**القرار**: feature flag (الخيار B) — الـ demos تظهر فقط للأدوار `platform_admin` أو `super_admin`. ميزة قيّمة في sales pitch محفوظة، تجربة المستخدم العادي مش مزدحمة بـ mocks.
+
+### التغييرات
+
+**1. `apex_finance/lib/core/session.dart`** — أضفنا helper:
+```dart
+static bool get isPlatformAdmin =>
+    roles.contains('platform_admin') || roles.contains('super_admin');
+```
+
+**2. `apex_finance/lib/core/router.dart`** — أضفنا route guard:
+```dart
+String? _adminOnly(BuildContext c, GoRouterState s) =>
+    S.isPlatformAdmin ? null : '/app';
+```
+
+طُبّق على **13 راوت**:
+- `/showcase`
+- `/uae-corp-tax`
+- `/apex-map`
+- `/theme-generator`
+- `/white-label`
+- `/syncfusion-grid`
+- `/startup-metrics`
+- `/payments-playground`
+- `/ap-pipeline-demo`
+- `/bank-ocr-demo`
+- `/gosi-demo`
+- `/eosb-demo`
+- `/whatsapp-demo`
+
+أي محاولة وصول من غير admin تتحوّل لـ `/app` تلقائياً.
+
+**3. `apex_finance/lib/screens/whats_new/apex_whats_new_hub.dart`** — أخفينا الـ tiles من غير الـ admins. الـ `_group()` بيفلتر items اللي route بتاعها في `_adminOnlyRoutes` set.
+
+**4. `apex_finance/lib/core/apex_commands_registry.dart`** — أخفينا الـ Cmd+K commands. الـ `buildAppCommands()` بترجع filtered list لغير الـ admins (9 commands مخفية).
+
+### النتيجة لكل دور
+
+| الدور | What's New tiles | Cmd+K demo commands | الراوتس عبر URL |
+|-------|------------------|---------------------|------------------|
+| `registered_user`, `client_user`, `client_admin`, `provider_*` | مخفية | مخفية | redirect لـ `/app` |
+| `platform_admin`, `super_admin` | كاملة | كاملة | تعمل كالعادي |
+
+### لم يُتأثّر
+
+- ✅ Sprint screens 35-44 (لسه partial production logic — ما عُلّمت بـ guard)
+- ✅ `/whats-new` hub نفسه (يفتح للجميع، بس فاضي للمستخدم العادي بعد فلترة الـ tiles)
+- ✅ `/industry-packs` (حافظ public — مفيد للـ industry templates)
+- ✅ `apex_map_screen` cross-links (الـ screen نفسها admin-only، فمحتواها لا يحتاج فلترة)
+
+### التحقق
+
+```bash
+$ flutter analyze lib/core/apex_commands_registry.dart lib/core/router.dart \
+                  lib/core/session.dart lib/screens/whats_new/apex_whats_new_hub.dart
+1 issue found. (pre-existing avoid_web_libraries_in_flutter — not from my changes)
+```
+
+### Rollback
+
+```bash
+git revert <commit-hash>
+```
+
+أو يدوياً: شيل سطر `redirect: _adminOnly,` من كل الـ 13 راوت + شيل الـ filter في `buildAppCommands` و `_group`.
+
+---
+
 ## ⚠️ متوقّفة — تحتاج موافقة الـ deeper changes
 
 ### Stage 5b: Demo Screens

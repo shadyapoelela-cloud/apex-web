@@ -194,6 +194,14 @@ import '../screens/account/mfa_screen.dart';
 
 final authRefresh = ValueNotifier<int>(0);
 
+/// Redirect guard for demo / dev-tool / showcase routes.
+/// Returns null (allow) when the current session has platform_admin or
+/// super_admin; otherwise redirects to the launchpad.
+/// Use as `redirect: _adminOnly` on any GoRoute that should not be visible
+/// to end users (mock data, component demos, internal tooling).
+String? _adminOnly(BuildContext c, GoRouterState s) =>
+    S.isPlatformAdmin ? null : '/app';
+
 /// Routes that should be auto-wrapped with the unified [HybridSidebar]
 /// so every compliance screen shares the same 10-round-researched nav
 /// experience (journal-entries, ZATCA, ratios, etc.).
@@ -303,6 +311,7 @@ final appRouter = GoRouter(
     // Reachable via Cmd+K -> "Apex Showcase" or directly.
     GoRoute(
       path: '/showcase',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const ApexShowcaseScreen(), s),
     ),
     // What's New Hub — landing page for every backend capability added.
@@ -313,6 +322,7 @@ final appRouter = GoRouter(
     // Interactive demos of each new backend feature.
     GoRoute(
       path: '/uae-corp-tax',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const UaeCorpTaxScreen(), s),
     ),
     GoRoute(
@@ -358,22 +368,27 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/apex-map',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const ApexMapScreen(), s),
     ),
     GoRoute(
       path: '/theme-generator',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const ThemeGeneratorScreen(), s),
     ),
     GoRoute(
       path: '/white-label',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const WhiteLabelSettingsScreen(), s),
     ),
     GoRoute(
       path: '/syncfusion-grid',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const SyncfusionGridDemoScreen(), s),
     ),
     GoRoute(
       path: '/startup-metrics',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const StartupMetricsScreen(), s),
     ),
     GoRoute(
@@ -382,26 +397,32 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/payments-playground',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const PaymentsPlaygroundScreen(), s),
     ),
     GoRoute(
       path: '/ap-pipeline-demo',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const ApPipelineScreen(), s),
     ),
     GoRoute(
       path: '/bank-ocr-demo',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const BankOcrDemoScreen(), s),
     ),
     GoRoute(
       path: '/gosi-demo',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const GosiCalcScreen(), s),
     ),
     GoRoute(
       path: '/eosb-demo',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const EosbCalcScreen(), s),
     ),
     GoRoute(
       path: '/whatsapp-demo',
+      redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const WhatsAppDemoScreen(), s),
     ),
     // Single canonical onboarding path — all variants redirect here.

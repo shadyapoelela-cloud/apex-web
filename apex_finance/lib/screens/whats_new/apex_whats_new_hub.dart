@@ -9,7 +9,26 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/apex_sticky_toolbar.dart';
 import '../../core/design_tokens.dart';
+import '../../core/session.dart';
 import '../../core/theme.dart';
+
+/// Routes that are gated to platform_admin (mock demos, dev tools, showcase).
+/// Tiles linking to these are filtered out of the Hub for non-admin users.
+const Set<String> _adminOnlyRoutes = {
+  '/showcase',
+  '/uae-corp-tax',
+  '/apex-map',
+  '/theme-generator',
+  '/white-label',
+  '/syncfusion-grid',
+  '/startup-metrics',
+  '/payments-playground',
+  '/ap-pipeline-demo',
+  '/bank-ocr-demo',
+  '/gosi-demo',
+  '/eosb-demo',
+  '/whatsapp-demo',
+};
 
 class ApexWhatsNewHub extends StatelessWidget {
   const ApexWhatsNewHub({super.key});
@@ -323,6 +342,11 @@ class ApexWhatsNewHub extends StatelessWidget {
   }
 
   Widget _group(BuildContext context, String title, List<_Item> items) {
+    // Hide admin-only tiles (demos, dev tools) from non-admin users.
+    final visibleItems = S.isPlatformAdmin
+        ? items
+        : items.where((it) => !_adminOnlyRoutes.contains(it.route)).toList();
+    if (visibleItems.isEmpty) return const SizedBox.shrink();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -350,7 +374,7 @@ class ApexWhatsNewHub extends StatelessWidget {
             return Wrap(
               spacing: AppSpacing.md,
               runSpacing: AppSpacing.md,
-              children: items
+              children: visibleItems
                   .map(
                     (item) => SizedBox(
                       width: (constraints.maxWidth -
