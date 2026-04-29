@@ -21,9 +21,15 @@
 | F | `6b7e68c` | 3 (Workflow) | Event Registry (27 events) + in-process Event Bus + admin/public event catalog routes | +539 |
 | G | `af18872` | 3 (Workflow) | Workflow Rules Engine MVP — JSON-persisted rules + condition/action evaluator + 7 action types + admin CRUD routes | +772 |
 | H | `5117208` | 9 (Adaptive nav) | Role-aware sidebar — filter groups + items by `S.roles`, hide empty groups, new "الإدارة" group for admins | +109 |
+| 📚 | `75a75ae` | (docs) | Implementation log v1 (8 commits) | +217 |
+| I | `0878a51` | 7 (AI Forecast) | Algorithmic Cash-Flow Forecast — linear-regression-on-net-cash with σ-based confidence band, weekly buckets, +12-week history → +N-week projection. `GET /api/v1/forecast/cashflow` + admin variant | +473 |
+| J | `d5b29bd` | 3 (Workflow) | Approval Chains — multi-stage sign-off + new `approval` action type for the Workflow Engine. 4 new events (requested/approved/rejected/partial) | +650 |
+| K | `ac32388` | 7 (Anomaly) | Live Anomaly Detection — bridges existing pure detector to event_bus. Per-tenant ring buffer + cron-friendly batch scan + emits `anomaly.detected` | +307 |
 
-**Total LOC added**: ~2,300 (code) + this doc.
-**Time elapsed**: ~3 hours of continuous Claude work.
+**Total LOC added (Wave 1A + 1B)**: ~3,800 (code) + this doc.
+**Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
+**Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
+**Time elapsed**: ~5 hours of continuous Claude work.
 
 ---
 
@@ -106,6 +112,32 @@ actually built.
 - **Adaptive sidebar** — `requiredRoles` filtering on `_NavItem` + `_NavGroup`,
   new admin-only "الإدارة" group, full-text search filtered too
 
+### Wave 1B Additions (I–K)
+
+- **Cash-Flow Forecast** (`app/core/cashflow_forecast.py` + routes)
+  - Algorithmic, no ML libs: linear regression on weekly net cash flow
+  - Pulls from `pilot_gl_postings` filtered by GL accounts in
+    {cash, bank, petty_cash, cash_and_equivalents}
+  - σ-based confidence band that widens 0.25σ per week of horizon
+  - History fills missing weeks with zeros for uniform timeline
+  - Public + admin endpoints; admin variant accepts `starting_balance`
+  - 12-week history → 4-week projection (configurable bounds 4–104 / 1–52)
+- **Approval Chains** (`app/core/approvals.py` + routes + workflow integration)
+  - Multi-stage sign-off, JSON-persisted same as workflow rules
+  - 4 new events on the bus: requested / approved / rejected / partial
+  - `approval` action type in workflow engine — rules can now demand
+    multi-level sign-off as a step in a chain
+  - User inbox endpoint (`/api/v1/approvals/inbox?user_id=`) returns
+    only approvals where the user is currently the active approver
+- **Live Anomaly Detection** (`app/core/anomaly_live.py` + routes)
+  - Bridges the existing pure-function detector to live events
+  - Listens for je.posted / payment.received / bill.approved /
+    invoice.posted; ring-buffers per tenant (cap 500)
+  - Cron-friendly batch scan (`POST /admin/anomaly/scan-all`) emits
+    `anomaly.detected` events for severity ≥ medium
+  - Workflow rules can now react to anomalies — full closed loop:
+    transaction → buffer → scan → anomaly → rule → notification
+
 ---
 
 ## End-to-End Flow Demo (with this session's code)
@@ -173,13 +205,14 @@ session will execute Wave 2+ in full — they require:
 
 | Metric | Value |
 |--------|-------|
-| Commits (frontend + backend) | 8 |
-| Total LOC added | ~2,300 |
-| New backend modules | 8 (slack, teams, external_notify_routes, notification_digest, notification_digest_routes, event_registry, event_bus, event_routes, workflow_engine, workflow_routes) |
+| Commits (frontend + backend, Wave 1A + 1B) | 11 |
+| Total LOC added | ~3,800 |
+| New backend modules | 14 (slack, teams, external_notify_routes, notification_digest, notification_digest_routes, event_registry, event_bus, event_routes, workflow_engine, workflow_routes, cashflow_forecast, cashflow_forecast_routes, approvals, approval_routes, anomaly_live, anomaly_live_routes) |
 | New frontend widgets | 2 (ApexTrustSignals, ApexGamifiedProgress) + sidebar refactor |
-| New admin endpoints | 14 (notify×2, digest×2, events×4, workflow×6) |
-| New events catalogued | 27 |
-| Action types in engine | 7 |
+| New admin endpoints | 28 (notify×2, digest×2, events×4, workflow×8, forecast×1, approvals×7, anomaly×4) |
+| New public endpoints | 5 (events list/categories, forecast cashflow, approvals inbox/get/decide×2) |
+| New events catalogued | 31 (27 + 4 approval) |
+| Action types in engine | 8 (log, slack, teams, email, notify, webhook, approval) |
 | `flutter analyze` errors | 0 |
 | `python ast.parse` errors | 0 |
 | Backward compatibility | 100% (no breaking changes) |
@@ -187,15 +220,62 @@ session will execute Wave 2+ in full — they require:
 
 ---
 
+## End-to-End Closed Loop (Wave 1A + 1B)
+
+The infrastructure now supports a **fully closed loop** automation:
+
+```
+1. Domain code: emit("invoice.posted", {invoice_id, total_amount, ...})
+       ↓
+2. Event Bus broadcasts → all listeners get called:
+       • Workflow Engine listener (Wave 1A)
+       • Anomaly Live listener (Wave 1B)
+       ↓
+3. Workflow Engine matches rules (event_pattern, conditions)
+       • Action type=approval → creates 2-stage chain (CFO+CEO)
+                              → emits approval.requested
+       • Action type=slack    → posts to Slack channel
+       ↓
+4. Anomaly Live captures txn into per-tenant buffer
+       (Hourly cron triggers scan_all_tenants)
+       ↓
+5. Scan finds duplicate-payment cluster → emits anomaly.detected
+       ↓
+6. Workflow rule listening for anomaly.detected fires:
+       Action type=teams → notifies Audit channel
+       Action type=approval → blocks further posts to that vendor
+       ↓
+7. CFO opens /api/v1/approvals/inbox → approves
+       → emits approval.partial → CEO inbox notified
+       → CEO approves → emits approval.approved
+       ↓
+8. Workflow rule listening for approval.approved (object_type=invoice)
+       → posts the invoice JE → emits je.posted → goes to step 4 above
+       (with anomaly check passing this time, since approval was given)
+```
+
+**Total infrastructure for the above**: 14 new backend modules + 4 events
++ 8 action types + 28 admin endpoints + 5 public endpoints. ~3,800 LOC.
+Built in continuous session.
+
 ## How To Pick This Up Tomorrow
 
 1. **Run the test plan**: `architecture/TEST_PLAN.md` covers all migration changes.
-2. **Try a rule**: see "End-to-End Flow Demo" above.
-3. **Pick the next layer**:
-   - **Layer 7.4** (AI Cashflow Forecast) — high-value, single dev, ~1 week
-   - **Layer 9.5** (Custom Role Builder) — extends what we built today
-   - **Layer 5.6** (Email-to-Invoice) — IMAP listener + Claude Vision (already wired)
-4. **Follow the pattern** that worked here:
+2. **Try a rule**: see "End-to-End Flow Demo" above + the closed loop diagram.
+3. **Use Cash Flow Forecast**:
+   ```
+   curl "$API/api/v1/forecast/cashflow?tenant_id=X&weeks=8"
+   ```
+4. **Pick the next layer**:
+   - **Workflow Rule Builder UI** (Flutter) — make the engine usable
+     end-to-end via UI instead of curl. Target: ~600 LOC, ~1 week.
+   - **Layer 5.6** (Email-to-Invoice) — IMAP listener + Claude Vision
+     (already wired in `app/pilot/services/ai_extraction.py`). ~3 days.
+   - **Layer 9.5** (Custom Role Builder) — extends adaptive sidebar
+     with admin-defined custom roles. ~1 week.
+   - **Layer 8** (Module Marketplace) — backend toggleable modules per
+     tenant. ~3 weeks.
+5. **Follow the pattern** that worked here:
    - Audit before assuming missing
    - Build small composable modules
    - Add `try/except` mounting in `main.py`
@@ -203,8 +283,9 @@ session will execute Wave 2+ in full — they require:
    - One commit per layer
 
 The hard part — the **infrastructure for automation** (event bus + rules
-engine + adaptive nav) — is now in place. Everything in Layers 2-12 either
-hooks into the event bus, defines new actions, or extends adaptive nav.
+engine + approvals + anomaly + forecast + adaptive nav) — is now in place.
+Everything in Layers 2-12 either hooks into the event bus, defines new
+actions, or extends an existing pattern.
 
 ---
 
