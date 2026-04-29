@@ -966,6 +966,33 @@ class ApiService {
   static Future<ApiResult> workflowRunsClear({String? ruleId}) =>
       _adminDelete('/admin/workflow/runs${ruleId != null ? "?rule_id=${Uri.encodeQueryComponent(ruleId)}" : ""}');
 
+  // ── Activity Feed (Wave 1P Phase WW) ──
+  static Future<ApiResult> activityList({
+    required String userId,
+    String? tenantId,
+    bool onlyUnread = false,
+    int limit = 50,
+    int offset = 0,
+  }) {
+    final qs = <String>[
+      'user_id=${Uri.encodeQueryComponent(userId)}',
+      'limit=$limit',
+      'offset=$offset',
+    ];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (onlyUnread) qs.add('only_unread=true');
+    return _get('/api/v1/activity?${qs.join('&')}');
+  }
+  static Future<ApiResult> activityMarkRead({
+    required String userId,
+    String? tenantId,
+  }) {
+    final qs = <String>['user_id=${Uri.encodeQueryComponent(userId)}'];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    return _post('/api/v1/activity/mark-read?${qs.join('&')}', const {});
+  }
+  static Future<ApiResult> activityStats() => _adminGet('/admin/activity/stats');
+
   // ── Webhook Subscriptions (Wave 1E Phase T) ──
   static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
     final qs = <String>[];

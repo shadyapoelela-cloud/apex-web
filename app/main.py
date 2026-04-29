@@ -923,6 +923,15 @@ try:
 except Exception as _e:
     logging.warning(f"Workflow Run History router not mounted: {_e}")
 
+# Activity Feed — per-user "what's happening" stream from event bus.
+try:
+    from app.core import activity_feed  # noqa: F401  — registers listeners
+    from app.core.activity_feed_routes import router as activity_feed_router
+    app.include_router(activity_feed_router)
+    logging.info("Activity Feed router mounted at /api/v1/activity + /admin/activity (listeners registered)")
+except Exception as _e:
+    logging.warning(f"Activity Feed router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router
