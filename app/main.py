@@ -878,6 +878,15 @@ try:
 except Exception as _e:
     logging.warning(f"API keys router not mounted: {_e}")
 
+# Custom Role Builder — tenant-defined roles with granular permissions.
+try:
+    from app.core import custom_roles  # noqa: F401  ensures _load() runs
+    from app.core.custom_role_routes import router as custom_role_router
+    app.include_router(custom_role_router)
+    logging.info("Custom roles router mounted at /api/v1/permissions + /admin/roles")
+except Exception as _e:
+    logging.warning(f"Custom roles router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

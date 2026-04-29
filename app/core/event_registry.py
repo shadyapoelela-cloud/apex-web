@@ -252,6 +252,32 @@ _CATALOG: list[EventDefinition] = [
         label_en="User account suspended",
         category=EventCategory.user,
     ),
+    # ─ Custom Roles (Wave 1F Phase Y) ─
+    EventDefinition(
+        name="role.created",
+        label_ar="تم إنشاء دور مخصّص",
+        label_en="Custom role created",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="role.deleted",
+        label_ar="تم حذف دور مخصّص",
+        label_en="Custom role deleted",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="role.assigned",
+        label_ar="تم منح دور لمستخدم",
+        label_en="Role assigned to user",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="role.revoked",
+        label_ar="تم سحب دور من مستخدم",
+        label_en="Role revoked from user",
+        category=EventCategory.system,
+    ),
+
     # ─ Module Manager (per-tenant enable/disable) ─
     EventDefinition(
         name="module.enabled",
