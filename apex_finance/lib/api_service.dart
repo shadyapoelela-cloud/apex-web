@@ -827,6 +827,40 @@ class ApiService {
       _get('/api/v1/events/list${category != null ? "?category=$category" : ""}');
   static Future<ApiResult> eventsCategories() => _get('/api/v1/events/categories');
 
+  // ── Proactive Suggestions (Wave 1G Phase EE) ──
+  static Future<ApiResult> suggestionsList({String? tenantId, String? status}) {
+    final qs = <String>[];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (status != null) qs.add('status=$status');
+    final s = qs.isEmpty ? '' : '?${qs.join('&')}';
+    return _get('/api/v1/suggestions$s');
+  }
+  static Future<ApiResult> suggestionsDismiss(String id) =>
+      _post('/api/v1/suggestions/$id/dismiss', const {});
+  static Future<ApiResult> suggestionsApply(String id) =>
+      _post('/api/v1/suggestions/$id/apply', const {});
+
+  // ── Custom Roles + Permissions (Wave 1F Phase Y) ──
+  static Future<ApiResult> permissionsCatalog({String? category}) =>
+      _get('/api/v1/permissions/catalog${category != null ? "?category=$category" : ""}');
+  static Future<ApiResult> permissionsCategories() =>
+      _get('/api/v1/permissions/categories');
+  static Future<ApiResult> rolesList(String tenantId) =>
+      _adminGet('/admin/roles?tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+  static Future<ApiResult> rolesCreate(Map body) => _adminPost('/admin/roles', body);
+  static Future<ApiResult> rolesUpdate(String id, Map body) => _adminPatch('/admin/roles/$id', body);
+  static Future<ApiResult> rolesDelete(String id) => _adminDelete('/admin/roles/$id');
+  static Future<ApiResult> rolesAssign(String id, String userId) =>
+      _adminPost('/admin/roles/$id/assign', {'user_id': userId});
+  static Future<ApiResult> rolesRevoke(String id, String userId) =>
+      _adminPost('/admin/roles/$id/revoke', {'user_id': userId});
+  static Future<ApiResult> rolesEffective(String userId, String tenantId) =>
+      _adminGet('/admin/roles/effective?user_id=$userId&tenant_id=$tenantId');
+
+  // ── Recent Events (Wave 1A Phase F admin debug) ──
+  static Future<ApiResult> eventsRecent({int limit = 50}) =>
+      _adminGet('/admin/events/recent?limit=$limit');
+
   // ── Webhook Subscriptions (Wave 1E Phase T) ──
   static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
     final qs = <String>[];
