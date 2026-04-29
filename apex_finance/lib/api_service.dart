@@ -863,6 +863,35 @@ class ApiService {
   static Future<ApiResult> eventsRecent({int limit = 50}) =>
       _adminGet('/admin/events/recent?limit=$limit');
 
+  // ── Approvals Admin Console (Wave 1J Phase MM) ──
+  static Future<ApiResult> approvalsAdminList({String? tenantId, String? userId, String? state}) {
+    final qs = <String>[];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (userId != null) qs.add('user_id=${Uri.encodeQueryComponent(userId)}');
+    if (state != null) qs.add('state=$state');
+    final s = qs.isEmpty ? '' : '?${qs.join('&')}';
+    return _adminGet('/admin/approvals$s');
+  }
+  static Future<ApiResult> approvalsAdminCreate(Map body) => _adminPost('/admin/approvals', body);
+  static Future<ApiResult> approvalsAdminCancel(String id, {String? reason}) =>
+      _adminDelete('/admin/approvals/$id${reason != null ? "?reason=${Uri.encodeQueryComponent(reason)}" : ""}');
+  static Future<ApiResult> approvalsAdminStats() => _adminGet('/admin/approvals/stats');
+
+  // ── Anomaly Live Monitor (Wave 1J Phase NN) ──
+  static Future<ApiResult> anomalyBuffer({String? tenantId}) =>
+      _adminGet('/admin/anomaly/buffer${tenantId != null ? "?tenant_id=${Uri.encodeQueryComponent(tenantId)}" : ""}');
+  static Future<ApiResult> anomalyScan(String tenantId, {bool emitEvents = true}) =>
+      _adminPost('/admin/anomaly/scan?tenant_id=${Uri.encodeQueryComponent(tenantId)}&emit_events=$emitEvents');
+  static Future<ApiResult> anomalyScanAll({bool emitEvents = true}) =>
+      _adminPost('/admin/anomaly/scan-all?emit_events=$emitEvents');
+  static Future<ApiResult> anomalyClearBuffer({String? tenantId}) =>
+      _adminPost('/admin/anomaly/clear-buffer${tenantId != null ? "?tenant_id=${Uri.encodeQueryComponent(tenantId)}" : ""}');
+
+  // ── Email Inbox Status (Wave 1J Phase OO) ──
+  static Future<ApiResult> emailInboxStatus() => _adminGet('/admin/email-inbox/status');
+  static Future<ApiResult> emailInboxPoll({int? maxMessages}) =>
+      _adminPost('/admin/email-inbox/poll${maxMessages != null ? "?max_messages=$maxMessages" : ""}');
+
   // ── Webhook Subscriptions (Wave 1E Phase T) ──
   static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
     final qs = <String>[];

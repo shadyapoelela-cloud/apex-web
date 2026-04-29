@@ -340,14 +340,13 @@ class _AdminHealthDashboardState extends State<AdminHealthDashboard> {
   }
 
   Widget _approvalsCard() {
-    // Approvals stats not exposed yet via API helper — show placeholder + link.
     return _kpiCard(
       title: 'سلاسل الموافقات',
       icon: Icons.task_alt,
       color: AC.gold,
-      route: '/workflow/approvals',
+      route: '/admin/approvals',
       body: Text(
-        'افتح صندوق الموافقات لرؤية ما ينتظرك',
+        'إدارة + إحصائيات حسب الحالة',
         style: TextStyle(color: AC.ts, fontSize: 12),
       ),
     );
@@ -477,7 +476,9 @@ class _AdminHealthDashboardState extends State<AdminHealthDashboard> {
           _link('الأدوار', Icons.shield, '/admin/roles'),
           _link('الاقتراحات', Icons.tips_and_updates, '/admin/suggestions'),
           _link('الأحداث', Icons.timeline, '/admin/events'),
-          _link('سجل التدقيق', Icons.history, '/admin/audit'),
+          _link('الموافقات', Icons.task_alt, '/admin/approvals'),
+          _link('الشذوذ الحيّ', Icons.radar, '/admin/anomaly'),
+          _link('بريد الفواتير', Icons.mark_email_unread, '/admin/email-inbox'),
         ]),
       ]),
     );
