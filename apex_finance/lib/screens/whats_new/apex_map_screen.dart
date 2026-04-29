@@ -194,16 +194,16 @@ class ApexMapScreen extends StatelessWidget {
             route: '/sprint39-erp',
             icon: Icons.factory_outlined),
         _Item(
-            title: 'Sprint 40: رواتب + تقارير',
-            route: '/sprint40-payroll',
+            title: 'الرواتب + التقارير (Sprint 40 → Production)',
+            route: '/app/erp/hr/payroll',
             icon: Icons.analytics_outlined),
         _Item(
             title: 'Sprint 41: شراء + استلام',
             route: '/sprint41-procurement',
             icon: Icons.inventory_outlined),
         _Item(
-            title: 'Sprint 42: Q3-Q4 2026',
-            route: '/sprint42-longterm',
+            title: 'التدفق النقدي + التوحيد + BOM (Sprint 42 → Production)',
+            route: '/app/erp/treasury/cashflow',
             icon: Icons.auto_graph),
         _Item(
             title: 'Sprint 43: منظومة المنصة',

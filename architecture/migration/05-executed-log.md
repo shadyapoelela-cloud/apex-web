@@ -350,6 +350,72 @@ git revert <this-commit>
 
 ---
 
+## Commit 7 — Stage 5e: Sprint 40 + 42 Promotion to Production
+
+**القرار**: مبني على [audit detailed لكل sprint](#sprint-audit) — أرشفة Sprints 40 + 42 لأن **100% من ميزاتها تخرّجت لـ production**.
+
+### Sprint Audit Summary
+
+| Sprint | Theme | Coverage | Verdict |
+|--------|-------|----------|---------|
+| 35 — Foundation | UX Patterns (inline edit, shortcuts) | 12.5% | 🟢 KEEP |
+| 37 — Experience | Split layout, app switcher | 0% | 🟢 KEEP |
+| 38 — Composable | Dashboard builder + Notification bell | 50% | 🔵 REFACTOR لاحقاً |
+| 39 — ERP | HR + CRM + Workflow builder | 67% | 🔵 REFACTOR لاحقاً |
+| **40 — Payroll** | **GOSI/WPS + Report Builder** | **100%** | **🔴 ARCHIVE ✅** |
+| 41 — Procurement | Barcode + 3-Way Match | 33% | 🟢 KEEP |
+| **42 — Roadmap** | **Cashflow + Consolidation + BOM** | **100%** | **🔴 ARCHIVE ✅** |
+| 43 — Platform | White-label + WCAG 2.1 | 33% | 🟢 KEEP |
+| 44 — Operations | Gantt + Responsive audit | 33% | 🟢 KEEP |
+
+### الملفات المُعدَّلة
+
+**1. أرشفة Sprint 40 + 42**:
+- `apex_finance/_archive/2026-04-29/orphans/whats_new/sprint40_payroll_reports_screen.dart`
+- `apex_finance/_archive/2026-04-29/orphans/whats_new/sprint42_longterm_screen.dart`
+
+**2. تحويل routes لـ redirects** (router.dart):
+- `/sprint40-payroll` → `/app/erp/hr/payroll`
+- `/sprint42-longterm` → `/app/erp/treasury/cashflow`
+- 2 imports اتحذفوا
+
+**3. تحديث `/whats-new` hub**:
+- Sprint 40 tile الآن point لـ `/app/erp/hr/payroll` مع label "graduated"
+- Sprint 42 tile الآن point لـ `/app/erp/treasury/cashflow` مع label "graduated"
+
+**4. تحديث `/apex-map`**:
+- Sprint 40 entry → `/app/erp/hr/payroll`
+- Sprint 42 entry → `/app/erp/treasury/cashflow`
+
+### Verification
+
+```bash
+$ flutter analyze 2>&1 | grep "^  error"
+(no output, 0 errors)
+
+$ flutter analyze
+300 issues (all pre-existing infos/warnings)
+```
+
+### النتيجة
+
+كل ميزة في Sprint 40 + 42 موجودة في إنتاج عبر V5 shell:
+- Payroll → `/app/erp/hr/payroll` (PayrollRunV52Screen)
+- Custom Reports → `/app/erp/reports-bi/custom-reports` (ReportBuilderScreen)
+- AI Cashflow Forecast → `/app/erp/treasury/cashflow` (CashFlowForecastScreen)
+- Multi-Company Consolidation → `/app/erp/consolidation/consolidation` (ConsolidationV2Screen)
+- BOM/MRP → `/app/erp/manufacturing/bom-mrp` (BomMrpScreen)
+
+### Sprint REFACTOR (لاحقاً)
+
+Sprint 38 + 39 لهم coverage جزئي + ميزات unique. مايستحقش refactor دلوقتي — الـ `/whats-new` hub بعد فلتر admin ما بيعرض حاجة كتيرة للمستخدم العادي.
+
+### Sprint KEEP
+
+5 sprints (35, 37, 41, 43, 44) فيهم ميزات unique مش في إنتاج (inline edit, split layout, barcode scanner, white-label, Gantt). دي references مفيدة لخطة المنتج.
+
+---
+
 ## ⚠️ متوقّفة — تحتاج موافقة الـ deeper changes
 
 ### Stage 5b: Demo Screens
