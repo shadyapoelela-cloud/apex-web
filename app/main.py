@@ -761,6 +761,15 @@ try:
 except Exception as _e:
     logging.warning(f"Notifications router not mounted: {_e}")
 
+# External notification channels (Slack + Teams) admin smoke-test + broadcast.
+# See architecture/diagrams/02-target-state.md §7 (Multi-Channel Notifications).
+try:
+    from app.core.external_notify_routes import router as external_notify_router
+    app.include_router(external_notify_router)
+    logging.info("External notify router mounted at /admin/notify")
+except Exception as _e:
+    logging.warning(f"External notify router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router
