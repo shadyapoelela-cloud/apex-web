@@ -993,6 +993,34 @@ class ApiService {
   }
   static Future<ApiResult> activityStats() => _adminGet('/admin/activity/stats');
 
+  // ── Period Locks (Wave 1Q Phase XX) ──
+  static Future<ApiResult> periodLocksList({String? tenantId, bool onlyActive = false}) {
+    final qs = <String>[];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (onlyActive) qs.add('only_active=true');
+    final s = qs.isEmpty ? '' : '?${qs.join('&')}';
+    return _adminGet('/admin/period-locks$s');
+  }
+  static Future<ApiResult> periodLocksStats() => _adminGet('/admin/period-locks/stats');
+  static Future<ApiResult> periodLocksOverrides({
+    String? tenantId,
+    String? periodCode,
+    String? action,
+    int limit = 100,
+  }) {
+    final qs = <String>['limit=$limit'];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (periodCode != null) qs.add('period_code=${Uri.encodeQueryComponent(periodCode)}');
+    if (action != null) qs.add('action=$action');
+    return _adminGet('/admin/period-locks/overrides?${qs.join('&')}');
+  }
+  static Future<ApiResult> periodLockCreate(Map body) =>
+      _adminPost('/admin/period-locks', body);
+  static Future<ApiResult> periodLockUnlock(Map body) =>
+      _adminPost('/admin/period-locks/unlock', body);
+  static Future<ApiResult> periodLockCheck(Map body) =>
+      _adminPost('/admin/period-locks/check', body);
+
   // ── Webhook Subscriptions (Wave 1E Phase T) ──
   static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
     final qs = <String>[];

@@ -379,6 +379,45 @@ _CATALOG: list[EventDefinition] = [
         category=EventCategory.system,
     ),
 
+    # ─ Period Lock (Wave 1Q Phase XX) ─
+    EventDefinition(
+        name="period.locked",
+        label_ar="تم إقفال فترة محاسبية",
+        label_en="Accounting period locked",
+        category=EventCategory.compliance,
+        payload_schema={
+            "tenant_id": "string",
+            "period_code": "string",
+            "locked_by": "user_id?",
+        },
+    ),
+    EventDefinition(
+        name="period.unlocked",
+        label_ar="تم إعادة فتح فترة محاسبية",
+        label_en="Accounting period re-opened",
+        category=EventCategory.compliance,
+        payload_schema={
+            "tenant_id": "string",
+            "period_code": "string",
+            "unlocked_by": "user_id?",
+            "reason": "string",
+        },
+    ),
+    EventDefinition(
+        name="period.lock.overridden",
+        label_ar="تم تخطّي قفل الفترة بقيد مُبرَّر",
+        label_en="Period lock overridden with audit reason",
+        category=EventCategory.compliance,
+        payload_schema={
+            "tenant_id": "string",
+            "period_code": "string",
+            "actor_user_id": "user_id?",
+            "object_type": "string?",
+            "object_id": "string?",
+            "reason": "string",
+        },
+    ),
+
     # ─ Module Manager (per-tenant enable/disable) ─
     EventDefinition(
         name="module.enabled",

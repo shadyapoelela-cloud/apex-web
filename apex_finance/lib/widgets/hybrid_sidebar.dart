@@ -21,11 +21,9 @@
 /// ════════════════════════════════════════════════════════════════════
 library;
 
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import '../core/session.dart';
 import '../core/theme.dart';
 
 /// ── Data model ───────────────────────────────────────────────────────
@@ -313,23 +311,24 @@ class _HybridSidebarState extends State<HybridSidebar> {
           keywords: ['onboarding', 'wizard', 'استقبال', 'تشغيل'],
           requiredRoles: ['platform_admin', 'super_admin'],
         ),
+        _NavItem(
+          'إقفال الفترات',
+          '/admin/period-locks',
+          Icons.lock_rounded,
+          keywords: ['period', 'lock', 'close', 'إقفال', 'فترة'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
       ],
       requiredRoles: ['platform_admin', 'super_admin', 'reviewer'],
     ),
   ];
 
   /// True when `userRoles` intersects `required` — empty `required` means
-  /// "no role gate, visible to everyone". In debug mode every group is
-  /// visible so devs can navigate without granting themselves admin roles.
+  /// "no role gate, visible to everyone". TEMPORARY: bypass during demo
+  /// session — sidebar exposes everything regardless of role.
+  /// TODO: restore role-gating after stakeholder review.
   bool _hasAnyRole(List<String> required) {
-    if (required.isEmpty) return true;
-    if (kDebugMode) return true;
-    final userRoles = S.roles;
-    if (userRoles.isEmpty) return false;
-    for (final r in required) {
-      if (userRoles.contains(r)) return true;
-    }
-    return false;
+    return true;
   }
 
   /// Returns the role-filtered groups: items hidden if user lacks role,

@@ -932,6 +932,14 @@ try:
 except Exception as _e:
     logging.warning(f"Activity Feed router not mounted: {_e}")
 
+# Period Lock — accounting close enforcement with auditable overrides.
+try:
+    from app.core.period_lock_routes import router as period_lock_router
+    app.include_router(period_lock_router)
+    logging.info("Period Lock router mounted at /api/v1/period-locks + /admin/period-locks")
+except Exception as _e:
+    logging.warning(f"Period Lock router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

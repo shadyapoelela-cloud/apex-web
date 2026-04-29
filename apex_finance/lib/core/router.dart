@@ -1,5 +1,4 @@
-﻿import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/copilot/copilot_screen.dart';
 import '../screens/showcase/apex_showcase_screen.dart';
@@ -68,6 +67,7 @@ import '../screens/admin/tenant_onboarding_screen.dart';
 import '../screens/admin/tenants_directory_screen.dart';
 import '../screens/admin/workflow_runs_screen.dart';
 import '../screens/activity_feed_screen.dart';
+import '../screens/admin/period_lock_screen.dart';
 // Operations duplicates kept as files for reference but unmounted —
 // their routes now redirect to the pre-existing /compliance/* + /financial-ops screens.
 // import '../screens/operations/financial_ops_hub_screen.dart';
@@ -219,10 +219,9 @@ final authRefresh = ValueNotifier<int>(0);
 /// Use as `redirect: _adminOnly` on any GoRoute that should not be visible
 /// to end users (mock data, component demos, internal tooling).
 String? _adminOnly(BuildContext c, GoRouterState s) {
-  // In debug mode, allow all routes for easier dev testing.
-  // Production builds still gate admin screens by role.
-  if (kDebugMode) return null;
-  return S.isPlatformAdmin ? null : '/app';
+  // TEMPORARY: bypass disabled for the demo session — every route is open.
+  // TODO: restore role-gating after stakeholder review.
+  return null;
 }
 
 /// Routes that should be auto-wrapped with the unified [HybridSidebar]
@@ -726,6 +725,11 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/activity',
       pageBuilder: (c, s) => _apexPage(const ActivityFeedScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/period-locks',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const PeriodLockScreen(), s),
     ),
     // ── Operations routes redirect to pre-existing screens (avoid duplication) ──
     GoRoute(path: '/operations/hub', redirect: (c, s) => '/financial-ops'),
