@@ -761,6 +761,7 @@ try:
 except Exception as _e:
     logging.warning(f"Notifications router not mounted: {_e}")
 
+
 # External notification channels (Slack + Teams) admin smoke-test + broadcast.
 # See architecture/diagrams/02-target-state.md §7 (Multi-Channel Notifications).
 try:
@@ -769,6 +770,14 @@ try:
     logging.info("External notify router mounted at /admin/notify")
 except Exception as _e:
     logging.warning(f"External notify router not mounted: {_e}")
+
+# Notification digest (daily/weekly summary) — cron-friendly admin endpoints.
+try:
+    from app.core.notification_digest_routes import router as digest_router
+    app.include_router(digest_router)
+    logging.info("Notification digest router mounted at /admin/digest")
+except Exception as _e:
+    logging.warning(f"Notification digest router not mounted: {_e}")
 
 # Reports download — materialises the URL generate_report tool hands out.
 try:
