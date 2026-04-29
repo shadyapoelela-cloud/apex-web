@@ -779,6 +779,15 @@ try:
 except Exception as _e:
     logging.warning(f"Notification digest router not mounted: {_e}")
 
+# Event registry catalog — backbone for the Workflow Rules Engine.
+# See architecture/diagrams/02-target-state.md §6.
+try:
+    from app.core.event_routes import router as event_router
+    app.include_router(event_router)
+    logging.info("Event registry router mounted at /api/v1/events + /admin/events")
+except Exception as _e:
+    logging.warning(f"Event registry router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router
