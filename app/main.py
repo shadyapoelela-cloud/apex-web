@@ -833,6 +833,14 @@ try:
 except Exception as _e:
     logging.warning(f"Email inbox router not mounted: {_e}")
 
+# Workflow Templates Library — pre-built rules admins install one-click.
+try:
+    from app.core.workflow_templates_routes import router as workflow_templates_router
+    app.include_router(workflow_templates_router)
+    logging.info("Workflow templates router mounted at /admin/workflow/templates")
+except Exception as _e:
+    logging.warning(f"Workflow templates router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router
