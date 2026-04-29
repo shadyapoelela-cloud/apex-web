@@ -247,6 +247,13 @@ class _HybridSidebarState extends State<HybridSidebar> {
           keywords: ['events', 'monitor', 'أحداث'],
           requiredRoles: ['platform_admin', 'super_admin'],
         ),
+        _NavItem(
+          'الأدوار المخصّصة',
+          '/admin/roles',
+          Icons.shield_rounded,
+          keywords: ['roles', 'rbac', 'أدوار', 'صلاحيات'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
       ],
       requiredRoles: ['platform_admin', 'super_admin', 'reviewer'],
     ),
