@@ -798,6 +798,14 @@ try:
 except Exception as _e:
     logging.warning(f"Workflow engine not mounted: {_e}")
 
+# Cash-flow forecast — algorithmic projection of weekly cash position.
+try:
+    from app.core.cashflow_forecast_routes import router as cashflow_forecast_router
+    app.include_router(cashflow_forecast_router)
+    logging.info("Cashflow forecast router mounted at /api/v1/forecast + /admin/forecast")
+except Exception as _e:
+    logging.warning(f"Cashflow forecast router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router
