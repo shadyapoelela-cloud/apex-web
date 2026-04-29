@@ -50,8 +50,9 @@
 | LL | `559854c` | 11 (Admin UX) | Admin Health Dashboard (Flutter) — single-pane subsystem overview at `/admin/dashboard-health`. Aggregates Wave 1A–1H telemetry: workflow rules, approvals, webhooks, api_keys, modules, suggestions, events. Hero banner + 6 click-routable KPI cards + live events strip + 8 quick links. Robust to partial failures (parallel Future.wait, "–" fallback). New `suggestionsStats()` api_service helper. Sidebar entry "لوحة صحة المنصة". | +512 |
 | MM+NN+OO | `1e2f393` | 1B/1C (Admin UX) | Three Flutter admin consoles closing UI gaps for Wave 1B–1C backends. **MM**: Approvals Admin Console (`/admin/approvals`) — system-wide list across tenants, state filter chips, tenant/user filters, stats bar, cancel-pending dialog. **NN**: Anomaly Live Monitor (`/admin/anomaly`) — buffer size hero, per-tenant + scan-all, severity-coded findings (low/medium/high/critical), transaction-id chips, clear-buffer w/ confirm. **OO**: Email Inbox Status (`/admin/email-inbox`) — configured/not banner, read-only env-var display, manual poll w/ max_messages, last-poll result card. 9 new api_service helpers, 3 routes, 3 sidebar entries. Health dashboard quick-links extended. | +1,488 |
 | PP+QQ | `6e84b1f` | 4.4 (Industry Packs) | First-class assignment of sector packs to tenants. **PP** (backend): `industry_packs_service.py` (JSON-as-DB store, atomic writes, idempotent apply) + `industry_packs_routes.py` (7 endpoints: list/detail/applied/apply/remove/assignments/stats + mark-provisioned hook); 3 new events `industry_pack.applied/refreshed/removed`. **QQ** (UI): `AdminIndustryPacksScreen` (renamed to avoid name collision) — hero stats banner, tenant-id input, 5 pack cards w/ expandable COA preview (code + name_ar + account_type chip) + Widget list, apply dialog w/ notes, current-assignments block w/ remove. 7 api_service helpers, route, sidebar entry, dashboard quick-link. | +1,158 |
+| RR | `b6232dc` | 3 (Workflow UX) | Visual Workflow Rule Builder at `/admin/workflow/rules/new`. 5-step wizard (identity / event / conditions / actions / review) with clickable progress indicator. Step 2 includes a clickable list of all 50 registered events. Step 3 supports the engine's 9 operators with type coercion (CSV→list for `in`, numeric for gt/lt, bool for true/false). Step 4 supports 8 action types, each with its own param form (slack/teams/email/notify/webhook/approval/comment/log) and move-up + delete per row. Submission POSTs to /admin/workflow/rules. Empty-state in Rules Console now offers two CTAs (template install OR scratch builder). | +898 |
 
-**Total LOC added (Waves 1A–1K)**: ~16,255 (code) + this doc.
+**Total LOC added (Waves 1A–1L)**: ~17,153 (code) + this doc.
 **Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
 **Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
 **Wave 1C (commits L–O)**: 4 commits, ~1,350 LOC.
@@ -63,7 +64,8 @@
 **Wave 1I (commits JJ, LL)**: 2 commits, ~1,323 LOC.
 **Wave 1J (commit MM+NN+OO)**: 1 combined commit, ~1,488 LOC.
 **Wave 1K (commit PP+QQ)**: 1 combined commit, ~1,158 LOC.
-**Time elapsed**: ~22 hours of continuous Claude work.
+**Wave 1L (commit RR)**: 1 commit, ~898 LOC.
+**Time elapsed**: ~24 hours of continuous Claude work.
 
 ---
 
