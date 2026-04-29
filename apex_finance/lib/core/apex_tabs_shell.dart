@@ -442,13 +442,13 @@ class _AppTabState extends State<_AppTab> {
             color: tabBg,
             borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(10)),
+            // Uniform border colour is required when borderRadius is set.
+            // The accent-coloured top edge that used to sit in this Border
+            // is drawn separately as a Positioned bar via the Stack below.
             border: widget.active
-                ? Border(
-                    top: BorderSide(color: accent, width: 2.5),
-                    left: BorderSide(
-                        color: AC.bdr.withValues(alpha: 0.6)),
-                    right: BorderSide(
-                        color: AC.bdr.withValues(alpha: 0.6)),
+                ? Border.all(
+                    color: AC.bdr.withValues(alpha: 0.6),
+                    width: 1,
                   )
                 : null,
             boxShadow: widget.active
@@ -462,20 +462,38 @@ class _AppTabState extends State<_AppTab> {
                   ]
                 : null,
           ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(widget.app.icon,
-                color: widget.active || _hover ? accent : AC.tp,
-                size: 16),
-            const SizedBox(width: 8),
-            Text(
-              widget.app.label,
-              style: TextStyle(
-                color: widget.active || _hover ? accent : AC.tp,
-                fontSize: 13,
-                fontWeight:
-                    widget.active ? FontWeight.w800 : FontWeight.w500,
+          child: Stack(children: [
+            // Accent top-edge strip — drawn in the Stack so it can have its
+            // own colour without violating the uniform-border constraint.
+            if (widget.active)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 2.5,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: accent,
+                    borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(10)),
+                  ),
+                ),
               ),
-            ),
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(widget.app.icon,
+                  color: widget.active || _hover ? accent : AC.tp,
+                  size: 16),
+              const SizedBox(width: 8),
+              Text(
+                widget.app.label,
+                style: TextStyle(
+                  color: widget.active || _hover ? accent : AC.tp,
+                  fontSize: 13,
+                  fontWeight:
+                      widget.active ? FontWeight.w800 : FontWeight.w500,
+                ),
+              ),
+            ]),
           ]),
         ),
       ),
