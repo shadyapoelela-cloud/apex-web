@@ -272,6 +272,84 @@ git mv apex_finance/_archive/2026-04-29/orphans/v4_erp/X_screen.dart \
 
 ---
 
+## Commit 6 — Stage 5d-3: Multi-Class File Cleanup
+
+**القرار**: حذف 8 orphan classes موجودة داخل ملفات تحتوي على classes شغّالة.
+
+### الملفات المُعدَّلة
+
+#### 1. `apex_finance/lib/core/apex_loading_states.dart`
+- ❌ `ApexErrorPage` (حُذفت ~50 سطر)
+- ✅ `ApexLoadingShimmer`, `ApexInlineSpinner`, `ApexErrorBanner` محتفظة
+- حُذف docstring entry للـ `ApexErrorPage` كذلك
+
+#### 2. `apex_finance/lib/screens/extracted/client_screens.dart`
+- ❌ `ClientCreateScreen` + `_ClientCreateS` state (~155 سطر)
+- ❌ Dangling comment "// ── 3. COA Upload Screen ──" (5 أسطر)
+- ✅ `ClientListScreen` محتفظة (هي اللي بتستعمل `/clients/create` redirect)
+
+#### 3. `apex_finance/lib/screens/admin/admin_sub_screens.dart`
+حذفنا 4 classes:
+- ❌ `LegalAcceptanceScreen` + state
+- ❌ `ClientTypeSelectionScreen` + state
+- ❌ `TaskDocumentScreen` + state
+- ❌ `TaskDocumentManagementScreen` + state
+- ❌ Dead comment block للـ SubscriptionScreen في النهاية
+- ❌ 3 helpers (`_inp`, `_card`, `_kv`) كانوا يستخدموا فقط من الـ orphans
+- ❌ 1 unused import (`apex_app_bar.dart`)
+- ✅ `ReviewerConsoleScreen`, `ProviderVerificationScreen`, `PolicyManagementScreen`, `ProviderDocumentUploadScreen`, `ProviderComplianceScreen`, `ActivityHistoryScreen`, `ResultDetailPanel`, `TaskTypesBrowserScreen`, `KnowledgeDeveloperConsole`, `AuditLogScreen` كلهم محتفظين
+- النتيجة: 1273 → 814 سطر (459 سطر اتشال)
+
+#### 4. `apex_finance/lib/main.dart`
+- ❌ `NotificationsScreen` + `_NotifS` state + section header (53 سطر)
+- ❌ `NewClientScreen` + `_NewCS` state (40 سطر)
+- النتيجة: 2239 → 2146 سطر (93 سطر اتشال)
+
+### القصة الكاملة
+
+أول محاولة لـ admin_sub_screens استخدمت `awk 'NR<=895 || ...'` اللي حذف بالخطأ 3 classes شغّالة (TaskTypesBrowserScreen, KnowledgeDeveloperConsole, AuditLogScreen) لأني افترضت إن `TaskDocumentManagementScreen` بيمتد من السطر 896 لنهاية الملف. الـ `flutter analyze` كشف الخطأ فوراً.
+
+استرجعت الملف من git وأعدت بـ ranges محددة بدقة:
+```awk
+NR<=229 || (NR>=443 && NR<=553) || (NR>=670 && NR<=893) || (NR>=1038 && NR<=1268)
+```
+
+**درس**: الـ "delete from line X to end of file" خطر في ملفات multi-class. لازم نحدد END line بالظبط بناءً على الـ `^}` boundaries في `grep`.
+
+### النتائج العامة بعد Stage 5d-3
+
+| المقياس | قبل | بعد |
+|---------|-----|-----|
+| `apex_loading_states.dart` lines | 191 | 142 |
+| `client_screens.dart` lines | 433 | 280 |
+| `admin_sub_screens.dart` lines | 1273 | 814 |
+| `main.dart` lines | 2239 | 2146 |
+| **إجمالي السطور المحذوفة** | — | **~754** |
+| `flutter analyze` errors | 0 | 0 |
+| `flutter analyze` total issues | 304 | 300 |
+
+### Verification
+
+```bash
+$ flutter analyze 2>&1 | grep "^  error"
+(no output)
+
+$ flutter analyze lib/screens/admin/admin_sub_screens.dart
+3 issues found  (3 pre-existing super_parameters infos)
+
+$ grep -c "^class TaskTypesBrowserScreen\|^class KnowledgeDeveloperConsole\|^class AuditLogScreen" \
+  lib/screens/admin/admin_sub_screens.dart
+3   ← all 3 active classes present and accounted for
+```
+
+### Rollback
+
+```bash
+git revert <this-commit>
+```
+
+---
+
 ## ⚠️ متوقّفة — تحتاج موافقة الـ deeper changes
 
 ### Stage 5b: Demo Screens

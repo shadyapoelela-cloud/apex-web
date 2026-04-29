@@ -5,7 +5,6 @@
 ///   • ApexLoadingShimmer — for list/card placeholders
 ///   • ApexInlineSpinner — small inline loader (next to a label)
 ///   • ApexErrorBanner — recoverable error with retry button
-///   • ApexErrorPage — unrecoverable error / 404 / 500
 library;
 
 import 'package:flutter/material.dart';
@@ -137,55 +136,5 @@ class ApexErrorBanner extends StatelessWidget {
   }
 }
 
-/// Unrecoverable error page. Use for 404 / 500 / fatal.
-class ApexErrorPage extends StatelessWidget {
-  final String title;
-  final String? description;
-  final IconData icon;
-  final String? primaryLabel;
-  final VoidCallback? onPrimary;
-
-  const ApexErrorPage({
-    super.key,
-    this.title = 'حدث خطأ غير متوقع',
-    this.description,
-    this.icon = Icons.error_outline,
-    this.primaryLabel = 'الرجوع للرئيسية',
-    this.onPrimary,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AC.navy,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(icon, color: AC.err, size: 80),
-            const SizedBox(height: 16),
-            Text(title,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: AC.tp, fontSize: 18, fontWeight: FontWeight.w800)),
-            if (description != null) ...[
-              const SizedBox(height: 8),
-              Text(description!,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AC.ts, fontSize: 13, height: 1.5)),
-            ],
-            if (primaryLabel != null) ...[
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: onPrimary,
-                icon: const Icon(Icons.home_outlined, size: 16),
-                label: Text(primaryLabel!),
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: AC.gold, foregroundColor: AC.navy),
-              ),
-            ],
-          ]),
-        ),
-      ),
-    );
-  }
-}
+// ApexErrorPage removed — never instantiated anywhere in the codebase
+// (Stage 5d-3 cleanup, 2026-04-29). Restore from git history if needed.
