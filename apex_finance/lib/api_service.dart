@@ -912,6 +912,12 @@ class ApiService {
   static Future<ApiResult> industryPackAssignments() =>
       _adminGet('/admin/industry-packs/assignments');
   static Future<ApiResult> industryPackStats() => _adminGet('/admin/industry-packs/stats');
+  static Future<ApiResult> industryPackTemplateMap() =>
+      _get('/api/v1/industry-packs/template-map');
+  static Future<ApiResult> industryPackProvision(String packId, String tenantId) =>
+      _adminPost(
+        '/admin/industry-packs/$packId/provision?tenant_id=${Uri.encodeQueryComponent(tenantId)}',
+      );
 
   // ── Webhook Subscriptions (Wave 1E Phase T) ──
   static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {

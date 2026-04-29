@@ -151,6 +151,48 @@ def admin_mark_provisioned(
     return {"success": True}
 
 
+@router.post("/admin/industry-packs/{pack_id}/provision")
+def admin_run_provisioner(
+    pack_id: str,
+    tenant_id: str = Query(..., min_length=1),
+    seed_coa: bool = Query(True),
+    install_workflows: bool = Query(True),
+    provision_widgets: bool = Query(True),
+    x_admin_secret: Optional[str] = Header(None, alias="X-Admin-Secret"),
+):
+    """Re-run the auto-provisioner manually (e.g. after a partial failure).
+
+    Wave 1M Phase SS — same logic as the listener that fires on
+    `industry_pack.applied`, exposed as an admin button.
+    """
+    _verify_admin(x_admin_secret)
+    try:
+        from app.core.industry_pack_provisioner import manual_provision
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(500, f"provisioner_unavailable:{e}")
+    summary = manual_provision(
+        tenant_id,
+        pack_id,
+        seed_coa=seed_coa,
+        install_workflows=install_workflows,
+        provision_widgets=provision_widgets,
+    )
+    return {"success": True, "summary": summary}
+
+
+@router.get("/api/v1/industry-packs/template-map")
+def public_pack_template_map():
+    """Public introspection: which templates each pack auto-installs.
+
+    Useful for the UI to show admins what will happen on apply.
+    """
+    try:
+        from app.core.industry_pack_provisioner import get_pack_template_map
+    except Exception:
+        return {"success": True, "template_map": {}}
+    return {"success": True, "template_map": get_pack_template_map()}
+
+
 def _serialize_assignment(a) -> dict:
     from dataclasses import asdict
 

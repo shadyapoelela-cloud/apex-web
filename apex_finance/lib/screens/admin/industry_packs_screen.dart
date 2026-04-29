@@ -36,6 +36,7 @@ class _AdminIndustryPacksScreenState extends State<AdminIndustryPacksScreen> {
   List<Map<String, dynamic>> _packs = [];
   List<Map<String, dynamic>> _assignments = [];
   Map<String, dynamic> _stats = const {};
+  Map<String, List<String>> _templateMap = const {};
   final _tenantCtrl = TextEditingController();
   String? _expandedPackId;
   Map<String, dynamic>? _expandedDetail;
@@ -110,6 +111,7 @@ class _AdminIndustryPacksScreenState extends State<AdminIndustryPacksScreen> {
       ApiService.industryPacksList(),
       ApiService.industryPackAssignments(),
       ApiService.industryPackStats(),
+      ApiService.industryPackTemplateMap(),
     ]);
     if (!mounted) return;
     if (r[0].success && r[0].data is Map) {
@@ -127,7 +129,39 @@ class _AdminIndustryPacksScreenState extends State<AdminIndustryPacksScreen> {
     if (r[2].success && r[2].data is Map) {
       _stats = Map<String, dynamic>.from(r[2].data as Map);
     }
+    if (r[3].success && r[3].data is Map) {
+      final raw = (r[3].data['template_map'] as Map?) ?? const {};
+      _templateMap = {
+        for (final e in raw.entries)
+          e.key.toString(): ((e.value as List?) ?? const []).map((x) => x.toString()).toList(),
+      };
+    }
     setState(() => _loading = false);
+  }
+
+  Future<void> _reprovision(String packId, String tenantId) async {
+    final r = await ApiService.industryPackProvision(packId, tenantId);
+    if (!mounted) return;
+    if (r.success && r.data is Map) {
+      final summary = Map<String, dynamic>.from(r.data['summary'] as Map);
+      final wf = Map<String, dynamic>.from(summary['workflows'] as Map);
+      final installed = ((wf['installed'] as List?) ?? const []).length;
+      final failed = ((wf['failed'] as List?) ?? const []).length;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: failed == 0 ? AC.ok : AC.warn,
+          content: Text(
+            'إعادة التهيئة: $installed قاعدة مُثبَّتة, $failed فشلت',
+            style: TextStyle(color: AC.tp),
+          ),
+        ),
+      );
+      await _load();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: AC.err, content: Text(r.error ?? 'فشل')),
+      );
+    }
   }
 
   Future<void> _expand(String packId) async {
@@ -492,7 +526,36 @@ class _AdminIndustryPacksScreenState extends State<AdminIndustryPacksScreen> {
             _meta('$coaCount حساب', AC.cyan),
             _meta('$widgetCount widget', AC.gold),
             _meta('$wfCount workflow', AC.ok),
+            if ((_templateMap[id] ?? const []).isNotEmpty)
+              _meta('تهيئة تلقائية: ${(_templateMap[id] ?? const []).length} قاعدة', AC.warn),
           ]),
+          if ((_templateMap[id] ?? const []).isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(
+              'سيُثبَّت تلقائياً عند التطبيق:',
+              style: TextStyle(color: AC.ts, fontSize: 10),
+            ),
+            const SizedBox(height: 4),
+            Wrap(spacing: 4, runSpacing: 4, children: [
+              for (final tid in _templateMap[id] ?? const [])
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AC.warn.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                    border: Border.all(color: AC.warn.withValues(alpha: 0.3)),
+                  ),
+                  child: Text(
+                    tid,
+                    style: TextStyle(
+                      color: AC.warn,
+                      fontSize: 10,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ),
+            ]),
+          ],
           const SizedBox(height: 6),
           TextButton.icon(
             onPressed: () => _expand(id),
@@ -627,6 +690,8 @@ class _AdminIndustryPacksScreenState extends State<AdminIndustryPacksScreen> {
   }
 
   Widget _assignmentRow(Map<String, dynamic> a) {
+    final coa = a['coa_seeded'] == true;
+    final widgets = a['widgets_provisioned'] == true;
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -656,11 +721,31 @@ class _AdminIndustryPacksScreenState extends State<AdminIndustryPacksScreen> {
             ],
           ),
         ),
-        if (a['coa_seeded'] == true)
-          Tooltip(
-            message: 'COA seeded',
-            child: Icon(Icons.check_circle, color: AC.ok, size: 16),
+        Tooltip(
+          message: coa ? 'COA seeded' : 'COA not yet seeded',
+          child: Icon(
+            coa ? Icons.check_circle : Icons.radio_button_unchecked,
+            color: coa ? AC.ok : AC.ts,
+            size: 16,
           ),
+        ),
+        const SizedBox(width: 4),
+        Tooltip(
+          message: widgets ? 'Widgets provisioned' : 'Widgets not yet provisioned',
+          child: Icon(
+            widgets ? Icons.dashboard_customize : Icons.dashboard_customize_outlined,
+            color: widgets ? AC.gold : AC.ts,
+            size: 16,
+          ),
+        ),
+        IconButton(
+          tooltip: 'إعادة التهيئة',
+          onPressed: () => _reprovision(
+            a['pack_id'].toString(),
+            a['tenant_id'].toString(),
+          ),
+          icon: Icon(Icons.replay_circle_filled_outlined, color: AC.cyan, size: 18),
+        ),
         IconButton(
           tooltip: 'إزالة',
           onPressed: () => _removeAssignment(a['tenant_id'].toString()),

@@ -901,7 +901,9 @@ except Exception as _e:
 try:
     from app.core.industry_packs_routes import router as industry_packs_router
     app.include_router(industry_packs_router)
-    logging.info("Industry Packs router mounted at /api/v1/industry-packs + /admin/industry-packs")
+    # Importing the provisioner registers its listener on industry_pack.applied.
+    from app.core import industry_pack_provisioner  # noqa: F401
+    logging.info("Industry Packs router mounted at /api/v1/industry-packs + /admin/industry-packs (auto-provisioner active)")
 except Exception as _e:
     logging.warning(f"Industry Packs router not mounted: {_e}")
 

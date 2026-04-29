@@ -338,6 +338,20 @@ _CATALOG: list[EventDefinition] = [
         label_en="Industry pack assignment removed",
         category=EventCategory.system,
     ),
+    EventDefinition(
+        name="industry_pack.provisioned",
+        label_ar="اكتمل التهيئة التلقائية لحزمة القطاع",
+        label_en="Industry pack auto-provisioning completed",
+        category=EventCategory.system,
+        payload_schema={
+            "tenant_id": "uuid",
+            "pack_id": "string",
+            "workflows_installed": "int",
+            "workflows_failed": "int",
+            "coa_seeded": "bool",
+            "widgets_provisioned": "bool",
+        },
+    ),
 
     # ─ Module Manager (per-tenant enable/disable) ─
     EventDefinition(
