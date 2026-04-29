@@ -268,6 +268,12 @@ class _WorkflowRulesScreenState extends State<WorkflowRulesScreen> {
                 onPressed: () =>
                     GoRouter.of(context).go('/admin/workflow/templates'),
               ),
+              ApexToolbarAction(
+                label: 'قاعدة جديدة',
+                icon: Icons.add_circle_outline,
+                onPressed: () =>
+                    GoRouter.of(context).go('/admin/workflow/rules/new'),
+              ),
             ],
           ),
           if (_stats != null) _statsBar(_stats!),
@@ -344,16 +350,28 @@ class _WorkflowRulesScreenState extends State<WorkflowRulesScreen> {
             Text('لا توجد قواعد بعد',
                 style: TextStyle(color: AC.tp, fontSize: 14)),
             const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: () =>
-                  GoRouter.of(context).go('/admin/workflow/templates'),
-              icon: const Icon(Icons.add),
-              label: const Text('تثبيت قاعدة من القوالب'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AC.gold,
-                foregroundColor: AC.btnFg,
+            Wrap(spacing: 8, runSpacing: 8, alignment: WrapAlignment.center, children: [
+              ElevatedButton.icon(
+                onPressed: () =>
+                    GoRouter.of(context).go('/admin/workflow/templates'),
+                icon: const Icon(Icons.auto_awesome),
+                label: const Text('تثبيت من القوالب'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AC.gold,
+                  foregroundColor: AC.btnFg,
+                ),
               ),
-            ),
+              OutlinedButton.icon(
+                onPressed: () =>
+                    GoRouter.of(context).go('/admin/workflow/rules/new'),
+                icon: const Icon(Icons.add_circle_outline),
+                label: const Text('قاعدة جديدة'),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: AC.cyan),
+                  foregroundColor: AC.cyan,
+                ),
+              ),
+            ]),
           ],
         ),
       );
