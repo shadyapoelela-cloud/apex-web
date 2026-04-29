@@ -24,6 +24,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import '../core/session.dart';
 import '../core/theme.dart';
 
 /// ── Data model ───────────────────────────────────────────────────────
@@ -32,7 +33,17 @@ class _NavGroup {
   final IconData icon;
   final List<_NavItem> items;
   bool expanded;
-  _NavGroup(this.label, this.icon, this.items, {this.expanded = false});
+  /// If non-empty, only users whose `S.roles` intersects this list see the
+  /// group. Empty (default) = visible to everyone. Useful for hiding a
+  /// whole admin-only section.
+  final List<String> requiredRoles;
+  _NavGroup(
+    this.label,
+    this.icon,
+    this.items, {
+    this.expanded = false,
+    this.requiredRoles = const [],
+  });
 }
 
 class _NavItem {
@@ -40,8 +51,17 @@ class _NavItem {
   final String route;
   final IconData icon;
   final List<String> keywords;
-  const _NavItem(this.label, this.route, this.icon,
-      {this.keywords = const []});
+
+  /// Same semantics as `_NavGroup.requiredRoles`: empty = visible to all.
+  /// When set, the item is filtered out if `S.roles` doesn't intersect.
+  final List<String> requiredRoles;
+  const _NavItem(
+    this.label,
+    this.route,
+    this.icon, {
+    this.keywords = const [],
+    this.requiredRoles = const [],
+  });
 }
 
 /// ── Display modes ────────────────────────────────────────────────────
@@ -142,7 +162,78 @@ class _HybridSidebarState extends State<HybridSidebar> {
           Icons.swap_horiz_rounded),
       _NavItem('OCR الفواتير', '/compliance/ocr', Icons.document_scanner_rounded),
     ]),
+    // Admin-only group — visible only to platform_admin / super_admin.
+    // See architecture/diagrams/02-target-state.md §5 (Adaptive Navigation).
+    _NavGroup(
+      'الإدارة',
+      Icons.admin_panel_settings_rounded,
+      [
+        _NavItem(
+          'لوحة المراجع',
+          '/admin/reviewer',
+          Icons.fact_check_rounded,
+          requiredRoles: ['platform_admin', 'super_admin', 'reviewer'],
+        ),
+        _NavItem(
+          'اعتماد المزوّدين',
+          '/admin/providers/verify',
+          Icons.verified_user_rounded,
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'سياسات + قانوني',
+          '/admin/policies',
+          Icons.gavel_rounded,
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'سجل التدقيق الكامل',
+          '/admin/audit',
+          Icons.history_rounded,
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+        _NavItem(
+          'AI Console',
+          '/admin/ai-console',
+          Icons.psychology_rounded,
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
+      ],
+      requiredRoles: ['platform_admin', 'super_admin', 'reviewer'],
+    ),
   ];
+
+  /// True when `userRoles` intersects `required` — empty `required` means
+  /// "no role gate, visible to everyone".
+  bool _hasAnyRole(List<String> required) {
+    if (required.isEmpty) return true;
+    final userRoles = S.roles;
+    if (userRoles.isEmpty) return false;
+    for (final r in required) {
+      if (userRoles.contains(r)) return true;
+    }
+    return false;
+  }
+
+  /// Returns the role-filtered groups: items hidden if user lacks role,
+  /// whole groups hidden if all their items are filtered out.
+  List<_NavGroup> _visibleGroups() {
+    final out = <_NavGroup>[];
+    for (final g in _groups) {
+      if (!_hasAnyRole(g.requiredRoles)) continue;
+      final visibleItems = g.items.where((i) => _hasAnyRole(i.requiredRoles)).toList();
+      if (visibleItems.isEmpty) continue;
+      // Build a new group instance so the filter is non-destructive.
+      out.add(_NavGroup(
+        g.label,
+        g.icon,
+        visibleItems,
+        expanded: g.expanded,
+        requiredRoles: g.requiredRoles,
+      ));
+    }
+    return out;
+  }
 
   // ── Active-state helpers ────────────────────────────────────────────
   String _currentRoute(BuildContext context) {
@@ -168,6 +259,10 @@ class _HybridSidebarState extends State<HybridSidebar> {
     }
   }
 
+  /// Cache of the role-filtered groups so we don't rebuild on every paint.
+  /// Cleared on `setState()` of the host widget naturally; re-derived in build.
+  late List<_NavGroup> _filteredGroups;
+
   // ── Mode computation ────────────────────────────────────────────────
   _Mode _modeFor(double w) {
     if (w >= 1200) {
@@ -183,7 +278,9 @@ class _HybridSidebarState extends State<HybridSidebar> {
 
   // ── Dialogs ─────────────────────────────────────────────────────────
   void _showQuickSearch() {
-    final all = <_NavItem>[for (final g in _groups) ...g.items];
+    // Use the role-filtered groups so users can't search to a route they
+    // don't have permission for.
+    final all = <_NavItem>[for (final g in _filteredGroups) ...g.items];
     showDialog(
       context: context,
       barrierColor: AC.sidebarScrim,
@@ -205,6 +302,9 @@ class _HybridSidebarState extends State<HybridSidebar> {
   Widget build(BuildContext context) {
     final current = _currentRoute(context);
     _maybeExpandActiveGroup(current);
+    // Recompute role-filtered groups every build — cheap (small lists),
+    // safe across login/logout transitions where S.roles changes.
+    _filteredGroups = _visibleGroups();
 
     return LayoutBuilder(builder: (ctx, box) {
       final w = box.maxWidth;
@@ -330,8 +430,9 @@ class _HybridSidebarState extends State<HybridSidebar> {
   }
 
   void _jumpToGroup(int index) {
-    if (index < 0 || index >= _groups.length) return;
-    final group = _groups[index];
+    final groups = _filteredGroups;
+    if (index < 0 || index >= groups.length) return;
+    final group = groups[index];
     if (group.items.isEmpty) return;
     // Navigate to the group's first item.
     final first = group.items.first;
@@ -371,9 +472,9 @@ class _HybridSidebarState extends State<HybridSidebar> {
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 6),
-                itemCount: _groups.length,
+                itemCount: _filteredGroups.length,
                 itemBuilder: (ctx, i) =>
-                    _buildGroup(_groups[i], isRail, current, isOverlay),
+                    _buildGroup(_filteredGroups[i], isRail, current, isOverlay),
               ),
             ),
             Divider(color: AC.sidebarBorder, height: 1),
