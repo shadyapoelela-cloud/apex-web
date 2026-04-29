@@ -252,6 +252,25 @@ _CATALOG: list[EventDefinition] = [
         label_en="User account suspended",
         category=EventCategory.user,
     ),
+    # ─ Module Manager (per-tenant enable/disable) ─
+    EventDefinition(
+        name="module.enabled",
+        label_ar="تم تفعيل وحدة",
+        label_en="Module enabled",
+        category=EventCategory.system,
+        payload_schema={
+            "tenant_id": "uuid",
+            "module_id": "string",
+            "module_name_ar": "string",
+        },
+    ),
+    EventDefinition(
+        name="module.disabled",
+        label_ar="تم تعطيل وحدة",
+        label_en="Module disabled",
+        category=EventCategory.system,
+    ),
+
     # ─ Universal Comments + Mentions ─
     EventDefinition(
         name="comment.added",

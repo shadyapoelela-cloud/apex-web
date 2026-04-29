@@ -860,6 +860,15 @@ try:
 except Exception as _e:
     logging.warning(f"Comments router not mounted: {_e}")
 
+# Module Manager — per-tenant enable/disable of platform modules.
+try:
+    from app.core import module_manager  # noqa: F401  ensures _load() runs
+    from app.core.module_manager_routes import router as module_router
+    app.include_router(module_router)
+    logging.info("Module manager router mounted at /api/v1/modules + /admin/modules")
+except Exception as _e:
+    logging.warning(f"Module manager router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router
