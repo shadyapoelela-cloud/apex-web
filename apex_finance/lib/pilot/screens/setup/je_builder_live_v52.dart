@@ -84,6 +84,14 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   bool _toCheck = false;
   List<_LineState> _lines = [_LineState(), _LineState()];
   bool _submitting = false;
+  // When the user clicks تعديل on a posted entry, we drop into edit
+  // mode (a fresh draft) but remember the original posted entry id +
+  // number. On submit, the original is auto-reversed first so the
+  // posted ledger reflects the replacement: original + reversal of
+  // original + new corrected entry. Standard accounting workflow for
+  // correcting a posted entry without breaking the audit trail.
+  String? _editingPostedJeId;
+  String? _editingPostedJeNumber;
 
   // ─── Optional column visibility (Odoo-style ⚙️ toggle) ───
   // All default OFF — keep first impression simple. User toggles via
@@ -375,14 +383,44 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               })
           .toList(),
     };
+    // ── Edit-of-posted workflow ──
+    // If we entered this draft via the تعديل button on a posted
+    // entry, reverse the original first so the ledger stays
+    // consistent. Only do this on autoPost (final submit) — saving
+    // as a draft shouldn't mutate the posted ledger yet.
+    if (autoPost && _editingPostedJeId != null) {
+      final reverseResp = await _client.reverseJournalEntry(
+        _editingPostedJeId!,
+        {
+          'reversal_date': _formatDate(DateTime.now()),
+          'memo_ar':
+              'عكس قيد ${_editingPostedJeNumber ?? ""} للتعديل',
+        },
+      );
+      if (!mounted) return;
+      if (!reverseResp.success) {
+        setState(() {
+          _submitting = false;
+          _error = 'فشل عكس القيد الأصلي: '
+              '${reverseResp.error ?? "خطأ غير معروف"}';
+        });
+        return;
+      }
+    }
     final r = await _client.createJournalEntry(body);
     if (!mounted) return;
     setState(() => _submitting = false);
     if (r.success) {
+      final wasEdit = _editingPostedJeId != null && autoPost;
+      _editingPostedJeId = null;
+      _editingPostedJeNumber = null;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: _ok,
-        content: Text(
-            autoPost ? 'تم إنشاء القيد وترحيله ✓' : 'تم حفظ القيد (مسودة) ✓'),
+        content: Text(wasEdit
+            ? 'تم عكس القيد الأصلي وترحيل القيد المُصحَّح ✓'
+            : (autoPost
+                ? 'تم إنشاء القيد وترحيله ✓'
+                : 'تم حفظ القيد (مسودة) ✓')),
       ));
       Navigator.of(context).pop(true);
     } else {
@@ -831,6 +869,58 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
               )
             : const Icon(Icons.auto_awesome_rounded, size: 18),
       ),
+    );
+  }
+
+  // Banner that appears at the top of the create form when the
+  // user landed here via "تعديل" on a posted entry. Tells them
+  // exactly what will happen on submit (reverse + new entry) and
+  // gives them a cancel option to revert to viewing the original.
+  Widget _editingPostedBanner() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+          horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: _navy.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _navy.withValues(alpha: 0.25)),
+      ),
+      child: Row(children: [
+        Icon(Icons.edit_note_rounded, color: _navy, size: 20),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                  'وضع التعديل: ${_editingPostedJeNumber ?? ""}',
+                  style: TextStyle(
+                      color: _navy,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800)),
+              const SizedBox(height: 2),
+              Text(
+                  'عند الترحيل سيُعكس القيد الأصلي تلقائياً ثم يُرحَّل القيد المُصحَّح في خطوة واحدة.',
+                  style: TextStyle(
+                      color: _td, fontSize: 11.5)),
+            ],
+          ),
+        ),
+        TextButton(
+          onPressed: _submitting
+              ? null
+              : () {
+                  setState(() {
+                    _editingPostedJeId = null;
+                    _editingPostedJeNumber = null;
+                  });
+                  Navigator.of(context).maybePop();
+                },
+          child: Text('إلغاء التعديل',
+              style: TextStyle(
+                  color: _td, fontWeight: FontWeight.w700)),
+        ),
+      ]),
     );
   }
 
@@ -1548,14 +1638,19 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
           : [_LineState(), _LineState()];
       _memo.text = originalMemo;
       _kind = originalKind;
+      // Remember the original so _submit can reverse it before
+      // posting the corrected version (atomic edit-in-place).
+      _editingPostedJeId = _je?['id'] as String?;
+      _editingPostedJeNumber = _je?['je_number'] as String?;
       _je = null; // back to create mode
       _jeLines = [];
     });
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: _ok,
-        content: const Text(
-            'تم نسخ بنود القيد إلى مسودة جديدة — عدّل ثم اضغط ترحيل'),
+        backgroundColor: _navy,
+        duration: const Duration(seconds: 5),
+        content: Text(
+            'وضع التعديل: عند الترحيل سيتم عكس القيد الأصلي ${_editingPostedJeNumber ?? ""} وإنشاء قيد مُصحَّح'),
       ));
     }
   }
@@ -1819,6 +1914,8 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       children: [
+        if (_editingPostedJeId != null) _editingPostedBanner(),
+        if (_editingPostedJeId != null) const SizedBox(height: 12),
         if (_aiWarnings.isNotEmpty) _aiWarningsStrip(),
         if (_aiWarnings.isNotEmpty) const SizedBox(height: 18),
         Row(
