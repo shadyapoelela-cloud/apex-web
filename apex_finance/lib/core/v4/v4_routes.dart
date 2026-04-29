@@ -27,12 +27,14 @@ import 'apex_screen_host.dart';
 import 'apex_sub_module_shell.dart';
 import 'v4_groups.dart';
 
+
 /// Public list of routes — imported from router.dart and spread into
 /// the top-level GoRouter.routes array.
 List<RouteBase> v4Routes() => [
       GoRoute(
         path: '/app',
-        builder: (ctx, state) => const ApexLaunchpad(),
+        builder: (ctx, state) =>
+            const ApexLaunchpad(),
       ),
       GoRoute(
         path: '/app/:group',
