@@ -815,6 +815,16 @@ try:
 except Exception as _e:
     logging.warning(f"Approval routes not mounted: {_e}")
 
+# Live anomaly detection — bridges existing pure detector to the event stream.
+# Importing the module also registers event_bus listeners.
+try:
+    from app.core import anomaly_live  # noqa: F401 — registers listeners on import
+    from app.core.anomaly_live_routes import router as anomaly_live_router
+    app.include_router(anomaly_live_router)
+    logging.info("Anomaly live router mounted at /admin/anomaly")
+except Exception as _e:
+    logging.warning(f"Anomaly live router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router
