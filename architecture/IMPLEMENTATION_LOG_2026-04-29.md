@@ -40,15 +40,20 @@
 | X | `ef4f4c1` | 11.5 (Platform) | Public API Keys + scoped programmatic auth. SHA-256 hashed; raw_secret returned ONCE; HMAC-style verify with constant-time compare; scopes hierarchy ("*", "ns:*", exact); IP allowlists; rate-limit field; revoke + audit. CRUD admin endpoints + /api/v1/api-keys/me introspection. | +537 |
 | Y | `e3301f0` | 9.5 (RBAC) | Custom Role Builder + 47 atomic permissions across 6 categories. Tenants define their own roles (e.g. "Junior Bookkeeper"). Multi-role per user; effective_permissions resolution. CRUD + assign/revoke admin endpoints. Emits role.created/deleted/assigned/revoked. | +708 |
 | Z | `9df4b10` | 8 (Admin UX) | Module Manager Screen (Flutter) — toggle modules per tenant via UI. Category chips, per-module switches, auto-disabled cards with require-list warning, reset-all button. Wired to Wave 1E Phase V backend + admin-secret-gated. Sidebar entry in "الإدارة" group. | +491 |
+| 📚 | `290fcd4` | (docs) | Implementation log v6 (added X/Y/Z Wave 1F) | +7 |
+| AA+BB | `b701012` | 11.6+11.5 (Admin UX) | Webhooks Console + API Keys Management screens — full CRUD UI for the Wave 1E/1F backends. Webhooks: stats bar + create/test/reset/delete + HMAC indicator chip. API keys: scopes editor + raw_secret modal (shown ONCE) + revoke flow. 15 new api_service methods. 2 sidebar entries. | +1080 |
+| CC | `5c49c97` | 10.4 (Collab UX) | ApexCommentsPanel widget — universal embeddable comments thread for any APEX entity. Avatar + body + @mention chips + 👍/🙏/🔥 reactions + delete (author only) + relative timestamps. Drop into any screen with `ApexCommentsPanel(objectType, objectId)`. | +437 |
+| EE | `11689ca` | 7.11 (AI) | Proactive Suggestions Engine — 5 pattern detectors on event bus (overdue cluster, ZATCA failures, anomaly cluster, critical module disabled, user suspensions). Idempotent _propose, JSON storage, dismiss/apply states. Emits suggestion.proposed/dismissed/applied. | +498 |
 
-**Total LOC added (Waves 1A–1F)**: ~9,570 (code) + this doc.
+**Total LOC added (Waves 1A–1G)**: ~11,585 (code) + this doc.
 **Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
 **Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
 **Wave 1C (commits L–O)**: 4 commits, ~1,350 LOC.
 **Wave 1D (commit P+Q+S)**: 1 combined commit, ~1,056 LOC.
 **Wave 1E (commits T–V)**: 3 commits, ~1,634 LOC.
 **Wave 1F (commits X–Z)**: 3 commits, ~1,736 LOC.
-**Time elapsed**: ~13 hours of continuous Claude work.
+**Wave 1G (commits AA+BB, CC, EE)**: 3 commits, ~2,015 LOC.
+**Time elapsed**: ~15 hours of continuous Claude work.
 
 ---
 
