@@ -57,6 +57,7 @@ import '../screens/admin/api_keys_screen.dart';
 import '../screens/admin/suggestions_inbox_screen.dart';
 import '../screens/admin/events_browser_screen.dart';
 import '../screens/admin/custom_roles_screen.dart';
+import '../screens/admin/admin_health_dashboard.dart';
 // Operations duplicates kept as files for reference but unmounted —
 // their routes now redirect to the pre-existing /compliance/* + /financial-ops screens.
 // import '../screens/operations/financial_ops_hub_screen.dart';
@@ -662,6 +663,11 @@ final appRouter = GoRouter(
       path: '/admin/roles',
       redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const CustomRolesScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/dashboard-health',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const AdminHealthDashboard(), s),
     ),
     // ── Operations routes redirect to pre-existing screens (avoid duplication) ──
     GoRoute(path: '/operations/hub', redirect: (c, s) => '/financial-ops'),

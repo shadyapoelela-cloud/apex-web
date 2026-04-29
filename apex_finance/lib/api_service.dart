@@ -839,6 +839,8 @@ class ApiService {
       _post('/api/v1/suggestions/$id/dismiss', const {});
   static Future<ApiResult> suggestionsApply(String id) =>
       _post('/api/v1/suggestions/$id/apply', const {});
+  static Future<ApiResult> suggestionsStats() =>
+      _adminGet('/admin/suggestions/stats');
 
   // ── Custom Roles + Permissions (Wave 1F Phase Y) ──
   static Future<ApiResult> permissionsCatalog({String? category}) =>

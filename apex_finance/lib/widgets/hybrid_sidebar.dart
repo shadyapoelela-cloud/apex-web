@@ -254,6 +254,13 @@ class _HybridSidebarState extends State<HybridSidebar> {
           keywords: ['roles', 'rbac', 'أدوار', 'صلاحيات'],
           requiredRoles: ['platform_admin', 'super_admin'],
         ),
+        _NavItem(
+          'لوحة صحة المنصة',
+          '/admin/dashboard-health',
+          Icons.health_and_safety_rounded,
+          keywords: ['health', 'dashboard', 'صحة', 'لوحة', 'overview'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
       ],
       requiredRoles: ['platform_admin', 'super_admin', 'reviewer'],
     ),
