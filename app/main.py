@@ -761,6 +761,114 @@ try:
 except Exception as _e:
     logging.warning(f"Notifications router not mounted: {_e}")
 
+
+# External notification channels (Slack + Teams) admin smoke-test + broadcast.
+# See architecture/diagrams/02-target-state.md §7 (Multi-Channel Notifications).
+try:
+    from app.core.external_notify_routes import router as external_notify_router
+    app.include_router(external_notify_router)
+    logging.info("External notify router mounted at /admin/notify")
+except Exception as _e:
+    logging.warning(f"External notify router not mounted: {_e}")
+
+# Notification digest (daily/weekly summary) — cron-friendly admin endpoints.
+try:
+    from app.core.notification_digest_routes import router as digest_router
+    app.include_router(digest_router)
+    logging.info("Notification digest router mounted at /admin/digest")
+except Exception as _e:
+    logging.warning(f"Notification digest router not mounted: {_e}")
+
+# Event registry catalog — backbone for the Workflow Rules Engine.
+# See architecture/diagrams/02-target-state.md §6.
+try:
+    from app.core.event_routes import router as event_router
+    app.include_router(event_router)
+    logging.info("Event registry router mounted at /api/v1/events + /admin/events")
+except Exception as _e:
+    logging.warning(f"Event registry router not mounted: {_e}")
+
+# Workflow Rules Engine — declarative no-code automation (Wave 3 target).
+# Importing the engine module also registers a global event-bus listener.
+try:
+    from app.core import workflow_engine  # noqa: F401 — import registers listener
+    from app.core.workflow_routes import router as workflow_router
+    app.include_router(workflow_router)
+    logging.info("Workflow engine + routes mounted at /admin/workflow")
+except Exception as _e:
+    logging.warning(f"Workflow engine not mounted: {_e}")
+
+# Cash-flow forecast — algorithmic projection of weekly cash position.
+try:
+    from app.core.cashflow_forecast_routes import router as cashflow_forecast_router
+    app.include_router(cashflow_forecast_router)
+    logging.info("Cashflow forecast router mounted at /api/v1/forecast + /admin/forecast")
+except Exception as _e:
+    logging.warning(f"Cashflow forecast router not mounted: {_e}")
+
+# Approval Chains — multi-stage sign-off, integrates with Workflow Engine.
+try:
+    from app.core import approvals  # noqa: F401  ensures _load() runs
+    from app.core.approval_routes import router as approval_router
+    app.include_router(approval_router)
+    logging.info("Approval routes mounted at /api/v1/approvals + /admin/approvals")
+except Exception as _e:
+    logging.warning(f"Approval routes not mounted: {_e}")
+
+# Live anomaly detection — bridges existing pure detector to the event stream.
+# Importing the module also registers event_bus listeners.
+try:
+    from app.core import anomaly_live  # noqa: F401 — registers listeners on import
+    from app.core.anomaly_live_routes import router as anomaly_live_router
+    app.include_router(anomaly_live_router)
+    logging.info("Anomaly live router mounted at /admin/anomaly")
+except Exception as _e:
+    logging.warning(f"Anomaly live router not mounted: {_e}")
+
+# Email-to-Invoice intake — IMAP poller that emits `email.received` events.
+try:
+    from app.core.email_inbox_routes import router as email_inbox_router
+    app.include_router(email_inbox_router)
+    logging.info("Email inbox router mounted at /admin/email-inbox")
+except Exception as _e:
+    logging.warning(f"Email inbox router not mounted: {_e}")
+
+# Workflow Templates Library — pre-built rules admins install one-click.
+try:
+    from app.core.workflow_templates_routes import router as workflow_templates_router
+    app.include_router(workflow_templates_router)
+    logging.info("Workflow templates router mounted at /admin/workflow/templates")
+except Exception as _e:
+    logging.warning(f"Workflow templates router not mounted: {_e}")
+
+# Webhook Subscriptions — third-party / internal systems subscribe to events.
+# Importing the module registers a global event_bus listener.
+try:
+    from app.core import webhook_subscriptions  # noqa: F401 — registers listener
+    from app.core.webhook_subscription_routes import router as webhook_router
+    app.include_router(webhook_router)
+    logging.info("Webhook subscriptions router mounted at /admin/webhooks")
+except Exception as _e:
+    logging.warning(f"Webhook subscriptions router not mounted: {_e}")
+
+# Universal Comments + @Mentions — discuss any APEX entity.
+try:
+    from app.core import comments  # noqa: F401  ensures _load() runs
+    from app.core.comment_routes import router as comment_router
+    app.include_router(comment_router)
+    logging.info("Comments router mounted at /api/v1/comments + /admin/comments")
+except Exception as _e:
+    logging.warning(f"Comments router not mounted: {_e}")
+
+# Module Manager — per-tenant enable/disable of platform modules.
+try:
+    from app.core import module_manager  # noqa: F401  ensures _load() runs
+    from app.core.module_manager_routes import router as module_router
+    app.include_router(module_router)
+    logging.info("Module manager router mounted at /api/v1/modules + /admin/modules")
+except Exception as _e:
+    logging.warning(f"Module manager router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

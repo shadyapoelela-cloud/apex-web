@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
+import '../../core/apex_trust_signals.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/theme.dart' as core_theme;
@@ -108,6 +109,13 @@ class _SAS extends State<SlideAuthScreen> {
                 child: _pg == 0 ? _loginForm() : _regForm(),
               ),
             ]),
+          ),
+          // Trust signals — visible at every entry point per FinTech UX best practice.
+          // See architecture/diagrams/03-research-findings.md (Wave 6).
+          const SizedBox(height: 18),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 460),
+            child: const ApexTrustSignals(),
           ),
         ]),
       ))),

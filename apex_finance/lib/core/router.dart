@@ -49,6 +49,8 @@ import '../screens/compliance/islamic_finance_screen.dart';
 // import '../screens/compliance/multi_currency_screen.dart'; // deduplicated → /analytics/multi-currency-v2
 // onboarding_wizard_screen.dart archived to _archive/2026-04-29/ (Stage 5a).
 import '../screens/admin/audit_chain_viewer_screen.dart';
+import '../screens/admin/workflow_templates_screen.dart';
+import '../screens/admin/workflow_rules_screen.dart';
 // Operations duplicates kept as files for reference but unmounted —
 // their routes now redirect to the pre-existing /compliance/* + /financial-ops screens.
 // import '../screens/operations/financial_ops_hub_screen.dart';
@@ -612,6 +614,19 @@ final appRouter = GoRouter(
     GoRoute(path: '/compliance/multi-currency', redirect: (c, s) => '/analytics/multi-currency-v2'),
     GoRoute(path: '/onboarding/wizard', redirect: (c, s) => '/app/erp/finance/onboarding'),
     GoRoute(path: '/admin/audit-chain', pageBuilder: (c, s) => _apexPage(const AuditChainViewerScreen(), s)),
+    // Workflow Engine admin UI (Wave 1A Phase G + Wave 1C Phase M).
+    // Both gated behind admin role via the sidebar; the screens
+    // themselves prompt for X-Admin-Secret on first visit.
+    GoRoute(
+      path: '/admin/workflow/rules',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const WorkflowRulesScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/workflow/templates',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const WorkflowTemplatesScreen(), s),
+    ),
     // ── Operations routes redirect to pre-existing screens (avoid duplication) ──
     GoRoute(path: '/operations/hub', redirect: (c, s) => '/financial-ops'),
     GoRoute(path: '/operations/je-creator', redirect: (c, s) => '/compliance/journal-entry-builder'),
