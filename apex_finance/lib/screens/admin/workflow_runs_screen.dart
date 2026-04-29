@@ -503,8 +503,91 @@ class _WorkflowRunsScreenState extends State<WorkflowRunsScreen> {
           _meta('rule_id: ${(r['rule_id'] ?? '').toString().substring(0, 8)}', AC.cyan),
           _meta('${r['started_at']?.toString().substring(11, 19)} → ${r['ended_at']?.toString().substring(11, 19)}', AC.tp),
         ]),
+        const SizedBox(height: 12),
+        Row(children: [
+          OutlinedButton.icon(
+            onPressed: () => _replay(r, onlyThisRule: true),
+            icon: const Icon(Icons.replay, size: 14),
+            label: const Text('إعادة تشغيل (هذه القاعدة فقط)'),
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: AC.cyan),
+              foregroundColor: AC.cyan,
+            ),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton.icon(
+            onPressed: () => _replay(r, onlyThisRule: false),
+            icon: const Icon(Icons.public, size: 14),
+            label: const Text('إعادة بثّ الحدث (كل القواعد)'),
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: AC.warn),
+              foregroundColor: AC.warn,
+            ),
+          ),
+        ]),
       ]),
     );
+  }
+
+  Future<void> _replay(Map<String, dynamic> r, {required bool onlyThisRule}) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AC.navy2,
+        title: Text(
+          onlyThisRule ? 'إعادة تشغيل القاعدة' : 'إعادة بثّ الحدث',
+          style: TextStyle(color: AC.tp),
+        ),
+        content: Text(
+          onlyThisRule
+              ? 'سيُعاد تنفيذ القاعدة "${r['rule_name']}" بنفس الحمولة الأصلية. سيُسجَّل run جديد بـ بادئة [REPLAY].'
+              : 'سيُعاد بثّ الحدث "${r['event_name']}" على الـ event bus. كل القواعد المتاحة قد تُطلَق. استخدم بحذر — قد يُحدث side-effects (إرسال Slack/email/إلخ).',
+          style: TextStyle(color: AC.ts, fontSize: 12),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('تراجع', style: TextStyle(color: AC.ts)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: onlyThisRule ? AC.cyan : AC.warn,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(onlyThisRule ? 'إعادة تشغيل' : 'بثّ'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final res = await ApiService.workflowRunReplay(
+      r['id'].toString(),
+      onlyThisRule: onlyThisRule,
+    );
+    if (!mounted) return;
+    if (res.success && res.data is Map) {
+      final mode = res.data['mode'];
+      String msg;
+      if (mode == 'targeted') {
+        if (res.data['ran'] == true) {
+          msg = 'تمّت إعادة التشغيل — run جديد: ${res.data['new_run_id'].toString().substring(0, 8)}';
+        } else {
+          msg = 'لم تتطابق الشروط مع الحمولة الجديدة';
+        }
+      } else {
+        msg = 'تمّ بثّ ${res.data['event']} — راجع السجلّ';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.ok,
+        content: Text(msg, style: TextStyle(color: AC.tp)),
+      ));
+      await _load();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.err,
+        content: Text(res.error ?? 'فشل'),
+      ));
+    }
   }
 
   Widget _actionRow(int i, Map<String, dynamic> a) {

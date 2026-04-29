@@ -965,6 +965,15 @@ class ApiService {
       _adminGet('/admin/workflow/runs/stats');
   static Future<ApiResult> workflowRunsClear({String? ruleId}) =>
       _adminDelete('/admin/workflow/runs${ruleId != null ? "?rule_id=${Uri.encodeQueryComponent(ruleId)}" : ""}');
+  static Future<ApiResult> workflowRunReplay(
+    String runId, {
+    Map? payloadOverride,
+    bool onlyThisRule = true,
+  }) =>
+      _adminPost('/admin/workflow/runs/$runId/replay', {
+        if (payloadOverride != null) 'payload_override': payloadOverride,
+        'only_this_rule': onlyThisRule,
+      });
 
   // ── Activity Feed (Wave 1P Phase WW) ──
   static Future<ApiResult> activityList({
