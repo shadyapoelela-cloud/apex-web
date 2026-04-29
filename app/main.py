@@ -806,6 +806,15 @@ try:
 except Exception as _e:
     logging.warning(f"Cashflow forecast router not mounted: {_e}")
 
+# Approval Chains — multi-stage sign-off, integrates with Workflow Engine.
+try:
+    from app.core import approvals  # noqa: F401  ensures _load() runs
+    from app.core.approval_routes import router as approval_router
+    app.include_router(approval_router)
+    logging.info("Approval routes mounted at /api/v1/approvals + /admin/approvals")
+except Exception as _e:
+    logging.warning(f"Approval routes not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

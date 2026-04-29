@@ -419,6 +419,53 @@ def execute_action(action: Action, payload: dict, rule: WorkflowRule) -> dict:
             except Exception as e:  # noqa: BLE001
                 return {"action": typ, "ok": False, "error": str(e)}
 
+        if typ == "approval":
+            # Multi-level approval chain.
+            # params: {
+            #   "approver_user_ids": ["uid1","uid2",...],
+            #   "title_ar": "...",
+            #   "title_en": "...",   (optional)
+            #   "body": "...",        (optional, supports {payload.field})
+            #   "object_type": "invoice"|"bill"|...,  (optional)
+            #   "object_id_field": "invoice_id",       (path into payload)
+            # }
+            try:
+                from app.core.approvals import create_approval
+            except Exception as e:
+                return {"action": typ, "ok": False, "error": f"approvals_unavailable:{e}"}
+
+            approvers = p.get("approver_user_ids") or []
+            # Allow templated single approver: "approver_user_id_field": "..."
+            if not approvers and p.get("approver_user_id_field"):
+                u = _resolve_path(payload, p["approver_user_id_field"])
+                if u:
+                    approvers = [u]
+            if not approvers:
+                return {"action": typ, "ok": False, "error": "missing_approver_user_ids"}
+
+            obj_id_field = p.get("object_id_field")
+            obj_id = (
+                _resolve_path(payload, obj_id_field) if obj_id_field else None
+            )
+            try:
+                a = create_approval(
+                    title_ar=_resolve_template(
+                        p.get("title_ar", f"موافقة مطلوبة: {rule.name}"), payload
+                    ),
+                    title_en=_resolve_template(p.get("title_en") or "", payload) or None,
+                    body=_resolve_template(p.get("body") or "", payload) or None,
+                    object_type=p.get("object_type"),
+                    object_id=str(obj_id) if obj_id else None,
+                    requested_by=payload.get("requested_by"),
+                    rule_id=rule.id,
+                    tenant_id=payload.get("tenant_id"),
+                    approver_user_ids=approvers,
+                    meta={"trigger_payload": payload},
+                )
+                return {"action": typ, "ok": True, "approval_id": a.id}
+            except Exception as e:  # noqa: BLE001
+                return {"action": typ, "ok": False, "error": str(e)}
+
         logger.warning("Unknown action type: %s (rule %s)", typ, rule.name)
         return {"action": typ, "ok": False, "error": f"unknown_action:{typ}"}
 

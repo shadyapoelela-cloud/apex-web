@@ -252,6 +252,39 @@ _CATALOG: list[EventDefinition] = [
         label_en="User account suspended",
         category=EventCategory.user,
     ),
+    # ─ Approvals (multi-stage chains) ─
+    EventDefinition(
+        name="approval.requested",
+        label_ar="طلب موافقة جديد",
+        label_en="Approval requested",
+        category=EventCategory.system,
+        payload_schema={
+            "approval_id": "uuid",
+            "object_type": "string",
+            "object_id": "string",
+            "current_approver": "user_id",
+            "total_stages": "int",
+        },
+    ),
+    EventDefinition(
+        name="approval.approved",
+        label_ar="موافقة اكتملت",
+        label_en="Approval fully approved",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="approval.rejected",
+        label_ar="موافقة رُفضت",
+        label_en="Approval rejected",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="approval.partial",
+        label_ar="مرحلة موافقة مكتملة",
+        label_en="Approval stage advanced",
+        category=EventCategory.system,
+    ),
+
     # ─ Marketplace ─
     EventDefinition(
         name="service_request.created",
