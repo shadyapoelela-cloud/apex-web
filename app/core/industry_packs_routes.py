@@ -74,6 +74,22 @@ def public_applied(tenant_id: str = Query(..., min_length=1)):
     return {"success": True, "applied": True, "assignment": a}
 
 
+@router.get("/api/v1/industry-packs/template-map")
+def public_pack_template_map():
+    """Public introspection: which templates each pack auto-installs.
+
+    Useful for the UI to show admins what will happen on apply.
+    Defined BEFORE the `{pack_id}` route because FastAPI matches in
+    declaration order and `template-map` would otherwise be treated as
+    a pack_id and return 404.
+    """
+    try:
+        from app.core.industry_pack_provisioner import get_pack_template_map
+    except Exception:
+        return {"success": True, "template_map": {}}
+    return {"success": True, "template_map": get_pack_template_map()}
+
+
 @router.get("/api/v1/industry-packs/{pack_id}")
 def public_detail(pack_id: str):
     d = get_pack_detail(pack_id)
@@ -178,19 +194,6 @@ def admin_run_provisioner(
         provision_widgets=provision_widgets,
     )
     return {"success": True, "summary": summary}
-
-
-@router.get("/api/v1/industry-packs/template-map")
-def public_pack_template_map():
-    """Public introspection: which templates each pack auto-installs.
-
-    Useful for the UI to show admins what will happen on apply.
-    """
-    try:
-        from app.core.industry_pack_provisioner import get_pack_template_map
-    except Exception:
-        return {"success": True, "template_map": {}}
-    return {"success": True, "template_map": get_pack_template_map()}
 
 
 def _serialize_assignment(a) -> dict:

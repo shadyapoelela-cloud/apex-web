@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/copilot/copilot_screen.dart';
 import '../screens/showcase/apex_showcase_screen.dart';
@@ -217,8 +218,12 @@ final authRefresh = ValueNotifier<int>(0);
 /// super_admin; otherwise redirects to the launchpad.
 /// Use as `redirect: _adminOnly` on any GoRoute that should not be visible
 /// to end users (mock data, component demos, internal tooling).
-String? _adminOnly(BuildContext c, GoRouterState s) =>
-    S.isPlatformAdmin ? null : '/app';
+String? _adminOnly(BuildContext c, GoRouterState s) {
+  // In debug mode, allow all routes for easier dev testing.
+  // Production builds still gate admin screens by role.
+  if (kDebugMode) return null;
+  return S.isPlatformAdmin ? null : '/app';
+}
 
 /// Routes that should be auto-wrapped with the unified [HybridSidebar]
 /// so every compliance screen shares the same 10-round-researched nav

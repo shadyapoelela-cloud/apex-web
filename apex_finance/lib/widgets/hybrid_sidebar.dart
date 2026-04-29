@@ -21,6 +21,7 @@
 /// ════════════════════════════════════════════════════════════════════
 library;
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -318,9 +319,11 @@ class _HybridSidebarState extends State<HybridSidebar> {
   ];
 
   /// True when `userRoles` intersects `required` — empty `required` means
-  /// "no role gate, visible to everyone".
+  /// "no role gate, visible to everyone". In debug mode every group is
+  /// visible so devs can navigate without granting themselves admin roles.
   bool _hasAnyRole(List<String> required) {
     if (required.isEmpty) return true;
+    if (kDebugMode) return true;
     final userRoles = S.roles;
     if (userRoles.isEmpty) return false;
     for (final r in required) {
