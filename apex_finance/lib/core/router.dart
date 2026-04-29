@@ -52,6 +52,8 @@ import '../screens/admin/audit_chain_viewer_screen.dart';
 import '../screens/admin/workflow_templates_screen.dart';
 import '../screens/admin/workflow_rules_screen.dart';
 import '../screens/admin/module_manager_screen.dart';
+import '../screens/admin/webhooks_screen.dart';
+import '../screens/admin/api_keys_screen.dart';
 // Operations duplicates kept as files for reference but unmounted —
 // their routes now redirect to the pre-existing /compliance/* + /financial-ops screens.
 // import '../screens/operations/financial_ops_hub_screen.dart';
@@ -632,6 +634,16 @@ final appRouter = GoRouter(
       path: '/admin/modules',
       redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const ModuleManagerScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/webhooks',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const WebhooksScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/api-keys',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const ApiKeysScreen(), s),
     ),
     // ── Operations routes redirect to pre-existing screens (avoid duplication) ──
     GoRoute(path: '/operations/hub', redirect: (c, s) => '/financial-ops'),

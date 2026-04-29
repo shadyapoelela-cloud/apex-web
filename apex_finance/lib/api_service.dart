@@ -827,6 +827,86 @@ class ApiService {
       _get('/api/v1/events/list${category != null ? "?category=$category" : ""}');
   static Future<ApiResult> eventsCategories() => _get('/api/v1/events/categories');
 
+  // ── Webhook Subscriptions (Wave 1E Phase T) ──
+  static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
+    final qs = <String>[];
+    if (tenantId != null) qs.add('tenant_id=$tenantId');
+    if (enabled != null) qs.add('enabled=$enabled');
+    final s = qs.isEmpty ? '' : '?${qs.join('&')}';
+    return _adminGet('/admin/webhooks$s');
+  }
+  static Future<ApiResult> webhooksCreate(Map body) => _adminPost('/admin/webhooks', body);
+  static Future<ApiResult> webhooksUpdate(String id, Map body) => _adminPatch('/admin/webhooks/$id', body);
+  static Future<ApiResult> webhooksDelete(String id) => _adminDelete('/admin/webhooks/$id');
+  static Future<ApiResult> webhooksReset(String id) => _adminPost('/admin/webhooks/$id/reset');
+  static Future<ApiResult> webhooksTest(String id, {String event = 'webhook.test', Map? payload}) =>
+      _adminPost('/admin/webhooks/$id/test', {'event': event, 'payload': payload ?? const {}});
+  static Future<ApiResult> webhooksStats() => _adminGet('/admin/webhooks/stats');
+
+  // ── API Keys (Wave 1F Phase X) ──
+  static Future<ApiResult> apiKeysList({String? tenantId, bool includeRevoked = false}) {
+    final qs = <String>['include_revoked=$includeRevoked'];
+    if (tenantId != null) qs.add('tenant_id=$tenantId');
+    return _adminGet('/admin/api-keys?${qs.join('&')}');
+  }
+  static Future<ApiResult> apiKeysCreate(Map body) => _adminPost('/admin/api-keys', body);
+  static Future<ApiResult> apiKeysUpdate(String id, Map body) => _adminPatch('/admin/api-keys/$id', body);
+  static Future<ApiResult> apiKeysRevoke(String id, {String? reason}) =>
+      _adminPost('/admin/api-keys/$id/revoke', {'reason': reason});
+  static Future<ApiResult> apiKeysStats() => _adminGet('/admin/api-keys/stats');
+
+  // ── Comments (Wave 1E Phase U) ──
+  static Future<ApiResult> commentsList({
+    required String objectType,
+    required String objectId,
+    String? tenantId,
+    bool includeDeleted = false,
+  }) {
+    final qs = <String>[
+      'object_type=${Uri.encodeQueryComponent(objectType)}',
+      'object_id=${Uri.encodeQueryComponent(objectId)}',
+      'include_deleted=$includeDeleted',
+    ];
+    if (tenantId != null) qs.add('tenant_id=$tenantId');
+    return _get('/api/v1/comments?${qs.join('&')}');
+  }
+  static Future<ApiResult> commentsAdd({
+    required String objectType,
+    required String objectId,
+    required String authorUserId,
+    required String body,
+    String? parentId,
+    String? tenantId,
+    List<String>? extraMentions,
+  }) =>
+      _post('/api/v1/comments', {
+        'object_type': objectType,
+        'object_id': objectId,
+        'author_user_id': authorUserId,
+        'body': body,
+        if (parentId != null) 'parent_id': parentId,
+        if (tenantId != null) 'tenant_id': tenantId,
+        if (extraMentions != null) 'extra_mentions': extraMentions,
+      });
+  static Future<ApiResult> commentsEdit(String id, String byUserId, String body) =>
+      _patch('/api/v1/comments/$id', {'by_user_id': byUserId, 'body': body});
+  static Future<ApiResult> commentsDelete(String id, String byUserId) async {
+    // Delete with body — re-implement here since _delete doesn't support body.
+    try {
+      final res = await _httpClient.delete(
+        Uri.parse('$_base/api/v1/comments/$id'),
+        headers: _h,
+        body: jsonEncode({'by_user_id': byUserId}),
+      );
+      if (res.statusCode >= 200 && res.statusCode < 300) return ApiResult.ok(jsonDecode(res.body));
+      return ApiResult.error(_parseErr(res.body, res.statusCode));
+    } catch (e) {
+      return ApiResult.error('خطأ: $e');
+    }
+  }
+  static Future<ApiResult> commentsReact(String id, String userId, String emoji) =>
+      _post('/api/v1/comments/$id/react', {'user_id': userId, 'emoji': emoji});
+
   // ── Module Manager (Wave 1E Phase V) ──
   static Future<ApiResult> modulesCatalog({String? category}) =>
       _get('/api/v1/modules/catalog${category != null ? "?category=$category" : ""}');
