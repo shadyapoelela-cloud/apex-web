@@ -68,6 +68,7 @@ import '../screens/admin/tenants_directory_screen.dart';
 import '../screens/admin/workflow_runs_screen.dart';
 import '../screens/activity_feed_screen.dart';
 import '../screens/admin/period_lock_screen.dart';
+import '../screens/admin/onboarding_chat_screen.dart';
 // Operations duplicates kept as files for reference but unmounted —
 // their routes now redirect to the pre-existing /compliance/* + /financial-ops screens.
 // import '../screens/operations/financial_ops_hub_screen.dart';
@@ -730,6 +731,11 @@ final appRouter = GoRouter(
       path: '/admin/period-locks',
       redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const PeriodLockScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/tenant-onboarding-ai',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(const OnboardingChatScreen(), s),
     ),
     // ── Operations routes redirect to pre-existing screens (avoid duplication) ──
     GoRoute(path: '/operations/hub', redirect: (c, s) => '/financial-ops'),

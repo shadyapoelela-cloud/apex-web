@@ -184,6 +184,12 @@ class _TenantOnboardingScreenState extends State<TenantOnboardingScreen> {
               icon: Icons.list_alt,
               onPressed: () => GoRouter.of(context).go('/admin/tenants'),
             ),
+            ApexToolbarAction(
+              label: 'وضع المحادثة',
+              icon: Icons.auto_awesome,
+              onPressed: () =>
+                  GoRouter.of(context).go('/admin/tenant-onboarding-ai'),
+            ),
           ],
         ),
         if (_step < 3) _stepIndicator(),

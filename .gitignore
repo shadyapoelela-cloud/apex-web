@@ -101,3 +101,4 @@ tenant_directory.json
 workflow_runs.json
 activity_feed.json
 period_locks.json
+onboarding_sessions.json

@@ -940,6 +940,14 @@ try:
 except Exception as _e:
     logging.warning(f"Period Lock router not mounted: {_e}")
 
+# Conversational Onboarding — chat-style tenant intake (Claude optional).
+try:
+    from app.core.onboarding_chat_routes import router as onb_chat_router
+    app.include_router(onb_chat_router)
+    logging.info("Onboarding Chat router mounted at /api/v1/onboarding-chat")
+except Exception as _e:
+    logging.warning(f"Onboarding Chat router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

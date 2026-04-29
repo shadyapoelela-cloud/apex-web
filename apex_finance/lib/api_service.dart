@@ -1021,6 +1021,18 @@ class ApiService {
   static Future<ApiResult> periodLockCheck(Map body) =>
       _adminPost('/admin/period-locks/check', body);
 
+  // ── Conversational Onboarding (Wave 1R Phase YY) ──
+  static Future<ApiResult> onboardingChatStart() =>
+      _post('/api/v1/onboarding-chat/start', const {});
+  static Future<ApiResult> onboardingChatReply(String sessionId, String text) =>
+      _post('/api/v1/onboarding-chat/$sessionId/reply', {'text': text});
+  static Future<ApiResult> onboardingChatGet(String sessionId) =>
+      _get('/api/v1/onboarding-chat/$sessionId');
+  static Future<ApiResult> onboardingChatSessions() =>
+      _adminGet('/admin/onboarding-chat/sessions');
+  static Future<ApiResult> onboardingChatStats() =>
+      _adminGet('/admin/onboarding-chat/stats');
+
   // ── Webhook Subscriptions (Wave 1E Phase T) ──
   static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
     final qs = <String>[];

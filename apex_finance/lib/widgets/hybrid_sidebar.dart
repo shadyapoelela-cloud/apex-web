@@ -318,6 +318,13 @@ class _HybridSidebarState extends State<HybridSidebar> {
           keywords: ['period', 'lock', 'close', 'إقفال', 'فترة'],
           requiredRoles: ['platform_admin', 'super_admin'],
         ),
+        _NavItem(
+          'استقبال ذكي (محادثة)',
+          '/admin/tenant-onboarding-ai',
+          Icons.auto_awesome_rounded,
+          keywords: ['ai', 'chat', 'onboarding', 'محادثة', 'ذكاء'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
       ],
       requiredRoles: ['platform_admin', 'super_admin', 'reviewer'],
     ),
