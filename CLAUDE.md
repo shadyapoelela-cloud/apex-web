@@ -72,5 +72,5 @@
 - The Copilot service uses Claude API with hardcoded fallback responses when API key is missing
 - Phase model `init_db()` functions are called at startup via lifespan -- if one fails, others still run
 - Social auth (Google/Apple) tokens are NOT validated -- stubs only (production requires real validation)
-- SMS verification endpoints are stubs -- always return success
+- SMS verification uses pluggable backends in `app/core/sms_backend.py`: Unifonic (Saudi +966), Twilio (international), Console (dev/test). OTP storage in `app/core/otp_store.py` with TTL=5min + attempt limit=5 + hash-at-rest. Backend selected via `SMS_BACKEND` env var (default `console` — logs only, never sends). Production deployments pick `unifonic` or `twilio` and provide credentials. Coverage: `tests/test_sms_otp.py` (10 cases passing).
 - Alembic is configured but has no migration files yet -- schema created at startup via SQLAlchemy

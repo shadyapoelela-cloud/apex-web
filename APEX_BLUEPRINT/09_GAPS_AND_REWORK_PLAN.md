@@ -147,11 +147,41 @@
 - **Fix plan:** Verify Google JWT against Google's JWKS. Verify Apple ID token. Use `google-auth` library.
 - **Estimate:** 2 days
 
-### 🔴 G-B2. SMS verification is stub
-- **Files:** `app/phase1/services/mobile_auth_service.py`
-- **Issue:** Always returns success. No actual SMS sent.
-- **Fix plan:** Integrate Twilio (international) + Unifonic (Saudi). Real OTP store with TTL.
-- **Estimate:** 2 days
+### ✅ G-B2. ~~SMS verification is stub~~ — RESOLVED (Wave) + docs (2026-04-30)
+- **Discovery (Sprint 7):** SMS implementation was already complete.
+  Blueprint was wrong (7th time in this sprint). Original "Files:" pointer
+  was also wrong — `app/phase1/services/mobile_auth_service.py` does not
+  exist; the real code lives in `app/core/sms_backend.py` and
+  `app/core/otp_store.py`.
+- **Existing implementation:**
+  - `app/core/sms_backend.py` — 3 send-side backends, switched via `SMS_BACKEND`:
+    * **Unifonic** (KSA / MENA primary): REST POST to
+      `https://el.cloud.unifonic.com/rest/SMS/messages` using `UNIFONIC_APP_SID`.
+    * **Twilio** (global fallback): REST POST to
+      `https://api.twilio.com/2010-04-01/Accounts/.../Messages.json`
+      with `TWILIO_ACCOUNT_SID`/`TWILIO_AUTH_TOKEN`/`TWILIO_FROM_NUMBER`.
+    * **Console** (dev/test): logs masked recipient + message; never sends.
+  - `app/core/otp_store.py` — OTP storage with `OTP_BACKEND=memory|redis`,
+    6-digit codes, 5-minute TTL, max 5 verify attempts, hash-at-rest,
+    rate-limit cooldown. Redis backend is currently a stub (raises
+    `NotImplementedError` — multi-instance deployments need to implement it).
+  - `app/phase1/routes/social_auth_routes.py:25` imports `request_otp` /
+    `verify_otp` / `clear_otp`; the `verify_mobile_code` endpoint at line 502
+    drives the verification flow.
+  - **10 tests** in `tests/test_sms_otp.py` covering: happy path, wrong code,
+    attempt-limit clearing, cooldown rate-limit, format validation,
+    expiry, clear (all currently passing).
+- **Sprint 7 contribution (docs-only):**
+  - Added 8 SMS / OTP env vars to `.env.example` with provider links and the
+    "console default" behaviour explained:
+    `SMS_BACKEND`, `OTP_BACKEND`, `UNIFONIC_APP_SID`, `UNIFONIC_SENDER_ID`,
+    `UNIFONIC_BASE_URL`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`,
+    `TWILIO_FROM_NUMBER`.
+  - Fixed `CLAUDE.md` line 75 — was claiming "SMS verification endpoints are
+    stubs -- always return success", which would mislead any reader into
+    re-implementing complete production code.
+- **Status:** DONE
+- **Sprint:** 7 (closure + docs); original implementation was a prior Wave
 
 ### 🔴 G-B3. No real OCR service
 - **Files:** Receipt capture flow
@@ -407,6 +437,49 @@
 ---
 
 ## 11. Documentation Gaps / ثغرات التوثيق
+
+### 🟠 G-DOCS-1. Blueprint accuracy audit
+- **Files:** `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md`,
+  `APEX_BLUEPRINT/10_CLAUDE_CODE_INSTRUCTIONS.md`, `CLAUDE.md`
+- **Issue:** Sprint 7 found **7 gaps where blueprint claims contradicted code reality**:
+  1. **G-A1** — line count (3500 claimed vs 2146 actual)
+  2. **G-A2** — `v4_groups` deletion plan ignored real internal-import dependencies;
+     blueprint also assumed "no V4-only screens" but found 6.
+  3. **G-A3** — alembic claimed empty; 7 migrations exist (covering only 25/108 tables — separate gap G-A3.1)
+  4. **G-S1** — bcrypt rounds claimed 10; library default has been 12 since v4.0
+  5. **G-Z1** — ZATCA encryption claimed missing; fully implemented in Wave 11
+  6. **G-B1** — OAuth claimed stubbed; Wave 1 PR#2/#3 implemented full
+     google-auth + PyJWT verification with 26 passing tests.
+  7. **G-B2** — SMS claimed stubbed ("always return success"); full
+     `sms_backend.py` (Unifonic + Twilio + Console) + `otp_store.py`
+     (TTL + attempt limits) shipped, 10 tests passing.
+- **`CLAUDE.md` "Common Pitfalls" section is the highest-risk surface.** Sprint 7
+  fixed two stale bullets (lines 74 + 75) that would have misled any reader
+  into re-implementing complete code. Two more bullets there are also stale
+  but addressed in their own branches:
+  - Line 31: *"main.dart is the monolith (~3500 lines)"* — fixed by G-A1 branch.
+  - Line 76: *"Alembic ... has no migration files yet"* — fixed by G-A3 branch.
+  Once both PRs merge, Sprint 8 should re-audit `CLAUDE.md` end-to-end as part
+  of this gap, including the Phase 1-11 / Sprints 1-6 architecture summary at
+  the top (Wave 1-13 work isn't reflected there at all).
+- **Risk:** Future tasks may follow stale plans, causing rework, missed scope, or
+  (worst case) production-breaking changes from operators acting on the blueprint
+  without first reading the code (e.g. a naive G-A3 lifespan replacement would
+  have deployed production with 83 missing tables; a naive G-B1/G-B2
+  "implementation" would have collided with working Wave code).
+- **Fix plan:**
+  1. Cross-reference every P0/P1 gap in this file against current code; mark each
+     as `accurate` / `stale` / `done-but-undocumented`.
+  2. Update inaccurate entries before they're picked up.
+  3. Add to `10_CLAUDE_CODE_INSTRUCTIONS.md`: explicit **verify-first protocol** —
+     "Code is truth; blueprint may lag. Always grep-and-read the cited files
+     before drafting a fix plan."
+  4. Cross-link Wave 1 / Wave 11 / Wave 13 deliverables back into 09 so OAuth /
+     SMS / encryption / ZATCA CSID / bank-feed work is visible in the gap tracker.
+  5. Re-audit `CLAUDE.md` "Common Pitfalls" — at least one more stale entry
+     suspected (the 204-tests count is also out of date now).
+- **Estimate:** 4-6 hours
+- **Sprint:** 8 (before any further P0/P1 task — must be the FIRST item)
 
 ### 🟢 G-D1. No public API docs
 - **Issue:** FastAPI auto-generates `/docs` (Swagger) but not customer-facing.
