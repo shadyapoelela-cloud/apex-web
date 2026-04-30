@@ -459,13 +459,13 @@ class ApexListToolbar extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             // ── MIDDLE: search bar with embedded filter/group/favorites ─
-            // When searchPillMaxWidth is set the pill is capped and aligned
-            // to the start so the toolbar still flexes — but the search
-            // visual stops at the requested cap instead of stretching.
+            // When searchPillMaxWidth is set the pill is capped and centred
+            // inside the remaining row space — so the search sits visually
+            // in the middle of the toolbar instead of hugging the start.
             Expanded(
               child: searchPillMaxWidth != null
                   ? Align(
-                      alignment: AlignmentDirectional.centerStart,
+                      alignment: Alignment.center,
                       child: ConstrainedBox(
                         constraints:
                             BoxConstraints(maxWidth: searchPillMaxWidth!),
