@@ -71,6 +71,6 @@
 - `main.dart` has 60+ tightly coupled classes -- splitting requires careful dependency analysis
 - The Copilot service uses Claude API with hardcoded fallback responses when API key is missing
 - Phase model `init_db()` functions are called at startup via lifespan -- if one fails, others still run
-- Social auth (Google/Apple) tokens are NOT validated -- stubs only (production requires real validation)
+- Social auth (Google/Apple) tokens **are** validated. `app/core/social_auth_verify.py` (Wave 1 PR#2/PR#3) verifies Google id_tokens via `google-auth.verify_oauth2_token()` against Google's JWKs, and Apple identity_tokens via `PyJWT` + `PyJWKClient` against `https://appleid.apple.com/auth/keys` (audience + issuer + signature checks). Production needs `GOOGLE_OAUTH_CLIENT_ID` + `APPLE_CLIENT_ID` env vars; dev mode allows a logged dev-bypass when they're unset so integration tests stay green. Coverage in `tests/test_social_auth.py` + `tests/test_social_auth_verify.py` (26 cases).
 - SMS verification endpoints are stubs -- always return success
 - Alembic is configured but has no migration files yet -- schema created at startup via SQLAlchemy
