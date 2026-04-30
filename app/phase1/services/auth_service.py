@@ -61,6 +61,12 @@ def safe_aware(dt):
 
 PASSWORD_MIN_LENGTH = 8
 
+# bcrypt cost factor. Bumped to 12 (G-S1, 2026-04-30). The bcrypt library's
+# default is also 12 since 4.0, but we set it explicitly to (a) protect
+# against future library default drift and (b) drive password_needs_rehash()
+# rotation for any pre-existing hashes still at lower cost.
+BCRYPT_ROUNDS = 12
+
 # Try bcrypt, fallback to hashlib
 USE_BCRYPT = True
 
@@ -72,7 +78,7 @@ USE_BCRYPT = True
 
 def hash_password(password: str) -> str:
     if USE_BCRYPT:
-        return _bcrypt.hashpw(password.encode(), _bcrypt.gensalt()).decode()
+        return _bcrypt.hashpw(password.encode(), _bcrypt.gensalt(rounds=BCRYPT_ROUNDS)).decode()
     salt = secrets.token_hex(16)
     h = hashlib.sha256(f"{salt}{password}".encode()).hexdigest()
     return f"{salt}${h}"
@@ -87,6 +93,27 @@ def verify_password(password: str, password_hash: str) -> bool:
         return hashlib.sha256(f"{salt}{password}".encode()).hexdigest() == h
     except (ValueError, AttributeError):
         return False
+
+
+def password_needs_rehash(password_hash: str) -> bool:
+    """Return True if a stored hash should be re-hashed at login.
+
+    Triggers when:
+      - Hash is the legacy SHA-256 fallback (no `$2` prefix).
+      - Hash is bcrypt at cost factor < BCRYPT_ROUNDS.
+    Caller is expected to re-hash with hash_password() and persist the new value.
+    """
+    if not password_hash:
+        return False
+    if not password_hash.startswith("$2"):
+        # SHA-256 fallback hashes should always be migrated to bcrypt.
+        return True
+    try:
+        # Format: $2b$<rounds>$<22-char-salt><31-char-hash>
+        cost = int(password_hash.split("$", 3)[2])
+    except (IndexError, ValueError):
+        return False
+    return cost < BCRYPT_ROUNDS
 
 
 def validate_password_strength(password: str):
@@ -330,6 +357,10 @@ class AuthService:
             user.failed_login_count = 0
             user.locked_until = None
             user.last_login_at = utcnow()
+
+            # G-S1: opportunistic rehash for old / weak password hashes.
+            if password_needs_rehash(user.password_hash):
+                user.password_hash = hash_password(password)
 
             session = UserSession(
                 id=gen_uuid(),

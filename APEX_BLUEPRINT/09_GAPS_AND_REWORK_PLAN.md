@@ -204,11 +204,29 @@
 
 ## 5. Compliance & Security Gaps
 
-### 🔴 G-S1. Password hash uses default cost
-- **Files:** `app/phase1/services/password_service.py`
-- **Issue:** bcrypt rounds = 10 (default). Recommended 12+ for 2026.
-- **Fix plan:** Set `bcrypt.gensalt(rounds=12)`. Plan rotation for existing hashes (rehash on next login).
-- **Estimate:** 1 day
+### ✅ G-S1. ~~Password hash uses default cost~~ — DONE 2026-04-30
+- **Files:** `app/phase1/services/auth_service.py` (the actual location;
+  blueprint originally pointed to a `password_service.py` that doesn't exist),
+  `app/core/totp_service.py`, `tests/test_password_rotation.py`.
+- **Audit finding:** bcrypt 5.0.0 already defaults to 12 rounds since lib v4.0,
+  so `bcrypt.gensalt()` (no args) was producing 12-round hashes — but only
+  *implicitly*, leaving us exposed to any future library default drift, and
+  doing nothing about pre-existing hashes from older bcrypt versions (≤3.x
+  defaulted to 10).
+- **Resolution (Sprint 7, branch `sprint-7/g-s1-bcrypt-12`):**
+  1. ✅ Added explicit `BCRYPT_ROUNDS = 12` constant in `auth_service.py`.
+  2. ✅ `hash_password()` now calls `bcrypt.gensalt(rounds=BCRYPT_ROUNDS)` explicitly.
+  3. ✅ Added `password_needs_rehash(password_hash)` helper — returns True for
+     SHA-256 fallback hashes and for bcrypt hashes with cost < 12.
+  4. ✅ Wired opportunistic rehash into `AuthService.login()` — successful
+     verify → if `password_needs_rehash()` then `user.password_hash = hash_password(password)`.
+  5. ✅ TOTP recovery codes (`app/core/totp_service.py:_hash_recovery_codes`)
+     also use `BCRYPT_ROUNDS` for consistency.
+  6. ✅ 7 new tests in `tests/test_password_rotation.py` (constant value,
+     new-hash cost, verify against legacy 10/11/12-round hashes,
+     `password_needs_rehash` for each scenario incl. SHA-256 + garbage input).
+  7. ✅ All 21 existing auth tests still pass (no regression).
+- **Estimate (actual):** 1 session
 
 ### 🟠 G-S2. JWT secret not rotated
 - **Issue:** Single `JWT_SECRET` env var. No rotation.
