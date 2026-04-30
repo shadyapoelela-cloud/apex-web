@@ -348,27 +348,30 @@ class _TenantsDirectoryScreenState extends State<TenantsDirectoryScreen> {
     final tid = (t['tenant_id'] ?? '').toString();
     final active = (t['status'] ?? 'active') == 'active';
     final color = active ? AC.ok : AC.ts;
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AC.navy2,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(AppRadius.sm),
+    return InkWell(
+      onTap: () => GoRouter.of(context).go('/admin/tenants/$tid'),
+      borderRadius: BorderRadius.circular(AppRadius.md),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: AC.navy2,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                ),
+                child: Icon(Icons.business, color: color, size: 18),
               ),
-              child: Icon(Icons.business, color: color, size: 18),
-            ),
-            const SizedBox(width: 10),
+              const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,7 +472,8 @@ class _TenantsDirectoryScreenState extends State<TenantsDirectoryScreen> {
               ),
             ),
           ]),
-        ],
+          ],
+        ),
       ),
     );
   }

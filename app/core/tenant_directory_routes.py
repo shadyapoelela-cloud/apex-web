@@ -177,6 +177,140 @@ class OnboardRequest(BaseModel):
     skip_provisioning: bool = False
 
 
+@router.get("/admin/tenants/{tenant_id}/overview")
+def admin_overview(
+    tenant_id: str,
+    x_admin_secret: Optional[str] = Header(None, alias="X-Admin-Secret"),
+):
+    """One-shot aggregator: pulls counts from every per-tenant subsystem
+    so the Wave 1Y Tenant Detail page can render the full picture in
+    a single round-trip.
+
+    Best-effort: each subsystem is wrapped in try/except so a single
+    missing module doesn't break the whole overview.
+    """
+    _verify_admin(x_admin_secret)
+    rec = get(tenant_id)
+    if not rec:
+        raise HTTPException(404, "tenant not found")
+    overview: dict[str, Any] = {"tenant": rec}
+
+    # Industry pack assignment
+    try:
+        from app.core.industry_packs_service import get_assignment
+        overview["industry_pack"] = get_assignment(tenant_id)
+    except Exception as e:  # noqa: BLE001
+        overview["industry_pack_error"] = str(e)
+
+    # Workflow rules + recent runs
+    try:
+        from app.core.workflow_engine import list_rules
+        rules = list_rules(tenant_id=tenant_id)
+        overview["workflow"] = {
+            "rules_total": len(rules),
+            "rules_enabled": sum(1 for r in rules if r.enabled),
+            "rules_disabled": sum(1 for r in rules if not r.enabled),
+            "total_runs": sum(getattr(r, "run_count", 0) for r in rules),
+            "rules_with_errors": sum(1 for r in rules if getattr(r, "last_error", None)),
+        }
+    except Exception as e:  # noqa: BLE001
+        overview["workflow_error"] = str(e)
+
+    # Recent run history
+    try:
+        from app.core.workflow_run_history import list_runs as _list_runs
+        recent_runs = _list_runs(tenant_id=tenant_id, limit=10)
+        overview["recent_runs"] = recent_runs
+    except Exception as e:  # noqa: BLE001
+        overview["recent_runs_error"] = str(e)
+
+    # Approvals breakdown
+    try:
+        from app.core.approvals import list_approvals
+        from dataclasses import asdict as _ad
+        rows = [_ad(a) for a in list_approvals(tenant_id=tenant_id)]
+        overview["approvals"] = {
+            "total": len(rows),
+            "by_state": {
+                state: sum(1 for r in rows if r.get("state") == state)
+                for state in ["pending", "approved", "rejected", "cancelled"]
+            },
+        }
+    except Exception as e:  # noqa: BLE001
+        overview["approvals_error"] = str(e)
+
+    # Period locks
+    try:
+        from app.core.period_lock import list_locks
+        locks = list_locks(tenant_id=tenant_id, only_active=False)
+        overview["period_locks"] = {
+            "total": len(locks),
+            "active": sum(1 for r in locks if r.get("unlocked_at") is None),
+            "history": sum(1 for r in locks if r.get("unlocked_at")),
+        }
+    except Exception as e:  # noqa: BLE001
+        overview["period_locks_error"] = str(e)
+
+    # Period close cycles
+    try:
+        from app.core.period_close import list_closes
+        closes = list_closes(tenant_id=tenant_id)
+        overview["period_close"] = {
+            "total": len(closes),
+            "by_status": {
+                "in_progress": sum(1 for c in closes if c.get("status") == "in_progress"),
+                "completed": sum(1 for c in closes if c.get("status") == "completed"),
+                "cancelled": sum(1 for c in closes if c.get("status") == "cancelled"),
+            },
+        }
+    except Exception as e:  # noqa: BLE001
+        overview["period_close_error"] = str(e)
+
+    # Bank feeds
+    try:
+        from app.core.bank_feeds import list_connections, list_transactions
+        conns = list_connections(tenant_id=tenant_id)
+        txns = list_transactions(tenant_id=tenant_id, limit=1000)
+        overview["bank_feeds"] = {
+            "connections": len(conns),
+            "transactions": len(txns),
+            "reconciled": sum(1 for t in txns if t.get("matched_entity_id")),
+        }
+    except Exception as e:  # noqa: BLE001
+        overview["bank_feeds_error"] = str(e)
+
+    # Anomaly buffer
+    try:
+        from app.core.anomaly_live import buffer_size
+        overview["anomaly_buffer_size"] = buffer_size(tenant_id)
+    except Exception as e:  # noqa: BLE001
+        overview["anomaly_error"] = str(e)
+
+    # Custom roles
+    try:
+        from app.core.custom_roles import list_roles
+        roles = list_roles(tenant_id=tenant_id)
+        overview["custom_roles"] = {
+            "total": len(roles),
+        }
+    except Exception as e:  # noqa: BLE001
+        overview["custom_roles_error"] = str(e)
+
+    # Recent events from event bus filtered to this tenant
+    try:
+        from app.core.event_bus import recent_events
+        all_recent = recent_events(limit=200)
+        tenant_events = [
+            e for e in all_recent
+            if (e.get("payload") or {}).get("tenant_id") == tenant_id
+        ]
+        overview["recent_events"] = tenant_events[:30]
+    except Exception as e:  # noqa: BLE001
+        overview["recent_events_error"] = str(e)
+
+    return {"success": True, **overview}
+
+
 @router.post("/admin/tenants/onboard", status_code=201)
 def admin_onboard(
     payload: OnboardRequest,

@@ -939,6 +939,8 @@ class ApiService {
       _adminPost('/admin/tenants/$tenantId/activate');
   static Future<ApiResult> tenantOnboard(Map body) =>
       _adminPost('/admin/tenants/onboard', body);
+  static Future<ApiResult> tenantOverview(String tenantId) =>
+      _adminGet('/admin/tenants/$tenantId/overview');
 
   // ── Workflow Run History (Wave 1O Phase VV) ──
   static Future<ApiResult> workflowRunsList({

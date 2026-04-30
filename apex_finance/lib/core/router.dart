@@ -68,6 +68,7 @@ import '../screens/admin/tenants_directory_screen.dart';
 import '../screens/admin/workflow_runs_screen.dart';
 import '../screens/activity_feed_screen.dart';
 import '../screens/notification_center_screen.dart';
+import '../screens/admin/tenant_detail_screen.dart';
 import '../screens/admin/period_lock_screen.dart';
 import '../screens/admin/onboarding_chat_screen.dart';
 import '../screens/admin/period_close_screen.dart' as admin_pc;
@@ -721,6 +722,14 @@ final appRouter = GoRouter(
       path: '/admin/tenants',
       redirect: _adminOnly,
       pageBuilder: (c, s) => _apexPage(const TenantsDirectoryScreen(), s),
+    ),
+    GoRoute(
+      path: '/admin/tenants/:tenantId',
+      redirect: _adminOnly,
+      pageBuilder: (c, s) => _apexPage(
+        TenantDetailScreen(tenantId: s.pathParameters['tenantId']!),
+        s,
+      ),
     ),
     GoRoute(
       path: '/admin/workflow/runs',
