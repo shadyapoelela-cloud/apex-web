@@ -8,7 +8,9 @@ import '../core/apex_ask_panel.dart' show openApexAskPanel;
 import '../core/session.dart';
 import '../core/theme.dart';
 import '../core/ui_components.dart';
-import '../main.dart' show ClientsTab, AnalysisTab, MarketTab, ProviderTab, AccountTab, AdminTab;
+import '../main.dart' show MarketTab, ProviderTab, AccountTab, AdminTab;
+import '../screens/tabs/clients_tab.dart' show ClientsTab;
+import '../screens/tabs/analysis_tab.dart' show AnalysisTab;
 import '../screens/dashboard/enhanced_dashboard.dart';
 import 'apex_search.dart';
 
