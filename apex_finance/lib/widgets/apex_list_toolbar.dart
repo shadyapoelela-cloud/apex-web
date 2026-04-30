@@ -437,8 +437,13 @@ class ApexListToolbar extends StatelessWidget {
         ),
         border: Border(bottom: BorderSide(color: AC.bdr)),
       ),
-      child: IntrinsicHeight(
-        child: Row(
+      // Was IntrinsicHeight previously — but the search-pill's Wrap
+      // reports an intrinsic height of 0 (Wrap doesn't implement intrinsic
+      // dimensions). That made the toolbar size to the title cluster's
+      // height, clipping the third active-filter chip out of the pill
+      // when many filters were toggled at once. Plain Row sizes to its
+      // tallest child naturally so the pill grows downward as needed.
+      child: Row(
           textDirection: TextDirection.rtl,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -533,7 +538,6 @@ class ApexListToolbar extends StatelessWidget {
             ],
           ],
         ),
-      ),
     );
   }
 }
