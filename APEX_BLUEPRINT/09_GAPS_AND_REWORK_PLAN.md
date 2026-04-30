@@ -18,16 +18,22 @@
 
 ## 2. Architectural Gaps / ثغرات معمارية
 
-### 🔴 G-A1. Monolithic `lib/main.dart` (3500 lines)
-- **Files:** `lib/main.dart`
+### ✅ G-A1. ~~Monolithic `lib/main.dart` (3500 lines)~~ — DONE 2026-04-30
+- **Files:** `apex_finance/lib/main.dart` (actual path; original audit said `lib/main.dart`)
 - **Issue:** 60+ tightly-coupled classes including `LoginScreen`, `RegScreen`, `MainNav`, dialog forms.
 - **Impact:** Hot reload slow, code review hard, hard to test individual screens.
-- **Fix plan:**
-  1. Extract auth screens → `lib/screens/auth/login_screen.dart`, `lib/screens/auth/register_screen.dart`
-  2. Extract `MainNav` → `lib/widgets/main_nav.dart`
-  3. Extract form dialogs → `lib/widgets/forms/`
-  4. Keep only `App` widget + `MaterialApp.router` setup in `main.dart` (target < 200 lines)
-- **Estimate:** 3 days
+- **Resolution (Sprint 7, branch `sprint-7/g-a1-split-main-dart`, 5 commits):**
+  1. ✅ Extract auth screens → `apex_finance/lib/screens/auth/{login_screen,register_screen}.dart`
+  2. ✅ Extract `MainNav` + `_AppBarPill` + `ApexSearch` → `apex_finance/lib/widgets/{main_nav,apex_search}.dart`
+  3. ✅ Extract form dialogs → `apex_finance/lib/widgets/forms/{knowledge_feedback_screen,new_service_request_screen}.dart`
+  4. ✅ Extract all 7 tabs → `apex_finance/lib/screens/tabs/{dash,clients,analysis,market,provider,account,admin}_tab.dart`
+  5. ✅ Extract helpers → `widgets/{form_helpers,apex_widgets}.dart`
+  6. ✅ Move `UpgradePlanScreen` → `apex_finance/lib/screens/upgrade_plan_screen.dart`
+- **Result:** `main.dart` 2146 → **21 lines** (target was < 200). 0 errors in `flutter analyze`.
+- **Notable decision:** Renamed extracted helpers to `compactCard`/`compactKv`/`compactBadge`
+  to avoid collision with `theme.dart`'s `apexCard`/`apexBadge` which use different padding /
+  color treatments. Future cleanup task: unify into a single design system.
+- **Actual Effort:** 1 session
 
 ### 🔴 G-A2. Two router systems coexisting (V4 + V5)
 - **Files:** `lib/core/v4/v4_routes.dart`, `lib/core/v5/v5_routes.dart`, `lib/core/router.dart`
@@ -231,11 +237,29 @@
 
 ## 5. Compliance & Security Gaps
 
-### 🔴 G-S1. Password hash uses default cost
-- **Files:** `app/phase1/services/password_service.py`
-- **Issue:** bcrypt rounds = 10 (default). Recommended 12+ for 2026.
-- **Fix plan:** Set `bcrypt.gensalt(rounds=12)`. Plan rotation for existing hashes (rehash on next login).
-- **Estimate:** 1 day
+### ✅ G-S1. ~~Password hash uses default cost~~ — DONE 2026-04-30
+- **Files:** `app/phase1/services/auth_service.py` (the actual location;
+  blueprint originally pointed to a `password_service.py` that doesn't exist),
+  `app/core/totp_service.py`, `tests/test_password_rotation.py`.
+- **Audit finding:** bcrypt 5.0.0 already defaults to 12 rounds since lib v4.0,
+  so `bcrypt.gensalt()` (no args) was producing 12-round hashes — but only
+  *implicitly*, leaving us exposed to any future library default drift, and
+  doing nothing about pre-existing hashes from older bcrypt versions (≤3.x
+  defaulted to 10).
+- **Resolution (Sprint 7, branch `sprint-7/g-s1-bcrypt-12`):**
+  1. ✅ Added explicit `BCRYPT_ROUNDS = 12` constant in `auth_service.py`.
+  2. ✅ `hash_password()` now calls `bcrypt.gensalt(rounds=BCRYPT_ROUNDS)` explicitly.
+  3. ✅ Added `password_needs_rehash(password_hash)` helper — returns True for
+     SHA-256 fallback hashes and for bcrypt hashes with cost < 12.
+  4. ✅ Wired opportunistic rehash into `AuthService.login()` — successful
+     verify → if `password_needs_rehash()` then `user.password_hash = hash_password(password)`.
+  5. ✅ TOTP recovery codes (`app/core/totp_service.py:_hash_recovery_codes`)
+     also use `BCRYPT_ROUNDS` for consistency.
+  6. ✅ 7 new tests in `tests/test_password_rotation.py` (constant value,
+     new-hash cost, verify against legacy 10/11/12-round hashes,
+     `password_needs_rehash` for each scenario incl. SHA-256 + garbage input).
+  7. ✅ All 21 existing auth tests still pass (no regression).
+- **Estimate (actual):** 1 session
 
 ### 🟠 G-S2. JWT secret not rotated
 - **Issue:** Single `JWT_SECRET` env var. No rotation.
@@ -359,11 +383,39 @@
 
 ## 8. ZATCA Gaps / ثغرات ZATCA
 
-### 🔴 G-Z1. Signing key stored plaintext
-- **Files:** `ZatcaCsid` table
-- **Issue:** Private key in DB column.
-- **Fix plan:** Encrypt with `ZATCA_KEY_ENCRYPTION_KEY`. Or move to AWS KMS / HashiCorp Vault.
-- **Estimate:** 3 days
+### ✅ G-Z1. ~~Signing key stored plaintext~~ — RESOLVED (Wave 11) + docs (2026-04-30)
+- **Discovery (Sprint 7):** Encryption was already implemented in Wave 11.
+  Blueprint was wrong (5th time in this sprint).
+- **Existing implementation:**
+  - `app/core/compliance_models.py:225` — `ZatcaCsid` model with
+    `cert_pem_encrypted` and `private_key_pem_encrypted` (both `Column(Text)`,
+    Fernet-encrypted at rest).
+  - `app/core/zatca_csid.py:81-89` — `_encrypt()` / `_decrypt()` helpers using
+    `cryptography.fernet.Fernet`; `register_csid()` encrypts on write,
+    `get_active_csid()` decrypts on read, list/detail routes never expose plaintext.
+  - `ZATCA_CERT_ENCRYPTION_KEY` env var; production-required (dev derives a
+    deterministic key from `JWT_SECRET` with a logged warning).
+  - `app/core/env_validator.py:154` — refuses production startup without the key.
+  - `tests/test_zatca_csid.py` — 31 cases covering encryption round-trip,
+    `test_list_never_exposes_plaintext`, lifecycle transitions, audit chain.
+- **Sprint 7 contribution (docs-only fix):**
+  - Added the 3 missing Fernet keys to `.env.example` with generation instructions:
+    `ZATCA_CERT_ENCRYPTION_KEY`, `TOTP_ENCRYPTION_KEY`, `BANK_FEEDS_ENCRYPTION_KEY`.
+  - Without these in `.env.example`, operators deploying fresh production environments
+    hit `env_validator` startup failure with no upstream guidance on what to generate.
+- **Status:** DONE
+- **Sprint:** 7 (closure + docs); original encryption work in Wave 11
+
+> 🔍 **Pattern Note (Sprint 7):** This is the **5th** gap in Sprint 7 where the
+> blueprint disagreed with reality:
+>   1. G-A1 — line count (3500 claimed vs 2146 actual)
+>   2. G-A2 — `v4_groups` deletion plan ignored real internal-import dependencies
+>   3. G-A3 — alembic claimed empty; 7 migrations exist (covering 25/108 tables)
+>   4. G-S1 — bcrypt rounds claimed 10; library default is already 12 since v4.0
+>   5. G-Z1 — ZATCA encryption claimed missing; fully implemented in Wave 11
+>
+> A blueprint accuracy audit is recommended for Sprint 8 before further P0/P1
+> work — see new gap **G-DOCS-1**.
 
 ### 🟠 G-Z2. No CSID auto-renewal
 - **Issue:** PCSID expires; no auto-renewal job.
