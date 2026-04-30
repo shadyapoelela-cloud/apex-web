@@ -7,7 +7,6 @@ import 'core/ui_components.dart';
 import 'core/session.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
-import 'dart:html' as html;
 import 'core/apex_ask_panel.dart' show openApexAskPanel;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +16,7 @@ import 'providers/app_providers.dart';
 // that rely on `ApexApp` still resolve without source-level churn.
 export 'app/apex_app.dart' show ApexApp;
 import 'app/apex_app.dart' show ApexApp;
+import 'widgets/form_helpers.dart';
 
 void main() {
   // Restore session from localStorage
@@ -64,11 +64,6 @@ Widget _badge(String t, Color c) => Container(padding: const EdgeInsets.symmetri
   decoration: BoxDecoration(color: c.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
   child: Text(t, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w600)));
 
-InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
-  labelText: l, prefixIcon: ic != null ? Icon(ic, color: AC.goldText, size: 20) : null,
-  filled: true, fillColor: AC.navy3, labelStyle: TextStyle(color: AC.ts),
-  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AC.goldText)));
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // App Root
@@ -76,268 +71,6 @@ InputDecoration _inp(String l, {IconData? ic}) => InputDecoration(
 // ApexApp extracted to app/apex_app.dart (Sprint 1 refactor)
 
 
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-// LOGIN
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-  @override State<LoginScreen> createState() => _LoginS();
-}
-class _LoginS extends State<LoginScreen> {
-  final _u = TextEditingController(), _p = TextEditingController();
-  bool _l = false, _obscure = true;
-  String? _e;
-
-  @override
-  void initState() {
-    super.initState();
-    // DEMO MODE: auto-login if ?demo=1 in URL
-    final search = html.window.location.search ?? '';
-    final hash = html.window.location.hash;
-    if (search.contains('demo=1') || hash.contains('demo=1')) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _u.text = 'shady';
-        _p.text = 'Aa@123456';
-        _go();
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _u.dispose();
-    _p.dispose();
-    super.dispose();
-  }
-
-  Future<void> _go() async {
-    setState(() { _l = true; _e = null; });
-    try {
-      final res = await ApiService.login(_u.text.trim(), _p.text);
-      if (res.success) {
-        final d = res.data;
-        S.token = d['tokens']['access_token']; S.uid = d['user']['id'];
-        S.uname = d['user']['username']; S.dname = d['user']['display_name'];
-        S.plan = d['user']['plan']; S.email = d['user']['email'];
-        S.roles = List<String>.from(d['user']['roles'] ?? []);
-        ApiService.setToken(S.token!);
-        S.save();
-      } else { setState(() { _e = res.error ?? '\u062e\u0637\u0623 \u0641\u064a \u0627\u0644\u062f\u062e\u0648\u0644'; _l = false; }); }
-    } catch (e) { setState(() { _e = '\u062e\u0637\u0623 \u0627\u0644\u0627\u062a\u0635\u0627\u0644: $e'; _l = false; }); }
-  }
-
-  @override
-  Widget build(BuildContext c) => Scaffold(
-    body: AnimatedContainer(
-      duration: const Duration(seconds: 2),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter, end: Alignment.bottomCenter,
-          colors: [AC.navy, AC.navy2, AC.navy],
-          stops: const [0.0, 0.5, 1.0],
-        ),
-      ),
-      child: Center(child: SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 36),
-          decoration: BoxDecoration(
-            color: AC.navy2,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AC.gold.withValues(alpha: 0.1)),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 40, spreadRadius: -8),
-              BoxShadow(color: AC.gold.withValues(alpha: 0.06), blurRadius: 60, spreadRadius: -4),
-            ],
-          ),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-        // Logo with glow
-        Container(
-          padding: const EdgeInsets.all(28),
-          decoration: BoxDecoration(
-            color: AC.gold.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: AC.gold.withValues(alpha: 0.15)),
-            boxShadow: [
-              BoxShadow(color: AC.gold.withValues(alpha: 0.08), blurRadius: 32, spreadRadius: 2),
-              BoxShadow(color: AC.gold.withValues(alpha: 0.04), blurRadius: 60, spreadRadius: 8),
-            ],
-          ),
-          child: Column(children: [
-            Icon(Icons.account_balance, color: AC.goldText, size: 56),
-            const SizedBox(height: 10),
-            ApexLogo(fontSize: 36),
-            const SizedBox(height: 6),
-            Text('\u0645\u0646\u0635\u0629 \u0627\u0644\u062a\u062d\u0644\u064a\u0644 \u0627\u0644\u0645\u0627\u0644\u064a \u0648\u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0645\u0647\u0646\u064a\u0629',
-              style: TextStyle(color: AC.ts, fontSize: 11)),
-            const SizedBox(height: 4),
-            Text('\u0645\u0646\u0635\u0629 \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0645\u0627\u0644\u064a',
-              style: TextStyle(color: AC.goldText.withValues(alpha: 0.7), fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1)),
-          ]),
-        ),
-        const SizedBox(height: 32),
-        // Title
-        Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.tp, fontSize: 22, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 6),
-        Text('\u0623\u062f\u062e\u0644 \u0628\u064a\u0627\u0646\u0627\u062a\u0643 \u0644\u0644\u0645\u062a\u0627\u0628\u0639\u0629', style: TextStyle(color: AC.ts, fontSize: 13)),
-        const SizedBox(height: 24),
-        // Error
-        if (_e != null) Container(
-          width: double.infinity, margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: AC.err.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: AC.err.withValues(alpha: 0.3))),
-          child: Row(children: [Icon(Icons.error_outline, color: AC.err, size: 18), const SizedBox(width: 8),
-            Expanded(child: Text(_e!, style: TextStyle(color: AC.err, fontSize: 12)))]),
-        ),
-        // Email field
-        TextField(controller: _u, style: TextStyle(color: AC.tp),
-          textDirection: TextDirection.ltr,
-          decoration: InputDecoration(
-            labelText: '\u0627\u0644\u0628\u0631\u064a\u062f \u0623\u0648 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645',
-            prefixIcon: Icon(Icons.email_outlined, color: AC.goldText, size: 20),
-            filled: true, fillColor: AC.navy3.withValues(alpha: 0.5), labelStyle: TextStyle(color: AC.ts),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.bdr.withValues(alpha: 0.3))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.bdr.withValues(alpha: 0.3))),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.goldText, width: 1.5)),
-          )),
-        const SizedBox(height: 16),
-        // Password field
-        TextField(controller: _p, obscureText: _obscure, style: TextStyle(color: AC.tp),
-          decoration: InputDecoration(
-            labelText: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631',
-            prefixIcon: Icon(Icons.lock_outlined, color: AC.goldText, size: 20),
-            suffixIcon: IconButton(icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: AC.ts, size: 20),
-              onPressed: () => setState(() => _obscure = !_obscure)),
-            filled: true, fillColor: AC.navy3.withValues(alpha: 0.5), labelStyle: TextStyle(color: AC.ts),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.bdr.withValues(alpha: 0.3))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.bdr.withValues(alpha: 0.3))),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: AC.goldText, width: 1.5)),
-          ),
-          onSubmitted: (_) => _go()),
-        // Forgot password
-        Align(alignment: AlignmentDirectional.centerStart, child: TextButton(
-          onPressed: () => context.go('/forgot-password'),
-          child: Text('\u0646\u0633\u064a\u062a \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061f', style: TextStyle(color: AC.goldText, fontSize: 12)))),
-        const SizedBox(height: 8),
-        // Login button with gradient
-        SizedBox(width: double.infinity, height: 50, child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            gradient: _l ? null : LinearGradient(colors: [AC.gold, AC.goldLight]),
-            color: _l ? AC.gold.withValues(alpha: 0.5) : null,
-            boxShadow: _l ? null : [BoxShadow(color: AC.gold.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
-          ),
-          child: ElevatedButton(
-            onPressed: _l ? null : _go,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.transparent, shadowColor: Colors.transparent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              disabledBackgroundColor: AC.gold.withValues(alpha: 0.5),
-            ),
-            child: _l ? SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: AC.navy))
-              : Text('\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644', style: TextStyle(color: AC.navy, fontSize: 16, fontWeight: FontWeight.bold)),
-          ),
-        )),
-        const SizedBox(height: 24),
-        // Divider with "or" pill
-        Row(children: [
-          Expanded(child: Container(height: 1, decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.transparent, AC.bdr])))),
-          Padding(padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(color: AC.navy3.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AC.bdr.withValues(alpha: 0.3))),
-              child: Text('\u0623\u0648', style: TextStyle(color: AC.ts, fontSize: 12, fontWeight: FontWeight.w500)),
-            )),
-          Expanded(child: Container(height: 1, decoration: BoxDecoration(gradient: LinearGradient(colors: [AC.bdr, Colors.transparent])))),
-        ]),
-        const SizedBox(height: 20),
-        // Social Login Buttons (UI only - not functional yet)
-        Row(children: [
-          Expanded(child: OutlinedButton.icon(
-            onPressed: () => ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('\u0642\u0631\u064a\u0628\u0627\u064b - Google Sign-In'), backgroundColor: AC.navy3)),
-            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr.withValues(alpha: 0.4)), padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-            icon: Icon(Icons.g_mobiledata, color: AC.err, size: 24),
-            label: Text('Google', style: TextStyle(color: AC.tp, fontSize: 12)),
-          )),
-          const SizedBox(width: 10),
-          Expanded(child: OutlinedButton.icon(
-            onPressed: () => ScaffoldMessenger.of(c).showSnackBar(SnackBar(content: Text('\u0642\u0631\u064a\u0628\u0627\u064b - Apple Sign-In'), backgroundColor: AC.navy3)),
-            style: OutlinedButton.styleFrom(side: BorderSide(color: AC.bdr.withValues(alpha: 0.4)), padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-            icon: Icon(Icons.apple, color: AC.tp, size: 22),
-            label: Text('Apple', style: TextStyle(color: AC.tp, fontSize: 12)),
-          )),
-        ]),
-        const SizedBox(height: 24),
-        // Subtle divider before register
-        Row(children: [
-          Expanded(child: Container(height: 1, decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.transparent, AC.bdr.withValues(alpha: 0.3)])))),
-          const SizedBox(width: 8),
-          Expanded(child: Container(height: 1, decoration: BoxDecoration(gradient: LinearGradient(colors: [AC.bdr.withValues(alpha: 0.3), Colors.transparent])))),
-        ]),
-        const SizedBox(height: 8),
-        // Register link
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text('\u0644\u064a\u0633 \u0644\u062f\u064a\u0643 \u062d\u0633\u0627\u0628\u061f', style: TextStyle(color: AC.ts, fontSize: 13)),
-          TextButton(onPressed: () => context.go('/register'),
-            child: Text('\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628', style: TextStyle(color: AC.gold, fontSize: 13, fontWeight: FontWeight.bold))),
-        ]),
-      ]),
-    ),
-  ),
-    )),
-    ),
-  );
-}
-
-class RegScreen extends StatefulWidget {
-  const RegScreen({super.key});
-  @override State<RegScreen> createState() => _RegS();
-}
-class _RegS extends State<RegScreen> {
-  final _un=TextEditingController(),_em=TextEditingController(),_dn=TextEditingController(),_pw=TextEditingController();
-  bool _l=false; String? _e;
-  @override
-  void dispose() {
-    _un.dispose();
-    _em.dispose();
-    _dn.dispose();
-    _pw.dispose();
-    super.dispose();
-  }
-  Future<void> _go() async {
-    setState((){ _l=true; _e=null; });
-    try {
-      final res = await ApiService.register(username: _un.text.trim(), email: _em.text.trim(), displayName: _dn.text.trim(), password: _pw.text);
-      if(res.success) {
-        final d = res.data;
-        S.token=d['tokens']['access_token']; S.uid=d['user']['id'];
-        S.uname=d['user']['username']; S.dname=d['user']['display_name'];
-        S.plan=d['user']['plan']; S.email=d['user']['email'];
-        ApiService.setToken(S.token!);
-        S.save();
-        if(mounted) context.go('/home');
-      } else { setState(()=> _e=res.error??'\u062e\u0637\u0623'); }
-    } catch(e){ setState(()=> _e='$e'); }
-    finally { if(mounted) setState(()=> _l=false); }
-  }
-  @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: Text('\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628', style: TextStyle(color: AC.gold))),
-    body: Center(child: SingleChildScrollView(padding: const EdgeInsets.all(28), child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 400), child: Column(mainAxisSize: MainAxisSize.min, children: [
-        TextField(controller:_un, decoration:_inp('\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645 *', ic: Icons.alternate_email)),
-        SizedBox(height:12), TextField(controller:_em, decoration:_inp('\u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a *', ic: Icons.email_outlined)),
-        SizedBox(height:12), TextField(controller:_dn, decoration:_inp('\u0627\u0644\u0627\u0633\u0645 \u0627\u0644\u0638\u0627\u0647\u0631 *', ic: Icons.badge_outlined)),
-        SizedBox(height:12), TextField(controller:_pw, obscureText:true, decoration:_inp('\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 *', ic: Icons.lock_outline)),
-        if(_e!=null) Padding(padding:EdgeInsets.only(top:10), child:Text(_e!, style:TextStyle(color:AC.err, fontSize:12))),
-        const SizedBox(height:22),
-        SizedBox(width:double.infinity, child: ElevatedButton(onPressed:_l?null:_go,
-          child: _l ? const CircularProgressIndicator(strokeWidth:2) : const Text('\u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u062d\u0633\u0627\u0628'))),
-      ])))));
-}
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // MAIN NAVIGATION â€” 6 tabs
@@ -1794,9 +1527,9 @@ class _KFS extends State<KnowledgeFeedbackScreen> {
             Icon(_type==t['code'] ? Icons.radio_button_checked : Icons.radio_button_off, color: _type==t['code'] ? AC.gold : AC.ts, size: 18),
             SizedBox(width: 10), Text(t['ar']!, style: TextStyle(color: _type==t['code'] ? AC.gold : AC.tp, fontSize: 13))])))),
       const SizedBox(height: 16),
-      TextField(controller: _title, decoration: _inp('\u0627\u0644\u0639\u0646\u0648\u0627\u0646 *', ic: Icons.title)),
+      TextField(controller: _title, decoration: apexInputDecoration('\u0627\u0644\u0639\u0646\u0648\u0627\u0646 *', ic: Icons.title)),
       SizedBox(height: 12),
-      TextField(controller: _desc, maxLines: 4, decoration: _inp('\u0627\u0644\u0648\u0635\u0641 \u0627\u0644\u062a\u0641\u0635\u064a\u0644\u064a')),
+      TextField(controller: _desc, maxLines: 4, decoration: apexInputDecoration('\u0627\u0644\u0648\u0635\u0641 \u0627\u0644\u062a\u0641\u0635\u064a\u0644\u064a')),
       if(_e!=null) Padding(padding:EdgeInsets.only(top:10), child:Text(_e!, style:TextStyle(color:AC.err))),
       SizedBox(height: 20),
       SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: _l?null:_submit,
@@ -1902,11 +1635,11 @@ class _NSRS extends State<NewServiceRequestScreen> {
               borderRadius: BorderRadius.circular(8), border: Border.all(color: _clientId==cl['id']?AC.gold:AC.bdr)),
             child: Text(cl['name_ar']??'', style: TextStyle(color: _clientId==cl['id']?AC.gold:AC.tp, fontSize: 13))))),
         const SizedBox(height: 12)],
-      TextField(controller: _title, decoration: _inp('\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0637\u0644\u0628 *')),
+      TextField(controller: _title, decoration: apexInputDecoration('\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0637\u0644\u0628 *')),
       const SizedBox(height: 12),
-      TextField(controller: _desc, maxLines: 3, decoration: _inp('\u0648\u0635\u0641 \u0627\u0644\u0637\u0644\u0628')),
+      TextField(controller: _desc, maxLines: 3, decoration: apexInputDecoration('\u0648\u0635\u0641 \u0627\u0644\u0637\u0644\u0628')),
       SizedBox(height: 12),
-      TextField(controller: _budget, keyboardType: TextInputType.number, decoration: _inp('\u0627\u0644\u0645\u064a\u0632\u0627\u0646\u064a\u0629 (\u0631.\u0633)', ic: Icons.attach_money)),
+      TextField(controller: _budget, keyboardType: TextInputType.number, decoration: apexInputDecoration('\u0627\u0644\u0645\u064a\u0632\u0627\u0646\u064a\u0629 (\u0631.\u0633)', ic: Icons.attach_money)),
       SizedBox(height: 12),
       Text('\u0627\u0644\u0623\u0648\u0644\u0648\u064a\u0629', style: TextStyle(color: AC.ts, fontSize: 13)),
       SizedBox(height: 6),
