@@ -72,15 +72,43 @@
 - **Estimate:** 4-6 hours
 - **Sprint:** 8
 
-### 🟠 G-A3. Alembic configured but no migration files
-- **Files:** `alembic.ini`, `alembic/env.py`
-- **Issue:** Schema created via `Base.metadata.create_all()` at startup. No version control on DB.
-- **Fix plan:**
-  1. `alembic revision --autogenerate -m "baseline_2026_04"`
-  2. Switch `app/main.py` lifespan to call `alembic upgrade head` instead of `create_all()`
-  3. Add `alembic upgrade head` to CI before tests
-  4. Document workflow in `10_CLAUDE_CODE_INSTRUCTIONS.md`
-- **Estimate:** 2 days
+### ⚠️ G-A3. ~~Alembic configured but no migration files~~ — PARTIAL: drift detected (2026-04-30)
+- **Files:** `alembic/`, `app/main.py`, `app/phase1/models/platform_models.py`
+- **Discovery (Sprint 7):** Blueprint was wrong on two counts:
+  1. **7 migrations exist** (chain: `2b92f970a8f9` → `1a8f7d2b4e5c` → `c7f1a9b02e10` →
+     `d3a1e9b4f201` → `e4c7d9f8a123` → `f8a3c61b9d72` → `g1e2b4c9f3d8`).
+  2. **They cover only 25 of 108 tables** (15 `knowledge_*` from a separate Base
+     + 10 phase1 tables: `activity_log`, `ap_invoices`, `ap_line_items`, `hr_*`,
+     `sync_operations`, `tenant_branding`, `zatca_submissions`).
+- **Drift detection (2026-04-30):** 2097-line unified diff between alembic-result
+  schema and ORM-result schema. Saved to `APEX_BLUEPRINT/_archive/2026-04-30_alembic_drift.txt`.
+- **Why production still works:** `_run_startup()` in `app/main.py` calls
+  `Base.metadata.create_all()` (multiple call sites incl. lines 1611, 1744, 2261)
+  which creates all 108 tables. Replacing this with `alembic upgrade head` would
+  deploy production with **83 missing tables** (`clients`, `analysis_*`, `audit_*`,
+  `archive_*`, `bank_feed_*`, etc.).
+- **Status:** Lifespan integration **POSTPONED**. `create_all` remains canonical.
+  G-A3.1 created to address full alembic catch-up.
+- **Sprint:** 7 (current — partial); continued in 8 (G-A3.1)
+
+### 🟠 G-A3.1. Alembic catch-up migration — production-safe
+- **Issue:** Alembic covers only 25/108 tables. Cannot replace `create_all` until
+  alembic schema matches ORM schema.
+- **Risk:** HIGH — touches production schema management.
+- **Plan (multi-step, requires DBA review):**
+  1. **Audit** existing 7 migrations to understand original intent (KB-only baseline?
+     incremental HR/AP/infra additions?).
+  2. **Decision A — squash + restamp:** consolidate the 7 into a single comprehensive
+     baseline + `alembic stamp head` on production.
+     OR
+     **Decision B — incremental catch-up:** generate migration #8 covering all 83
+     missing tables, run on populated production DB only after careful review of
+     `op.create_table(... if_not_exists=True)` semantics.
+  3. **Test exhaustively** on production-clone DB before cutover.
+  4. **Cutover:** maintenance window → stamp head → switch lifespan to `alembic upgrade head`.
+- **Pre-requisite:** DBA review + production DB snapshot + rollback plan
+- **Estimate:** 1-2 weeks (NOT a Sprint 7 task)
+- **Sprint:** 8 (with allocated DBA review time)
 
 ### 🟠 G-A4. Endpoint naming inconsistency
 - **Files:** All `app/phaseN/routes/*.py`
