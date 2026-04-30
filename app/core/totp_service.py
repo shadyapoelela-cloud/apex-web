@@ -84,8 +84,16 @@ def _generate_recovery_codes(count: int = _RECOVERY_CODE_COUNT) -> List[str]:
 
 
 def _hash_recovery_codes(codes: List[str]) -> str:
-    """Bcrypt-hash each recovery code and store as JSON array of hashes."""
-    hashed = [bcrypt.hashpw(c.encode("utf-8"), bcrypt.gensalt()).decode("utf-8") for c in codes]
+    """Bcrypt-hash each recovery code and store as JSON array of hashes.
+
+    Cost factor sourced from auth_service.BCRYPT_ROUNDS (single source of truth, G-S1).
+    """
+    from app.phase1.services.auth_service import BCRYPT_ROUNDS
+
+    hashed = [
+        bcrypt.hashpw(c.encode("utf-8"), bcrypt.gensalt(rounds=BCRYPT_ROUNDS)).decode("utf-8")
+        for c in codes
+    ]
     return json.dumps(hashed)
 
 
