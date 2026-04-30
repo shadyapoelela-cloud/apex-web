@@ -208,7 +208,6 @@ import '../screens/compliance/ifrs_tools_screen.dart';
 import '../screens/compliance/transfer_pricing_screen.dart';
 import '../screens/compliance/extras_tools_screen.dart';
 import 'package:file_picker/file_picker.dart';
-import 'v4/v4_routes.dart';
 import 'v5/v5_routes.dart';
 import 'apex_bottom_nav.dart';
 import 'apex_magnetic_shell.dart';
@@ -317,11 +316,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/launchpad/full', pageBuilder: (c, s) => _apexPage(const ApexLaunchpadScreen(), s)),
 
     // ── V5.1 shell (16-app ERP + Cmd+K palette + Entity Scope) ──
-    // Registered FIRST so /app/* routes win over legacy paths.
+    // V4 shell removed in G-A2 (2026-04-30). V5 owns the /app namespace.
     ...v5Routes(),
-    // ── V4 shell (Wave 1.5) ──
-    // Coexists with V5; nothing is removed.
-    ...v4Routes(),
 
     // Auth
     GoRoute(path: '/login', pageBuilder: (c, s) => _apexPage(const SlideAuthScreen(), s)),

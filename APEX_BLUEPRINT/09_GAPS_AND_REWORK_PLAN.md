@@ -35,15 +35,42 @@
   color treatments. Future cleanup task: unify into a single design system.
 - **Actual Effort:** 1 session
 
-### 🔴 G-A2. Two router systems coexisting (V4 + V5)
-- **Files:** `lib/core/v4/v4_routes.dart`, `lib/core/v5/v5_routes.dart`, `lib/core/router.dart`
-- **Issue:** Maintenance burden, confusing for developers, unclear precedence.
+### ⚠️ G-A2. ~~Two router systems coexisting~~ — PARTIAL: V4 routes removed (2026-04-30)
+- **Files (deleted):** `apex_finance/lib/core/v4/v4_routes.dart`
+- **Files (kept w/ `@deprecated` header):** the other 11 files in `apex_finance/lib/core/v4/`
+- **Resolution (Sprint 7, branch `sprint-7/g-a2-deprecate-v4-router`):**
+  1. ✅ Deleted `v4_routes.dart` — was the source of `/app` route conflict with V5.
+  2. ✅ Removed `import 'v4/v4_routes.dart'` and `...v4Routes()` spread from `core/router.dart`.
+  3. ✅ Added `@deprecated` header to all 11 remaining V4 files.
+  4. ❌ Could NOT delete `v4_groups.dart`/`v4_groups_data.dart` as originally planned —
+     they are imported by `apex_launchpad.dart`, `apex_sub_module_shell.dart`,
+     `apex_command_palette.dart`, `apex_tab_bar.dart`, all of which are themselves
+     in `core/v4/` with 0 external users. Deleting `v4_groups` while keeping those
+     widgets would break analyzer.
+- **Status:** Route conflict resolved; V5 now owns `/app` exclusively. V4 widgets
+  remain as a self-contained, deprecated dead zone except `apex_screen_host.dart`
+  which is still imported by 6 screens (see G-A2.1).
+- **Audit finding (correction to original assumption):**
+  Original plan said "no V4-only features expected." Actual audit found **6
+  V4-only screens with no V5 equivalents** — see G-A2.1.
+
+### 🟠 G-A2.1. Migrate 6 V4-dependent screens to V5
+- **Files:**
+  - `apex_finance/lib/screens/v4_ai/ai_guardrails_screen.dart`
+  - `apex_finance/lib/screens/v4_compliance/zatca_csid_screen.dart`
+  - `apex_finance/lib/screens/v4_compliance/zatca_queue_screen.dart`
+  - `apex_finance/lib/screens/v4_erp/bank_feeds_screen.dart`
+  - `apex_finance/lib/screens/v4_erp/bank_reconciliation_screen.dart`
+  - `apex_finance/lib/screens/v4_erp/sales_customers_screen.dart`
+- **Issue:** All 6 import `apex_screen_host.dart` from the deprecated `core/v4/`
+  directory. They have no V5 equivalent and are not registered in the router after
+  G-A2 removed `v4_routes.dart`, so they are currently unreachable from any URL.
 - **Fix plan:**
-  1. Audit V4 routes → identify unique features (none expected)
-  2. Migrate any V4-only screens to V5 dynamic shell
-  3. Remove `lib/core/v4/` entirely
-  4. Document V5-only convention in `10_CLAUDE_CODE_INSTRUCTIONS.md`
-- **Estimate:** 1 week
+  1. Replace `ApexScreenHost(...)` with `Scaffold` or V5 ServiceShell wrapper
+  2. Add proper V5 routes (e.g., `/app/erp/finance/bank-rec`)
+  3. Once all 6 migrated, delete `apex_finance/lib/core/v4/` entirely
+- **Estimate:** 4-6 hours
+- **Sprint:** 8
 
 ### 🟠 G-A3. Alembic configured but no migration files
 - **Files:** `alembic.ini`, `alembic/env.py`
