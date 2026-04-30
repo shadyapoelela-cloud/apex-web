@@ -216,9 +216,7 @@ import '../../pilot/screens/setup/coa_editor_screen.dart' as pilot_coa;
 import '../../pilot/screens/setup/products_screen.dart' as pilot_products;
 import '../../pilot/screens/setup/stock_movements_screen.dart' as pilot_stock;
 import '../../pilot/screens/setup/purchasing_screen.dart' as pilot_purch;
-// Legacy heavy JE builder kept reachable via /compliance/journal-entries.
-// The V5 chip below now points at the lighter V5.2 list instead.
-import '../../screens/v5_2/journal_entries_v52_screen.dart';
+import '../../pilot/screens/setup/je_builder_screen.dart' as pilot_je;
 import '../../pilot/screens/setup/financial_reports_screen.dart' as pilot_reports;
 import '../../pilot/screens/setup/members_screen.dart' as pilot_members;
 
@@ -240,12 +238,11 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/trial-balance': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE alias
   'erp/finance/income-statement': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE alias
   'erp/finance/balance-sheet': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE alias
-  // V5.2 list — same MultiViewTemplate toolbar/header as the sales-invoices
-  // screen so both flagship lists feel identical. The legacy rich JE
-  // builder is still reachable via the old /compliance/journal-entries
-  // path and the kept-import alias `pilot_je.JeBuilderScreen` for users
-  // who want the heavier custom UI.
-  'erp/finance/je-builder': (ctx) => const JournalEntriesV52Screen(),
+  // Rich JE builder — live backend list + entity check + filter chips +
+  // bulk actions + AI-warning strip. Row click opens JeBuilderLiveV52Screen
+  // (the V5.2 builder) where the partner/cost-center/VAT columns are
+  // visible by default + decimal-formatter + tabbed partner picker.
+  'erp/finance/je-builder': (ctx) => const pilot_je.JeBuilderScreen(),
   'erp/finance/period-close': (ctx) => const ClosingCockpitV52Screen(),  // V5.2 with DAG
   'erp/finance/close-checklist': (ctx) => const CloseChecklistScreen(),
   'erp/finance/coa-editor': (ctx) => const pilot_coa.CoaEditorScreen(),  // LIVE — real SOCPA CoA + seed + create
