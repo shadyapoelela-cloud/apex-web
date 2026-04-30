@@ -948,6 +948,14 @@ try:
 except Exception as _e:
     logging.warning(f"Onboarding Chat router not mounted: {_e}")
 
+# Period Close Checklist — interactive 12-task close cycle.
+try:
+    from app.core.period_close_routes import router as period_close_router
+    app.include_router(period_close_router)
+    logging.info("Period Close router mounted at /admin/period-close")
+except Exception as _e:
+    logging.warning(f"Period Close router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

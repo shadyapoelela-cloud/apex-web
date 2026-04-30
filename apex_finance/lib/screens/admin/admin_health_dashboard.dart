@@ -485,6 +485,7 @@ class _AdminHealthDashboardState extends State<AdminHealthDashboard> {
           _link('استقبال جديد', Icons.rocket_launch, '/admin/tenant-onboarding'),
           _link('إقفال الفترات', Icons.lock, '/admin/period-locks'),
           _link('استقبال ذكي', Icons.auto_awesome, '/admin/tenant-onboarding-ai'),
+          _link('دورة الإقفال', Icons.event_note, '/admin/period-close'),
         ]),
       ]),
     );

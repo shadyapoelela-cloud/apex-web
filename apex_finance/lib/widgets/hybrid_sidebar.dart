@@ -325,6 +325,13 @@ class _HybridSidebarState extends State<HybridSidebar> {
           keywords: ['ai', 'chat', 'onboarding', 'محادثة', 'ذكاء'],
           requiredRoles: ['platform_admin', 'super_admin'],
         ),
+        _NavItem(
+          'دورة الإقفال',
+          '/admin/period-close',
+          Icons.event_note_rounded,
+          keywords: ['period', 'close', 'checklist', 'إقفال', 'دورة'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
       ],
       requiredRoles: ['platform_admin', 'super_admin', 'reviewer'],
     ),

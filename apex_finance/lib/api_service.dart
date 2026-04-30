@@ -1042,6 +1042,23 @@ class ApiService {
   static Future<ApiResult> onboardingChatStats() =>
       _adminGet('/admin/onboarding-chat/stats');
 
+  // ── Period Close Admin Checklist (Wave 1T Phase AAA) ──
+  static Future<ApiResult> adminPeriodCloseStart(Map body) =>
+      _adminPost('/admin/period-close/start', body);
+  static Future<ApiResult> adminPeriodCloseList({String? tenantId, String? entityId}) {
+    final qs = <String>[];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (entityId != null) qs.add('entity_id=${Uri.encodeQueryComponent(entityId)}');
+    final s = qs.isEmpty ? '' : '?${qs.join('&')}';
+    return _adminGet('/admin/period-close$s');
+  }
+  static Future<ApiResult> adminPeriodCloseGet(String closeId) =>
+      _adminGet('/admin/period-close/$closeId');
+  static Future<ApiResult> adminPeriodCloseCompleteTask(String taskId, Map body) =>
+      _adminPost('/admin/period-close/tasks/$taskId/complete', body);
+  static Future<ApiResult> adminPeriodCloseTemplates() =>
+      _adminGet('/admin/period-close/templates/default');
+
   // ── Webhook Subscriptions (Wave 1E Phase T) ──
   static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
     final qs = <String>[];
