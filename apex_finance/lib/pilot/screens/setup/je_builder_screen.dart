@@ -705,13 +705,15 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
                     createLabelAr: 'قيد جديد',
                     onAiCreate: _create,
                     aiCreateLabelAr: 'ذكاء',
-                    selectedCount: _selectedIds.length,
-                    onClearSelection: () =>
-                        setState(() => _selectedIds.clear()),
+                    // Selection mode is handled by the screen's existing
+                    // _bulkActionBar() rendered just below this toolbar,
+                    // not by ApexListToolbar's built-in selection swap.
+                    // Passing selectedCount here would render an empty
+                    // duplicate "X محدّد" bar with no actions.
                     // Half the previous full-row width. Active filter /
-                    // group chips already flow downward inside the pill
-                    // (Wrap with runSpacing) so the box grows in height
-                    // when needed without consuming horizontal space.
+                    // group chips flow downward inside the pill (Wrap
+                    // with runSpacing) so the box grows in height when
+                    // needed without consuming horizontal space.
                     searchPillMaxWidth: 380,
                   ),
                 ),
