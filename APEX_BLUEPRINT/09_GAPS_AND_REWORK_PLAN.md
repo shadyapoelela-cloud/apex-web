@@ -141,11 +141,38 @@
 
 ## 4. Backend Gaps / ثغرات الخلفية
 
-### 🔴 G-B1. Social auth tokens NOT validated
-- **Files:** `app/phase1/services/social_auth_service.py`
-- **Issue:** Stub accepts any token. Production risk: identity theft.
-- **Fix plan:** Verify Google JWT against Google's JWKS. Verify Apple ID token. Use `google-auth` library.
-- **Estimate:** 2 days
+### ✅ G-B1. ~~Social auth tokens NOT validated~~ — RESOLVED (Wave 1) + docs (2026-04-30)
+- **Discovery (Sprint 7):** Validation was already implemented in Wave 1 PR#2/PR#3.
+  Blueprint was wrong (6th time in this sprint). Original "Files:" pointer was
+  also wrong — `app/phase1/services/social_auth_service.py` does not exist; the
+  real code lives in `app/core/social_auth_verify.py` and the routes in
+  `app/phase1/routes/social_auth_routes.py`.
+- **Existing implementation:**
+  - `app/core/social_auth_verify.py` — `verify_google_id_token()` and
+    `verify_apple_identity_token()`, returning a `VerifiedIdentity` dataclass.
+  - `app/phase1/routes/social_auth_routes.py:72,120` — `_verify_google_id_token`
+    + `_verify_apple_identity_token`, called from the login/register routes
+    (lines 260, 381).
+  - **Google:** `google-auth.verify_oauth2_token()` → checks signature against
+    Google's JWKs + audience match against `GOOGLE_OAUTH_CLIENT_ID` + issuer.
+  - **Apple:** `PyJWT` + `PyJWKClient("https://appleid.apple.com/auth/keys")`
+    → fetches Apple's public JWKS, verifies signature, checks audience against
+    `APPLE_CLIENT_ID` + issuer `https://appleid.apple.com`.
+  - **Libraries (in `requirements.txt`):** `google-auth>=2.25.0`,
+    `pyjwt[crypto]>=2.8.0`, `cryptography>=46.0.7`.
+  - `app/core/env_validator.py:134-141` — emits a *warning* (not an error) on
+    missing keys — social sign-in is opt-in.
+  - **26 tests** in `tests/test_social_auth.py` + `tests/test_social_auth_verify.py`
+    (currently passing).
+- **Sprint 7 contribution (docs-only fix):**
+  - Added `GOOGLE_OAUTH_CLIENT_ID` + `APPLE_CLIENT_ID` to `.env.example` with
+    provider links + the dev-bypass-vs-production behaviour explained.
+  - **Fixed `CLAUDE.md` line 74** which still claimed the tokens were stubbed.
+    This was the highest-risk item — any developer or AI agent reading that
+    file would have planned an "implementation" of code that already exists
+    and would likely have broken the working integration in the process.
+- **Status:** DONE
+- **Sprint:** 7 (closure + docs); original work in Wave 1
 
 ### 🔴 G-B2. SMS verification is stub
 - **Files:** `app/phase1/services/mobile_auth_service.py`
@@ -407,6 +434,39 @@
 ---
 
 ## 11. Documentation Gaps / ثغرات التوثيق
+
+### 🟠 G-DOCS-1. Blueprint accuracy audit
+- **Files:** `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md`,
+  `APEX_BLUEPRINT/10_CLAUDE_CODE_INSTRUCTIONS.md`, `CLAUDE.md`
+- **Issue:** Sprint 7 found **6 gaps where blueprint claims contradicted code reality**:
+  1. **G-A1** — line count (3500 claimed vs 2146 actual)
+  2. **G-A2** — `v4_groups` deletion plan ignored real internal-import dependencies
+  3. **G-A3** — alembic claimed empty; 7 migrations exist covering 25/108 tables
+  4. **G-S1** — bcrypt rounds claimed 10; library default has been 12 since v4.0
+  5. **G-Z1** — ZATCA encryption claimed missing; fully implemented in Wave 11
+  6. **G-B1** — OAuth claimed stubbed; Wave 1 PR#2/#3 implemented full
+     google-auth + PyJWT verification with 26 passing tests. `CLAUDE.md` line 74
+     was actively misleading (highest-risk item — would have led readers to
+     re-implement working code).
+- **Risk:** Future tasks may follow stale plans, causing rework, missed scope, or
+  (worst case) production-breaking changes from operators acting on the blueprint
+  without first reading the code (e.g. a naive G-A3 lifespan replacement would have
+  deployed production with 83 missing tables; a naive G-B1 "implementation" would
+  have collided with the working Wave 1 code).
+- **Fix plan:**
+  1. Cross-reference every P0/P1 gap in this file against current code; mark each
+     as `accurate` / `stale` / `done-but-undocumented`.
+  2. Update inaccurate entries before they're picked up.
+  3. Add to `10_CLAUDE_CODE_INSTRUCTIONS.md`: explicit **verify-first protocol** —
+     "Code is truth; blueprint may lag. Always grep-and-read the cited files before
+     drafting a fix plan."
+  4. Cross-link Wave 1 / Wave 11 / Wave 13 deliverables back into 09 so OAuth /
+     encryption / ZATCA CSID / bank-feed work is visible in the gap tracker.
+  5. Audit `CLAUDE.md` "Common Pitfalls" section — multiple bullets there are stale
+     (G-B1 was line 74; G-A3 was line 76; G-B2 line 75 likely also stale — verify
+     before fixing).
+- **Estimate:** 4-6 hours
+- **Sprint:** 8 (before any further P0/P1 task)
 
 ### 🟢 G-D1. No public API docs
 - **Issue:** FastAPI auto-generates `/docs` (Swagger) but not customer-facing.
