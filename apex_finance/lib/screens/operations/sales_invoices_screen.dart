@@ -778,6 +778,10 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
           icon: Icons.auto_awesome_rounded,
         ),
       ],
+      // Same compact-pill behaviour we shipped on the JE list — caps the
+      // search at 380px and centres it inside the toolbar so chips wrap
+      // downward instead of stretching across the full row.
+      searchPillMaxWidth: 380,
     );
   }
 

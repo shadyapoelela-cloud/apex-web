@@ -793,6 +793,10 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
           icon: Icons.file_download_outlined,
         ),
       ],
+      // Same compact-pill behaviour we shipped on the JE list — caps the
+      // search at 380px and centres it inside the toolbar so chips wrap
+      // downward instead of stretching across the full row.
+      searchPillMaxWidth: 380,
     );
   }
 
