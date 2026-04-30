@@ -240,6 +240,12 @@ class ApexListToolbar extends StatelessWidget {
   /// Background color of the AI button. Defaults to AC.purple (theme-aware).
   final Color? aiButtonColor;
 
+  /// Optional max width for the search-pill (the bar that holds the search
+  /// input + filter/group chips). When null the pill stretches to fill the
+  /// remaining row space (current sales-invoices behaviour). When set, the
+  /// pill is capped at the given width so it never feels oversized.
+  final double? searchPillMaxWidth;
+
   // ── Bulk-select (A2) ───────────────────────────────────────────────
   /// Number of currently selected rows. When > 0 the toolbar swaps to
   /// a "selection bar" that exposes bulk actions instead of the normal
@@ -293,6 +299,7 @@ class ApexListToolbar extends StatelessWidget {
     this.selectedCount = 0,
     this.bulkActions = const [],
     this.onClearSelection,
+    this.searchPillMaxWidth,
   });
 
   static void _noop(String _) {}
@@ -452,24 +459,52 @@ class ApexListToolbar extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             // ── MIDDLE: search bar with embedded filter/group/favorites ─
+            // When searchPillMaxWidth is set the pill is capped and aligned
+            // to the start so the toolbar still flexes — but the search
+            // visual stops at the requested cap instead of stretching.
             Expanded(
-              child: _SearchBarWithMenu(
-                searchCtl: searchCtl,
-                searchFocus: searchFocus,
-                searchHint: searchHint,
-                onSearchChanged: onSearchChanged,
-                filterGroups: filterGroups,
-                groupOptions: groupOptions,
-                activeGroupKey: activeGroupKey,
-                onChangeGroup: onChangeGroup,
-                sortOptions: sortOptions,
-                activeSortKey: activeSortKey,
-                onChangeSort: onChangeSort,
-                favorites: favorites,
-                onSaveFavorite: onSaveFavorite,
-                onClearAllFilters: onClearAllFilters,
-                activeFilterCount: _activeFilterCount,
-              ),
+              child: searchPillMaxWidth != null
+                  ? Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: ConstrainedBox(
+                        constraints:
+                            BoxConstraints(maxWidth: searchPillMaxWidth!),
+                        child: _SearchBarWithMenu(
+                          searchCtl: searchCtl,
+                          searchFocus: searchFocus,
+                          searchHint: searchHint,
+                          onSearchChanged: onSearchChanged,
+                          filterGroups: filterGroups,
+                          groupOptions: groupOptions,
+                          activeGroupKey: activeGroupKey,
+                          onChangeGroup: onChangeGroup,
+                          sortOptions: sortOptions,
+                          activeSortKey: activeSortKey,
+                          onChangeSort: onChangeSort,
+                          favorites: favorites,
+                          onSaveFavorite: onSaveFavorite,
+                          onClearAllFilters: onClearAllFilters,
+                          activeFilterCount: _activeFilterCount,
+                        ),
+                      ),
+                    )
+                  : _SearchBarWithMenu(
+                      searchCtl: searchCtl,
+                      searchFocus: searchFocus,
+                      searchHint: searchHint,
+                      onSearchChanged: onSearchChanged,
+                      filterGroups: filterGroups,
+                      groupOptions: groupOptions,
+                      activeGroupKey: activeGroupKey,
+                      onChangeGroup: onChangeGroup,
+                      sortOptions: sortOptions,
+                      activeSortKey: activeSortKey,
+                      onChangeSort: onChangeSort,
+                      favorites: favorites,
+                      onSaveFavorite: onSaveFavorite,
+                      onClearAllFilters: onClearAllFilters,
+                      activeFilterCount: _activeFilterCount,
+                    ),
             ),
             const SizedBox(width: 12),
             // ── LEFT: pagination · view-mode · help ─────────────────

@@ -708,6 +708,11 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
                     selectedCount: _selectedIds.length,
                     onClearSelection: () =>
                         setState(() => _selectedIds.clear()),
+                    // Half the previous full-row width. Active filter /
+                    // group chips already flow downward inside the pill
+                    // (Wrap with runSpacing) so the box grows in height
+                    // when needed without consuming horizontal space.
+                    searchPillMaxWidth: 380,
                   ),
                 ),
                 if (_selectedIds.isNotEmpty) _bulkActionBar(),
