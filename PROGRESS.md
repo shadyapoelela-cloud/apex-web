@@ -13,16 +13,17 @@
   - Discovery: full verification in Wave 1 PR#2/PR#3 (26 tests passing).
   - Fixed `CLAUDE.md` line 74 — was misleading any reader to re-implement Wave 1.
 - [x] **G-A2 (partial)**: Deprecate V4 router.
-  - Branch: `sprint-7/g-a2-deprecate-v4-router`
+  - Branch: `sprint-7/g-a2-deprecate-v4-router` (merged)
   - Deleted: `apex_finance/lib/core/v4/v4_routes.dart` (resolved /app conflict).
-  - Updated: `apex_finance/lib/core/router.dart` (removed import + spread).
-  - Added `@deprecated` header to all 11 remaining V4 files.
-  - `flutter analyze`: 0 errors. `flutter build web --no-tree-shake-icons`: ✓.
-  - Deviation from plan: kept `v4_groups.dart`/`v4_groups_data.dart` because
-    deleting them would break 4 widgets the user explicitly listed as keep.
-  - Audit surprise: 6 V4-only screens with no V5 equivalent (now unreachable).
-  - Follow-up: **G-A2.1** opened to migrate the 6 screens to V5 in Sprint 8.
-- [ ] G-A3 (partial): Alembic baseline
+  - `@deprecated` headers on 11 remaining V4 files.
+  - Follow-up: **G-A2.1** opened to migrate 6 V4-only screens (Sprint 8).
+- [x] **G-A3 (partial)**: Alembic baseline.
+  - Branch: `sprint-7/g-a3-alembic-baseline`
+  - **Discovery:** 7 migrations exist but cover only 25/108 tables (drift = 2097 lines).
+  - **Decision:** lifespan **NOT** modified. `create_all()` remains canonical.
+    Replacing it would deploy production with 83 missing tables.
+  - **Follow-up:** **G-A3.1** opened — full alembic catch-up + DBA-reviewed cutover (Sprint 8).
+  - Drift archived: `APEX_BLUEPRINT/_archive/2026-04-30_alembic_drift.txt`.
 - [ ] G-T1 (partial): Flutter widget tests
 - [ ] G-B2: SMS (docs)
 
@@ -30,4 +31,4 @@
 
 ## Blockers
 
-(none active)
+(none active — G-A3.1 deferred to Sprint 8 by design)

@@ -1,0 +1,2097 @@
+--- alembic
++++ orm
+@@ -1,4 +1,53 @@
++TABLE acceptance_logs_v2
++  COL accepted_at DATETIME NULL
++  COL doc_type VARCHAR(50) NOT NULL
++  COL doc_version VARCHAR(20) NOT NULL
++  COL document_id VARCHAR NOT NULL
++  COL id VARCHAR NOT NULL PK
++  COL ip_address VARCHAR(45) NULL
++  COL user_agent VARCHAR(500) NULL
++  COL user_id VARCHAR NOT NULL
++  IDX ix_acceptance_logs_v2_document_id(document_id)
++  IDX ix_acceptance_logs_v2_user_id(user_id)
++TABLE account_actions
++  COL action_details TEXT NULL
++  COL action_type VARCHAR NOT NULL
++  COL created_at DATETIME NULL
++  COL id VARCHAR NOT NULL PK
++  COL ip_address VARCHAR NULL
++  COL user_id VARCHAR NOT NULL
++  IDX ix_account_actions_user_id(user_id)
++TABLE account_closure_requests
++  COL closure_type VARCHAR(20) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL processed_at DATETIME NULL
++  COL processed_by VARCHAR(36) NULL
++  COL reactivation_date DATETIME NULL
++  COL reason TEXT NULL
++  COL requested_at DATETIME NOT NULL
++  COL retention_notice_sent BOOLEAN NULL
++  COL status VARCHAR(20) NOT NULL
++  COL user_id VARCHAR(36) NOT NULL
++  IDX ix_account_closure_requests_user_id(user_id)
++  FK (user_id) -> users(id)
++TABLE active_knowledge_rules
++  COL action JSON NOT NULL
++  COL activated_at DATETIME NOT NULL
++  COL activated_by VARCHAR(36) NOT NULL
++  COL applicability_scope VARCHAR(30) NULL
++  COL candidate_rule_id VARCHAR(36) NULL
++  COL condition JSON NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL name_ar VARCHAR(200) NOT NULL
++  COL priority INTEGER NULL
++  COL rule_code VARCHAR(80) NOT NULL
++  COL rule_type VARCHAR(50) NOT NULL
++  COL version INTEGER NULL
++  FK (candidate_rule_id) -> knowledge_candidate_rules(id)
+ TABLE activity_log
+   COL action VARCHAR(40) NOT NULL
+-  COL created_at DATETIME NOT NULL DEFAULT=CURRENT_TIMESTAMP
++  COL created_at DATETIME NOT NULL
+   COL details JSON NULL
+@@ -15,26 +64,130 @@
+   IDX ix_activity_log_tenant_id(tenant_id)
+-TABLE ai_usage_log
+-  COL agent_run_id VARCHAR(36) NULL
+-  COL cache_creation_tokens INTEGER NOT NULL DEFAULT='0'
+-  COL cache_read_tokens INTEGER NOT NULL DEFAULT='0'
+-  COL cost_usd FLOAT NOT NULL DEFAULT='0'
+-  COL created_at DATETIME NOT NULL DEFAULT=CURRENT_TIMESTAMP
+-  COL error INTEGER NOT NULL DEFAULT='0'
+-  COL error_kind VARCHAR(60) NULL
+-  COL extras JSON NULL
+-  COL id VARCHAR(36) NOT NULL PK
+-  COL input_tokens INTEGER NOT NULL DEFAULT='0'
+-  COL latency_ms INTEGER NULL
+-  COL model VARCHAR(60) NOT NULL
+-  COL output_tokens INTEGER NOT NULL DEFAULT='0'
+-  COL stop_reason VARCHAR(40) NULL
+-  COL surface VARCHAR(40) NOT NULL
++TABLE ai_suggestion
++  COL action_type VARCHAR(60) NOT NULL
++  COL after_json JSON NOT NULL
++  COL approved_at DATETIME NULL
++  COL approved_by VARCHAR(36) NULL
++  COL before_json JSON NULL
++  COL confidence INTEGER NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL destructive INTEGER NOT NULL
++  COL gate_reason VARCHAR(120) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL reasoning TEXT NULL
++  COL rejected_at DATETIME NULL
++  COL rejected_by VARCHAR(36) NULL
++  COL rejection_reason TEXT NULL
++  COL source VARCHAR(60) NOT NULL
++  COL status VARCHAR(20) NOT NULL
++  COL target_id VARCHAR(64) NULL
++  COL target_type VARCHAR(60) NULL
+   COL tenant_id VARCHAR(36) NULL
+-  COL turn_index INTEGER NULL
+-  COL user_id VARCHAR(36) NULL
+-  IDX ix_ai_usage_log_agent_run_id(agent_run_id)
+-  IDX ix_ai_usage_log_tenant_id(tenant_id)
+-  IDX ix_ai_usage_model(model)
+-  IDX ix_ai_usage_surface(surface)
+-  IDX ix_ai_usage_tenant_time(tenant_id,created_at)
++  COL updated_at DATETIME NOT NULL
++  IDX ix_ai_suggestion_created(created_at)
++  IDX ix_ai_suggestion_status(status)
++  IDX ix_ai_suggestion_tenant(tenant_id)
++  IDX ix_ai_suggestion_tenant_id(tenant_id)
++TABLE analysis_result_explanations
++  COL analysis_run_id VARCHAR(36) NOT NULL
++  COL applied_rules_json JSON NULL
++  COL coa_account_id VARCHAR(36) NULL
++  COL confidence FLOAT NULL
++  COL created_at DATETIME NOT NULL
++  COL explanation_ar TEXT NULL
++  COL explanation_en TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL references_json JSON NULL
++  COL requires_human_review BOOLEAN NULL
++  COL result_key VARCHAR(100) NOT NULL
++  COL result_type VARCHAR(50) NOT NULL
++  COL result_value NUMERIC(18, 4) NULL
++  COL risk_severity VARCHAR(20) NULL
++  COL source_rows_json JSON NULL
++  IDX ix_analysis_result_explanations_analysis_run_id(analysis_run_id)
++  IDX ix_explanation_run(analysis_run_id)
++  IDX ix_explanation_type(result_type)
++  FK (analysis_run_id) -> analysis_runs(id)
++TABLE analysis_results
++  COL analyzed_by VARCHAR(36) NULL
++  COL audit_trail_json JSON NULL
++  COL balance_diff NUMERIC(18, 2) NULL
++  COL brain_findings JSON NULL
++  COL brain_rules_evaluated INTEGER NULL
++  COL brain_rules_triggered INTEGER NULL
++  COL can_approve BOOLEAN NULL
++  COL client_id VARCHAR(36) NOT NULL
++  COL cogs NUMERIC(18, 2) NULL
++  COL cogs_method VARCHAR(30) NULL
++  COL confidence_label VARCHAR(20) NULL
++  COL created_at DATETIME NOT NULL
++  COL errors_count INTEGER NULL
++  COL executive_summary TEXT NULL
++  COL full_result_json JSON NULL
++  COL gross_profit NUMERIC(18, 2) NULL
++  COL has_narrative BOOLEAN NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_balanced BOOLEAN NULL
++  COL locked_at DATETIME NULL
++  COL locked_by VARCHAR(36) NULL
++  COL management_letter TEXT NULL
++  COL narrative_platform VARCHAR(20) NULL
++  COL net_profit NUMERIC(18, 2) NULL
++  COL net_revenue NUMERIC(18, 2) NULL
++  COL operating_profit NUMERIC(18, 2) NULL
++  COL overall_confidence FLOAT NULL
++  COL period_locked BOOLEAN NOT NULL
++  COL ratios JSON NULL
++  COL recommendations JSON NULL
++  COL revenue NUMERIC(18, 2) NULL
++  COL risks JSON NULL
++  COL status VARCHAR(20) NOT NULL
++  COL strengths JSON NULL
++  COL total_assets NUMERIC(18, 2) NULL
++  COL total_equity NUMERIC(18, 2) NULL
++  COL total_liabilities NUMERIC(18, 2) NULL
++  COL upload_id VARCHAR(36) NOT NULL
++  COL warnings_count INTEGER NULL
++  COL weaknesses JSON NULL
++  IDX ix_analysis_results_analyzed_by(analyzed_by)
++  IDX ix_analysis_results_client_id(client_id)
++  IDX ix_analysis_results_upload_id(upload_id)
++  FK (client_id) -> clients(id)
++  FK (upload_id) -> coa_uploads(id)
++  FK (analyzed_by) -> users(id)
++  FK (locked_by) -> users(id)
++TABLE analysis_runs
++  COL balance_sheet_json JSON NULL
++  COL binding_quality_score FLOAT NULL
++  COL cash_flow_json JSON NULL
++  COL classification_json JSON NULL
++  COL client_id VARCHAR(36) NOT NULL
++  COL closing_inventory NUMERIC(18, 2) NULL
++  COL coa_upload_id VARCHAR(36) NOT NULL
++  COL completed_at DATETIME NULL
++  COL created_at DATETIME NOT NULL
++  COL error_message TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL income_statement_json JSON NULL
++  COL industry VARCHAR(100) NULL
++  COL knowledge_brain_json JSON NULL
++  COL matched_accounts INTEGER NULL
++  COL overall_confidence FLOAT NULL
++  COL ratios_json JSON NULL
++  COL readiness_json JSON NULL
++  COL run_status VARCHAR(30) NOT NULL
++  COL tb_upload_id VARCHAR(36) NOT NULL
++  COL total_accounts_analyzed INTEGER NULL
++  COL triggered_by VARCHAR(36) NULL
++  COL unmatched_accounts INTEGER NULL
++  COL validations_json JSON NULL
++  COL warnings_json JSON NULL
++  IDX ix_analysis_run_client(client_id)
++  IDX ix_analysis_run_status(run_status)
++  IDX ix_analysis_run_tb(tb_upload_id)
++  IDX ix_analysis_runs_client_id(client_id)
++  IDX ix_analysis_runs_coa_upload_id(coa_upload_id)
++  IDX ix_analysis_runs_tb_upload_id(tb_upload_id)
++  FK (coa_upload_id) -> client_coa_uploads(id)
++  FK (client_id) -> clients(id)
++  FK (tb_upload_id) -> trial_balance_uploads(id)
+ TABLE ap_invoices
+@@ -90,2 +243,3 @@
+   COL suggested_account_id VARCHAR(36) NULL
++  COL tenant_id VARCHAR(36) NULL
+   COL unit_price NUMERIC(18, 2) NOT NULL
+@@ -93,3 +247,604 @@
+   IDX ix_ap_line_items_invoice_id(invoice_id)
++  IDX ix_ap_line_items_tenant_id(tenant_id)
+   FK (invoice_id) -> ap_invoices(id)
++TABLE archive_items
++  COL archived_at DATETIME NOT NULL
++  COL client_id VARCHAR(36) NULL
++  COL created_at DATETIME NOT NULL
++  COL deleted_at DATETIME NULL
++  COL expires_at DATETIME NOT NULL
++  COL file_ext VARCHAR(20) NULL
++  COL file_name VARCHAR(300) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL mime_type VARCHAR(100) NULL
++  COL owner_user_id VARCHAR(36) NOT NULL
++  COL purged_at DATETIME NULL
++  COL size_bytes BIGINT NULL
++  COL source_id VARCHAR(36) NULL
++  COL source_type VARCHAR(50) NOT NULL
++  COL status VARCHAR(30) NULL
++  COL storage_key TEXT NOT NULL
++  COL visibility_scope VARCHAR(30) NULL
++  IDX ix_archive_items_client_id(client_id)
++  IDX ix_archive_items_owner_user_id(owner_user_id)
++  IDX ix_archive_status_expires(status,expires_at)
++  IDX ix_archive_user_client(owner_user_id,client_id)
++  FK (client_id) -> clients(id)
++  FK (owner_user_id) -> users(id)
++TABLE archive_links
++  COL archive_item_id VARCHAR(36) NOT NULL
++  COL attached_at DATETIME NOT NULL
++  COL attached_by VARCHAR(36) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL target_process_id VARCHAR(36) NOT NULL
++  COL target_process_type VARCHAR(50) NOT NULL
++  IDX ix_archive_links_archive_item_id(archive_item_id)
++  IDX ix_archive_links_attached_by(attached_by)
++  FK (archive_item_id) -> archive_items(id)
++  FK (attached_by) -> users(id)
++TABLE archive_policies
++  COL allow_download BOOLEAN NULL
++  COL allow_reuse BOOLEAN NULL
++  COL created_at DATETIME NOT NULL
++  COL hold_rule VARCHAR(100) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL retention_days INTEGER NOT NULL
++  COL scope_id VARCHAR(50) NULL
++  COL scope_type VARCHAR(30) NOT NULL
++  COL updated_at DATETIME NOT NULL
++TABLE archive_retention_events
++  COL actor_id VARCHAR(36) NULL
++  COL archive_item_id VARCHAR(36) NOT NULL
++  COL event_at DATETIME NOT NULL
++  COL event_type VARCHAR(30) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL notes TEXT NULL
++  IDX ix_archive_retention_events_archive_item_id(archive_item_id)
++  FK (archive_item_id) -> archive_items(id)
++TABLE audit_events
++  COL action VARCHAR(100) NOT NULL
++  COL created_at DATETIME NULL
++  COL details TEXT NULL
++  COL entity_id VARCHAR(36) NULL
++  COL entity_type VARCHAR(50) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL ip_address VARCHAR(45) NULL
++  COL resource_id VARCHAR(36) NULL
++  COL resource_type VARCHAR(50) NULL
++  COL user_id VARCHAR(36) NULL
++  IDX ix_audit_events_action(action)
++  IDX ix_audit_events_user_id(user_id)
++  IDX ix_audit_resource(resource_type,resource_id)
++  IDX ix_audit_user_action(user_id,action)
++TABLE audit_findings
++  COL area VARCHAR(100) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL description_ar TEXT NOT NULL
++  COL finding_code VARCHAR(50) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL impact_on_report VARCHAR(50) NULL
++  COL management_response TEXT NULL
++  COL materiality NUMERIC(18, 2) NULL
++  COL owner_id VARCHAR(36) NULL
++  COL proposed_adjustment JSON NULL
++  COL service_case_id VARCHAR(36) NOT NULL
++  COL severity VARCHAR(20) NOT NULL
++  COL status VARCHAR(30) NULL
++  COL title_ar VARCHAR(300) NOT NULL
++  COL title_en VARCHAR(300) NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_audit_findings_service_case_id(service_case_id)
++  IDX ix_finding_case_severity(service_case_id,severity)
++  FK (service_case_id) -> service_cases(id)
++TABLE audit_program_templates
++  COL area VARCHAR(100) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL description_ar TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL international_ref VARCHAR(100) NULL
++  COL is_active BOOLEAN NULL
++  COL local_std_ref VARCHAR(100) NULL
++  COL procedure_code VARCHAR(50) NOT NULL
++  COL risk_level VARCHAR(20) NULL
++  COL title_ar VARCHAR(300) NOT NULL
++  COL title_en VARCHAR(300) NULL
++TABLE audit_samples
++  COL area VARCHAR(100) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL created_by VARCHAR(36) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL population_ref VARCHAR(200) NULL
++  COL population_size INTEGER NULL
++  COL sampling_method VARCHAR(30) NOT NULL
++  COL selected_count INTEGER NOT NULL
++  COL selection_rationale TEXT NULL
++  COL service_case_id VARCHAR(36) NOT NULL
++  COL status VARCHAR(30) NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_audit_samples_service_case_id(service_case_id)
++  FK (service_case_id) -> service_cases(id)
++TABLE audit_trail
++  COL action VARCHAR(80) NOT NULL
++  COL actor_ip VARCHAR(64) NULL
++  COL actor_user_agent VARCHAR(300) NULL
++  COL actor_user_id VARCHAR(36) NULL
++  COL after_json JSON NULL
++  COL before_json JSON NULL
++  COL chain_seq BIGINT NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL entity_id VARCHAR(36) NULL
++  COL entity_type VARCHAR(50) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL metadata_json JSON NULL
++  COL prev_hash VARCHAR(64) NULL
++  COL this_hash VARCHAR(64) NOT NULL
++  IDX ix_audit_trail_action(action)
++  IDX ix_audit_trail_actor(actor_user_id)
++  IDX ix_audit_trail_actor_user_id(actor_user_id)
++  IDX ix_audit_trail_created(created_at)
++  IDX ix_audit_trail_entity(entity_type,entity_id)
++TABLE audit_workpapers
++  COL area VARCHAR(100) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL created_by VARCHAR(36) NOT NULL
++  COL description TEXT NULL
++  COL evidence_ref TEXT NULL
++  COL evidence_type VARCHAR(50) NULL
++  COL finding_description TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL materiality_impact NUMERIC(18, 2) NULL
++  COL procedure_code VARCHAR(50) NOT NULL
++  COL result VARCHAR(30) NULL
++  COL reviewed_at DATETIME NULL
++  COL reviewer_id VARCHAR(36) NULL
++  COL reviewer_notes TEXT NULL
++  COL reviewer_status VARCHAR(30) NULL
++  COL service_case_id VARCHAR(36) NOT NULL
++  COL severity VARCHAR(20) NULL
++  COL title_ar VARCHAR(300) NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_audit_workpapers_service_case_id(service_case_id)
++  IDX ix_wp_case_area(service_case_id,area)
++  FK (service_case_id) -> service_cases(id)
++TABLE bank_feed_connection
++  COL access_token_encrypted TEXT NULL
++  COL account_name VARCHAR(200) NULL
++  COL account_number_masked VARCHAR(60) NULL
++  COL bank_name VARCHAR(120) NULL
++  COL created_at DATETIME NOT NULL
++  COL currency VARCHAR(3) NULL
++  COL external_account_id VARCHAR(120) NOT NULL
++  COL iban_masked VARCHAR(60) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL last_sync_at DATETIME NULL
++  COL last_sync_error TEXT NULL
++  COL last_sync_txn_count INTEGER NULL
++  COL provider VARCHAR(30) NOT NULL
++  COL refresh_token_encrypted TEXT NULL
++  COL status VARCHAR(20) NOT NULL
++  COL tenant_id VARCHAR(36) NOT NULL
++  COL token_expires_at DATETIME NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_bank_feed_connection_tenant_id(tenant_id)
++  IDX ix_bfc_provider(provider)
++  IDX ix_bfc_status(status)
++  IDX ix_bfc_tenant(tenant_id)
++TABLE bank_feed_transaction
++  COL amount VARCHAR(40) NOT NULL
++  COL category_hint VARCHAR(80) NULL
++  COL connection_id VARCHAR(36) NOT NULL
++  COL counterparty VARCHAR(200) NULL
++  COL created_at DATETIME NOT NULL
++  COL currency VARCHAR(3) NOT NULL
++  COL description TEXT NULL
++  COL direction VARCHAR(10) NOT NULL
++  COL external_id VARCHAR(120) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL matched_at DATETIME NULL
++  COL matched_by VARCHAR(36) NULL
++  COL matched_entity_id VARCHAR(36) NULL
++  COL matched_entity_type VARCHAR(40) NULL
++  COL raw_json JSON NULL
++  COL tenant_id VARCHAR(36) NOT NULL
++  COL txn_date DATETIME NOT NULL
++  IDX ix_bank_feed_transaction_connection_id(connection_id)
++  IDX ix_bank_feed_transaction_tenant_id(tenant_id)
++  IDX ix_bft_connection_date(connection_id,txn_date)
++  IDX ix_bft_tenant_date(tenant_id,txn_date)
++TABLE client_chart_of_accounts
++  COL account_code VARCHAR(100) NULL
++  COL account_level INTEGER NULL
++  COL account_name_normalized VARCHAR(500) NOT NULL
++  COL account_name_raw VARCHAR(500) NOT NULL
++  COL account_type_raw VARCHAR(100) NULL
++  COL active_flag BOOLEAN NOT NULL
++  COL client_id VARCHAR(36) NOT NULL
++  COL coa_upload_id VARCHAR(36) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL issues_json JSON NOT NULL
++  COL normal_balance VARCHAR(20) NULL
++  COL notes TEXT NULL
++  COL parent_code VARCHAR(100) NULL
++  COL parent_name VARCHAR(500) NULL
++  COL record_status VARCHAR(50) NOT NULL
++  COL source_row_number INTEGER NOT NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_client_chart_of_accounts_client_id(client_id)
++  IDX ix_client_chart_of_accounts_coa_upload_id(coa_upload_id)
++  IDX ix_coa_account_client(client_id)
++  IDX ix_coa_account_code(account_code)
++  IDX ix_coa_account_composite(client_id,coa_upload_id,source_row_number)
++  IDX ix_coa_account_name(account_name_normalized)
++  IDX ix_coa_account_upload(coa_upload_id)
++  FK (coa_upload_id) -> client_coa_uploads(id)
++  FK (client_id) -> clients(id)
++TABLE client_coa_assessments
++  COL ambiguous_accounts_json JSON NULL
++  COL classified_accounts INTEGER NULL
++  COL client_id VARCHAR(36) NOT NULL
++  COL coa_upload_id VARCHAR(36) NOT NULL
++  COL completeness_score FLOAT NOT NULL
++  COL consistency_score FLOAT NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL duplicate_suspects_json JSON NULL
++  COL duplication_risk_score FLOAT NOT NULL
++  COL high_confidence_count INTEGER NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL issues_json JSON NULL
++  COL low_confidence_count INTEGER NULL
++  COL missing_categories_json JSON NULL
++  COL naming_clarity_score FLOAT NOT NULL
++  COL overall_score FLOAT NOT NULL
++  COL recommendations_json JSON NULL
++  COL reporting_readiness_score FLOAT NOT NULL
++  COL total_accounts INTEGER NULL
++  COL unclassified_count INTEGER NULL
++  IDX ix_assessment_client(client_id)
++  IDX ix_client_coa_assessments_client_id(client_id)
++  IDX ix_client_coa_assessments_coa_upload_id(coa_upload_id)
++  FK (coa_upload_id) -> client_coa_uploads(id)
++  FK (client_id) -> clients(id)
++TABLE client_coa_rules
++  COL action_json JSON NOT NULL
++  COL client_id VARCHAR(36) NOT NULL
++  COL condition_json JSON NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL created_by VARCHAR(36) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL priority INTEGER NULL
++  COL rule_name VARCHAR(200) NOT NULL
++  COL rule_type VARCHAR(50) NOT NULL
++  COL source_account_id VARCHAR(36) NULL
++  COL source_upload_id VARCHAR(36) NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_client_coa_rules_client_id(client_id)
++  IDX ix_client_rule_active(client_id,is_active)
++  FK (client_id) -> clients(id)
++TABLE client_coa_uploads
++  COL client_id VARCHAR(36) NOT NULL
++  COL column_mapping_json JSON NULL
++  COL created_at DATETIME NOT NULL
++  COL detected_columns_json JSON NULL
++  COL file_extension VARCHAR(10) NOT NULL
++  COL file_name VARCHAR(255) NOT NULL
++  COL file_size_bytes BIGINT NOT NULL
++  COL header_row_index INTEGER NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL sheet_name VARCHAR(255) NULL
++  COL source_type VARCHAR(50) NOT NULL
++  COL stored_file_path TEXT NOT NULL
++  COL total_rows_detected INTEGER NULL
++  COL total_rows_parsed INTEGER NULL
++  COL total_rows_rejected INTEGER NULL
++  COL updated_at DATETIME NOT NULL
++  COL upload_status VARCHAR(50) NOT NULL
++  COL uploaded_by VARCHAR(36) NULL
++  COL warnings_json JSON NULL
++  IDX ix_client_coa_uploads_client_id(client_id)
++  IDX ix_client_coa_uploads_uploaded_by(uploaded_by)
++  IDX ix_coa_upload_client(client_id)
++  IDX ix_coa_upload_client_date(client_id,created_at)
++  IDX ix_coa_upload_status(upload_status)
++  FK (client_id) -> clients(id)
++  FK (uploaded_by) -> users(id)
++TABLE client_documents
++  COL accepted_at DATETIME NULL
++  COL client_id VARCHAR(36) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL document_type VARCHAR(50) NOT NULL
++  COL expires_at DATETIME NULL
++  COL file_path VARCHAR(500) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL name_ar VARCHAR(200) NOT NULL
++  COL name_en VARCHAR(200) NULL
++  COL reject_reason TEXT NULL
++  COL rejected_at DATETIME NULL
++  COL replaced_at DATETIME NULL
++  COL replaced_by_id VARCHAR(36) NULL
++  COL required BOOLEAN NULL
++  COL status VARCHAR(20) NULL
++  COL updated_at DATETIME NOT NULL
++  COL uploaded_at DATETIME NULL
++  IDX ix_client_doc_type(client_id,document_type)
++  IDX ix_client_documents_client_id(client_id)
++  FK (client_id) -> clients(id)
++TABLE client_memberships
++  COL client_id VARCHAR(36) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL joined_at DATETIME NOT NULL
++  COL revoke_reason VARCHAR(200) NULL
++  COL revoked_at DATETIME NULL
++  COL revoked_by VARCHAR(36) NULL
++  COL role_in_client VARCHAR(30) NULL
++  COL user_id VARCHAR(36) NOT NULL
++  IDX ix_client_memberships_client_id(client_id)
++  IDX ix_client_memberships_user_id(user_id)
++  FK (client_id) -> clients(id)
++  FK (revoked_by) -> users(id)
++  FK (user_id) -> users(id)
++TABLE client_onboarding_drafts
++  COL converted_client_id VARCHAR(36) NULL
++  COL created_at DATETIME NOT NULL
++  COL draft_data JSON NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_converted BOOLEAN NULL
++  COL step_completed INTEGER NULL
++  COL updated_at DATETIME NOT NULL
++  COL user_id VARCHAR(36) NOT NULL
++  IDX ix_client_onboarding_drafts_user_id(user_id)
++  FK (user_id) -> users(id)
++TABLE client_required_documents
++  COL client_id VARCHAR(36) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL document_code VARCHAR(50) NOT NULL
++  COL document_name_ar VARCHAR(200) NOT NULL
++  COL document_name_en VARCHAR(200) NULL
++  COL expires_at DATETIME NULL
++  COL file_name VARCHAR(300) NULL
++  COL file_path TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_mandatory BOOLEAN NULL
++  COL rejection_reason TEXT NULL
++  COL source_rule VARCHAR(50) NULL
++  COL status VARCHAR(30) NULL
++  COL updated_at DATETIME NOT NULL
++  COL uploaded_at DATETIME NULL
++  COL verified_at DATETIME NULL
++  COL verified_by VARCHAR(36) NULL
++  IDX ix_client_doc_status(client_id,status)
++  IDX ix_client_required_documents_client_id(client_id)
++  FK (client_id) -> clients(id)
++TABLE client_types
++  COL code VARCHAR(50) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL description_ar TEXT NULL
++  COL description_en TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL knowledge_mode_eligible BOOLEAN NULL
++  COL knowledge_mode_features_ar TEXT NULL
++  COL name_ar VARCHAR(150) NOT NULL
++  COL name_en VARCHAR(150) NOT NULL
++  COL sort_order INTEGER NULL
++TABLE clients
++  COL city VARCHAR(100) NULL
++  COL client_type_code VARCHAR(50) NOT NULL
++  COL coa_stage VARCHAR(20) NULL
++  COL commercial_name VARCHAR(200) NULL
++  COL country VARCHAR(50) NULL
++  COL cr_number VARCHAR(30) NULL
++  COL created_at DATETIME NOT NULL
++  COL created_by VARCHAR(36) NOT NULL
++  COL currency VARCHAR(3) NOT NULL
++  COL deleted_at DATETIME NULL
++  COL fiscal_year_end VARCHAR(10) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL inventory_system VARCHAR(20) NULL
++  COL is_deleted BOOLEAN NULL
++  COL knowledge_mode BOOLEAN NULL
++  COL legal_entity_type VARCHAR(50) NULL
++  COL legal_name VARCHAR(200) NULL
++  COL name_ar VARCHAR(200) NOT NULL
++  COL name_en VARCHAR(200) NULL
++  COL national_address TEXT NULL
++  COL onboarding_completed BOOLEAN NULL
++  COL onboarding_step INTEGER NULL
++  COL readiness_status VARCHAR(30) NULL
++  COL registration_status VARCHAR(30) NULL
++  COL sector VARCHAR(50) NULL
++  COL sector_main_code VARCHAR(50) NULL
++  COL sector_sub_code VARCHAR(50) NULL
++  COL tax_jurisdiction VARCHAR(2) NOT NULL
++  COL tax_number VARCHAR(30) NULL
++  COL updated_at DATETIME NOT NULL
++  COL vat_registration_number VARCHAR(15) NULL
++  COL website VARCHAR(300) NULL
++  IDX ix_client_type_sector(client_type_code,sector)
++  IDX ix_clients_client_type_code(client_type_code)
++  IDX ix_clients_created_by(created_by)
++  IDX ix_clients_legal_entity_type(legal_entity_type)
++  IDX ix_clients_sector_main_code(sector_main_code)
++  IDX ix_clients_sector_sub_code(sector_sub_code)
++  IDX ix_clients_vat_registration_number(vat_registration_number)
++  FK (created_by) -> users(id)
++TABLE coa_accounts
++  COL account_code VARCHAR(30) NULL
++  COL account_name VARCHAR(300) NOT NULL
++  COL classification_source VARCHAR(20) NULL
++  COL close_credit NUMERIC(18, 2) NULL
++  COL close_debit NUMERIC(18, 2) NULL
++  COL confidence FLOAT NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL movement_credit NUMERIC(18, 2) NULL
++  COL movement_debit NUMERIC(18, 2) NULL
++  COL net_balance NUMERIC(18, 2) NOT NULL
++  COL normalized_class VARCHAR(50) NULL
++  COL open_credit NUMERIC(18, 2) NULL
++  COL open_debit NUMERIC(18, 2) NULL
++  COL section VARCHAR(30) NULL
++  COL tab_raw VARCHAR(200) NULL
++  COL upload_id VARCHAR(36) NOT NULL
++  COL warnings JSON NULL
++  IDX ix_coa_accounts_upload_id(upload_id)
++  IDX ix_coa_upload_class(upload_id,normalized_class)
++  FK (upload_id) -> coa_uploads(id)
++TABLE coa_approval_records
++  COL action VARCHAR(30) NOT NULL
++  COL approved_accounts INTEGER NULL
++  COL approved_by VARCHAR(36) NULL
++  COL avg_confidence FLOAT NULL
++  COL client_id VARCHAR(36) NOT NULL
++  COL coa_upload_id VARCHAR(36) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_current BOOLEAN NULL
++  COL notes TEXT NULL
++  COL overall_quality_score FLOAT NULL
++  COL total_accounts INTEGER NULL
++  IDX ix_approval_upload(coa_upload_id,is_current)
++  IDX ix_coa_approval_records_coa_upload_id(coa_upload_id)
++  FK (coa_upload_id) -> client_coa_uploads(id)
++  FK (client_id) -> clients(id)
++TABLE coa_knowledge_feedback
++  COL client_id VARCHAR(36) NOT NULL
++  COL coa_account_id VARCHAR(36) NULL
++  COL coa_upload_id VARCHAR(36) NULL
++  COL created_at DATETIME NOT NULL
++  COL feedback_category VARCHAR(50) NOT NULL
++  COL feedback_severity VARCHAR(30) NULL
++  COL feedback_source_type VARCHAR(50) NOT NULL
++  COL feedback_text TEXT NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL reference_context_json JSON NULL
++  COL status VARCHAR(50) NOT NULL
++  COL submitted_by VARCHAR(36) NULL
++  COL suggested_correction_json JSON NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_coa_knowledge_feedback_client_id(client_id)
++  IDX ix_coa_knowledge_feedback_submitted_by(submitted_by)
++  IDX ix_kf_client(client_id)
++  IDX ix_kf_status(status)
++  IDX ix_kf_upload(coa_upload_id)
++  FK (coa_account_id) -> client_chart_of_accounts(id)
++  FK (coa_upload_id) -> client_coa_uploads(id)
++  FK (client_id) -> clients(id)
++  FK (submitted_by) -> users(id)
++TABLE coa_uploads
++  COL classification_confidence FLOAT NULL
++  COL client_id VARCHAR(36) NOT NULL
++  COL closing_inventory NUMERIC(18, 2) NULL
++  COL created_at DATETIME NOT NULL
++  COL error_message TEXT NULL
++  COL file_format VARCHAR(20) NULL
++  COL file_size_bytes INTEGER NULL
++  COL filename VARCHAR(300) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL industry VARCHAR(30) NULL
++  COL inventory_system_override VARCHAR(20) NULL
++  COL mapped_accounts INTEGER NULL
++  COL status VARCHAR(20) NOT NULL
++  COL tab_consistency_score FLOAT NULL
++  COL tab_mismatches INTEGER NULL
++  COL total_accounts INTEGER NULL
++  COL unmapped_accounts INTEGER NULL
++  COL updated_at DATETIME NOT NULL
++  COL uploaded_by VARCHAR(36) NOT NULL
++  IDX ix_coa_uploads_client_id(client_id)
++  IDX ix_coa_uploads_uploaded_by(uploaded_by)
++  FK (client_id) -> clients(id)
++  FK (uploaded_by) -> users(id)
++TABLE compliance_actions
++  COL action_by VARCHAR(36) NULL
++  COL action_type VARCHAR(50) NOT NULL
++  COL compliance_event_id VARCHAR(36) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL notes TEXT NULL
++  IDX ix_compliance_actions_compliance_event_id(compliance_event_id)
++  FK (compliance_event_id) -> task_compliance_events(id)
++TABLE eligibility_assessments
++  COL analysis_run_id VARCHAR(36) NULL
++  COL assessed_by VARCHAR(36) NULL
++  COL assessment_type VARCHAR(30) NOT NULL
++  COL boundary_status VARCHAR(30) NULL
++  COL client_id VARCHAR(36) NOT NULL
++  COL confidence FLOAT NULL
++  COL created_at DATETIME NOT NULL
++  COL eligibility_status VARCHAR(30) NOT NULL
++  COL explanation_ar TEXT NULL
++  COL explanation_en TEXT NULL
++  COL financial_data_json JSON NULL
++  COL gaps_json JSON NULL
++  COL human_review_reason TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL met_requirements_json JSON NULL
++  COL missing_documents_json JSON NULL
++  COL next_actions_json JSON NULL
++  COL readiness_score FLOAT NULL
++  COL references_json JSON NULL
++  COL requires_human_review BOOLEAN NULL
++  COL risk_severity VARCHAR(20) NULL
++  COL target_program_id VARCHAR(36) NULL
++  COL target_program_name VARCHAR(300) NULL
++  COL target_program_type VARCHAR(30) NULL
++  COL updated_at DATETIME NULL
++  IDX ix_elig_client(client_id)
++  IDX ix_elig_status(eligibility_status)
++  IDX ix_elig_type(assessment_type)
++  FK (client_id) -> clients(id)
++TABLE entitlement_audit_log
++  COL action VARCHAR NOT NULL
++  COL created_at DATETIME NULL
++  COL details JSON NULL
++  COL id VARCHAR NOT NULL PK
++  COL new_plan VARCHAR NULL
++  COL old_plan VARCHAR NULL
++  COL performed_by VARCHAR NULL
++  COL user_id VARCHAR NOT NULL
++  IDX ix_entitlement_audit_log_user_id(user_id)
++TABLE feedback_attachments
++  COL created_at DATETIME NOT NULL
++  COL feedback_id VARCHAR(36) NOT NULL
++  COL file_size_bytes INTEGER NULL
++  COL file_type VARCHAR(20) NULL
++  COL filename VARCHAR(300) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL storage_path VARCHAR(500) NULL
++  IDX ix_feedback_attachments_feedback_id(feedback_id)
++  FK (feedback_id) -> knowledge_feedback_events(id)
++TABLE funding_programs
++  COL created_at DATETIME NOT NULL
++  COL effective_from DATETIME NULL
++  COL effective_to DATETIME NULL
++  COL eligibility_rules_json JSON NULL
++  COL financial_requirements_json JSON NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL jurisdiction VARCHAR(50) NULL
++  COL max_employees INTEGER NULL
++  COL max_revenue NUMERIC(18, 2) NULL
++  COL min_business_age_months INTEGER NULL
++  COL min_employees INTEGER NULL
++  COL min_revenue NUMERIC(18, 2) NULL
++  COL name_ar VARCHAR(300) NOT NULL
++  COL name_en VARCHAR(300) NULL
++  COL program_type VARCHAR(50) NULL
++  COL provider_name_ar VARCHAR(300) NOT NULL
++  COL provider_name_en VARCHAR(300) NULL
++  COL reference_authority_id VARCHAR(36) NULL
++  COL required_documents_json JSON NULL
++  COL source_url TEXT NULL
++  COL target_entity_types_json JSON NULL
++  COL target_sectors_json JSON NULL
++  COL updated_at DATETIME NULL
++  COL validity_status VARCHAR(30) NULL
++  IDX ix_funding_active(is_active)
++  IDX ix_funding_programs_reference_authority_id(reference_authority_id)
++  IDX ix_funding_type(program_type)
++  FK (reference_authority_id) -> reference_authorities(id)
+ TABLE hr_employees
+@@ -187,271 +942,1033 @@
+   FK (payroll_run_id) -> hr_payroll_runs(id)
+-TABLE knowledge_audit_log
+-  COL action VARCHAR(20) NOT NULL
+-  COL entity_id VARCHAR(12) NOT NULL
+-  COL entity_type VARCHAR(20) NOT NULL
+-  COL field_changed VARCHAR(100) NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL new_value TEXT NULL
+-  COL old_value TEXT NULL
+-  COL reason TEXT NULL
+-  COL timestamp DATETIME NULL
+-  COL user VARCHAR(50) NULL
+-  IDX ix_knowledge_audit_log_entity_id(entity_id)
+-  IDX ix_knowledge_audit_log_entity_type(entity_type)
+-  IDX ix_knowledge_audit_log_timestamp(timestamp)
+-TABLE knowledge_authorities
+-  COL active BOOLEAN NULL
+-  COL code VARCHAR(20) NOT NULL
+-  COL created_at DATETIME NULL
+-  COL domain_scope JSON NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL jurisdiction VARCHAR(10) NULL
++TABLE journal_entry_sequence
++  COL client_id VARCHAR(36) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL fiscal_year VARCHAR(4) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL last_number INTEGER NOT NULL
++  COL prefix VARCHAR(10) NOT NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_je_seq_client_year(client_id,fiscal_year)
++  IDX ix_journal_entry_sequence_client_id(client_id)
++TABLE knowledge_candidate_rules
++  COL action JSON NOT NULL
++  COL applicability_scope VARCHAR(30) NULL
++  COL approved_at DATETIME NULL
++  COL approved_by VARCHAR(36) NULL
++  COL condition JSON NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL created_by VARCHAR(36) NOT NULL
++  COL description TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
+   COL name_ar VARCHAR(200) NOT NULL
+   COL name_en VARCHAR(200) NULL
+-  COL notes TEXT NULL
+-  COL official_urls JSON NULL
+-  COL source_priority INTEGER NULL
+-  COL update_frequency VARCHAR(20) NULL
+-  IDX ix_knowledge_authorities_code(code) UNIQUE
+-TABLE knowledge_cases
++  COL priority INTEGER NULL
++  COL rule_code VARCHAR(80) NOT NULL
++  COL rule_type VARCHAR(50) NOT NULL
++  COL scope_sector VARCHAR(50) NULL
++  COL source_feedback_id VARCHAR(36) NULL
++  COL status VARCHAR(20) NOT NULL
++  COL test_results JSON NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_candidate_rule_status(status,rule_type)
++  IDX ix_knowledge_candidate_rules_created_by(created_by)
++  IDX ix_knowledge_candidate_rules_source_feedback_id(source_feedback_id)
++  FK (source_feedback_id) -> knowledge_feedback_events(id)
++  FK (created_by) -> users(id)
++TABLE knowledge_feedback_events
++  COL applicability_scope VARCHAR(30) NULL
++  COL client_id VARCHAR(36) NULL
++  COL created_at DATETIME NOT NULL
++  COL description TEXT NOT NULL
++  COL evidence TEXT NULL
++  COL explanation_id VARCHAR(36) NULL
++  COL feedback_type VARCHAR(50) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_deleted BOOLEAN NULL
++  COL priority VARCHAR(10) NULL
++  COL reference_standard VARCHAR(100) NULL
++  COL result_id VARCHAR(36) NULL
++  COL scope_client_type VARCHAR(50) NULL
++  COL scope_sector VARCHAR(50) NULL
++  COL status VARCHAR(30) NOT NULL
++  COL suggested_classification VARCHAR(50) NULL
++  COL suggested_correction TEXT NULL
++  COL target_account_name VARCHAR(300) NULL
++  COL target_classification VARCHAR(50) NULL
++  COL target_metric_key VARCHAR(80) NULL
++  COL title VARCHAR(300) NOT NULL
++  COL updated_at DATETIME NOT NULL
++  COL user_id VARCHAR(36) NOT NULL
++  IDX ix_feedback_status_type(status,feedback_type)
++  IDX ix_feedback_user_result(user_id,result_id)
++  IDX ix_knowledge_feedback_events_client_id(client_id)
++  IDX ix_knowledge_feedback_events_result_id(result_id)
++  IDX ix_knowledge_feedback_events_user_id(user_id)
++  FK (client_id) -> clients(id)
++  FK (user_id) -> users(id)
++TABLE knowledge_feedback_reviews
++  COL created_at DATETIME NOT NULL
++  COL decision VARCHAR(30) NOT NULL
++  COL feedback_id VARCHAR(36) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL quality_score INTEGER NULL
++  COL reviewer_id VARCHAR(36) NOT NULL
++  COL reviewer_notes TEXT NULL
++  IDX ix_knowledge_feedback_reviews_feedback_id(feedback_id)
++  IDX ix_knowledge_feedback_reviews_reviewer_id(reviewer_id)
++  IDX ix_review_feedback_reviewer(feedback_id,reviewer_id)
++  FK (feedback_id) -> knowledge_feedback_events(id)
++  FK (reviewer_id) -> users(id)
++TABLE legal_documents_v2
++  COL content_ar TEXT NOT NULL
++  COL content_en TEXT NULL
+   COL created_at DATETIME NULL
+-  COL date_recorded DATE NULL
+-  COL decision TEXT NULL
++  COL doc_type VARCHAR(50) NOT NULL
++  COL effective_date DATETIME NULL
++  COL id VARCHAR NOT NULL PK
++  COL is_current BOOLEAN NULL
++  COL is_mandatory BOOLEAN NULL
++  COL title_ar VARCHAR(255) NOT NULL
++  COL title_en VARCHAR(255) NULL
++  COL version VARCHAR(20) NOT NULL
++  IDX ix_legal_documents_v2_doc_type(doc_type)
++  IDX ix_legal_documents_v2_is_current(is_current)
++TABLE legal_entity_types
++  COL additional_fields JSON NULL
++  COL code VARCHAR(50) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL description_ar TEXT NULL
++  COL description_en TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL name_ar VARCHAR(200) NOT NULL
++  COL name_en VARCHAR(200) NOT NULL
++  COL required_documents_profile JSON NULL
++  COL sort_order INTEGER NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_legal_entity_types_code(code) UNIQUE
++TABLE license_registry
++  COL created_at DATETIME NOT NULL
++  COL effective_from DATETIME NULL
++  COL effective_to DATETIME NULL
++  COL fees_json JSON NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL issuing_authority_ar VARCHAR(300) NOT NULL
++  COL issuing_authority_id VARCHAR(36) NULL
++  COL jurisdiction VARCHAR(50) NULL
++  COL license_type VARCHAR(50) NOT NULL
++  COL name_ar VARCHAR(300) NOT NULL
++  COL name_en VARCHAR(300) NULL
++  COL renewal_cycle_months INTEGER NULL
++  COL required_documents_json JSON NULL
++  COL requirements_json JSON NULL
++  COL source_url TEXT NULL
++  COL target_activities_json JSON NULL
++  COL updated_at DATETIME NULL
++  COL validity_status VARCHAR(30) NULL
++  IDX ix_license_active(is_active)
++  IDX ix_license_registry_issuing_authority_id(issuing_authority_id)
++  IDX ix_license_type(license_type)
++  FK (issuing_authority_id) -> reference_authorities(id)
++TABLE notification_delivery_logs
++  COL channel VARCHAR(20) NOT NULL
++  COL created_at DATETIME NULL
++  COL error_message TEXT NULL
++  COL id VARCHAR NOT NULL PK
++  COL notification_id VARCHAR NOT NULL
++  COL status VARCHAR(20) NOT NULL
++  IDX ix_notification_delivery_logs_notification_id(notification_id)
++TABLE notification_preferences
++  COL channel_email BOOLEAN NULL
++  COL channel_in_app BOOLEAN NULL
++  COL channel_sms BOOLEAN NULL
++  COL created_at DATETIME NULL
++  COL id VARCHAR NOT NULL PK
++  COL notification_type VARCHAR(50) NOT NULL
++  COL updated_at DATETIME NULL
++  COL user_id VARCHAR NOT NULL
++  IDX ix_notification_preferences_user_id(user_id)
++TABLE notifications
++  COL body_ar TEXT NULL
++  COL body_en TEXT NULL
++  COL category VARCHAR(50) NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_read BOOLEAN NULL
++  COL read_at DATETIME NULL
++  COL source_id VARCHAR(36) NULL
++  COL source_type VARCHAR(50) NULL
++  COL title_ar VARCHAR(200) NOT NULL
++  COL title_en VARCHAR(200) NULL
++  COL user_id VARCHAR(36) NOT NULL
++  IDX ix_notification_user_read(user_id,is_read)
++  IDX ix_notifications_user_id(user_id)
++  FK (user_id) -> users(id)
++TABLE notifications_v2
++  COL action_url VARCHAR(500) NULL
++  COL body_ar TEXT NULL
++  COL body_en TEXT NULL
++  COL created_at DATETIME NULL
++  COL icon VARCHAR(50) NULL
++  COL id VARCHAR NOT NULL PK
++  COL is_read BOOLEAN NULL
++  COL notification_type VARCHAR(50) NOT NULL
++  COL read_at DATETIME NULL
++  COL reference_id VARCHAR NULL
++  COL reference_type VARCHAR(50) NULL
++  COL title_ar VARCHAR(255) NOT NULL
++  COL title_en VARCHAR(255) NULL
++  COL user_id VARCHAR NOT NULL
++  IDX ix_notifications_v2_is_read(is_read)
++  IDX ix_notifications_v2_notification_type(notification_type)
++  IDX ix_notifications_v2_user_id(user_id)
++TABLE password_resets
++  COL created_at DATETIME NOT NULL
++  COL expires_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL token_hash VARCHAR(255) NOT NULL
++  COL used BOOLEAN NULL
++  COL used_at DATETIME NULL
++  COL user_id VARCHAR(36) NOT NULL
++  IDX ix_password_resets_user_id(user_id)
++  FK (user_id) -> users(id)
++TABLE payment_records
++  COL amount NUMERIC(18, 2) NOT NULL
++  COL completed_at DATETIME NULL
++  COL created_at DATETIME NULL
++  COL currency VARCHAR(3) NOT NULL
++  COL einvoice_hash VARCHAR(64) NULL
++  COL einvoice_uuid VARCHAR(36) NULL
++  COL id VARCHAR NOT NULL PK
++  COL idempotency_key VARCHAR(64) NULL
++  COL net_amount NUMERIC(18, 2) NULL
++  COL payment_method VARCHAR NULL
++  COL plan_code VARCHAR NOT NULL
++  COL session_id VARCHAR NULL
++  COL status VARCHAR NULL
++  COL tax_amount NUMERIC(18, 2) NOT NULL
++  COL user_id VARCHAR NULL
++  IDX ix_payment_records_einvoice_uuid(einvoice_uuid)
++  IDX ix_payment_records_idempotency_key(idempotency_key) UNIQUE
++  IDX ix_payment_records_session_id(session_id)
++  IDX ix_payment_records_user_id(user_id)
++  FK (user_id) -> users(id)
++TABLE permissions
++  COL action VARCHAR(30) NOT NULL
++  COL code VARCHAR(80) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL name_ar VARCHAR(150) NULL
++  COL name_en VARCHAR(150) NULL
++  COL resource VARCHAR(50) NOT NULL
++  IDX ix_perm_resource_action(resource,action)
++TABLE plan_features
++  COL created_at DATETIME NOT NULL
++  COL feature_code VARCHAR(80) NOT NULL
++  COL feature_name_ar VARCHAR(150) NULL
++  COL feature_name_en VARCHAR(150) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL plan_id VARCHAR(36) NOT NULL
++  COL value VARCHAR(50) NOT NULL
++  COL value_type VARCHAR(20) NULL
++  IDX ix_plan_features_plan_id(plan_id)
++  FK (plan_id) -> plans(id)
++TABLE plan_limits
++  COL created_at DATETIME NULL
++  COL description_ar VARCHAR NULL
++  COL description_en VARCHAR NULL
++  COL feature_key VARCHAR NOT NULL
++  COL feature_value VARCHAR NOT NULL
++  COL id VARCHAR NOT NULL PK
++  COL plan_name VARCHAR NOT NULL
++  IDX ix_plan_limits_plan_name(plan_name)
++TABLE plans
++  COL code VARCHAR(20) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL currency VARCHAR(3) NOT NULL
++  COL description_ar TEXT NULL
++  COL description_en TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL name_ar VARCHAR(100) NOT NULL
++  COL name_en VARCHAR(100) NOT NULL
++  COL price_monthly_sar NUMERIC(18, 2) NOT NULL
++  COL price_yearly_sar NUMERIC(18, 2) NOT NULL
++  COL sort_order INTEGER NULL
++  COL target_user_ar VARCHAR(200) NULL
++  COL target_user_en VARCHAR(200) NULL
++  COL updated_at DATETIME NOT NULL
++TABLE policy_acceptance_logs
++  COL accepted_at DATETIME NOT NULL
++  COL accepted_ip VARCHAR(45) NULL
++  COL accepted_user_agent VARCHAR(500) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL policy_document_id VARCHAR(36) NOT NULL
++  COL user_id VARCHAR(36) NOT NULL
++  IDX ix_acceptance_user_policy(user_id,policy_document_id)
++  IDX ix_policy_acceptance_logs_user_id(user_id)
++  FK (policy_document_id) -> policy_documents(id)
++  FK (user_id) -> users(id)
++TABLE policy_documents
++  COL content_ar TEXT NOT NULL
++  COL content_en TEXT NULL
++  COL created_at DATETIME NOT NULL
++  COL effective_from DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_current BOOLEAN NULL
++  COL policy_type VARCHAR(50) NOT NULL
++  COL superseded_at DATETIME NULL
++  COL title_ar VARCHAR(200) NOT NULL
++  COL title_en VARCHAR(200) NOT NULL
++  COL version VARCHAR(20) NOT NULL
++  IDX ix_policy_type_current(policy_type,is_current)
++TABLE provider_compliance_flags
++  COL action VARCHAR(22) NOT NULL
++  COL created_at DATETIME NULL
+   COL description TEXT NULL
+-  COL domain VARCHAR(30) NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL input_summary TEXT NULL
+-  COL lessons_json JSON NULL
+-  COL linked_entries JSON NULL
+-  COL linked_rules JSON NULL
+-  COL outcome TEXT NULL
+-  COL reasoning TEXT NULL
+-  COL sector VARCHAR(30) NULL
+-  COL status VARCHAR(20) NULL
+-  COL title VARCHAR(300) NULL
+-  IDX ix_knowledge_cases_domain(domain)
+-  IDX ix_knowledge_cases_status(status)
+-TABLE knowledge_domains
+-  COL active BOOLEAN NULL
+-  COL code VARCHAR(30) NOT NULL
+-  COL description TEXT NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL name_ar VARCHAR(100) NOT NULL
+-  COL name_en VARCHAR(100) NULL
+-  COL priority INTEGER NULL
+-  IDX ix_knowledge_domains_code(code) UNIQUE
+-TABLE knowledge_entries
+-  COL applicability_json JSON NULL
+-  COL approver_user VARCHAR(50) NULL
+-  COL confidence_level FLOAT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_resolved BOOLEAN NULL
++  COL provider_id VARCHAR(36) NOT NULL
++  COL resolved_at DATETIME NULL
++  COL resolved_by VARCHAR(36) NULL
++  COL service_task_id VARCHAR(36) NULL
++  IDX ix_provider_compliance_flags_provider_id(provider_id)
++TABLE provider_suspensions
++  COL compliance_flag_id VARCHAR(36) NULL
+   COL created_at DATETIME NULL
+-  COL domain VARCHAR(30) NULL
+-  COL entry_code VARCHAR(50) NULL
+-  COL exceptions_json JSON NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL impacts_json JSON NULL
+-  COL linked_cases JSON NULL
+-  COL linked_rules JSON NULL
+-  COL obligation_level VARCHAR(20) NULL
+-  COL obligations_json JSON NULL
+-  COL owner_user VARCHAR(50) NULL
+-  COL review_frequency VARCHAR(20) NULL
+-  COL review_status VARCHAR(20) NULL
+-  COL reviewer_user VARCHAR(50) NULL
+-  COL source_id VARCHAR(12) NULL
+-  COL status VARCHAR(20) NULL
+-  COL structured_json JSON NULL
+-  COL subdomain VARCHAR(50) NULL
+-  COL summary TEXT NULL
+-  COL title VARCHAR(300) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL lifted_at DATETIME NULL
++  COL lifted_by VARCHAR(36) NULL
++  COL provider_id VARCHAR(36) NOT NULL
++  COL reason TEXT NOT NULL
++  COL status VARCHAR(6) NULL
++  COL suspended_at DATETIME NULL
++  COL suspension_type VARCHAR(4) NOT NULL
++  IDX ix_provider_suspensions_compliance_flag_id(compliance_flag_id)
++  IDX ix_provider_suspensions_provider_id(provider_id)
++  FK (compliance_flag_id) -> provider_compliance_flags(id)
++TABLE reference_authorities
++  COL authority_level VARCHAR(30) NULL
++  COL authority_type VARCHAR(50) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL domain_pack VARCHAR(50) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL jurisdiction VARCHAR(50) NULL
++  COL last_checked_at DATETIME NULL
++  COL monitoring_urls_json JSON NULL
++  COL name_ar VARCHAR(300) NOT NULL
++  COL name_en VARCHAR(300) NULL
++  COL review_cycle_days INTEGER NULL
+   COL updated_at DATETIME NULL
+-  IDX idx_entry_domain_status(domain,status)
+-  IDX ix_knowledge_entries_domain(domain)
+-  IDX ix_knowledge_entries_entry_code(entry_code)
+-  IDX ix_knowledge_entries_source_id(source_id)
+-  IDX ix_knowledge_entries_status(status)
+-  FK (source_id) -> knowledge_sources(id)
+-TABLE knowledge_patterns
++  COL website_url TEXT NULL
++  IDX ix_ref_auth_domain(domain_pack)
++  IDX ix_ref_auth_type(authority_type)
++TABLE reference_documents
++  COL authority_id VARCHAR(36) NOT NULL
++  COL content_hash VARCHAR(64) NULL
++  COL created_at DATETIME NOT NULL
++  COL document_type VARCHAR(50) NULL
++  COL effective_from DATETIME NULL
++  COL effective_to DATETIME NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL last_verified_at DATETIME NULL
++  COL metadata_json JSON NULL
++  COL review_status VARCHAR(30) NULL
++  COL reviewer_notes TEXT NULL
++  COL source_url TEXT NULL
++  COL superseded_by VARCHAR(36) NULL
++  COL title_ar VARCHAR(500) NOT NULL
++  COL title_en VARCHAR(500) NULL
++  COL updated_at DATETIME NULL
++  COL validity_status VARCHAR(30) NULL
++  COL version VARCHAR(50) NULL
++  IDX ix_ref_doc_auth(authority_id)
++  IDX ix_ref_doc_status(validity_status)
++  IDX ix_reference_documents_authority_id(authority_id)
++  FK (authority_id) -> reference_authorities(id)
++TABLE regulatory_update_events
++  COL authority_id VARCHAR(36) NOT NULL
++  COL change_summary_ar TEXT NULL
++  COL change_summary_en TEXT NULL
++  COL change_type VARCHAR(30) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL detected_at DATETIME NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL impact_assessment TEXT NULL
++  COL reference_document_id VARCHAR(36) NULL
++  COL review_status VARCHAR(30) NULL
++  COL reviewed_at DATETIME NULL
++  COL reviewed_by VARCHAR(36) NULL
++  IDX ix_reg_update_auth(authority_id)
++  IDX ix_reg_update_status(review_status)
++  IDX ix_regulatory_update_events_authority_id(authority_id)
++  IDX ix_regulatory_update_events_reference_document_id(reference_document_id)
++  FK (authority_id) -> reference_authorities(id)
++  FK (reference_document_id) -> reference_documents(id)
++TABLE rejected_coa_rows
++  COL coa_upload_id VARCHAR(36) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL raw_row_json JSON NOT NULL
++  COL rejection_reasons_json JSON NOT NULL
++  COL source_row_number INTEGER NOT NULL
++  IDX ix_rejected_coa_rows_coa_upload_id(coa_upload_id)
++  FK (coa_upload_id) -> client_coa_uploads(id)
++TABLE result_explanations
++  COL analysis_id VARCHAR(36) NOT NULL
++  COL applied_rules TEXT NULL
+   COL confidence FLOAT NULL
+   COL created_at DATETIME NULL
+-  COL data_json JSON NULL
++  COL explanation_ar TEXT NOT NULL
++  COL explanation_en TEXT NULL
++  COL feedback_count INTEGER NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL metric_formatted VARCHAR(50) NULL
++  COL metric_key VARCHAR(80) NOT NULL
++  COL metric_label_ar VARCHAR(200) NOT NULL
++  COL metric_label_en VARCHAR(200) NULL
++  COL metric_value NUMERIC(18, 4) NULL
++  COL result_id VARCHAR(36) NOT NULL
++  COL result_key VARCHAR(100) NOT NULL
++  COL severity VARCHAR(20) NULL
++  COL source_accounts JSON NULL
++  COL source_rows TEXT NULL
++  COL source_rows_count INTEGER NULL
++  COL summary_ar TEXT NULL
++  COL summary_en TEXT NULL
++  COL warnings TEXT NULL
++  IDX ix_explanation_metric(result_id,metric_key)
++  IDX ix_result_explanations_analysis_id(analysis_id)
++  IDX ix_result_explanations_result_id(result_id)
++  FK (result_id) -> analysis_results(id)
++TABLE result_warnings
++  COL code VARCHAR(50) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL details JSON NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL message_ar TEXT NOT NULL
++  COL message_en TEXT NULL
++  COL result_id VARCHAR(36) NOT NULL
++  COL severity VARCHAR(20) NOT NULL
++  COL source_metric VARCHAR(80) NULL
++  IDX ix_result_warnings_result_id(result_id)
++  FK (result_id) -> analysis_results(id)
++TABLE role_permissions
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL permission_id VARCHAR(36) NOT NULL
++  COL role_id VARCHAR(36) NOT NULL
++  IDX ix_role_permissions_permission_id(permission_id)
++  IDX ix_role_permissions_role_id(role_id)
++  FK (permission_id) -> permissions(id)
++  FK (role_id) -> roles(id)
++TABLE roles
++  COL code VARCHAR(30) NOT NULL
++  COL created_at DATETIME NOT NULL
+   COL description TEXT NULL
+-  COL domain VARCHAR(30) NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL pattern_type VARCHAR(30) NULL
+-  COL sector VARCHAR(30) NULL
+-  COL status VARCHAR(20) NULL
+-  COL title VARCHAR(200) NULL
+-  IDX ix_knowledge_patterns_domain(domain)
+-TABLE knowledge_playbooks
+-  COL created_at DATETIME NULL
+-  COL domain VARCHAR(30) NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL invoked_entries JSON NULL
+-  COL invoked_rules JSON NULL
+-  COL objective TEXT NULL
+-  COL outputs_expected JSON NULL
+-  COL required_inputs JSON NULL
+-  COL risk_flags JSON NULL
+-  COL sector VARCHAR(30) NULL
+-  COL status VARCHAR(20) NULL
+-  COL steps_json JSON NULL
+-  COL title VARCHAR(200) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_system BOOLEAN NULL
++  COL name_ar VARCHAR(100) NOT NULL
++  COL name_en VARCHAR(100) NOT NULL
++TABLE sector_main
++  COL code VARCHAR(50) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL icon VARCHAR(50) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL name_ar VARCHAR(200) NOT NULL
++  COL name_en VARCHAR(200) NOT NULL
++  COL sort_order INTEGER NULL
++  IDX ix_sector_main_code(code) UNIQUE
++TABLE sector_sub
++  COL additional_documents JSON NULL
++  COL code VARCHAR(50) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL license_type VARCHAR(100) NULL
++  COL name_ar VARCHAR(200) NOT NULL
++  COL name_en VARCHAR(200) NOT NULL
++  COL requires_license BOOLEAN NULL
++  COL sector_main_code VARCHAR(50) NOT NULL
++  COL sort_order INTEGER NULL
++  IDX ix_sector_sub_code(code) UNIQUE
++  IDX ix_sector_sub_sector_main_code(sector_main_code)
++  FK (sector_main_code) -> sector_main(code)
++TABLE service_cases
++  COL assigned_provider_id VARCHAR(36) NULL
++  COL assigned_reviewer_id VARCHAR(36) NULL
++  COL client_id VARCHAR(36) NOT NULL
++  COL completed_at DATETIME NULL
++  COL created_at DATETIME NOT NULL
++  COL created_by VARCHAR(36) NOT NULL
++  COL current_stage VARCHAR(50) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL notes TEXT NULL
++  COL progress_percent FLOAT NULL
++  COL service_code VARCHAR(50) NOT NULL
++  COL service_id VARCHAR(36) NOT NULL
++  COL started_at DATETIME NULL
++  COL status VARCHAR(30) NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_case_client_service(client_id,service_code)
++  IDX ix_service_cases_client_id(client_id)
++  IDX ix_service_cases_created_by(created_by)
++  IDX ix_service_cases_service_id(service_id)
++  FK (client_id) -> clients(id)
++  FK (service_id) -> service_catalog(id)
++  FK (created_by) -> users(id)
++TABLE service_catalog
++  COL category VARCHAR(50) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL description_ar TEXT NULL
++  COL description_en TEXT NULL
++  COL icon VARCHAR(50) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL min_plan VARCHAR(20) NULL
++  COL requires_coa BOOLEAN NULL
++  COL requires_review BOOLEAN NULL
++  COL requires_tb BOOLEAN NULL
++  COL service_code VARCHAR(50) NOT NULL
++  COL sort_order INTEGER NULL
++  COL title_ar VARCHAR(300) NOT NULL
++  COL title_en VARCHAR(300) NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_service_catalog_service_code(service_code) UNIQUE
++TABLE service_provider_documents
++  COL created_at DATETIME NOT NULL
++  COL document_type VARCHAR(50) NOT NULL
++  COL file_size_bytes INTEGER NULL
++  COL filename VARCHAR(300) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL provider_id VARCHAR(36) NOT NULL
++  COL reviewed_at DATETIME NULL
++  COL reviewed_by VARCHAR(36) NULL
++  COL reviewer_notes TEXT NULL
++  COL status VARCHAR(20) NOT NULL
++  COL storage_path VARCHAR(500) NULL
++  IDX ix_service_provider_documents_provider_id(provider_id)
++  FK (provider_id) -> service_providers(id)
++TABLE service_provider_scopes
++  COL approved_at DATETIME NULL
++  COL approved_by VARCHAR(36) NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_approved BOOLEAN NULL
++  COL provider_id VARCHAR(36) NOT NULL
++  COL scope_code VARCHAR(80) NOT NULL
++  COL scope_name_ar VARCHAR(200) NOT NULL
++  COL scope_name_en VARCHAR(200) NULL
++  IDX ix_service_provider_scopes_provider_id(provider_id)
++  FK (provider_id) -> service_providers(id)
++TABLE service_providers
++  COL active_tasks_count INTEGER NULL
++  COL badge VARCHAR(50) NULL
++  COL bio_ar TEXT NULL
++  COL bio_en TEXT NULL
++  COL category VARCHAR(50) NOT NULL
++  COL city VARCHAR(100) NULL
++  COL commission_rate NUMERIC(5, 2) NOT NULL
++  COL completed_tasks_count INTEGER NULL
++  COL compliance_status VARCHAR(30) NULL
++  COL country VARCHAR(50) NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_deleted BOOLEAN NULL
++  COL is_premium BOOLEAN NULL
++  COL listing_priority INTEGER NULL
++  COL policy_accepted_at DATETIME NULL
++  COL provider_policy_accepted BOOLEAN NULL
++  COL rating_average FLOAT NULL
++  COL rating_count INTEGER NULL
++  COL reviewer_notes TEXT NULL
++  COL specialization VARCHAR(200) NULL
++  COL updated_at DATETIME NOT NULL
++  COL user_id VARCHAR(36) NOT NULL
++  COL verification_score INTEGER NULL
++  COL verification_status VARCHAR(30) NOT NULL
++  COL verified_at DATETIME NULL
++  COL verified_by VARCHAR(36) NULL
++  COL years_experience INTEGER NULL
++  IDX ix_provider_category_status(category,verification_status)
++  IDX ix_provider_compliance(compliance_status)
++  FK (user_id) -> users(id)
++TABLE service_request_messages
++  COL attachment_filename VARCHAR(300) NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_system BOOLEAN NULL
++  COL message TEXT NOT NULL
++  COL request_id VARCHAR(36) NOT NULL
++  COL sender_id VARCHAR(36) NOT NULL
++  IDX ix_service_request_messages_request_id(request_id)
++  IDX ix_service_request_messages_sender_id(sender_id)
++  FK (request_id) -> service_requests(id)
++  FK (sender_id) -> users(id)
++TABLE service_requests
++  COL accepted_at DATETIME NULL
++  COL agreed_price_sar NUMERIC(18, 2) NULL
++  COL budget_sar NUMERIC(18, 2) NULL
++  COL cancelled_at DATETIME NULL
++  COL category_required VARCHAR(50) NULL
++  COL client_id VARCHAR(36) NOT NULL
++  COL client_rating INTEGER NULL
++  COL client_review TEXT NULL
++  COL completed_at DATETIME NULL
++  COL created_at DATETIME NOT NULL
++  COL deadline DATETIME NULL
++  COL deadline_extended BOOLEAN NULL
++  COL delivered_at DATETIME NULL
++  COL description TEXT NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL payment_currency VARCHAR(3) NOT NULL
++  COL payment_status VARCHAR(20) NULL
++  COL platform_commission NUMERIC(18, 2) NULL
++  COL provider_id VARCHAR(36) NULL
++  COL provider_payout NUMERIC(18, 2) NULL
++  COL provider_rating INTEGER NULL
++  COL provider_review TEXT NULL
++  COL requested_by VARCHAR(36) NOT NULL
++  COL scope_code VARCHAR(80) NULL
++  COL status VARCHAR(30) NOT NULL
++  COL title VARCHAR(300) NOT NULL
++  COL updated_at DATETIME NOT NULL
++  COL urgency VARCHAR(20) NULL
++  IDX ix_request_provider(provider_id,status)
++  IDX ix_request_status_client(status,client_id)
++  IDX ix_service_requests_client_id(client_id)
++  IDX ix_service_requests_provider_id(provider_id)
++  IDX ix_service_requests_requested_by(requested_by)
++  FK (client_id) -> clients(id)
++  FK (provider_id) -> service_providers(id)
++  FK (requested_by) -> users(id)
++TABLE service_workflow_stages
++  COL completion_rules JSON NULL
++  COL created_at DATETIME NOT NULL
++  COL description_ar TEXT NULL
++  COL help_text_ar TEXT NULL
++  COL help_text_en TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL input_requirements JSON NULL
++  COL is_mandatory BOOLEAN NULL
++  COL output_deliverables JSON NULL
++  COL service_id VARCHAR(36) NOT NULL
++  COL stage_code VARCHAR(50) NOT NULL
++  COL stage_order INTEGER NOT NULL
++  COL title_ar VARCHAR(300) NOT NULL
++  COL title_en VARCHAR(300) NULL
++  IDX ix_service_workflow_stages_service_id(service_id)
++  IDX ix_stage_service_order(service_id,stage_order)
++  FK (service_id) -> service_catalog(id)
++TABLE stage_notes
++  COL body_ar TEXT NOT NULL
++  COL body_en TEXT NULL
++  COL common_errors_ar TEXT NULL
++  COL common_errors_en TEXT NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL impact_ar TEXT NULL
++  COL impact_en TEXT NULL
++  COL is_active BOOLEAN NULL
++  COL required_documents JSON NULL
++  COL role_scope VARCHAR(30) NULL
++  COL service_key VARCHAR(50) NOT NULL
++  COL sort_order INTEGER NULL
++  COL stage_key VARCHAR(50) NOT NULL
++  COL title_ar VARCHAR(300) NOT NULL
++  COL title_en VARCHAR(300) NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_stage_note_lookup(service_key,stage_key,role_scope)
++  IDX ix_stage_notes_service_key(service_key)
++  IDX ix_stage_notes_stage_key(stage_key)
++TABLE subscription_entitlements
++  COL expires_at DATETIME NULL
++  COL feature_code VARCHAR(80) NOT NULL
++  COL granted_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL source_plan_id VARCHAR(36) NULL
++  COL user_id VARCHAR(36) NOT NULL
++  COL value VARCHAR(50) NOT NULL
++  COL value_type VARCHAR(20) NULL
++  IDX ix_entitlement_user_feature(user_id,feature_code)
++  IDX ix_subscription_entitlements_user_id(user_id)
++  FK (source_plan_id) -> plans(id)
++  FK (user_id) -> users(id)
++TABLE support_programs
++  COL benefits_json JSON NULL
++  COL created_at DATETIME NOT NULL
++  COL effective_from DATETIME NULL
++  COL effective_to DATETIME NULL
++  COL eligibility_rules_json JSON NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL jurisdiction VARCHAR(50) NULL
++  COL name_ar VARCHAR(300) NOT NULL
++  COL name_en VARCHAR(300) NULL
++  COL provider_name_ar VARCHAR(300) NOT NULL
++  COL provider_type VARCHAR(50) NULL
++  COL reference_authority_id VARCHAR(36) NULL
++  COL required_documents_json JSON NULL
++  COL source_url TEXT NULL
++  COL support_type VARCHAR(50) NULL
++  COL target_entity_types_json JSON NULL
++  COL target_sectors_json JSON NULL
+   COL updated_at DATETIME NULL
+-  COL when_to_use TEXT NULL
+-  IDX ix_knowledge_playbooks_domain(domain)
+-TABLE knowledge_review_queue
+-  COL action VARCHAR(20) NULL
+-  COL assigned_to VARCHAR(50) NULL
+-  COL created_at DATETIME NULL
+-  COL entity_id VARCHAR(12) NOT NULL
+-  COL entity_type VARCHAR(20) NOT NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL notes TEXT NULL
+-  COL requested_by VARCHAR(50) NULL
+-  COL resolved_at DATETIME NULL
+-  COL status VARCHAR(20) NULL
+-  IDX ix_knowledge_review_queue_entity_id(entity_id)
+-  IDX ix_knowledge_review_queue_status(status)
+-TABLE knowledge_rule_versions
+-  COL change_reason TEXT NULL
+-  COL changed_by VARCHAR(50) NULL
+-  COL created_at DATETIME NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL rule_id VARCHAR(12) NULL
+-  COL snapshot_json JSON NULL
+-  COL version_no INTEGER NOT NULL
+-  IDX ix_knowledge_rule_versions_rule_id(rule_id)
+-  FK (rule_id) -> knowledge_rules(id)
+-TABLE knowledge_rules
+-  COL action_json JSON NULL
+-  COL active BOOLEAN NULL
+-  COL authority_code VARCHAR(20) NULL
+-  COL condition_json JSON NULL
+-  COL confidence_weight FLOAT NULL
+-  COL created_at DATETIME NULL
+-  COL domain VARCHAR(30) NULL
+-  COL exception_json JSON NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL obligation_level VARCHAR(20) NULL
+-  COL priority INTEGER NULL
+-  COL reference VARCHAR(200) NULL
+-  COL review_status VARCHAR(20) NULL
+-  COL rule_code VARCHAR(50) NOT NULL
+-  COL rule_name_ar VARCHAR(200) NOT NULL
+-  COL rule_name_en VARCHAR(200) NULL
+-  COL rule_type VARCHAR(30) NULL
+-  COL scope VARCHAR(50) NULL
+-  COL source_entry_id VARCHAR(12) NULL
+-  COL subdomain VARCHAR(50) NULL
+-  COL updated_at DATETIME NULL
+-  COL version INTEGER NULL
+-  IDX ix_knowledge_rules_active(active)
+-  IDX ix_knowledge_rules_domain(domain)
+-  IDX ix_knowledge_rules_rule_code(rule_code) UNIQUE
+-  IDX ix_knowledge_rules_source_entry_id(source_entry_id)
+-  FK (source_entry_id) -> knowledge_entries(id)
+-TABLE knowledge_sector_mappings
+-  COL entity_id VARCHAR(12) NULL
+-  COL entity_type VARCHAR(20) NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL notes TEXT NULL
+-  COL sector_code VARCHAR(30) NULL
+-  IDX ix_knowledge_sector_mappings_entity_id(entity_id)
+-  IDX ix_knowledge_sector_mappings_sector_code(sector_code)
+-  FK (sector_code) -> knowledge_sectors(code)
+-TABLE knowledge_sectors
+-  COL active BOOLEAN NULL
+-  COL code VARCHAR(30) NOT NULL
+-  COL description TEXT NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL name_ar VARCHAR(100) NOT NULL
+-  COL name_en VARCHAR(100) NULL
+-  COL parent_sector_id VARCHAR(12) NULL
+-  IDX ix_knowledge_sectors_code(code) UNIQUE
+-  IDX ix_knowledge_sectors_parent_sector_id(parent_sector_id)
+-  FK (parent_sector_id) -> knowledge_sectors(id)
+-TABLE knowledge_sources
+-  COL authority_code VARCHAR(20) NULL
+-  COL checksum VARCHAR(64) NULL
+-  COL country VARCHAR(10) NULL
+-  COL created_at DATETIME NULL
+-  COL domain VARCHAR(30) NULL
+-  COL effective_date DATE NULL
+-  COL expiry_date DATE NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL issue_date DATE NULL
+-  COL language VARCHAR(5) NULL
+-  COL legal_force VARCHAR(30) NULL
+-  COL official_reference VARCHAR(200) NULL
+-  COL raw_text TEXT NULL
+-  COL source_type VARCHAR(30) NULL
+-  COL source_url VARCHAR(500) NULL
+-  COL status VARCHAR(20) NULL
+-  COL subdomain VARCHAR(50) NULL
+-  COL superseded_by VARCHAR(12) NULL
+-  COL title VARCHAR(300) NOT NULL
+-  COL updated_at DATETIME NULL
+-  COL version_label VARCHAR(20) NULL
+-  IDX idx_source_domain_status(domain,status)
+-  IDX ix_knowledge_sources_authority_code(authority_code)
+-  IDX ix_knowledge_sources_domain(domain)
+-  IDX ix_knowledge_sources_source_type(source_type)
+-  IDX ix_knowledge_sources_status(status)
+-  FK (authority_code) -> knowledge_authorities(code)
+-TABLE knowledge_updates
+-  COL applied_at DATETIME NULL
+-  COL authority_code VARCHAR(20) NULL
+-  COL change_summary TEXT NULL
+-  COL created_at DATETIME NULL
+-  COL effective_date DATE NULL
+-  COL id VARCHAR(12) NOT NULL PK
+-  COL impacted_domains JSON NULL
+-  COL impacted_entries JSON NULL
+-  COL impacted_playbooks JSON NULL
+-  COL impacted_rules JSON NULL
+-  COL review_deadline DATE NULL
+-  COL source_url VARCHAR(500) NULL
+-  COL status VARCHAR(20) NULL
+-  COL title VARCHAR(300) NOT NULL
+-  COL update_type VARCHAR(30) NULL
+-  IDX ix_knowledge_updates_status(status)
+-  IDX ix_knowledge_updates_update_type(update_type)
++  COL validity_status VARCHAR(30) NULL
++  IDX ix_support_active(is_active)
++  IDX ix_support_programs_reference_authority_id(reference_authority_id)
++  IDX ix_support_type(support_type)
++  FK (reference_authority_id) -> reference_authorities(id)
++TABLE suspension_appeals
++  COL appeal_text TEXT NOT NULL
++  COL appealed_by VARCHAR(36) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL reviewed_at DATETIME NULL
++  COL reviewed_by VARCHAR(36) NULL
++  COL reviewer_notes TEXT NULL
++  COL status VARCHAR(20) NOT NULL
++  COL suspension_id VARCHAR(36) NOT NULL
++  IDX ix_suspension_appeals_appealed_by(appealed_by)
++  IDX ix_suspension_appeals_suspension_id(suspension_id)
++  FK (suspension_id) -> suspension_events(id)
++  FK (appealed_by) -> users(id)
++TABLE suspension_events
++  COL expires_at DATETIME NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL lifted_at DATETIME NULL
++  COL lifted_by VARCHAR(36) NULL
++  COL reason VARCHAR(50) NOT NULL
++  COL reason_details TEXT NULL
++  COL started_at DATETIME NOT NULL
++  COL suspended_by VARCHAR(36) NULL
++  COL suspension_type VARCHAR(50) NOT NULL
++  COL target_id VARCHAR(36) NOT NULL
++  COL target_type VARCHAR(30) NOT NULL
++  IDX ix_suspension_events_suspended_by(suspended_by)
++  IDX ix_suspension_events_target_id(target_id)
++  IDX ix_suspension_target(target_type,target_id,is_active)
++  FK (suspended_by) -> users(id)
+ TABLE sync_operations
+   COL applied_at DATETIME NULL
++  COL client_device_id VARCHAR(64) NULL
+   COL client_timestamp DATETIME NOT NULL
+-  COL entity_id VARCHAR(36) NULL
++  COL client_version VARCHAR(32) NULL
++  COL entity_id VARCHAR(64) NULL
+   COL entity_type VARCHAR(40) NOT NULL
++  COL error TEXT NULL
+   COL id VARCHAR(36) NOT NULL PK
+   COL op_id VARCHAR(64) NOT NULL
+-  COL payload JSON NULL
+-  COL received_at DATETIME NOT NULL DEFAULT=CURRENT_TIMESTAMP
++  COL payload JSON NOT NULL
++  COL received_at DATETIME NOT NULL
+   COL result JSON NULL
+-  COL status VARCHAR(16) NOT NULL DEFAULT='pending'
++  COL status VARCHAR(16) NOT NULL
+   COL tenant_id VARCHAR(36) NULL
+   COL user_id VARCHAR(36) NULL
+-  COL verb VARCHAR(20) NOT NULL
++  COL verb VARCHAR(16) NOT NULL
+   IDX ix_sync_operations_entity_id(entity_id)
+   IDX ix_sync_operations_entity_type(entity_type)
+-  IDX ix_sync_operations_op_id(op_id) UNIQUE
+-  IDX ix_sync_operations_received_at(received_at)
++  IDX ix_sync_operations_op_id(op_id)
+   IDX ix_sync_operations_status(status)
+   IDX ix_sync_operations_tenant_id(tenant_id)
++  IDX ix_sync_operations_user_id(user_id)
++TABLE task_compliance_events
++  COL auto_generated BOOLEAN NULL
++  COL created_at DATETIME NOT NULL
++  COL days_overdue INTEGER NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL provider_id VARCHAR(36) NOT NULL
++  COL reason TEXT NULL
++  COL request_id VARCHAR(36) NOT NULL
++  COL status VARCHAR(20) NOT NULL
++  IDX ix_compliance_provider(provider_id,status)
++  IDX ix_task_compliance_events_provider_id(provider_id)
++  IDX ix_task_compliance_events_request_id(request_id)
++  FK (provider_id) -> service_providers(id)
++  FK (request_id) -> service_requests(id)
++TABLE task_document_requirements
++  COL created_at DATETIME NULL
++  COL description_ar TEXT NULL
++  COL document_name_ar VARCHAR(200) NOT NULL
++  COL document_name_en VARCHAR(200) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_mandatory BOOLEAN NULL
++  COL requirement_type VARCHAR(15) NOT NULL
++  COL sort_order INTEGER NULL
++  COL task_type_id VARCHAR(36) NOT NULL
++  IDX ix_task_document_requirements_task_type_id(task_type_id)
++  FK (task_type_id) -> task_types(id)
++TABLE task_submissions
++  COL created_at DATETIME NULL
++  COL file_name VARCHAR(500) NULL
++  COL file_url TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL provider_id VARCHAR(36) NOT NULL
++  COL requirement_id VARCHAR(36) NOT NULL
++  COL reviewed_at DATETIME NULL
++  COL reviewer_notes TEXT NULL
++  COL service_task_id VARCHAR(36) NOT NULL
++  COL status VARCHAR(8) NULL
++  COL updated_at DATETIME NULL
++  COL uploaded_at DATETIME NULL
++  IDX ix_task_submissions_provider_id(provider_id)
++  IDX ix_task_submissions_requirement_id(requirement_id)
++  IDX ix_task_submissions_service_task_id(service_task_id)
++  FK (requirement_id) -> task_document_requirements(id)
++TABLE task_types
++  COL code VARCHAR(50) NOT NULL
++  COL created_at DATETIME NULL
++  COL description_ar TEXT NULL
++  COL description_en TEXT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_active BOOLEAN NULL
++  COL name_ar VARCHAR(200) NOT NULL
++  COL name_en VARCHAR(200) NOT NULL
++  COL updated_at DATETIME NULL
++  IDX ix_task_types_code(code) UNIQUE
++TABLE tb_binding_results
++  COL binding_confidence FLOAT NULL
++  COL coa_account_id VARCHAR(36) NULL
++  COL coa_cashflow_role VARCHAR(50) NULL
++  COL coa_normalized_class VARCHAR(100) NULL
++  COL coa_statement_section VARCHAR(100) NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL match_type VARCHAR(50) NULL
++  COL matched BOOLEAN NULL
++  COL mismatch_reason VARCHAR(200) NULL
++  COL requires_review BOOLEAN NULL
++  COL review_status VARCHAR(30) NULL
++  COL reviewed_at DATETIME NULL
++  COL reviewed_by VARCHAR(36) NULL
++  COL tb_account_code VARCHAR(100) NULL
++  COL tb_account_name_raw VARCHAR(500) NOT NULL
++  COL tb_amount_credit NUMERIC(18, 2) NOT NULL
++  COL tb_amount_debit NUMERIC(18, 2) NOT NULL
++  COL tb_net_balance NUMERIC(18, 2) NOT NULL
++  COL tb_row_id VARCHAR(36) NOT NULL
++  COL tb_upload_id VARCHAR(36) NOT NULL
++  IDX ix_binding_matched(tb_upload_id,matched)
++  IDX ix_binding_review(tb_upload_id,requires_review)
++  IDX ix_binding_upload(tb_upload_id)
++  IDX ix_tb_binding_results_tb_upload_id(tb_upload_id)
++  FK (coa_account_id) -> client_chart_of_accounts(id)
++  FK (tb_row_id) -> tb_parsed_rows(id)
++  FK (tb_upload_id) -> trial_balance_uploads(id)
++TABLE tb_parsed_rows
++  COL account_code VARCHAR(100) NULL
++  COL account_name_normalized VARCHAR(500) NULL
++  COL account_name_raw VARCHAR(500) NOT NULL
++  COL close_credit NUMERIC(18, 2) NOT NULL
++  COL close_debit NUMERIC(18, 2) NOT NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_summary_row BOOLEAN NULL
++  COL issues_json JSON NULL
++  COL movement_credit NUMERIC(18, 2) NOT NULL
++  COL movement_debit NUMERIC(18, 2) NOT NULL
++  COL net_balance NUMERIC(18, 2) NOT NULL
++  COL open_credit NUMERIC(18, 2) NOT NULL
++  COL open_debit NUMERIC(18, 2) NOT NULL
++  COL source_row_number INTEGER NOT NULL
++  COL sub_tab VARCHAR(200) NULL
++  COL tab_raw VARCHAR(200) NULL
++  COL tb_upload_id VARCHAR(36) NOT NULL
++  IDX ix_tb_parsed_rows_tb_upload_id(tb_upload_id)
++  IDX ix_tb_row_code(account_code)
++  IDX ix_tb_row_upload(tb_upload_id)
++  FK (tb_upload_id) -> trial_balance_uploads(id)
+ TABLE tenant_branding
+-  COL brand_text VARCHAR(120) NOT NULL DEFAULT='APEX'
+-  COL dark_mode BOOLEAN NOT NULL DEFAULT=1
++  COL brand_text VARCHAR(120) NOT NULL
++  COL dark_mode BOOLEAN NOT NULL
+   COL id VARCHAR(36) NOT NULL PK
+   COL logo_url VARCHAR(500) NULL
+-  COL primary_hex VARCHAR(9) NOT NULL DEFAULT='#D4AF37'
+-  COL radius_scale FLOAT NOT NULL DEFAULT='1.0'
+-  COL secondary_hex VARCHAR(9) NOT NULL DEFAULT='#2E75B6'
++  COL primary_hex VARCHAR(9) NOT NULL
++  COL radius_scale FLOAT NOT NULL
++  COL secondary_hex VARCHAR(9) NOT NULL
+   COL tenant_id VARCHAR(36) NULL
+-  COL type_scale FLOAT NOT NULL DEFAULT='1.0'
+-  COL updated_at DATETIME NOT NULL DEFAULT=CURRENT_TIMESTAMP
++  COL type_scale FLOAT NOT NULL
++  COL updated_at DATETIME NOT NULL
+   IDX ix_tenant_branding_tenant_id(tenant_id)
++TABLE trial_balance_uploads
++  COL binding_approved BOOLEAN NULL
++  COL binding_confidence_avg FLOAT NULL
++  COL client_id VARCHAR(36) NOT NULL
++  COL coa_upload_id VARCHAR(36) NULL
++  COL company_name_detected VARCHAR(300) NULL
++  COL created_at DATETIME NOT NULL
++  COL file_extension VARCHAR(10) NOT NULL
++  COL file_format VARCHAR(20) NULL
++  COL file_name VARCHAR(255) NOT NULL
++  COL file_size_bytes BIGINT NOT NULL
++  COL fiscal_year VARCHAR(10) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL period_label VARCHAR(100) NULL
++  COL stored_file_path TEXT NOT NULL
++  COL total_matched INTEGER NULL
++  COL total_new_accounts INTEGER NULL
++  COL total_rows_detected INTEGER NULL
++  COL total_rows_parsed INTEGER NULL
++  COL total_rows_skipped INTEGER NULL
++  COL total_unmatched INTEGER NULL
++  COL updated_at DATETIME NOT NULL
++  COL upload_status VARCHAR(50) NOT NULL
++  COL uploaded_by VARCHAR(36) NULL
++  IDX ix_tb_upload_client(client_id)
++  IDX ix_tb_upload_coa(coa_upload_id)
++  IDX ix_tb_upload_status(upload_status)
++  IDX ix_trial_balance_uploads_client_id(client_id)
++  IDX ix_trial_balance_uploads_coa_upload_id(coa_upload_id)
++  IDX ix_trial_balance_uploads_uploaded_by(uploaded_by)
++  FK (coa_upload_id) -> client_coa_uploads(id)
++  FK (client_id) -> clients(id)
++  FK (uploaded_by) -> users(id)
++TABLE user_profiles
++  COL avatar_url VARCHAR(500) NULL
++  COL bio TEXT NULL
++  COL city VARCHAR(100) NULL
++  COL country VARCHAR(50) NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL job_title VARCHAR(100) NULL
++  COL notification_email BOOLEAN NULL
++  COL notification_in_app BOOLEAN NULL
++  COL notification_sms BOOLEAN NULL
++  COL organization_name VARCHAR(200) NULL
++  COL updated_at DATETIME NOT NULL
++  COL user_id VARCHAR(36) NOT NULL
++  FK (user_id) -> users(id)
++TABLE user_roles
++  COL assigned_at DATETIME NOT NULL
++  COL assigned_by VARCHAR(36) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL role_id VARCHAR(36) NOT NULL
++  COL user_id VARCHAR(36) NOT NULL
++  IDX ix_user_roles_role_id(role_id)
++  IDX ix_user_roles_user_id(user_id)
++  FK (role_id) -> roles(id)
++  FK (user_id) -> users(id)
++TABLE user_security_events
++  COL created_at DATETIME NOT NULL
++  COL details JSON NULL
++  COL event_type VARCHAR(50) NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL ip_address VARCHAR(45) NULL
++  COL user_agent VARCHAR(500) NULL
++  COL user_id VARCHAR(36) NOT NULL
++  IDX ix_security_events_user_type(user_id,event_type)
++  IDX ix_user_security_events_user_id(user_id)
++  FK (user_id) -> users(id)
++TABLE user_sessions
++  COL created_at DATETIME NOT NULL
++  COL device_info VARCHAR(500) NULL
++  COL expires_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL ip_address VARCHAR(45) NULL
++  COL is_active BOOLEAN NULL
++  COL last_used_at DATETIME NULL
++  COL refresh_token_hash VARCHAR(255) NULL
++  COL token_hash VARCHAR(255) NOT NULL
++  COL user_id VARCHAR(36) NOT NULL
++  IDX ix_user_sessions_user_id(user_id)
++  FK (user_id) -> users(id)
++TABLE user_subscriptions
++  COL billing_cycle VARCHAR(10) NULL
++  COL cancelled_at DATETIME NULL
++  COL created_at DATETIME NOT NULL
++  COL expires_at DATETIME NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL plan_id VARCHAR(36) NOT NULL
++  COL previous_plan_id VARCHAR(36) NULL
++  COL renewed_at DATETIME NULL
++  COL started_at DATETIME NOT NULL
++  COL status VARCHAR(20) NOT NULL
++  COL updated_at DATETIME NOT NULL
++  COL user_id VARCHAR(36) NOT NULL
++  IDX ix_user_subscriptions_plan_id(plan_id)
++  FK (plan_id) -> plans(id)
++  FK (user_id) -> users(id)
++TABLE users
++  COL apple_sub VARCHAR(100) NULL
++  COL auth_provider VARCHAR(20) NULL
++  COL created_at DATETIME NOT NULL
++  COL deleted_at DATETIME NULL
++  COL display_name VARCHAR(100) NOT NULL
++  COL email VARCHAR(255) NOT NULL
++  COL email_verified BOOLEAN NULL
++  COL failed_login_count INTEGER NULL
++  COL google_sub VARCHAR(100) NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL is_deleted BOOLEAN NULL
++  COL language VARCHAR(5) NULL
++  COL last_login_at DATETIME NULL
++  COL locked_until DATETIME NULL
++  COL login_count INTEGER NULL
++  COL mobile VARCHAR(20) NULL
++  COL mobile_country_code VARCHAR(10) NULL
++  COL mobile_number VARCHAR(20) NULL
++  COL mobile_verified BOOLEAN NULL
++  COL password_hash VARCHAR(255) NOT NULL
++  COL status VARCHAR(30) NOT NULL
++  COL timezone VARCHAR(50) NULL
++  COL totp_enabled_at DATETIME NULL
++  COL totp_recovery_codes_hashed TEXT NULL
++  COL totp_secret_encrypted TEXT NULL
++  COL updated_at DATETIME NOT NULL
++  COL username VARCHAR(50) NOT NULL
++  IDX ix_users_email(email) UNIQUE
++  IDX ix_users_username(username) UNIQUE
++TABLE zatca_csid
++  COL cert_pem_encrypted TEXT NOT NULL
++  COL cert_serial VARCHAR(120) NULL
++  COL cert_subject VARCHAR(300) NULL
++  COL compliance_csid VARCHAR(120) NULL
++  COL created_at DATETIME NOT NULL
++  COL environment VARCHAR(20) NOT NULL
++  COL expires_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL issued_at DATETIME NULL
++  COL private_key_pem_encrypted TEXT NOT NULL
++  COL production_csid VARCHAR(120) NULL
++  COL revocation_reason TEXT NULL
++  COL revoked_at DATETIME NULL
++  COL revoked_by VARCHAR(36) NULL
++  COL status VARCHAR(20) NOT NULL
++  COL tenant_id VARCHAR(36) NOT NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_zatca_csid_expires_at(expires_at)
++  IDX ix_zatca_csid_status(status)
++  IDX ix_zatca_csid_tenant_env(tenant_id,environment)
++  IDX ix_zatca_csid_tenant_id(tenant_id)
++TABLE zatca_submission_queue
++  COL attempts INTEGER NOT NULL
++  COL cleared_at DATETIME NULL
++  COL cleared_uuid VARCHAR(64) NULL
++  COL created_at DATETIME NOT NULL
++  COL id VARCHAR(36) NOT NULL PK
++  COL invoice_id VARCHAR(36) NOT NULL
++  COL last_attempt_at DATETIME NULL
++  COL last_error_code VARCHAR(80) NULL
++  COL last_error_message TEXT NULL
++  COL max_attempts INTEGER NOT NULL
++  COL next_retry_at DATETIME NULL
++  COL payload JSON NOT NULL
++  COL status VARCHAR(20) NOT NULL
++  COL tenant_id VARCHAR(36) NULL
++  COL updated_at DATETIME NOT NULL
++  IDX ix_zatca_queue_invoice(invoice_id)
++  IDX ix_zatca_queue_status_next_retry(status,next_retry_at)
++  IDX ix_zatca_queue_tenant(tenant_id)
++  IDX ix_zatca_submission_queue_invoice_id(invoice_id)
++  IDX ix_zatca_submission_queue_next_retry_at(next_retry_at)
++  IDX ix_zatca_submission_queue_tenant_id(tenant_id)
+ TABLE zatca_submissions
+-  COL attempts INTEGER NOT NULL DEFAULT='0'
++  COL attempts INTEGER NOT NULL
+   COL cleared_invoice_b64 TEXT NULL
+   COL completed_at DATETIME NULL
+-  COL created_at DATETIME NOT NULL DEFAULT=CURRENT_TIMESTAMP
++  COL created_at DATETIME NOT NULL
+   COL errors JSON NULL
+@@ -467,3 +1984,3 @@
+   COL signed_xml TEXT NOT NULL
+-  COL status VARCHAR(16) NOT NULL DEFAULT='pending'
++  COL status VARCHAR(16) NOT NULL
+   COL tenant_id VARCHAR(36) NULL
