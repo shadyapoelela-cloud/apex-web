@@ -1,13 +1,10 @@
-﻿import 'dart:ui';
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'api_service.dart';
-import 'screens/dashboard/enhanced_dashboard.dart';
 import 'core/theme.dart';
 import 'core/ui_components.dart';
 import 'core/session.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
-import 'core/apex_ask_panel.dart' show openApexAskPanel;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'providers/app_providers.dart';
@@ -16,9 +13,8 @@ import 'providers/app_providers.dart';
 // that rely on `ApexApp` still resolve without source-level churn.
 export 'app/apex_app.dart' show ApexApp;
 import 'app/apex_app.dart' show ApexApp;
-import 'widgets/form_helpers.dart';
 import 'widgets/apex_widgets.dart';
-import 'widgets/main_nav.dart';
+import 'widgets/main_nav.dart' show quickServiceBtn;
 
 void main() {
   // Restore session from localStorage
@@ -163,47 +159,6 @@ class _DashS extends ConsumerState<DashTab> {
 }
 
 
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-// UPGRADE PLAN SCREEN (NEW)
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-class UpgradePlanScreen extends StatelessWidget {
-  final List plans; final String? currentPlan;
-  UpgradePlanScreen({super.key, required this.plans, this.currentPlan});
-  @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: Text('\u062a\u0631\u0642\u064a\u0629 \u0627\u0644\u062e\u0637\u0629', style: TextStyle(color: AC.gold))),
-    body: ListView(padding: EdgeInsets.all(16), children: [
-      Text('\u0627\u062e\u062a\u0631 \u0627\u0644\u062e\u0637\u0629 \u0627\u0644\u0645\u0646\u0627\u0633\u0628\u0629', style: TextStyle(color: AC.tp, fontSize: 18, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 16),
-      ...plans.map((p) {
-        final isCurrent = p['code'] == currentPlan;
-        final features = (p['features'] as Map<String,dynamic>?)?.entries.toList() ?? [];
-        return Container(margin: EdgeInsets.only(bottom: 14), padding: EdgeInsets.all(18),
-          decoration: BoxDecoration(color: AC.navy3, borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: isCurrent ? AC.gold : AC.bdr, width: isCurrent ? 2 : 1)),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [Text(p['name_ar']??'', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isCurrent ? AC.gold : AC.tp)),
-              Spacer(),
-              if(isCurrent) compactBadge('\u0627\u0644\u062d\u0627\u0644\u064a\u0629', AC.gold)
-              else compactBadge(p['price_monthly_sar']==0?'\u0645\u062c\u0627\u0646\u064a':'${p['price_monthly_sar']} \u0631.\u0633', AC.cyan)]),
-            SizedBox(height: 6),
-            Text(p['target_user_ar']??'', style: TextStyle(color: AC.ts, fontSize: 12)),
-            const SizedBox(height: 12),
-            ...features.take(8).map((f) => Padding(padding: EdgeInsets.only(bottom: 3),
-              child: Row(children: [
-                Icon(f.value['value']=='true'||f.value['value']=='unlimited'?Icons.check_circle:Icons.cancel,
-                  color: f.value['value']=='true'||f.value['value']=='unlimited'?AC.ok:AC.err.withValues(alpha: 0.5), size: 14),
-                SizedBox(width: 8),
-                Expanded(child: Text(f.value['name_ar']??f.key, style: TextStyle(color: AC.ts, fontSize: 11)))]))),
-            if(!isCurrent) ...[const SizedBox(height: 12),
-              SizedBox(width: double.infinity, child: ElevatedButton(
-                onPressed: () { ScaffoldMessenger.of(c).showSnackBar(SnackBar(
-                  content: Text('\u0633\u064a\u062a\u0645 \u062a\u0641\u0639\u064a\u0644 \u0628\u0648\u0627\u0628\u0629 \u0627\u0644\u062f\u0641\u0639 \u0642\u0631\u064a\u0628\u0627\u064b'),
-                  backgroundColor: AC.navy3)); },
-                child: const Text('\u062a\u0631\u0642\u064a\u0629')))],
-          ]));
-      }),
-    ]));
-}
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // CLIENTS TAB
@@ -663,68 +618,6 @@ class _AnalysisS extends ConsumerState<AnalysisTab> {
   }
 }
 
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-// KNOWLEDGE FEEDBACK (NEW)
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-class KnowledgeFeedbackScreen extends StatefulWidget {
-  final String? resultId;
-  const KnowledgeFeedbackScreen({super.key, this.resultId});
-  @override State<KnowledgeFeedbackScreen> createState() => _KFS();
-}
-class _KFS extends State<KnowledgeFeedbackScreen> {
-  final _title = TextEditingController(), _desc = TextEditingController();
-  String _type = 'classification_correction'; bool _l = false; String? _e; bool _done = false;
-  final _types = [
-    {'code':'classification_correction','ar':'\u062a\u0635\u062d\u064a\u062d \u062a\u0628\u0648\u064a\u0628'},
-    {'code':'new_rule_suggestion','ar':'\u0627\u0642\u062a\u0631\u0627\u062d \u0642\u0627\u0639\u062f\u0629 \u062c\u062f\u064a\u062f\u0629'},
-    {'code':'data_quality_issue','ar':'\u0645\u0634\u0643\u0644\u0629 \u062c\u0648\u062f\u0629 \u0628\u064a\u0627\u0646\u0627\u062a'},
-    {'code':'explanation_improvement','ar':'\u062a\u062d\u0633\u064a\u0646 \u0627\u0644\u0634\u0631\u062d'},
-  ];
-  @override
-  void dispose() {
-    _title.dispose();
-    _desc.dispose();
-    super.dispose();
-  }
-  Future<void> _submit() async {
-    if(_title.text.trim().isEmpty) { setState(()=> _e='\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0645\u0637\u0644\u0648\u0628'); return; }
-    setState((){ _l=true; _e=null; });
-    try {
-      final r = await ApiService.submitKnowledgeFeedback({'feedback_type':_type,'title':_title.text.trim(),'description':_desc.text.trim()});
-      if(r.success) setState(()=> _done=true);
-      else setState(()=> _e=r.error);
-    } catch(e){ setState(()=> _e='$e'); }
-    finally { if(mounted) setState(()=> _l=false); }
-  }
-  @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: Text('\u0645\u0644\u0627\u062d\u0638\u0629 \u0645\u0639\u0631\u0641\u064a\u0629', style: TextStyle(color: AC.gold))),
-    body: _done ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-      Icon(Icons.check_circle, color: AC.ok, size: 60), SizedBox(height: 16),
-      Text('\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629 \u0628\u0646\u062c\u0627\u062d', style: TextStyle(color: AC.tp, fontSize: 18)),
-      SizedBox(height: 8),
-      Text('\u0633\u062a\u062e\u0636\u0639 \u0644\u0644\u0645\u0631\u0627\u062c\u0639\u0629', style: TextStyle(color: AC.ts)),
-      SizedBox(height: 20),
-      ElevatedButton(onPressed: ()=>Navigator.pop(c), child: Text('\u0631\u062c\u0648\u0639'))])) :
-    SingleChildScrollView(padding: EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('\u0646\u0648\u0639 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629', style: TextStyle(color: AC.ts, fontSize: 14)),
-      SizedBox(height: 8),
-      ..._types.map((t) => GestureDetector(onTap: ()=>setState(()=>_type=t['code']!),
-        child: Container(margin: EdgeInsets.only(bottom: 6), padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(color: _type==t['code'] ? AC.gold.withValues(alpha: 0.1) : AC.navy3,
-            borderRadius: BorderRadius.circular(10), border: Border.all(color: _type==t['code'] ? AC.gold : AC.bdr)),
-          child: Row(children: [
-            Icon(_type==t['code'] ? Icons.radio_button_checked : Icons.radio_button_off, color: _type==t['code'] ? AC.gold : AC.ts, size: 18),
-            SizedBox(width: 10), Text(t['ar']!, style: TextStyle(color: _type==t['code'] ? AC.gold : AC.tp, fontSize: 13))])))),
-      const SizedBox(height: 16),
-      TextField(controller: _title, decoration: apexInputDecoration('\u0627\u0644\u0639\u0646\u0648\u0627\u0646 *', ic: Icons.title)),
-      SizedBox(height: 12),
-      TextField(controller: _desc, maxLines: 4, decoration: apexInputDecoration('\u0627\u0644\u0648\u0635\u0641 \u0627\u0644\u062a\u0641\u0635\u064a\u0644\u064a')),
-      if(_e!=null) Padding(padding:EdgeInsets.only(top:10), child:Text(_e!, style:TextStyle(color:AC.err))),
-      SizedBox(height: 20),
-      SizedBox(width: double.infinity, child: ElevatedButton.icon(onPressed: _l?null:_submit,
-        icon: _l ? SizedBox(height:18,width:18,child:CircularProgressIndicator(strokeWidth:2,color:AC.navy)) : Icon(Icons.send),
-        label: Text(_l ? '\u062c\u0627\u0631\u064a \u0627\u0644\u0625\u0631\u0633\u0627\u0644...' : '\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0645\u0644\u0627\u062d\u0638\u0629')))])));
-}
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // MARKETPLACE TAB
@@ -777,72 +670,6 @@ class _MarketS extends ConsumerState<MarketTab> {
       ]));
 }
 
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-// NEW SERVICE REQUEST (NEW)
-// â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
-class NewServiceRequestScreen extends StatefulWidget {
-  const NewServiceRequestScreen({super.key});
-  @override State<NewServiceRequestScreen> createState() => _NSRS();
-}
-class _NSRS extends State<NewServiceRequestScreen> {
-  final _title=TextEditingController(), _desc=TextEditingController(), _budget=TextEditingController();
-  String _urgency='medium'; List _clients=[]; String? _clientId, _e; bool _l=false, _done=false;
-  @override void initState() { super.initState();
-    ApiService.listClients().then((r){ if(r.success && mounted) { final d = r.data; setState((){ _clients = d is List ? d : []; }); } }); }
-  @override
-  void dispose() {
-    _title.dispose();
-    _desc.dispose();
-    _budget.dispose();
-    super.dispose();
-  }
-  Future<void> _go() async {
-    if(_title.text.isEmpty||_clientId==null) { setState(()=> _e='\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0648\u0627\u0644\u0639\u0645\u064a\u0644 \u0645\u0637\u0644\u0648\u0628\u0627\u0646'); return; }
-    setState((){ _l=true; _e=null; });
-    try {
-      final r = await ApiService.createServiceRequest({'client_id':_clientId,'title':_title.text.trim(),'description':_desc.text.trim(),
-        'urgency':_urgency,'budget_sar':double.tryParse(_budget.text)??0,'deadline_days':14});
-      if(r.success) setState(()=> _done=true);
-      else setState(()=> _e=r.error);
-    } catch(e){ setState(()=> _e='$e'); }
-    finally { if(mounted) setState(()=> _l=false); }
-  }
-  @override Widget build(BuildContext c) => Scaffold(
-    appBar: AppBar(title: Text('\u0637\u0644\u0628 \u062e\u062f\u0645\u0629 \u062c\u062f\u064a\u062f', style: TextStyle(color: AC.gold))),
-    body: _done ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-      Icon(Icons.check_circle, color: AC.ok, size: 60), SizedBox(height: 16),
-      Text('\u062a\u0645 \u0625\u0646\u0634\u0627\u0621 \u0637\u0644\u0628 \u0627\u0644\u062e\u062f\u0645\u0629', style: TextStyle(color: AC.tp, fontSize: 18)),
-      const SizedBox(height: 20),
-      ElevatedButton(onPressed: ()=>Navigator.pop(c), child: Text('\u0631\u062c\u0648\u0639'))])) :
-    SingleChildScrollView(padding: EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      if(_clients.isNotEmpty) ...[
-        Text('\u0627\u062e\u062a\u0631 \u0627\u0644\u0639\u0645\u064a\u0644', style: TextStyle(color: AC.ts, fontSize: 13)),
-        SizedBox(height: 6),
-        ..._clients.map((cl) => GestureDetector(onTap: ()=>setState(()=>_clientId=cl['id']),
-          child: Container(margin: EdgeInsets.only(bottom: 6), padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(color: _clientId==cl['id']?AC.gold.withValues(alpha: 0.1):AC.navy3,
-              borderRadius: BorderRadius.circular(8), border: Border.all(color: _clientId==cl['id']?AC.gold:AC.bdr)),
-            child: Text(cl['name_ar']??'', style: TextStyle(color: _clientId==cl['id']?AC.gold:AC.tp, fontSize: 13))))),
-        const SizedBox(height: 12)],
-      TextField(controller: _title, decoration: apexInputDecoration('\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0637\u0644\u0628 *')),
-      const SizedBox(height: 12),
-      TextField(controller: _desc, maxLines: 3, decoration: apexInputDecoration('\u0648\u0635\u0641 \u0627\u0644\u0637\u0644\u0628')),
-      SizedBox(height: 12),
-      TextField(controller: _budget, keyboardType: TextInputType.number, decoration: apexInputDecoration('\u0627\u0644\u0645\u064a\u0632\u0627\u0646\u064a\u0629 (\u0631.\u0633)', ic: Icons.attach_money)),
-      SizedBox(height: 12),
-      Text('\u0627\u0644\u0623\u0648\u0644\u0648\u064a\u0629', style: TextStyle(color: AC.ts, fontSize: 13)),
-      SizedBox(height: 6),
-      Row(children: ['low','medium','high'].map((u) => Expanded(child: GestureDetector(onTap: ()=>setState(()=>_urgency=u),
-        child: Container(margin: EdgeInsets.symmetric(horizontal: 3), padding: EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(color: _urgency==u ? (u=='high'?AC.err:u=='medium'?AC.warn:AC.ok).withValues(alpha: 0.15) : AC.navy3,
-            borderRadius: BorderRadius.circular(8), border: Border.all(color: _urgency==u ? (u=='high'?AC.err:u=='medium'?AC.warn:AC.ok) : AC.bdr)),
-          child: Center(child: Text(u=='high'?'\u0639\u0627\u0644\u064a\u0629':u=='medium'?'\u0645\u062a\u0648\u0633\u0637\u0629':'\u0645\u0646\u062e\u0641\u0636\u0629',
-            style: TextStyle(color: _urgency==u ? AC.tp : AC.ts, fontSize: 12))))))).toList()),
-      if(_e!=null) Padding(padding: EdgeInsets.only(top: 10), child: Text(_e!, style: TextStyle(color: AC.err))),
-      const SizedBox(height: 20),
-      SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _l?null:_go,
-        child: _l ? const CircularProgressIndicator(strokeWidth: 2) : const Text('\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0637\u0644\u0628')))])));
-}
 
 // â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 // PROVIDER TAB
