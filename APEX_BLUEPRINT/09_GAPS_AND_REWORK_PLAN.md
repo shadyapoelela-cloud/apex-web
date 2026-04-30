@@ -356,11 +356,39 @@
 
 ## 8. ZATCA Gaps / ثغرات ZATCA
 
-### 🔴 G-Z1. Signing key stored plaintext
-- **Files:** `ZatcaCsid` table
-- **Issue:** Private key in DB column.
-- **Fix plan:** Encrypt with `ZATCA_KEY_ENCRYPTION_KEY`. Or move to AWS KMS / HashiCorp Vault.
-- **Estimate:** 3 days
+### ✅ G-Z1. ~~Signing key stored plaintext~~ — RESOLVED (Wave 11) + docs (2026-04-30)
+- **Discovery (Sprint 7):** Encryption was already implemented in Wave 11.
+  Blueprint was wrong (5th time in this sprint).
+- **Existing implementation:**
+  - `app/core/compliance_models.py:225` — `ZatcaCsid` model with
+    `cert_pem_encrypted` and `private_key_pem_encrypted` (both `Column(Text)`,
+    Fernet-encrypted at rest).
+  - `app/core/zatca_csid.py:81-89` — `_encrypt()` / `_decrypt()` helpers using
+    `cryptography.fernet.Fernet`; `register_csid()` encrypts on write,
+    `get_active_csid()` decrypts on read, list/detail routes never expose plaintext.
+  - `ZATCA_CERT_ENCRYPTION_KEY` env var; production-required (dev derives a
+    deterministic key from `JWT_SECRET` with a logged warning).
+  - `app/core/env_validator.py:154` — refuses production startup without the key.
+  - `tests/test_zatca_csid.py` — 31 cases covering encryption round-trip,
+    `test_list_never_exposes_plaintext`, lifecycle transitions, audit chain.
+- **Sprint 7 contribution (docs-only fix):**
+  - Added the 3 missing Fernet keys to `.env.example` with generation instructions:
+    `ZATCA_CERT_ENCRYPTION_KEY`, `TOTP_ENCRYPTION_KEY`, `BANK_FEEDS_ENCRYPTION_KEY`.
+  - Without these in `.env.example`, operators deploying fresh production environments
+    hit `env_validator` startup failure with no upstream guidance on what to generate.
+- **Status:** DONE
+- **Sprint:** 7 (closure + docs); original encryption work in Wave 11
+
+> 🔍 **Pattern Note (Sprint 7):** This is the **5th** gap in Sprint 7 where the
+> blueprint disagreed with reality:
+>   1. G-A1 — line count (3500 claimed vs 2146 actual)
+>   2. G-A2 — `v4_groups` deletion plan ignored real internal-import dependencies
+>   3. G-A3 — alembic claimed empty; 7 migrations exist (covering 25/108 tables)
+>   4. G-S1 — bcrypt rounds claimed 10; library default is already 12 since v4.0
+>   5. G-Z1 — ZATCA encryption claimed missing; fully implemented in Wave 11
+>
+> A blueprint accuracy audit is recommended for Sprint 8 before further P0/P1
+> work — see new gap **G-DOCS-1**.
 
 ### 🟠 G-Z2. No CSID auto-renewal
 - **Issue:** PCSID expires; no auto-renewal job.
@@ -431,6 +459,31 @@
 ---
 
 ## 11. Documentation Gaps / ثغرات التوثيق
+
+### 🟠 G-DOCS-1. Blueprint accuracy audit
+- **Files:** `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md`,
+  `APEX_BLUEPRINT/10_CLAUDE_CODE_INSTRUCTIONS.md`, `CLAUDE.md`
+- **Issue:** Sprint 7 found **5 gaps where blueprint claims contradicted code reality**:
+  1. **G-A1** — line count (3500 claimed vs 2146 actual)
+  2. **G-A2** — `v4_groups` deletion plan ignored real internal-import dependencies
+  3. **G-A3** — alembic claimed empty; 7 migrations exist covering 25/108 tables
+  4. **G-S1** — bcrypt rounds claimed 10; library default has been 12 since v4.0
+  5. **G-Z1** — ZATCA encryption claimed missing; fully implemented in Wave 11
+- **Risk:** Future tasks may follow stale plans, causing rework, missed scope, or
+  (worst case) production-breaking changes from operators acting on the blueprint
+  without first reading the code (e.g. naive G-A3 lifespan replacement would have
+  deployed production with 83 missing tables).
+- **Fix plan:**
+  1. Cross-reference every P0/P1 gap in this file against current code; mark each
+     as `accurate` / `stale` / `done-but-undocumented`.
+  2. Update inaccurate entries before they're picked up.
+  3. Add to `10_CLAUDE_CODE_INSTRUCTIONS.md`: explicit **verify-first protocol** —
+     "Code is truth; blueprint may lag. Always grep-and-read the cited files before
+     drafting a fix plan."
+  4. Cross-link Wave 11 / Wave 13 deliverables back into 09 so encryption / ZATCA
+     CSID / bank-feed work is visible in the gap tracker.
+- **Estimate:** 4-6 hours
+- **Sprint:** 8 (before any further P0/P1 task)
 
 ### 🟢 G-D1. No public API docs
 - **Issue:** FastAPI auto-generates `/docs` (Swagger) but not customer-facing.
