@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme.dart' as core_theme;
+import '../../../core/v5/templates/multi_view_template.dart';
 
 import '../../api/pilot_client.dart';
 import '../../num_utils.dart';
@@ -509,11 +510,62 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
     if (saved == true && mounted) _load();
   }
 
+  // ──────────────────────────────────────────────────────────────────
+  // Status filter <-> MultiViewTemplate chip glue.
+  // ──────────────────────────────────────────────────────────────────
+  int _countOfStatus(String status) =>
+      _entries.where((e) => e['status'] == status).length;
+
+  void _toggleStatusFilter(String id) {
+    setState(() {
+      if (_statusMulti.contains(id)) {
+        _statusMulti.remove(id);
+      } else {
+        _statusMulti.add(id);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final visible = _visibleEntries;
     final hasNoEntries = _entries.isEmpty;
     final hasNoResults = !hasNoEntries && visible.isEmpty;
+
+    final filterChips = <FilterChipDef>[
+      FilterChipDef(
+        id: 'posted',
+        labelAr: 'مرحّل',
+        icon: Icons.verified,
+        color: core_theme.AC.ok,
+        count: _countOfStatus('posted'),
+        active: _statusMulti.contains('posted'),
+      ),
+      FilterChipDef(
+        id: 'pending_review',
+        labelAr: 'قيد المراجعة',
+        icon: Icons.hourglass_top,
+        color: core_theme.AC.info,
+        count: _countOfStatus('pending_review'),
+        active: _statusMulti.contains('pending_review'),
+      ),
+      FilterChipDef(
+        id: 'draft',
+        labelAr: 'مسودة',
+        icon: Icons.edit,
+        color: core_theme.AC.td,
+        count: _countOfStatus('draft'),
+        active: _statusMulti.contains('draft'),
+      ),
+      FilterChipDef(
+        id: 'reversed',
+        labelAr: 'معكوس',
+        icon: Icons.undo,
+        color: core_theme.AC.err,
+        count: _countOfStatus('reversed'),
+        active: _statusMulti.contains('reversed'),
+      ),
+    ];
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -547,10 +599,21 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
           },
           child: Focus(
             autofocus: true,
-            child: Scaffold(
-              backgroundColor: _navy,
-              body: Column(children: [
-                _header(visible),
+            // ── Unified MultiViewTemplate chrome (matches sales-invoices) ──
+            child: MultiViewTemplate(
+              titleAr: 'القيود اليومية',
+              subtitleAr: hasNoEntries
+                  ? 'لا توجد قيود بعد'
+                  : '${visible.length} قيد ظاهر · إجمالي ${_entries.length}',
+              enabledViews: const {ViewMode.list},
+              filterChips: filterChips,
+              onFilterToggle: _toggleStatusFilter,
+              onCreateNew: _create,
+              createLabelAr: 'قيد جديد',
+              onSearchChanged: (q) {
+                setState(() => _search = q);
+              },
+              listBuilder: (ctx) => Column(children: [
                 if (_selectedIds.isNotEmpty) _bulkActionBar(),
                 if (_activeFilterCount > 0 && _selectedIds.isEmpty)
                   _activeFiltersStrip(),

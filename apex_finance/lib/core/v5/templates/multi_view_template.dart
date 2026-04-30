@@ -120,6 +120,10 @@ class MultiViewTemplate extends StatefulWidget {
   /// Primary header actions (Import, Export, Refresh, ...).
   final List<Widget>? headerActions;
 
+  /// Fired whenever the search field changes. When null the search box
+  /// stays decorative (no filtering side-effect).
+  final ValueChanged<String>? onSearchChanged;
+
   const MultiViewTemplate({
     super.key,
     required this.titleAr,
@@ -137,6 +141,7 @@ class MultiViewTemplate extends StatefulWidget {
     this.onCreateNew,
     this.createLabelAr = 'جديد',
     this.headerActions,
+    this.onSearchChanged,
   });
 
   @override
@@ -208,6 +213,7 @@ class _MultiViewTemplateState extends State<MultiViewTemplate> {
             width: 240,
             child: TextField(
               controller: _searchCtrl,
+              onChanged: widget.onSearchChanged,
               decoration: InputDecoration(
                 hintText: 'بحث...',
                 hintStyle: const TextStyle(fontSize: 12),
