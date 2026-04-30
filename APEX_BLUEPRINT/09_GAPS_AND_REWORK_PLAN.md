@@ -18,16 +18,22 @@
 
 ## 2. Architectural Gaps / ثغرات معمارية
 
-### 🔴 G-A1. Monolithic `lib/main.dart` (3500 lines)
-- **Files:** `lib/main.dart`
+### ✅ G-A1. ~~Monolithic `lib/main.dart` (3500 lines)~~ — DONE 2026-04-30
+- **Files:** `apex_finance/lib/main.dart` (actual path; original audit said `lib/main.dart`)
 - **Issue:** 60+ tightly-coupled classes including `LoginScreen`, `RegScreen`, `MainNav`, dialog forms.
 - **Impact:** Hot reload slow, code review hard, hard to test individual screens.
-- **Fix plan:**
-  1. Extract auth screens → `lib/screens/auth/login_screen.dart`, `lib/screens/auth/register_screen.dart`
-  2. Extract `MainNav` → `lib/widgets/main_nav.dart`
-  3. Extract form dialogs → `lib/widgets/forms/`
-  4. Keep only `App` widget + `MaterialApp.router` setup in `main.dart` (target < 200 lines)
-- **Estimate:** 3 days
+- **Resolution (Sprint 7, branch `sprint-7/g-a1-split-main-dart`, 5 commits):**
+  1. ✅ Extract auth screens → `apex_finance/lib/screens/auth/{login_screen,register_screen}.dart`
+  2. ✅ Extract `MainNav` + `_AppBarPill` + `ApexSearch` → `apex_finance/lib/widgets/{main_nav,apex_search}.dart`
+  3. ✅ Extract form dialogs → `apex_finance/lib/widgets/forms/{knowledge_feedback_screen,new_service_request_screen}.dart`
+  4. ✅ Extract all 7 tabs → `apex_finance/lib/screens/tabs/{dash,clients,analysis,market,provider,account,admin}_tab.dart`
+  5. ✅ Extract helpers → `widgets/{form_helpers,apex_widgets}.dart`
+  6. ✅ Move `UpgradePlanScreen` → `apex_finance/lib/screens/upgrade_plan_screen.dart`
+- **Result:** `main.dart` 2146 → **21 lines** (target was < 200). 0 errors in `flutter analyze`.
+- **Notable decision:** Renamed extracted helpers to `compactCard`/`compactKv`/`compactBadge`
+  to avoid collision with `theme.dart`'s `apexCard`/`apexBadge` which use different padding /
+  color treatments. Future cleanup task: unify into a single design system.
+- **Actual Effort:** 1 session
 
 ### 🔴 G-A2. Two router systems coexisting (V4 + V5)
 - **Files:** `lib/core/v4/v4_routes.dart`, `lib/core/v5/v5_routes.dart`, `lib/core/router.dart`
