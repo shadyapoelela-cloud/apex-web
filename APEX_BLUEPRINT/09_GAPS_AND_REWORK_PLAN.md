@@ -72,27 +72,35 @@
 - **Estimate:** 4-6 hours
 - **Sprint:** 8
 
-### ⚠️ G-A3. ~~Alembic configured but no migration files~~ — PARTIAL: drift detected (2026-04-30)
+### ⚠️ G-A3. ~~Alembic configured but no migration files~~ — PARTIAL: drift detected (2026-04-30, table count corrected 2026-04-30 by G-DOCS-1)
 - **Files:** `alembic/`, `app/main.py`, `app/phase1/models/platform_models.py`
 - **Discovery (Sprint 7):** Blueprint was wrong on two counts:
   1. **7 migrations exist** (chain: `2b92f970a8f9` → `1a8f7d2b4e5c` → `c7f1a9b02e10` →
      `d3a1e9b4f201` → `e4c7d9f8a123` → `f8a3c61b9d72` → `g1e2b4c9f3d8`).
-  2. **They cover only 25 of 108 tables** (15 `knowledge_*` from a separate Base
-     + 10 phase1 tables: `activity_log`, `ap_invoices`, `ap_line_items`, `hr_*`,
-     `sync_operations`, `tenant_branding`, `zatca_submissions`).
+  2. **They cover only 25 of 198 distinct tables** (14 `knowledge_*` from
+     `2b92f970a8f9_initial_schema_74_models.py` despite the misleading filename
+     + 6 HR/AP tables in `1a8f7d2b4e5c` + 4 infra tables in `c7f1a9b02e10`
+     + 1 `ai_usage_log` in `f8a3c61b9d72`).
+     The 3 remaining migrations (`d3a1e9b4f201`, `e4c7d9f8a123`,
+     `g1e2b4c9f3d8`) only add RLS policies / constraints / dimensions —
+     no `create_table` calls.
+- **G-DOCS-1 correction (2026-04-30):** Earlier blueprint figures said
+  "25/108 tables" and "83 tables uncovered". The audit re-counted distinct
+  `__tablename__` declarations in `app/**/*.py` and found **198**, not 108.
+  Corrected coverage: **25/198 (12%) — 173 tables uncovered.**
 - **Drift detection (2026-04-30):** 2097-line unified diff between alembic-result
   schema and ORM-result schema. Saved to `APEX_BLUEPRINT/_archive/2026-04-30_alembic_drift.txt`.
 - **Why production still works:** `_run_startup()` in `app/main.py` calls
   `Base.metadata.create_all()` (multiple call sites incl. lines 1611, 1744, 2261)
-  which creates all 108 tables. Replacing this with `alembic upgrade head` would
-  deploy production with **83 missing tables** (`clients`, `analysis_*`, `audit_*`,
-  `archive_*`, `bank_feed_*`, etc.).
+  which creates all 198 tables. Replacing this with `alembic upgrade head` would
+  deploy production with **173 missing tables** (`clients`, `analysis_*`, `audit_*`,
+  `archive_*`, `bank_feed_*`, plus everything else outside the four covered groups).
 - **Status:** Lifespan integration **POSTPONED**. `create_all` remains canonical.
   G-A3.1 created to address full alembic catch-up.
 - **Sprint:** 7 (current — partial); continued in 8 (G-A3.1)
 
 ### 🟠 G-A3.1. Alembic catch-up migration — production-safe
-- **Issue:** Alembic covers only 25/108 tables. Cannot replace `create_all` until
+- **Issue:** Alembic covers only 25/198 tables (12%). Cannot replace `create_all` until
   alembic schema matches ORM schema.
 - **Risk:** HIGH — touches production schema management.
 - **Plan (multi-step, requires DBA review):**
@@ -101,7 +109,7 @@
   2. **Decision A — squash + restamp:** consolidate the 7 into a single comprehensive
      baseline + `alembic stamp head` on production.
      OR
-     **Decision B — incremental catch-up:** generate migration #8 covering all 83
+     **Decision B — incremental catch-up:** generate migration #8 covering all 173
      missing tables, run on populated production DB only after careful review of
      `op.create_table(... if_not_exists=True)` semantics.
   3. **Test exhaustively** on production-clone DB before cutover.
@@ -376,10 +384,30 @@
 
 ## 6. ERP Functional Gaps / ثغرات وظيفية في ERP
 
-### 🟠 G-E1. No Bank Feed Integration
-- **Issue:** `/settings/bank-feeds` is placeholder.
-- **Fix plan:** Integrate SAMA Open Banking (Saudi) and CBUAE Open Finance (UAE). Daily sync. Auto-categorize via rules + AI.
-- **Estimate:** 1 month
+### ⚠️ G-E1. ~~No Bank Feed Integration~~ — PARTIAL: provider plumbing shipped (Wave 13); Open-Banking adapters still TBD
+- **What is in tree (Wave 13):**
+  - `app/core/bank_feeds.py` — `BankFeedProvider` ABC + `MockBankFeedProvider`,
+    Fernet encryption helpers (`BANK_FEEDS_ENCRYPTION_KEY`), `ConnectionInput`
+    DTO, register/list provider helpers.
+  - `app/core/bank_feeds_routes.py` — registered into `app/main.py:1312-1314`
+    so `/api/v1/bank-feeds/...` is live.
+  - `app/core/bank_reconciliation.py` + `bank_reconciliation_ai.py` +
+    `bank_reconciliation_routes.py` — rule-based + AI-assisted matching against
+    GL entries, with audit trail.
+  - Tables: `bank_feed_connection`, `bank_feed_transaction`
+    (`app/core/compliance_models.py:269` and `:321`). Storage of access tokens
+    is encrypted at rest.
+  - Tests: `tests/test_bank_feeds.py`, `tests/test_bank_reconciliation.py`,
+    `tests/test_bank_rec_ai.py`, `tests/test_bank_ocr_tenant_ap.py`.
+- **What still ships only as a `Mock` provider:** real SAMA Open Banking (KSA)
+  and CBUAE Open Finance (UAE) adapters. The plumbing accepts new providers
+  via `register_provider(name, BankFeedProvider)` — the gap is the certified
+  client implementation + bank-side onboarding (which requires regulatory
+  registration), not application-level code.
+- **Fix plan:** Implement `SamaProvider` + `CbuaeProvider` subclasses against
+  the production Open Banking specs once registration is granted. Daily sync
+  job (cron) + auto-categorize via rules then AI fallback.
+- **Estimate:** 2-3 weeks (down from "1 month") because the abstraction is in place.
 
 ### 🟠 G-E2. No FX revaluation at period end
 - **Issue:** Multi-currency balances don't auto-revalue.
@@ -487,16 +515,19 @@
 - **Status:** DONE
 - **Sprint:** 7 (closure + docs); original encryption work in Wave 11
 
-> 🔍 **Pattern Note (Sprint 7):** This is the **5th** gap in Sprint 7 where the
-> blueprint disagreed with reality:
->   1. G-A1 — line count (3500 claimed vs 2146 actual)
+> 🔍 **Pattern Note (Sprint 7 → closed by G-DOCS-1 in Sprint 8):** This is one
+> of **9 places** Sprint 7 found where the blueprint disagreed with reality.
+> The full list lives in the G-DOCS-1 entry (§ 11) — the five spotted at this
+> point in the timeline were:
+>   1. G-A1 — line count (3500 claimed vs 2146 actual; now 21 after split)
 >   2. G-A2 — `v4_groups` deletion plan ignored real internal-import dependencies
->   3. G-A3 — alembic claimed empty; 7 migrations exist (covering 25/108 tables)
+>   3. G-A3 — alembic claimed empty; 7 migrations exist (covering 25/198 tables —
+>      the original "108 tables" total in the blueprint was itself stale, see G-DOCS-1)
 >   4. G-S1 — bcrypt rounds claimed 10; library default is already 12 since v4.0
 >   5. G-Z1 — ZATCA encryption claimed missing; fully implemented in Wave 11
 >
-> A blueprint accuracy audit is recommended for Sprint 8 before further P0/P1
-> work — see new gap **G-DOCS-1**.
+> ✅ The recommended blueprint accuracy audit shipped as gap **G-DOCS-1**
+> (Sprint 8) — see § 11 for the consolidated 9-evidence list.
 
 ### 🟠 G-Z2. No CSID auto-renewal
 - **Issue:** PCSID expires; no auto-renewal job.
@@ -585,6 +616,36 @@
 - **Estimate:** 2-3 days (1 day for the package version fix, 1-2 days for tests).
 - **Sprint:** 8
 
+### 🟢 G-T1.2. Refresh `test_flutter_files` to current screen tree
+- **Issue:** `tests/test_core.py::test_flutter_files` (line 118 onward) asserts
+  the existence of `apex_finance/lib/screens/clients/client_onboarding_wizard.dart`
+  among other "critical Flutter files". That file was deleted in Sprint 7 when
+  the onboarding wizard was rewritten, but the test list was not updated.
+  When the assertion fails the cascade pulls down 23 unrelated tests in
+  `tests/test_per_directory_coverage.py` (each importer of the test_core
+  module re-runs the same broken collection).
+- **Fix plan:**
+  1. Walk `apex_finance/lib/screens/**/*.dart` and rebuild the canonical "critical
+     Flutter files" list — keep router, theme, api_service, login, register,
+     dashboard, and a representative screen per service module.
+  2. Replace the hard-coded `files = [...]` list in `test_flutter_files`.
+  3. Re-run `pytest tests/test_core.py tests/test_per_directory_coverage.py -v`
+     to confirm the cascade is gone.
+- **Estimate:** 30 min
+- **Sprint:** 8 (low-risk, can ride alongside G-T1.1 or G-A2.1)
+
+### 🟠 G-T1.3. Test infra flake + coverage thresholds
+- **Issue:** Sprint 7 surfaced multiple test-infra fragilities beyond G-T1.2 —
+  cascading collection errors mask real failures, and there is no enforced
+  coverage floor in CI (the `pyproject.toml` setting is informational only).
+- **Fix plan:**
+  1. Convert `test_flutter_files`-style "list of paths" tests into glob walks
+     so a future rename does not break the suite.
+  2. Add `--cov-fail-under=70` (or the agreed-floor) to the CI pytest invocation.
+  3. Mark the 4 known-flaky tests with `pytest.mark.flaky(reruns=2)`.
+- **Estimate:** 4-6 hours
+- **Sprint:** 8 (alongside G-T1.1)
+
 ### 🟠 G-T2. No load tests
 - **Issue:** Cold-start tolerated but no performance baseline.
 - **Fix plan:** Locust scripts for auth, COA upload, ZATCA. Baseline + CI threshold.
@@ -599,14 +660,16 @@
 
 ## 11. Documentation Gaps / ثغرات التوثيق
 
-### 🟠 G-DOCS-1. Blueprint accuracy audit
-- **Files:** `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md`,
-  `APEX_BLUEPRINT/10_CLAUDE_CODE_INSTRUCTIONS.md`, `CLAUDE.md`
-- **Issue:** Sprint 7 found **8 places where blueprint claims contradicted code reality**:
-  1. **G-A1** — line count (3500 claimed vs 2146 actual)
+### ✅ G-DOCS-1. ~~Blueprint accuracy audit~~ — DONE 2026-04-30
+- **Files updated:** `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md`,
+  `APEX_BLUEPRINT/10_CLAUDE_CODE_INSTRUCTIONS.md`, `CLAUDE.md`, `PROGRESS.md`
+- **Issue:** Sprint 7 closed with **9 places where blueprint claims contradicted
+  code reality** (one more was discovered during this audit):
+  1. **G-A1** — line count (3500 claimed vs 2146 actual; now 21 after split)
   2. **G-A2** — `v4_groups` deletion plan ignored real internal-import dependencies;
      blueprint also assumed "no V4-only screens" but found 6.
-  3. **G-A3** — alembic claimed empty; 7 migrations exist (covering only 25/108 tables — separate gap G-A3.1)
+  3. **G-A3** — alembic claimed empty; 7 migrations exist (covering only 25/198 tables
+     — separate gap G-A3.1)
   4. **G-S1** — bcrypt rounds claimed 10; library default has been 12 since v4.0
   5. **G-Z1** — ZATCA encryption claimed missing; fully implemented in Wave 11
   6. **G-B1** — OAuth claimed stubbed; Wave 1 PR#2/#3 implemented full
@@ -618,32 +681,49 @@
      PR #103 / #104 merge accidentally overwrote `.env.example` with
      `PROGRESS.md` content, leaving production deployments without any
      env-var template. Recovered in the G-B2 PR.
-- **`CLAUDE.md` "Common Pitfalls" section is the highest-risk surface.** Sprint 7
+  9. **G-A3 table count drift + `tests/test_core.py::test_flutter_files`
+     references deleted file** — discovered during G-DOCS-1 audit:
+     - Blueprint G-A3 figures said "25/108 tables / 83 uncovered"; actual
+       `__tablename__` declarations across `app/**/*.py` total **198 distinct
+       tables**, so the real coverage is **25/198 (12%) — 173 uncovered**.
+     - `test_flutter_files` (`tests/test_core.py:118`) still asserts the
+       presence of `apex_finance/lib/screens/clients/client_onboarding_wizard.dart`,
+       which was deleted; that single stale list cascaded into 23 failures
+       in `test_per_directory_coverage.py` during Sprint 7. Tracked as G-T1.2.
+- **`CLAUDE.md` "Common Pitfalls" section was the highest-risk surface.** Sprint 7
   fixed two stale bullets (lines 74 + 75) that would have misled any reader
-  into re-implementing complete code. Two more bullets there are stale but
-  addressed in their own branches:
-  - Line 31: *"main.dart is the monolith (~3500 lines)"* — fixed by G-A1 branch.
-  - Line 76: *"Alembic ... has no migration files yet"* — fixed by G-A3 branch.
-- **Risk:** Future tasks may follow stale plans, causing rework, missed scope, or
-  (worst case) production-breaking changes (e.g. a naive G-A3 lifespan replacement
-  would have deployed production with 83 missing tables; a naive G-B1/G-B2
-  "implementation" would have collided with working Wave code; the
-  `.env.example` corruption would have left every fresh deploy without env-var
-  guidance).
-- **Fix plan:**
-  1. Cross-reference every P0/P1 gap in this file against current code; mark each
-     as `accurate` / `stale` / `done-but-undocumented`.
-  2. Update inaccurate entries before they're picked up.
-  3. Add to `10_CLAUDE_CODE_INSTRUCTIONS.md`: explicit **verify-first protocol** —
-     "Code is truth; blueprint may lag. Always grep-and-read the cited files before
-     drafting a fix plan."
-  4. Cross-link Wave 1 / Wave 11 / Wave 13 deliverables back into 09 so OAuth /
-     encryption / ZATCA CSID / bank-feed work is visible in the gap tracker.
-  5. Audit `CLAUDE.md` "Common Pitfalls" section — multiple bullets there are stale
-     (G-B1 was line 74; G-A3 was line 76; G-B2 line 75 likely also stale — verify
-     before fixing).
-- **Estimate:** 4-6 hours
-- **Sprint:** 8 (before any further P0/P1 task)
+  into re-implementing complete code. G-DOCS-1 fixed the remaining stale claims:
+  - Line 31: *"main.dart is the monolith (~3500 lines)"* — corrected to "21-line
+    bootstrap; classes live in `core/`, `screens/`, `widgets/`."
+  - Line 55: *"204 automated tests"* — corrected to **1784 tests** (the previous
+    figure was ~9× too low and had been left over from a much earlier sprint).
+  - Line 76: alembic count — corrected to "25/198 tables" with the **DO NOT
+    replace `create_all()` until G-A3.1 ships** warning preserved.
+- **Risk addressed:** Future tasks would have followed stale plans, causing
+  rework, missed scope, or (worst case) production-breaking changes (e.g. a
+  naive G-A3 lifespan replacement would have deployed production with 173
+  missing tables; a naive G-B1/G-B2 "implementation" would have collided with
+  working Wave code; the `.env.example` corruption would have left every
+  fresh deploy without env-var guidance).
+- **What this gap delivered:**
+  1. ✅ Cross-referenced every P0/P1 gap in this file against current code;
+     each Sprint 7 gap now marked `accurate` / `stale` / `done-but-undocumented`
+     in the audit grid (see Sprint 8 commit message).
+  2. ✅ Updated stale entries in 09 (this file) and `CLAUDE.md`.
+  3. ✅ Added **Verify-First Protocol** to `10_CLAUDE_CODE_INSTRUCTIONS.md`
+     (§ 0 at top of file) — *"Code is truth; blueprint may lag. Always
+     grep-and-read the cited files before drafting a fix plan."*
+  4. ✅ Cross-linked Wave 1 / Wave 11 / Wave 13 deliverables into the relevant
+     gap entries (G-B1 → Wave 1 PR#2/#3, G-Z1 → Wave 11, G-A3 → migration chain,
+     G-B2 → Wave SMS).
+  5. ✅ Audited `CLAUDE.md` "Common Pitfalls" — lines 74-75 were already fixed
+     by Sprint 7; line 76 verified and corrected to reflect 198-table reality.
+- **Sprint:** 8 (this gap)
+- **Follow-up gaps still open after G-DOCS-1:**
+  - G-A2.1 — Migrate 6 V4-only screens to V5
+  - G-A3.1 — Alembic catch-up + lifespan integration (DBA-reviewed)
+  - G-T1.1 — Fix Flutter test infra (`package:web` 1.1.1 vs Flutter 3.27.4)
+  - G-T1.2 — Refresh `test_flutter_files` to current screen tree (30 min)
 
 ### 🟢 G-D1. No public API docs
 - **Issue:** FastAPI auto-generates `/docs` (Swagger) but not customer-facing.

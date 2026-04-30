@@ -1,5 +1,27 @@
 # APEX Sprint Progress
 
+## Sprint 8 — Quality & Compliance (Q2 2026, week 1) — IN PROGRESS
+
+- [x] **G-DOCS-1**: Blueprint accuracy audit + Verify-First Protocol.
+  - Branch: `sprint-8/g-docs-1-blueprint-accuracy-audit`
+  - Phase A audit grid (verify-first against current code):
+    - G-A1, G-A2(.1), G-S1, G-Z1, G-B1, G-B2, G-T1 → **accurate**
+    - G-A3 / CLAUDE.md L76 → **stale on totals** (real coverage is
+      **25/198 tables**, not 25/108; 173 uncovered, not 83)
+    - CLAUDE.md L31 ("main.dart ~3500 lines") → **stale**, fixed
+    - CLAUDE.md L55 ("204 tests") → **stale**, real is **1784** (8.7× off)
+    - CLAUDE.md L77 ("60+ tightly coupled classes") → **stale**, fixed
+    - 9th evidence: `test_flutter_files` references deleted
+      `client_onboarding_wizard.dart` — cascaded 23 unrelated test errors;
+      tracked as G-T1.2.
+  - Cross-linked Wave 1 / Wave 11 / Wave 13 into 09 (OAuth, ZATCA encryption,
+    Bank Feeds plumbing) — G-E1 downgraded from "placeholder" to "PARTIAL".
+  - Added Verify-First Protocol as § 0 of `10_CLAUDE_CODE_INSTRUCTIONS.md`
+    with 5-step protocol + measurement-command grid + red-flag list +
+    conventional-commit hint.
+
+---
+
 ## Sprint 7 — Foundation (Q1 2026, week 1-2) — COMPLETE
 
 8/8 tasks closed. 4 follow-up gaps opened for Sprint 8.
@@ -42,10 +64,12 @@
 
 ## Cross-cutting follow-ups (Sprint 8)
 
-- **G-DOCS-1** ⭐ Blueprint accuracy audit — **MUST be the first item**
+- ✅ **G-DOCS-1** Blueprint accuracy audit — DONE 2026-04-30
 - **G-A2.1** — Migrate 6 V4-only screens to V5
-- **G-A3.1** — Alembic catch-up + lifespan integration (DBA-reviewed)
+- **G-A3.1** — Alembic catch-up (25/198 → 198/198) + lifespan integration (DBA-reviewed)
 - **G-T1.1** — Fix Flutter test infra; ship login/register/onboarding tests
+- **G-T1.2** — Refresh `test_flutter_files` to current screen tree (30 min)
+- **G-T1.3** — Test infra flake + coverage thresholds (4-6 hours)
 
 ---
 

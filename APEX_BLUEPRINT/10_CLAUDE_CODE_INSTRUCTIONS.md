@@ -6,6 +6,99 @@
 
 ---
 
+## 0. Verify-First Protocol / بروتوكول التحقق أولاً  *(added by G-DOCS-1, Sprint 8)*
+
+> **🟥 Read this before everything else in this file.**
+>
+> **Code is truth; the blueprint may lag.**
+> Sprint 7 found **9 places** where blueprint claims contradicted current code
+> reality (gap **G-DOCS-1** § 11 in `09_GAPS_AND_REWORK_PLAN.md` lists them).
+> Acting on a stale claim has already caused near-misses including a planned
+> `lifespan` swap that would have shipped production with **173 missing
+> database tables**, plans to "implement" OAuth and SMS that were already in
+> tree (Wave 1 + Wave SMS), and an `.env.example` overwrite that would have
+> left every fresh deploy with no env-var template.
+
+### When this protocol applies
+
+For **every** task — feature, refactor, bug-fix, or "just a docs update" —
+before you draft a plan, edit a single file, or open a PR.
+
+### The 5-step protocol
+
+1. **Read the gap entry / blueprint section that says the work is needed.**
+   Quote the bullet you're about to act on. If a number is cited
+   (line count, table count, test count, route count), assume it is stale
+   until you verify it.
+
+2. **Grep the cited file paths in the actual repo.** Do not trust
+   summaries — open the file. The blueprint will sometimes:
+   - claim a feature is "stub" / "missing" when a Wave PR already shipped it
+     (see G-B1 Wave 1, G-B2 Wave SMS, G-Z1 Wave 11, G-E1 Wave 13);
+   - cite line counts from before a refactor (see G-A1: blueprint had 3500,
+     reality was 2146, post-split is 21);
+   - cite table counts from before a phase landed (see G-A3: blueprint had
+     108, reality is 198 distinct `__tablename__` declarations);
+   - reference deleted files (see G-T1.2: `test_flutter_files` still asserts
+     `client_onboarding_wizard.dart` which no longer exists).
+
+3. **Run a measurement command** to either confirm or refute the claim:
+
+   | Claim type | Verification command |
+   | --- | --- |
+   | Line count | `wc -l <path>` (Bash) — or read the file with `Read` |
+   | Test count | `pytest tests/ --collect-only -q \| tail -3` |
+   | Tables in code | `grep -rE "__tablename__\s*=" app/ \| awk -F\\\" '{print $2}' \| sort -u \| wc -l` |
+   | Tables in alembic | `grep -rE "op\.create_table" alembic/versions/ \| wc -l` |
+   | Route registered? | `grep -rn "include_router" app/main.py` for the import |
+   | File exists? | `ls <path>` or `Glob` the directory |
+   | Tests passing? | run that test file directly, do not trust the summary |
+
+4. **Write the verdict next to the original claim**, in the form
+   `accurate` / `stale` / `done-but-undocumented`. If `stale` or
+   `done-but-undocumented`, fix the doc **in the same PR** that does the
+   code work. Do not split a "code fix" PR from its "doc fix" PR — they
+   drift again immediately.
+
+5. **If verification reveals a change of scope** (e.g. blueprint asked you
+   to "build feature X" and you find feature X already shipped in Wave Y),
+   stop, mark the gap as `done-but-undocumented`, and produce a
+   doc-only PR closing it. Do **not** "implement" a duplicate.
+
+### Red flags that should trigger this protocol mid-task
+
+- A planned step says *"replace `create_all()` with `alembic upgrade head`"*
+  → **stop**, run the table-count check above. If alembic covers <90% of
+  declared tables, escalate (see G-A3.1 — DBA review required).
+- A planned step says *"the user model needs an `auth_provider` column"*
+  → **stop**, grep the model. The column may already exist
+  (see `tests/test_core.py::test_user_fields`).
+- A planned step says *"add SMS verification"*, *"add Google Sign-In"*,
+  *"encrypt ZATCA cert"*, *"add bank feed plumbing"* → **stop**, those are
+  in Waves 1 / SMS / 11 / 13 respectively; check first.
+- A test list / "critical files" list ships unchanged across multiple PRs
+  → **stop**, run a directory walk and compare. `test_flutter_files`
+  taught us that.
+
+### Conventional-commit hint
+
+When a PR contains both code and doc fixes from this protocol, the body
+should call out the verification done. Example:
+
+```
+fix(auth): tighten JWT cookie samesite (#G-S2)
+
+Verify-first findings:
+- Blueprint G-S2 claimed cookies were not used → false; CSRF middleware
+  is wired but disabled by default (CSRF_ENABLED=false).
+- Updated 09 § 5 G-S2 with current state and reduced estimate to 2 days.
+```
+
+This makes the PR review trivial: reviewers can replay the verification
+without guessing what you saw.
+
+---
+
 ## 1. The Golden Rules / القواعد الذهبية
 
 These rules apply to EVERY task. If you violate one, stop and reconsider:
