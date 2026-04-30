@@ -58,8 +58,9 @@
 | XX | `77a60f2` | 4 (Compliance) | Period Lock with auditable overrides — closes "Period Lock partial" gap from target-state section 10. Backend: `period_lock.py` (JSON-as-DB; lock_period / unlock_period / is_locked / check_posting / list_overrides / stats; reason ≥3 chars required for unlock; 3 outcomes blocked/blocked/allowed_with_override) + `period_lock_routes.py` (7 endpoints: public list + admin lock/unlock/list/get/stats/overrides/check). 3 new events period.locked/.unlocked/.lock.overridden in EventCategory.compliance (54→57). UI at `/admin/period-locks`: 3-tab layout (active/history/audit) + stats bar + lock dialog auto-suggesting prev month + unlock dialog enforcing reason + simulator dialog with override permission toggle. Cleanup of 2 leftover imports from earlier kDebugMode bypass. | +1,322 |
 | YY | `bd76fcf` | 2 (Onboarding) | Conversational AI Onboarding — closes target-state section 2 "AI Conversational Onboarding" gap. Backend: `onboarding_chat.py` (JSON-as-DB session store, cap 1K, 24h TTL) + 6-step state machine (tenant_id → display_name → industry → headcount → review → done) with validation per step. Industry step accepts free-text description and ranks pack_ids via 2 strategies: optional Claude API (claude-haiku-4-5 if ANTHROPIC_API_KEY set) + Arabic+English keyword heuristic fallback (مطعم→fnb_retail, etc). On confirm, calls existing tenant_directory.register + apply_pack — same atomic flow as Wave 1N. 5 routes (3 public + 2 admin). UI: chat-style screen at `/admin/tenant-onboarding-ai` with sparkle/person avatars, typing indicator, step-aware hints, auto-scroll, done-banner w/ quick-links. Wave 1N form wizard gains "وضع المحادثة" toolbar. | +1,074 |
 | ZZ | `9e49876` | 11 (Observability) | Workflow Rule Replay — leverages Wave 1O Run History for "play this run again." POST `/admin/workflow/runs/{run_id}/replay` with body `{payload_override?, only_this_rule?}`. Two modes: targeted (loads original rule, evaluates conditions against captured/overridden payload, records new run prefixed `[REPLAY of <8-char>]`) and bus_replay (emits event on the bus, all listeners fire, marked higher-risk in UI). Conditions failing in targeted mode returns `{ran: false, reason: conditions_did_not_match_with_new_payload}` so admins iterate without blind firing. UI: 2 outlined buttons in expanded run cards (cyan targeted / orange bus replay) + confirmation dialog warning about side-effects + snackbar with new_run_id. | +190 |
+| AAA | `910fed3` | 4 (Compliance) | Period Close Interactive Checklist — wires the existing 12-task model+service that had no HTTP surface or UI. Backend: `period_close_routes.py` (5 endpoints: start/list/get/complete-task/templates). UI: `AdminPeriodCloseScreen` master-detail at `/admin/period-close` — left panel close cycle cards w/ progress bars, right panel numbered task cards (completed=green strikethrough, blocked=grey lock, in_progress=cyan, pending=warn) + per-task complete dialog w/ notes. Pairs with Wave 1Q Period Lock — task 10 is "قفل الفترة المحاسبية" and the toolbar links directly to `/admin/period-locks`. Helpers namespaced as `adminPeriodClose*` to avoid collision with older AI period-close helpers. | +828 |
 
-**Total LOC added (Waves 1A–1S)**: ~23,830 (code) + this doc.
+**Total LOC added (Waves 1A–1T)**: ~24,658 (code) + this doc.
 **Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
 **Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
 **Wave 1C (commits L–O)**: 4 commits, ~1,350 LOC.
@@ -79,7 +80,8 @@
 **Wave 1Q (commit XX)**: 1 commit, ~1,322 LOC.
 **Wave 1R (commit YY)**: 1 commit, ~1,074 LOC.
 **Wave 1S (commit ZZ)**: 1 commit, ~190 LOC.
-**Time elapsed**: ~36 hours of continuous Claude work.
+**Wave 1T (commit AAA)**: 1 commit, ~828 LOC.
+**Time elapsed**: ~37 hours of continuous Claude work.
 
 ---
 
