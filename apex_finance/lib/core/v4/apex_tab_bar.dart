@@ -1,3 +1,11 @@
+/// @deprecated V4 module — kept temporarily because 6 screens still depend on
+/// `apex_screen_host.dart` (the only file with external users). The other
+/// widgets here are an internally-consistent dead zone (0 external users) but
+/// removing them piecemeal would break `apex_launchpad`, `apex_sub_module_shell`,
+/// `apex_command_palette`, and `apex_tab_bar` which all import `v4_groups.dart`.
+///
+/// Migration to V5 is tracked in G-A2.1 — see
+/// `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md`. Do NOT add new usages.
 /// APEX V4 — Tab bar with overflow popover (Wave 1.5).
 ///
 /// Renders up to five "visible" tabs and funnels the rest into a
