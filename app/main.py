@@ -960,7 +960,9 @@ except Exception as _e:
 try:
     from app.core.approval_templates_routes import router as approval_tpl_router
     app.include_router(approval_tpl_router)
-    logging.info("Approval Templates router mounted at /api/v1/approval-templates + /admin/approval-templates")
+    # Importing the advancer registers its listener on approval.approved.
+    from app.core import approval_chain_advancer  # noqa: F401
+    logging.info("Approval Templates router mounted at /api/v1/approval-templates + /admin/approval-templates (chain advancer active)")
 except Exception as _e:
     logging.warning(f"Approval Templates router not mounted: {_e}")
 

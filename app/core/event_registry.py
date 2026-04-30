@@ -444,6 +444,26 @@ _CATALOG: list[EventDefinition] = [
             "stages_total": "int",
         },
     ),
+    EventDefinition(
+        name="approval_template.stage_advanced",
+        label_ar="تمّت ترقية مرحلة في سلسلة الموافقات",
+        label_en="Approval chain advanced to next stage",
+        category=EventCategory.system,
+        payload_schema={
+            "template_id": "string",
+            "previous_approval_id": "uuid",
+            "new_approval_id": "uuid",
+            "stage_sequence": "int",
+            "remaining_after": "int",
+            "tenant_id": "string?",
+        },
+    ),
+    EventDefinition(
+        name="approval_template.chain_halted",
+        label_ar="توقّفت سلسلة الموافقات لعدم وجود معتمدين للمرحلة التالية",
+        label_en="Approval chain halted (next stage has no approvers)",
+        category=EventCategory.system,
+    ),
 
     # ─ Module Manager (per-tenant enable/disable) ─
     EventDefinition(
