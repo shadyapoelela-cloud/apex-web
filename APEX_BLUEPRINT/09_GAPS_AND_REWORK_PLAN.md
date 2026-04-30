@@ -520,13 +520,44 @@
 
 ## 10. Testing Gaps / ثغرات الاختبارات
 
-### 🟠 G-T1. No frontend tests
-- **Issue:** 204 backend tests but zero Flutter tests.
-- **Fix plan:**
-  1. Add `flutter_test` widget tests for critical screens
-  2. Add `integration_test` for J1, J2, J3 user journeys
-  3. Target 50% widget coverage
-- **Estimate:** 1 month
+### ⚠️ G-T1. ~~No frontend tests~~ — START done; full screen coverage blocked (2026-04-30)
+- **Files:** `apex_finance/test/`, `apex_finance/test/widget/`, `apex_finance/pubspec.lock`
+- **Discovery (Sprint 7):** Frontend test count **was not zero** — 2 test files existed
+  (`validators_ui_test.dart` 30 cases passing, `ask_panel_test.dart` failing to load).
+- **Resolution (Sprint 7, branch `sprint-7/g-t1-flutter-tests`):**
+  - ✅ Created `apex_finance/test/widget/` directory.
+  - ✅ Added `apex_output_chips_test.dart` (5 cases passing): default title,
+    custom title, chip-per-link, empty-items collapse, tap-wiring sanity.
+  - ❌ Could **not** ship widget tests for the user-journey screens
+    (login / register / onboarding) because all of them transitively import
+    `api_service.dart` → `package:http/browser_client.dart` → `package:web` 1.1.1,
+    which fails to compile against Flutter 3.27.4 (`extensions.dart:39: 'toJS' isn't
+    defined for 'num'`). `--platform chrome` fallback also times out (12-min limit).
+  - ✅ Pre-existing `validators_ui_test.dart` still passes (30/30); confirmed it as
+    the canonical example of what can be tested today.
+- **Status:** Foundation in place. Pure-widget tests work. Screen-level tests
+  blocked by infra. Follow-up tracked as G-T1.1.
+- **Sprint:** 7 (current — partial); G-T1.1 in 8.
+
+### 🟠 G-T1.1. Fix Flutter test infra to unblock screen-level widget tests
+- **Issue:** Any widget test that imports a screen pulling `api_service.dart`
+  (i.e. essentially every screen in the app) fails to compile because the
+  transitive `package:web` 1.1.1 is incompatible with Flutter 3.27.4. Running
+  with `--platform chrome` does not help (test timeout / dart-to-JS chain hangs).
+- **Plan:**
+  1. Pin `package:web` to a Flutter 3.27.4-compatible version in `pubspec.yaml`
+     OR upgrade Flutter SDK to a release that ships with a matching `web` version.
+  2. Remove `dart:html` direct usage from `api_service.dart` and `pilot_client.dart`
+     in favour of `package:web` interop, OR isolate web-only code behind a
+     conditional import (`if (dart.library.html)`) so tests on the VM don't pull it.
+  3. Then add the 3 widget tests originally planned:
+     `slide_auth_screen_test.dart`, `forgot_password_flow_test.dart`,
+     `pilot_onboarding_wizard_test.dart`.
+  4. (Optional) Add `integration_test` for J1, J2, J3 end-to-end journeys —
+     this should land alongside G-A2.1 (V4 screen migration) since some of the
+     6 V4 screens are part of those journeys.
+- **Estimate:** 2-3 days (1 day for the package version fix, 1-2 days for tests).
+- **Sprint:** 8
 
 ### 🟠 G-T2. No load tests
 - **Issue:** Cold-start tolerated but no performance baseline.
