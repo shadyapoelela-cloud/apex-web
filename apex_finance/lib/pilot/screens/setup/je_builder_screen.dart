@@ -716,8 +716,10 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
                   ),
                 ),
                 if (_selectedIds.isNotEmpty) _bulkActionBar(),
-                if (_activeFilterCount > 0 && _selectedIds.isEmpty)
-                  _activeFiltersStrip(),
+                // Active filters are now rendered inside the toolbar pill
+                // (ApexListToolbar's chips Wrap), so the legacy strip
+                // below is suppressed to avoid duplicate / overflowing
+                // chip rows under the search box.
                 Expanded(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
