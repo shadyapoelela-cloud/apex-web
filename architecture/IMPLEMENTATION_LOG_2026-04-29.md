@@ -62,8 +62,9 @@
 | BBB | `d06c799` | 5 (Integration) | Bank Feeds Admin Console — wires the existing Wave 13 provider abstraction (Lean / Tarabut / Salt Edge + Mock) that shipped without a UI. UI: `BankFeedsScreen` at `/admin/bank-feeds` — 2-tab layout (الاتصالات / المعاملات) + stats bar. Connection cards show status badge + provider/IBAN/currency chips + action buttons (مزامنة / المعاملات / فصل). Transaction rows: directional arrow (credit↓green / debit↑red) + amount monospace + reference + reconciled badge. Connect dialog auto-defaults to Mock provider for offline testing. Reconcile dialog wires entity_type + entity_id. All API calls reuse pre-existing helpers (no backend change needed). | +676 |
 | CCC | `bccd3fc` | 3 (Workflow UX) | Approval Chain Templates — multi-stage patterns layered on Wave 1B Approvals. Backend: `approval_templates.py` (JSON-as-DB + 7 pre-seeded built-ins: CFO sign-off >100K, vendor onboarding, material change, period close, budget variance, high-risk txn, document amendment) with stages of kind=all_required\|any_one\|majority. Approver lists support {placeholder} expansion. `approval_templates_routes.py` (7 endpoints: list/categories/detail/create/delete/apply/stats). Apply creates stage-1 approval via existing `create_approval`; remaining stages stored in approval.meta.remaining_stages for workflow chaining. 3 new events `approval_template.created/.deleted/.applied` (57→60). UI: category filter chips + stats bar + per-template card with inline stage timeline (numbered circles, kind chip, approver chips, +N overflow) + apply dialog auto-detects placeholders. | +1,330 |
 | DDD | `93459a2` | 3 (Workflow UX) | Chain Stage Advancer — completes Wave 1V's chain. Listener on `approval.approved` reads `meta.template_id + meta.remaining_stages`, pops the next stage and creates a new approval for it via existing `create_approval()`. Carries previous_approval_id forward for audit linkage. Drops unresolved {placeholder} approvers and emits `approval_template.chain_halted` instead of crashing. Reject path automatically halts the chain (listener only listens for `approval.approved`). 2 new events `.stage_advanced` and `.chain_halted` (60→62). E2E test: 3-stage template → approve all → 3 linked approvals + chain ends naturally. | +158 |
+| EEE | `5f7e52c` | 10 (Collaboration) | Unified Notification Center — aggregates 4 user-facing sources into a single inbox at `/inbox`. Backend: `notification_center.py` pure query layer (per-user cursor, no new persistence) pulls from activity_feed (Wave 1P) + pending approvals (Wave 1B, filter user_id+state) + suggestions (Wave 1G, role-gated to platform_admin) + system (best-effort phase10 import). Normalizes to uniform shape (id/source/title/severity/action_url/ts/is_unread). 3 routes (GET inbox + POST mark-all-read + admin stats). mark-all-read bumps both cursors so both surfaces stay consistent. UI: hero w/ unread count, source-filter chips w/ icons, onlyUnread toggle, type-color-coded cards w/ tap-to-navigate. Sidebar entry placed ABOVE activity feed in Dashboards group (no role gate). | +880 |
 
-**Total LOC added (Waves 1A–1W)**: ~26,822 (code) + this doc.
+**Total LOC added (Waves 1A–1X)**: ~27,702 (code) + this doc.
 **Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
 **Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
 **Wave 1C (commits L–O)**: 4 commits, ~1,350 LOC.
@@ -87,7 +88,8 @@
 **Wave 1U (commit BBB)**: 1 commit, ~676 LOC.
 **Wave 1V (commit CCC)**: 1 commit, ~1,330 LOC.
 **Wave 1W (commit DDD)**: 1 commit, ~158 LOC.
-**Time elapsed**: ~40 hours of continuous Claude work.
+**Wave 1X (commit EEE)**: 1 commit, ~880 LOC.
+**Time elapsed**: ~41 hours of continuous Claude work.
 
 ---
 
