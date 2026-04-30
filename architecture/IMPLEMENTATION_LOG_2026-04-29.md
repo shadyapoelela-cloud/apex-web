@@ -61,8 +61,9 @@
 | AAA | `910fed3` | 4 (Compliance) | Period Close Interactive Checklist — wires the existing 12-task model+service that had no HTTP surface or UI. Backend: `period_close_routes.py` (5 endpoints: start/list/get/complete-task/templates). UI: `AdminPeriodCloseScreen` master-detail at `/admin/period-close` — left panel close cycle cards w/ progress bars, right panel numbered task cards (completed=green strikethrough, blocked=grey lock, in_progress=cyan, pending=warn) + per-task complete dialog w/ notes. Pairs with Wave 1Q Period Lock — task 10 is "قفل الفترة المحاسبية" and the toolbar links directly to `/admin/period-locks`. Helpers namespaced as `adminPeriodClose*` to avoid collision with older AI period-close helpers. | +828 |
 | BBB | `d06c799` | 5 (Integration) | Bank Feeds Admin Console — wires the existing Wave 13 provider abstraction (Lean / Tarabut / Salt Edge + Mock) that shipped without a UI. UI: `BankFeedsScreen` at `/admin/bank-feeds` — 2-tab layout (الاتصالات / المعاملات) + stats bar. Connection cards show status badge + provider/IBAN/currency chips + action buttons (مزامنة / المعاملات / فصل). Transaction rows: directional arrow (credit↓green / debit↑red) + amount monospace + reference + reconciled badge. Connect dialog auto-defaults to Mock provider for offline testing. Reconcile dialog wires entity_type + entity_id. All API calls reuse pre-existing helpers (no backend change needed). | +676 |
 | CCC | `bccd3fc` | 3 (Workflow UX) | Approval Chain Templates — multi-stage patterns layered on Wave 1B Approvals. Backend: `approval_templates.py` (JSON-as-DB + 7 pre-seeded built-ins: CFO sign-off >100K, vendor onboarding, material change, period close, budget variance, high-risk txn, document amendment) with stages of kind=all_required\|any_one\|majority. Approver lists support {placeholder} expansion. `approval_templates_routes.py` (7 endpoints: list/categories/detail/create/delete/apply/stats). Apply creates stage-1 approval via existing `create_approval`; remaining stages stored in approval.meta.remaining_stages for workflow chaining. 3 new events `approval_template.created/.deleted/.applied` (57→60). UI: category filter chips + stats bar + per-template card with inline stage timeline (numbered circles, kind chip, approver chips, +N overflow) + apply dialog auto-detects placeholders. | +1,330 |
+| DDD | `93459a2` | 3 (Workflow UX) | Chain Stage Advancer — completes Wave 1V's chain. Listener on `approval.approved` reads `meta.template_id + meta.remaining_stages`, pops the next stage and creates a new approval for it via existing `create_approval()`. Carries previous_approval_id forward for audit linkage. Drops unresolved {placeholder} approvers and emits `approval_template.chain_halted` instead of crashing. Reject path automatically halts the chain (listener only listens for `approval.approved`). 2 new events `.stage_advanced` and `.chain_halted` (60→62). E2E test: 3-stage template → approve all → 3 linked approvals + chain ends naturally. | +158 |
 
-**Total LOC added (Waves 1A–1V)**: ~26,664 (code) + this doc.
+**Total LOC added (Waves 1A–1W)**: ~26,822 (code) + this doc.
 **Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
 **Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
 **Wave 1C (commits L–O)**: 4 commits, ~1,350 LOC.
@@ -85,7 +86,8 @@
 **Wave 1T (commit AAA)**: 1 commit, ~828 LOC.
 **Wave 1U (commit BBB)**: 1 commit, ~676 LOC.
 **Wave 1V (commit CCC)**: 1 commit, ~1,330 LOC.
-**Time elapsed**: ~39 hours of continuous Claude work.
+**Wave 1W (commit DDD)**: 1 commit, ~158 LOC.
+**Time elapsed**: ~40 hours of continuous Claude work.
 
 ---
 
