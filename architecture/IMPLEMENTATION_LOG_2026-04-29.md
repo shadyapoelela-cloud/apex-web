@@ -59,8 +59,9 @@
 | YY | `bd76fcf` | 2 (Onboarding) | Conversational AI Onboarding — closes target-state section 2 "AI Conversational Onboarding" gap. Backend: `onboarding_chat.py` (JSON-as-DB session store, cap 1K, 24h TTL) + 6-step state machine (tenant_id → display_name → industry → headcount → review → done) with validation per step. Industry step accepts free-text description and ranks pack_ids via 2 strategies: optional Claude API (claude-haiku-4-5 if ANTHROPIC_API_KEY set) + Arabic+English keyword heuristic fallback (مطعم→fnb_retail, etc). On confirm, calls existing tenant_directory.register + apply_pack — same atomic flow as Wave 1N. 5 routes (3 public + 2 admin). UI: chat-style screen at `/admin/tenant-onboarding-ai` with sparkle/person avatars, typing indicator, step-aware hints, auto-scroll, done-banner w/ quick-links. Wave 1N form wizard gains "وضع المحادثة" toolbar. | +1,074 |
 | ZZ | `9e49876` | 11 (Observability) | Workflow Rule Replay — leverages Wave 1O Run History for "play this run again." POST `/admin/workflow/runs/{run_id}/replay` with body `{payload_override?, only_this_rule?}`. Two modes: targeted (loads original rule, evaluates conditions against captured/overridden payload, records new run prefixed `[REPLAY of <8-char>]`) and bus_replay (emits event on the bus, all listeners fire, marked higher-risk in UI). Conditions failing in targeted mode returns `{ran: false, reason: conditions_did_not_match_with_new_payload}` so admins iterate without blind firing. UI: 2 outlined buttons in expanded run cards (cyan targeted / orange bus replay) + confirmation dialog warning about side-effects + snackbar with new_run_id. | +190 |
 | AAA | `910fed3` | 4 (Compliance) | Period Close Interactive Checklist — wires the existing 12-task model+service that had no HTTP surface or UI. Backend: `period_close_routes.py` (5 endpoints: start/list/get/complete-task/templates). UI: `AdminPeriodCloseScreen` master-detail at `/admin/period-close` — left panel close cycle cards w/ progress bars, right panel numbered task cards (completed=green strikethrough, blocked=grey lock, in_progress=cyan, pending=warn) + per-task complete dialog w/ notes. Pairs with Wave 1Q Period Lock — task 10 is "قفل الفترة المحاسبية" and the toolbar links directly to `/admin/period-locks`. Helpers namespaced as `adminPeriodClose*` to avoid collision with older AI period-close helpers. | +828 |
+| BBB | `d06c799` | 5 (Integration) | Bank Feeds Admin Console — wires the existing Wave 13 provider abstraction (Lean / Tarabut / Salt Edge + Mock) that shipped without a UI. UI: `BankFeedsScreen` at `/admin/bank-feeds` — 2-tab layout (الاتصالات / المعاملات) + stats bar. Connection cards show status badge + provider/IBAN/currency chips + action buttons (مزامنة / المعاملات / فصل). Transaction rows: directional arrow (credit↓green / debit↑red) + amount monospace + reference + reconciled badge. Connect dialog auto-defaults to Mock provider for offline testing. Reconcile dialog wires entity_type + entity_id. All API calls reuse pre-existing helpers (no backend change needed). | +676 |
 
-**Total LOC added (Waves 1A–1T)**: ~24,658 (code) + this doc.
+**Total LOC added (Waves 1A–1U)**: ~25,334 (code) + this doc.
 **Wave 1A (commits A–H)**: 8 commits, ~2,300 LOC.
 **Wave 1B (commits I–K)**: 3 commits, ~1,430 LOC.
 **Wave 1C (commits L–O)**: 4 commits, ~1,350 LOC.
@@ -81,7 +82,8 @@
 **Wave 1R (commit YY)**: 1 commit, ~1,074 LOC.
 **Wave 1S (commit ZZ)**: 1 commit, ~190 LOC.
 **Wave 1T (commit AAA)**: 1 commit, ~828 LOC.
-**Time elapsed**: ~37 hours of continuous Claude work.
+**Wave 1U (commit BBB)**: 1 commit, ~676 LOC.
+**Time elapsed**: ~38 hours of continuous Claude work.
 
 ---
 
