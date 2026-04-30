@@ -67,6 +67,7 @@ import '../screens/admin/tenant_onboarding_screen.dart';
 import '../screens/admin/tenants_directory_screen.dart';
 import '../screens/admin/workflow_runs_screen.dart';
 import '../screens/activity_feed_screen.dart';
+import '../screens/notification_center_screen.dart';
 import '../screens/admin/period_lock_screen.dart';
 import '../screens/admin/onboarding_chat_screen.dart';
 import '../screens/admin/period_close_screen.dart' as admin_pc;
@@ -729,6 +730,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/activity',
       pageBuilder: (c, s) => _apexPage(const ActivityFeedScreen(), s),
+    ),
+    GoRoute(
+      path: '/inbox',
+      pageBuilder: (c, s) => _apexPage(const NotificationCenterScreen(), s),
     ),
     GoRoute(
       path: '/admin/period-locks',

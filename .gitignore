@@ -104,3 +104,4 @@ period_locks.json
 onboarding_sessions.json
 approval_templates.json
 bank_feeds.json
+inbox_cursors.json

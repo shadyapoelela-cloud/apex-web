@@ -1075,6 +1075,33 @@ class ApiService {
   static Future<ApiResult> approvalTemplatesStats() =>
       _adminGet('/admin/approval-templates/stats');
 
+  // ── Notification Center / Inbox (Wave 1X Phase EEE) ──
+  static Future<ApiResult> inboxList({
+    required String userId,
+    String? tenantId,
+    List<String>? sources,
+    bool onlyUnread = false,
+    int limit = 200,
+    List<String>? userRoles,
+  }) {
+    final qs = <String>['user_id=${Uri.encodeQueryComponent(userId)}', 'limit=$limit'];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    if (sources != null && sources.isNotEmpty) qs.add('sources=${sources.join(",")}');
+    if (onlyUnread) qs.add('only_unread=true');
+    if (userRoles != null && userRoles.isNotEmpty) qs.add('user_roles=${userRoles.join(",")}');
+    return _get('/api/v1/inbox?${qs.join('&')}');
+  }
+  static Future<ApiResult> inboxMarkAllRead({
+    required String userId,
+    String? tenantId,
+  }) {
+    final qs = <String>['user_id=${Uri.encodeQueryComponent(userId)}'];
+    if (tenantId != null) qs.add('tenant_id=${Uri.encodeQueryComponent(tenantId)}');
+    return _post('/api/v1/inbox/mark-all-read?${qs.join('&')}', const {});
+  }
+  static Future<ApiResult> inboxStats({String? userId}) =>
+      _adminGet('/admin/inbox/stats${userId != null ? "?user_id=${Uri.encodeQueryComponent(userId)}" : ""}');
+
   // ── Webhook Subscriptions (Wave 1E Phase T) ──
   static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
     final qs = <String>[];

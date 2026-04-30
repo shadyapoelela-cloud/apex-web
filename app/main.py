@@ -966,6 +966,14 @@ try:
 except Exception as _e:
     logging.warning(f"Approval Templates router not mounted: {_e}")
 
+# Notification Center — unified inbox aggregating 4 sources.
+try:
+    from app.core.notification_center_routes import router as inbox_router
+    app.include_router(inbox_router)
+    logging.info("Notification Center router mounted at /api/v1/inbox + /admin/inbox")
+except Exception as _e:
+    logging.warning(f"Notification Center router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router

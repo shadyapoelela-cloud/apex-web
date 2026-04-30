@@ -90,8 +90,10 @@ class _HybridSidebarState extends State<HybridSidebar> {
     _NavGroup('لوحات القيادة', Icons.dashboard_rounded, [
       _NavItem('الرئيسية', '/dashboard', Icons.home_rounded,
           keywords: ['home', 'start', 'landing']),
-      _NavItem('تيار نشاطي', '/activity', Icons.notifications_rounded,
-          keywords: ['activity', 'feed', 'تيار', 'نشاط', 'إشعارات']),
+      _NavItem('صندوق الإشعارات', '/inbox', Icons.inbox_rounded,
+          keywords: ['inbox', 'notifications', 'إشعارات', 'صندوق']),
+      _NavItem('تيار نشاطي', '/activity', Icons.timeline_rounded,
+          keywords: ['activity', 'feed', 'تيار', 'نشاط']),
       _NavItem('لوحة CFO', '/compliance/executive',
           Icons.admin_panel_settings_rounded),
       _NavItem('مركز الامتثال', '/compliance', Icons.shield_rounded),
