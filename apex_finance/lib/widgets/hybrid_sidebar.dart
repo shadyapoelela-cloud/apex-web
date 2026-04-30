@@ -332,6 +332,13 @@ class _HybridSidebarState extends State<HybridSidebar> {
           keywords: ['period', 'close', 'checklist', 'إقفال', 'دورة'],
           requiredRoles: ['platform_admin', 'super_admin'],
         ),
+        _NavItem(
+          'التغذية البنكية',
+          '/admin/bank-feeds',
+          Icons.account_balance_rounded,
+          keywords: ['bank', 'feeds', 'reconcile', 'بنوك', 'تغذية', 'مطابقة'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
       ],
       requiredRoles: ['platform_admin', 'super_admin', 'reviewer'],
     ),
