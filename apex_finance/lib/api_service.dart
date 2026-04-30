@@ -1059,6 +1059,22 @@ class ApiService {
   static Future<ApiResult> adminPeriodCloseTemplates() =>
       _adminGet('/admin/period-close/templates/default');
 
+  // ── Approval Chain Templates (Wave 1V Phase CCC) ──
+  static Future<ApiResult> approvalTemplatesList({String? category}) =>
+      _get('/api/v1/approval-templates${category != null ? "?category=$category" : ""}');
+  static Future<ApiResult> approvalTemplatesCategories() =>
+      _get('/api/v1/approval-templates/categories');
+  static Future<ApiResult> approvalTemplateGet(String id) =>
+      _get('/api/v1/approval-templates/$id');
+  static Future<ApiResult> approvalTemplateCreate(Map body) =>
+      _adminPost('/admin/approval-templates', body);
+  static Future<ApiResult> approvalTemplateDelete(String id) =>
+      _adminDelete('/admin/approval-templates/$id');
+  static Future<ApiResult> approvalTemplateApply(String id, Map body) =>
+      _adminPost('/admin/approval-templates/$id/apply', body);
+  static Future<ApiResult> approvalTemplatesStats() =>
+      _adminGet('/admin/approval-templates/stats');
+
   // ── Webhook Subscriptions (Wave 1E Phase T) ──
   static Future<ApiResult> webhooksList({String? tenantId, bool? enabled}) {
     final qs = <String>[];

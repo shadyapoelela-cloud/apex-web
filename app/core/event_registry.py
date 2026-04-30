@@ -418,6 +418,33 @@ _CATALOG: list[EventDefinition] = [
         },
     ),
 
+    # ─ Approval Templates (Wave 1V Phase CCC) ─
+    EventDefinition(
+        name="approval_template.created",
+        label_ar="تم إنشاء قالب موافقة جديد",
+        label_en="Approval template created",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="approval_template.deleted",
+        label_ar="تم حذف قالب موافقة",
+        label_en="Approval template deleted",
+        category=EventCategory.system,
+    ),
+    EventDefinition(
+        name="approval_template.applied",
+        label_ar="تم تطبيق قالب موافقة لبدء سلسلة جديدة",
+        label_en="Approval template applied to start a chain",
+        category=EventCategory.system,
+        payload_schema={
+            "template_id": "string",
+            "approval_id": "uuid?",
+            "title_ar": "string",
+            "tenant_id": "string?",
+            "stages_total": "int",
+        },
+    ),
+
     # ─ Module Manager (per-tenant enable/disable) ─
     EventDefinition(
         name="module.enabled",

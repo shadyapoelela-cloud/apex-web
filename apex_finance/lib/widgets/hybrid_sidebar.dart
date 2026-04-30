@@ -339,6 +339,13 @@ class _HybridSidebarState extends State<HybridSidebar> {
           keywords: ['bank', 'feeds', 'reconcile', 'بنوك', 'تغذية', 'مطابقة'],
           requiredRoles: ['platform_admin', 'super_admin'],
         ),
+        _NavItem(
+          'قوالب الموافقات',
+          '/admin/approval-templates',
+          Icons.task_alt_rounded,
+          keywords: ['approval', 'templates', 'chain', 'قوالب', 'موافقات', 'سلاسل'],
+          requiredRoles: ['platform_admin', 'super_admin'],
+        ),
       ],
       requiredRoles: ['platform_admin', 'super_admin', 'reviewer'],
     ),

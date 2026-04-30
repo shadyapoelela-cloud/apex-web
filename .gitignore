@@ -102,3 +102,5 @@ workflow_runs.json
 activity_feed.json
 period_locks.json
 onboarding_sessions.json
+approval_templates.json
+bank_feeds.json

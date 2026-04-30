@@ -487,6 +487,7 @@ class _AdminHealthDashboardState extends State<AdminHealthDashboard> {
           _link('استقبال ذكي', Icons.auto_awesome, '/admin/tenant-onboarding-ai'),
           _link('دورة الإقفال', Icons.event_note, '/admin/period-close'),
           _link('التغذية البنكية', Icons.account_balance, '/admin/bank-feeds'),
+          _link('قوالب الموافقات', Icons.task_alt, '/admin/approval-templates'),
         ]),
       ]),
     );

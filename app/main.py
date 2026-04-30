@@ -956,6 +956,14 @@ try:
 except Exception as _e:
     logging.warning(f"Period Close router not mounted: {_e}")
 
+# Approval Chain Templates — multi-stage approval patterns.
+try:
+    from app.core.approval_templates_routes import router as approval_tpl_router
+    app.include_router(approval_tpl_router)
+    logging.info("Approval Templates router mounted at /api/v1/approval-templates + /admin/approval-templates")
+except Exception as _e:
+    logging.warning(f"Approval Templates router not mounted: {_e}")
+
 # Reports download — materialises the URL generate_report tool hands out.
 try:
     from app.core.reports_download import router as reports_dl_router
