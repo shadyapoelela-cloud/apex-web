@@ -70,7 +70,7 @@ class ApexV5ServiceShell extends ConsumerWidget {
   final V5Chip? activeChip;
 
   /// Body builder for non-dashboard chips. If null and chip has a
-  /// V4SubModule, defaults to ApexSubModuleShell. If null and no
+  /// V5SubModule, defaults to ApexSubModuleShell. If null and no
   /// sub-module, shows "coming soon" host.
   final Widget Function(BuildContext ctx, V5Chip chip)? chipBodyBuilder;
 
@@ -3243,15 +3243,15 @@ class _ChipItemState extends State<_ChipItem> {
 // ──────────────────────────────────────────────────────────────────────
 
 class _V4SubModuleHost extends StatelessWidget {
-  final dynamic subModule; // V4SubModule
-  final dynamic activeScreen; // V4Screen
+  final dynamic subModule; // V5SubModule
+  final dynamic activeScreen; // V5Screen
 
   const _V4SubModuleHost({required this.subModule, required this.activeScreen});
 
   @override
   Widget build(BuildContext context) {
     // Placeholder — would wire into ApexSubModuleShell with the right
-    // V4ModuleGroup context. For POC, show a clear reuse indicator.
+    // V5ModuleGroup context. For POC, show a clear reuse indicator.
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

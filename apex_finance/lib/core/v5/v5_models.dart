@@ -8,8 +8,8 @@
 ///   Level 3:  Tab (5 visible per chip)
 ///   Level 4:  More ▾ (overflow items)
 ///
-/// Backward compatibility: V5Chip wraps V4SubModule — all existing
-/// V4Screen / V4SubModule data is reusable under V5.
+/// Backward compatibility: V5Chip wraps V5SubModule — all existing
+/// V5Screen / V5SubModule data is reusable under V5.
 ///
 /// See blueprints/APEX_V5_HIERARCHY.md for the full narrative.
 library;
@@ -17,7 +17,7 @@ library;
 import 'package:flutter/material.dart';
 import '../theme.dart' as core_theme;
 
-import '../v4/v4_groups.dart';
+import 'v5_groups.dart';
 
 /// Level 0: Service (5 apps in V5.1).
 @immutable
@@ -89,7 +89,7 @@ class V5MainModule {
 
 /// Level 2: Chip (a tab-group within a main module).
 ///
-/// V5Chip is a thin wrapper around V4SubModule — we reuse all visible
+/// V5Chip is a thin wrapper around V5SubModule — we reuse all visible
 /// tabs + overflow logic. `isDashboard=true` gets special rendering
 /// (live widgets instead of a tab row).
 @immutable
@@ -100,9 +100,9 @@ class V5Chip {
   final IconData icon;
   final bool isDashboard;
 
-  /// When isDashboard=false, this holds the V4SubModule with tabs.
+  /// When isDashboard=false, this holds the V5SubModule with tabs.
   /// When isDashboard=true, this is null and dashboardWidgets is used.
-  final V4SubModule? subModule;
+  final V5SubModule? subModule;
 
   /// Dashboard widgets — rendered when isDashboard=true. Each widget
   /// is an action-oriented card (enhancement #3 from V5.1).
@@ -163,8 +163,8 @@ class V5Chip {
     this.aiPowered = false,
   });
 
-  /// Convenience: build from existing V4SubModule.
-  factory V5Chip.fromSubModule(V4SubModule sub) => V5Chip(
+  /// Convenience: build from existing V5SubModule.
+  factory V5Chip.fromSubModule(V5SubModule sub) => V5Chip(
         id: sub.id,
         labelAr: sub.labelAr,
         labelEn: sub.labelEn,

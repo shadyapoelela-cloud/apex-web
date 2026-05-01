@@ -56,7 +56,26 @@
     floor-unreachability discovery).
   - Sprint 9 priority #2 closed (partial).
 
-- [ ] **G-A2.3** v4_groups → v5_groups (final V4 cleanup, 1-2h) — Sprint 9 #3, **next**
+- [x] **G-A2.3** V4 → V5 groups migration — **DONE** 2026-05-01 (V4 chapter closed)
+  - Branch: `sprint-9/g-a2-3-v4-to-v5-groups-migration`
+  - **2 files moved** via `git mv` (history preserved):
+    `lib/core/v4/v4_groups.dart` → `lib/core/v5/v5_groups.dart`,
+    `lib/core/v4/v4_groups_data.dart` → `lib/core/v5/v5_groups_data.dart`.
+  - **322 class-ref substitutions** across 5 files via word-boundary
+    Python regex (V4Screen=244, V4SubModule=66, V4ModuleGroup=11,
+    v4ScreenById=1). Affected: v5_groups.dart, v5_groups_data.dart,
+    v5_data.dart, v5_models.dart, apex_v5_service_shell.dart.
+  - **4 import paths updated** + 3 stale inline-comment refs cleaned.
+  - **Header docstrings rewritten** on the 2 moved files: stale
+    @deprecated G-A2.1 headers replaced with V5-accurate docstrings
+    that preserve "V4 product blueprint phase" / "V4 Module Hierarchy
+    Map" historical refs (judgment call per design approval point #4).
+  - **`lib/core/v4/` deleted entirely** (was 2 files + README — all gone).
+  - Verification: `flutter analyze` 306 baseline (0 new), 12/12
+    widget tests pass, pytest 1838 maintained, 0 V4* abstraction
+    refs remain in `lib/` (5 historical doc refs preserved).
+  - **V4 cleanup chapter closed** (Sprint 7 G-A2 → Sprint 8 G-A2.1
+    → Sprint 9 G-A2.3 — three-sprint progression).
 - [ ] **G-T1.7b** core/ coverage restoration (1,748 stmts, 1-3 weeks)
 
 ### Sprint 9 deferred (opened during this Sprint)

@@ -15,14 +15,14 @@
 /// Horizontal layer (NOT chips): Cmd+K, AI Copilot, Live Bell,
 /// Knowledge search, Entity Scope Selector — rendered once in shell.
 ///
-/// Each chip maps either to a V4SubModule (reusing existing tabs) OR
+/// Each chip maps either to a V5SubModule (reusing existing tabs) OR
 /// to a dashboard definition (new in V5).
 library;
 
 import 'package:flutter/material.dart';
 import '../theme.dart' as core_theme;
 
-import '../v4/v4_groups.dart';
+import 'v5_groups.dart';
 import 'v5_models.dart';
 
 // ──────────────────────────────────────────────────────────────────────
@@ -409,7 +409,7 @@ const _expensesDashboardWidgets = <V5DashboardWidget>[
 ];
 
 // ──────────────────────────────────────────────────────────────────────
-// Helper — convert V4SubModule into V5Chip.
+// Helper — convert V5SubModule into V5Chip.
 // ──────────────────────────────────────────────────────────────────────
 
 V5Chip _chipFromV4(String v4GroupId, String v4SubId, {
@@ -419,7 +419,7 @@ V5Chip _chipFromV4(String v4GroupId, String v4SubId, {
   final group = v4GroupById(v4GroupId);
   final sub = group?.subModuleById(v4SubId);
   if (sub == null) {
-    // Placeholder — sub-module not yet in v4_groups_data.
+    // Placeholder — sub-module not yet in v5_groups_data.
     return V5Chip(
       id: v4SubId,
       labelAr: labelOverrideAr ?? v4SubId,
