@@ -31,8 +31,10 @@ import 'v5_wired_screens.dart';
 List<RouteBase> v5Routes() => [
       // Phase 27.5: V5 Launchpad is the home again — user wants this as the
       // starting screen (Copilot hero + tile grid + news ticker + Ask APEX).
+      // G-S2 (2026-05-01): the /login redirect was removed because it
+      // overrode the top-level auth guard and produced /login ⇄ /app loops.
+      // /login now resolves to the real SlideAuthScreen route in router.dart.
       GoRoute(path: '/', redirect: (ctx, state) => '/app'),
-      GoRoute(path: '/login', redirect: (ctx, state) => '/app'),
       GoRoute(path: '/home', redirect: (ctx, state) => '/app'),
       GoRoute(
         path: '/app',

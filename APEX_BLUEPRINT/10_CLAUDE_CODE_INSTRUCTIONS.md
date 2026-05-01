@@ -86,13 +86,18 @@ When a PR contains both code and doc fixes from this protocol, the body
 should call out the verification done. Example:
 
 ```
-fix(auth): tighten JWT cookie samesite (#G-S2)
+fix(auth): tighten JWT cookie samesite (#G-S8)
 
 Verify-first findings:
-- Blueprint G-S2 claimed cookies were not used → false; CSRF middleware
-  is wired but disabled by default (CSRF_ENABLED=false).
-- Updated 09 § 5 G-S2 with current state and reduced estimate to 2 days.
+- Blueprint G-S8 (JWT secret rotation) claimed cookies were not used →
+  false; CSRF middleware is wired but disabled by default
+  (CSRF_ENABLED=false).
+- Updated 09 § 5 G-S8 with current state and reduced estimate to 2 days.
 ```
+
+> Note: this example referenced "G-S2" before 2026-05-01. The slot was
+> renumbered to G-S8 when an active auth-guard-bypass took the G-S2 ID.
+> JWT rotation work has not started yet, so the rename was doc-only.
 
 This makes the PR review trivial: reviewers can replay the verification
 without guessing what you saw.
