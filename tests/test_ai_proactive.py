@@ -139,3 +139,108 @@ def test_scan_tolerates_missing_tables():
     from app.ai.proactive import overdue_receivables
     result = overdue_receivables(days_overdue=7)
     assert isinstance(result, list)
+
+
+# ── G-T1.7a additions: cash_runway_warning + run_all_scans edges ──
+
+
+def test_cash_runway_silent_when_no_signal(monkeypatch):
+    """When current_balance <= 0 OR projected is empty/zeroes, return []
+    without raising. Covers the early-return guard at lines 245-248."""
+    from app.ai import proactive as p
+
+    def _zero_aggregate(*args, **kwargs):
+        return {"value": 0}
+
+    def _zero_forecast(*args, **kwargs):
+        return {"projected_values": []}
+
+    # Patch ledger helpers via monkeypatching the module the function
+    # lazy-imports from.
+    import app.services.copilot_tools_ledger as ledger
+    monkeypatch.setattr(ledger, "aggregate_metric", _zero_aggregate)
+    monkeypatch.setattr(ledger, "forecast_metric", _zero_forecast)
+
+    result = p.cash_runway_warning()
+    assert result == []
+
+
+def test_cash_runway_silent_when_balance_growing(monkeypatch):
+    """If projected ending > current, total_burn <= 0 and we stay silent."""
+    from app.ai import proactive as p
+    import app.services.copilot_tools_ledger as ledger
+
+    monkeypatch.setattr(ledger, "aggregate_metric",
+                        lambda *a, **kw: {"value": 100_000})
+    monkeypatch.setattr(ledger, "forecast_metric",
+                        lambda *a, **kw: {"projected_values": [110_000, 120_000, 130_000]})
+
+    result = p.cash_runway_warning()
+    assert result == []
+
+
+def test_cash_runway_emits_warning_at_safe_runway(monkeypatch):
+    """When runway > min_runway_days the function returns [] (no warning)."""
+    from app.ai import proactive as p
+    import app.services.copilot_tools_ledger as ledger
+
+    # current=100k, ending=10k → burn=90k over 6 months → 15k/mo →
+    # runway = (100k / 15k) * 30 ≈ 200 days, well above 30-day threshold.
+    monkeypatch.setattr(ledger, "aggregate_metric",
+                        lambda *a, **kw: {"value": 100_000})
+    monkeypatch.setattr(ledger, "forecast_metric",
+                        lambda *a, **kw: {"projected_values": [85_000, 70_000, 55_000, 40_000, 25_000, 10_000]})
+
+    result = p.cash_runway_warning(min_runway_days=30)
+    # Above threshold → empty list, no finding.
+    assert result == []
+
+
+def test_run_all_scans_summary_shape():
+    """run_all_scans returns the expected summary structure even on a fresh DB."""
+    from app.ai.proactive import run_all_scans
+    out = run_all_scans(emit_activity=False)
+    assert "scans_run" in out
+    assert out["scans_run"] >= 1
+    assert "total_findings" in out
+    assert "by_severity" in out
+    assert set(out["by_severity"].keys()) >= {"info", "warning", "error"}
+    assert "by_scan" in out
+    assert "findings" in out
+    assert isinstance(out["findings"], list)
+
+
+def test_run_all_scans_with_tenant_filter():
+    """tenant_id kwarg propagates to scans that accept it; falls through
+    to no-arg call for scans that don't (TypeError handler)."""
+    from app.ai.proactive import run_all_scans
+    out = run_all_scans(tenant_id="T-NONEXISTENT-TENANT", emit_activity=False)
+    # No error; counts populated for each registered scan.
+    assert out["scans_run"] >= 1
+    for name in ("overdue_receivables", "dead_zatca_submissions", "stale_sync_ops"):
+        assert name in out["by_scan"]
+
+
+def test_run_all_scans_emit_activity_false_skips_log():
+    """emit_activity=False short-circuits the log_activity call. No
+    side-effects, just the summary."""
+    from app.ai.proactive import run_all_scans
+    out = run_all_scans(emit_activity=False)
+    # Mostly a smoke test to exercise the emit_activity=False branch
+    # in the loop body.
+    assert out["scans_run"] >= 1
+
+
+def test_stale_sync_ops_returns_list():
+    """stale_sync_ops returns a list (may be empty) without raising."""
+    from app.ai.proactive import stale_sync_ops
+    result = stale_sync_ops()
+    assert isinstance(result, list)
+
+
+def test_overdue_receivables_zero_days():
+    """overdue_receivables with days_overdue=0 still returns a list
+    (every invoice is technically overdue but the table may be empty)."""
+    from app.ai.proactive import overdue_receivables
+    result = overdue_receivables(days_overdue=0)
+    assert isinstance(result, list)

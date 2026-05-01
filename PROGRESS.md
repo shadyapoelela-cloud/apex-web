@@ -32,8 +32,31 @@
     If `>30%` label use → open G-PROC-1.3 with small-PR exemption.
   - **Sprint 9 priority #1 closed.**
 
-- [ ] **G-T1.7a** ai/ coverage push (218 stmts, 1-2 days) — **next**
-- [ ] **G-A2.3** v4_groups → v5_groups (final V4 cleanup, 1-2h) — Sprint 9 #3
+- [x] **G-T1.7a** ai/ coverage push — **partial-DONE** 2026-05-01 (this PR)
+  - Branch: `sprint-9/g-t1-7a-ai-coverage-push`
+  - **79 unit tests added** across 5 files (3 NEW + 2 augmented):
+    - `tests/test_ai_routes_extras.py` — NEW, 46 tests for 25 orphan endpoints
+    - `tests/test_ai_approval_executor.py` — NEW, 7 tests for execute_suggestion + execute_all_approved
+    - `tests/test_ai_onboarding_routes.py` — NEW, 11 tests for onboarding error/validation paths (Phase 6, no DB writes)
+    - `tests/test_ai_scheduler.py` — augmented +7 tests for drain loop
+    - `tests/test_ai_proactive.py` — augmented +8 tests for cash_runway + run_all_scans
+  - **ai/ coverage: 54.31% → 69.42%** (+15.1pp; +128 statements covered)
+  - Per-file: scheduler 61.3% → 85% (+23.7pp), proactive 62.4% → 74% (+11.6pp),
+    routes 47.4% → 66% (+18.6pp), approval_executor 66.4% → 66% (~0)
+  - **Why partial:** 80% floor unreachable within "no DB writes" constraint
+    (~290 missing stmts cluster in 3 DB-integration zones: onboarding bodies,
+    approval `_execute_*` handlers, proactive `cash_runway_warning` notify block).
+    G-T1.7a.1 owns the remaining push.
+  - **Cascade: 22/23 maintained** (ai/ FAIL deliberate until G-T1.7a.1).
+  - **First production PR through diff-cover gate** (G-PROC-1 Phase 2 effectiveness):
+    zero `app/**` source changes → gate auto-passes "no relevant lines added".
+  - 6 verify-first saves during implementation (cascade-subprocess timeout
+    interaction, `--cov` flake, AiSuggestion column-name mismatch,
+    no-handler state-persistence behavior, drain env-var name, mathematical
+    floor-unreachability discovery).
+  - Sprint 9 priority #2 closed (partial).
+
+- [ ] **G-A2.3** v4_groups → v5_groups (final V4 cleanup, 1-2h) — Sprint 9 #3, **next**
 - [ ] **G-T1.7b** core/ coverage restoration (1,748 stmts, 1-3 weeks)
 
 ### Sprint 9 deferred (opened during this Sprint)
@@ -41,6 +64,9 @@
 - **G-PROC-2** — Separate `docs/` GH-Pages deploy artifact from main repo (Sprint 10)
 - **G-PROC-3** — CODEOWNERS for `app/ai/`, `app/core/`, `app/auth/` (Sprint 10, post-effectiveness-review)
 - **G-PROC-1.3** — Small-PR exemption (conditional on 2026-05-15 effectiveness review)
+- **G-T1.7a.1** — `app/ai/` DB-integration tests (expanded scope: onboarding + executor + proactive notify) — Sprint 10, owns the remaining 80% floor push and cascade-23/23 milestone
+- **G-T1.8** — `test_different_fiscal_years_isolated` order-dependent flake — Sprint 10
+- **G-T1.9** — ai/ test-suite runtime variance under broad `--cov` — **watch-only** (no investigation budget; documented in 09 § 4)
 
 ---
 
