@@ -705,17 +705,50 @@
   **UNCHANGED**. Real cascade root cause tracked as new gap G-T1.4.
 - **Sprint:** 8
 
-### 🟠 G-T1.3. Test infra flake + coverage thresholds
-- **Issue:** Sprint 7 surfaced multiple test-infra fragilities beyond G-T1.2 —
-  cascading collection errors mask real failures, and there is no enforced
-  coverage floor in CI (the `pyproject.toml` setting is informational only).
-- **Fix plan:**
-  1. Convert `test_flutter_files`-style "list of paths" tests into glob walks
-     so a future rename does not break the suite.
-  2. Add `--cov-fail-under=70` (or the agreed-floor) to the CI pytest invocation.
-  3. Mark the 4 known-flaky tests with `pytest.mark.flaky(reruns=2)`.
-- **Estimate:** 4-6 hours
-- **Sprint:** 8 (alongside G-T1.1)
+### ✅ G-T1.3. ~~Test infra flake + coverage thresholds~~ — RESOLVED 2026-05-01 (config sync)
+- **Verify-first finding (mixed case 2):** the original gap text claimed
+  "no enforced coverage floor in CI". Re-checking the actual files
+  proved this was partially incorrect:
+  - **`.github/workflows/ci.yml:86`** already has
+    `--cov-fail-under=55` (active CI gate, calibrated 2026-04-24).
+  - **`pyproject.toml [tool.coverage.report] fail_under = 10`** was
+    obsolete — set to 10% which gates nothing in practice.
+  - **No `--cov` flag in `[tool.pytest.ini_options].addopts`** —
+    correct by design; coverage instrumentation adds ~5× runtime
+    overhead and would slow local iteration.
+  - **`tests/test_core.py::test_flutter_files`** is still path-based
+    (7 entries post-G-T1.2). G-T1.2 verify-first proved this test
+    was never the cascade trigger, so the original gap rationale for
+    glob conversion ("future rename breaks the suite") is weak —
+    the test is now an intentional smoke-check with a docstring
+    explaining its purpose. **Glob conversion considered out-of-scope
+    for G-T1.3 — G-T1.2 closure documented sufficient.**
+- **What this gap delivered:**
+  1. ✅ `pyproject.toml [tool.coverage.report].fail_under: 10 → 55`
+     (synced with CI gate). Comment block documents calibration
+     history, decay rate, and the "do not lower without restoration
+     plan" rule.
+  2. ✅ `[tool.pytest.ini_options]` comment block clarifies the
+     deliberate decision to keep `--cov` out of `addopts` for fast
+     local iteration; points developers at the CI flag and at the
+     `pyproject.toml` gate for explicit `--cov` runs.
+  3. ❌ `test_flutter_files` glob conversion — out-of-scope as above.
+  4. ❌ `pytest.mark.flaky` annotations — original "4 known-flaky tests"
+     were never enumerated; treating as out-of-scope until a real
+     flake re-emerges. The cascade flake of Sprint 7 turned out to be
+     deterministic (G-T1.4 + G-T1.6 verify-first), not actually flaky.
+- **Empirical decay finding:** global coverage was **60.9%** when
+  CI gate was set 2026-04-24; current actual is **58.25%**. Drift
+  rate ≈ **−2.65pp/week**. At that pace, CI will fail in ~14 days
+  unless **G-PROC-1** ships in early Sprint 9 to stop the bleeding.
+  The `fail_under=55` is **not** a comfortable steady state — it's a
+  catch-net while the source:test ratio gets process control.
+- **Verification:**
+  - `pytest tests/ --cov=app --cov-fail-under=55` — passes at 58.25%.
+  - `pytest tests/test_per_directory_coverage.py` — still 22/23 PASS
+    (no change; `ai/` FAIL deliberate, awaiting G-T1.7a).
+  - `pyproject.toml fail_under == ci.yml --cov-fail-under == 55` ✓ synced.
+- **Sprint:** 8 (config sync); decay management in G-PROC-1 (Sprint 9).
 
 ### ✅ G-T1.4. ~~`test_tax_timeline_with_fiscal_year_param` time-rotted~~ — DONE 2026-05-01
 - **Root cause (verify-first):** the test hard-coded
@@ -1172,12 +1205,23 @@
   tests pushes the directory floors further down, compounding the
   G-T1.7b restoration debt. Process change is the multiplier; coverage
   PRs are the additive fix.
+- **Empirical decay rate (measured 2026-05-01 by G-T1.3):**
+  global project coverage was **60.9%** when the CI gate was
+  calibrated 2026-04-24; one week later it is **58.25%** — a drift
+  of **−2.65 pp/week**. At that pace the CI `--cov-fail-under=55`
+  gate hits its floor in **~14 days** (around 2026-05-15).
+  **G-PROC-1 scoping must complete in early Sprint 9** to prevent
+  a hard CI break before any restoration PRs land. After the
+  break, coverage falls below the global gate and every new PR
+  fails CI on `--cov-fail-under` until either (a) restoration tests
+  ship or (b) the gate is lowered (the latter explicitly forbidden
+  by the "never lower" rule in `pyproject.toml`).
 - **Status:** ⏸ Sprint 9 planning — open entry only, no work or
   design decisions made yet. Reference data captured in this entry
-  (and G-T1.7 evidence) is the input for the Sprint 9 kickoff.
+  (and G-T1.7 + G-T1.3 evidence) is the input for the Sprint 9 kickoff.
 - **Estimated:** 2-4 hours scoping + 1-2 days design + implementation
   of agreed gate.
-- **Sprint:** 9.
+- **Sprint:** 9 (early — must beat the 14-day decay deadline).
 
 ---
 

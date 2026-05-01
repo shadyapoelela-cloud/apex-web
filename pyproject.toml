@@ -10,6 +10,13 @@ target-version = "py311"
 select = ["E9", "F63", "F7", "F82"]
 
 [tool.pytest.ini_options]
+# Note: --cov is NOT in default addopts to keep local iteration fast
+# (coverage adds ~5x overhead). Run with coverage explicitly:
+#   pytest tests/ --cov=app --cov-report=term-missing
+# CI uses .github/workflows/ci.yml:86 for the --cov-fail-under=55 gate;
+# the same threshold lives in [tool.coverage.report].fail_under below
+# so a local `pytest --cov=app` (without explicit --cov-fail-under)
+# still gates against 55%.
 testpaths = ["tests"]
 addopts = "-v --tb=short"
 
@@ -18,8 +25,25 @@ source = ["app"]
 omit = ["app/*/models/*", "tests/*"]
 
 [tool.coverage.report]
+# Global coverage floor — synced with CI gate at .github/workflows/ci.yml:86.
+#
+# 2026-05-01 (G-T1.3): synced from obsolete 10% to 55% to match CI reality.
+# Calibrated 2026-04-24 when global actual was 60.9% (5.9pp buffer).
+# Current actual (2026-05-01): 58.25% (3.25pp buffer remaining).
+# Decay rate observed: -2.65pp/week (Sprint 7 expansion, see G-PROC-1).
+#
+# If actual drops below 55%, the next regression is real:
+#   - Open a coverage gap (likely G-T1.7c if pattern continues)
+#   - Do NOT lower this floor without restoration plan + cross-link
+#   - Per-directory floors (tests/test_per_directory_coverage.py) are
+#     the PRIMARY gate; this fail_under is the global safety net.
+#
+# Layered coverage gates (defense in depth):
+#   1. Per-directory floors (test_per_directory_coverage.py) - fine-grained
+#   2. Global fail_under (this) - catches aggregate decay across untracked dirs
+#   3. CI --cov-fail-under=55 (ci.yml:86) - explicit pipeline gate
 show_missing = true
-fail_under = 10
+fail_under = 55
 exclude_lines = [
     "pragma: no cover",
     "if __name__ == .__main__.",
