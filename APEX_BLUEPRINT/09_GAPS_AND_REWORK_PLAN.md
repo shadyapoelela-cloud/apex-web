@@ -1342,12 +1342,82 @@
   fails CI on `--cov-fail-under` until either (a) restoration tests
   ship or (b) the gate is lowered (the latter explicitly forbidden
   by the "never lower" rule in `pyproject.toml`).
-- **Status:** ⏸ Sprint 9 planning — open entry only, no work or
-  design decisions made yet. Reference data captured in this entry
-  (and G-T1.7 + G-T1.3 evidence) is the input for the Sprint 9 kickoff.
-- **Estimated:** 2-4 hours scoping + 1-2 days design + implementation
-  of agreed gate.
-- **Sprint:** 9 (early — must beat the 14-day decay deadline).
+- **Phase 1 — Investigation (DONE 2026-05-01, PR #119):**
+  Branch: `sprint-9/g-proc-1-investigation` — full report at
+  `APEX_BLUEPRINT/G-PROC-1-investigation.md` (328 lines).
+  Refined the original "21:1 ratio" to the global figure
+  **47.7:1** (after filtering 16.3M lines of Flutter build
+  artifacts in `docs/` and `apex_finance/build/web/`). Identified
+  three interacting root causes: (a) no PR-level test signal,
+  (b) G-T1.1 frontend-test infra blocker, (c) documented vs
+  undocumented PR culture mismatch. Recommended Phase 2 = G.1
+  (PR-diff coverage gate) + G.2 (PR template).
+- **Phase 2 — Controls (DONE 2026-05-01, this PR):**
+  Branch: `sprint-9/g-proc-1-phase-2-controls`.
+  - **`.github/workflows/ci.yml`:** added `--cov-report=xml` to
+    the existing pytest step + new "PR-diff coverage gate" step
+    using `diff-cover coverage.xml --compare-branch=origin/main
+    --include 'app/**' --fail-under=70`. Runs only on
+    `pull_request` events. Skipped when label
+    `skip-coverage-gate` is present on the PR. `diff-cover>=8.0`
+    appended to the inline `pip install` line.
+  - **Frontend exclusion is deliberate** — `--include 'app/**'`
+    scopes the gate to Python only until G-T1.1 (Flutter test
+    infra) ships. Inline TODO in `ci.yml` marks the scope
+    expansion as a follow-up tied to G-T1.1 closure.
+  - **`.github/PULL_REQUEST_TEMPLATE.md`** (new, 38 lines): six
+    sections — *What this PR does / Type / Test budget /
+    Verification / Risk / Bypass diff-cover gate?*. Type checklist
+    includes `proc` (process/CI/governance) before `hotfix`.
+- **Effectiveness review (scheduled 2026-05-15 — 2 weeks post-merge):**
+  After 2 weeks of Phase 2 in production, evaluate:
+    - % PRs that triggered the diff-cover gate
+    - % PRs that used the `skip-coverage-gate` label
+    - Pattern of label use (typo fixes? hotfixes? misuse?)
+    - If `>30%` label use → reconsider option (a) (small-PR
+      exemption by minimum-changed-lines threshold) or option (c)
+      (auto-skip <10-line diffs) as a new gap **G-PROC-1.3**.
+    - If gate effective (≤10% label use, ≥1 catch of
+      code-without-tests) → mark Phase 2 stable, move attention
+      to G-PROC-2 / G-PROC-3.
+- **Status:** ✅ Phase 1 + Phase 2 DONE. Sprint 9 priority #1
+  closed. Effectiveness review on calendar (2026-05-15).
+- **Sprint:** 9.
+
+### ⏸ G-PROC-2. Separate `docs/` GH-Pages deploy artifact from main repo
+- **Trigger:** G-PROC-1 Phase 1 investigation found **16.3M lines
+  (99.1%) of Sprint 7 churn was Flutter build artifacts** in
+  `docs/` (intentionally tracked for GitHub Pages deploy). This
+  noise inflates every line-based metric: ratios, decay analysis,
+  PR-diff sizes, repo clone time. The per-PR diff-cover gate
+  shipped in G-PROC-1 Phase 2 is **path-scoped** to `app/**` so
+  this noise does not directly bias the gate, but the broader
+  metrics (commit graphs, ratios, GitHub insights) remain biased
+  until the deploy artifact is moved out.
+- **Scope:** move `docs/` to a dedicated `gh-pages` branch (or a
+  separate repo). Update the GH Actions deploy workflow to push
+  the built artifact there instead of committing to `main`.
+- **Estimated:** 4-6 hours.
+- **Status:** ⏸ Deferred — Sprint 10 candidate. Open as a
+  standalone PR.
+- **Sprint:** 10.
+
+### ⏸ G-PROC-3. CODEOWNERS for `app/ai/`, `app/core/`, `app/auth/`
+- **Trigger:** G-PROC-1 Phase 1 found Sprint 7 PRs in critical
+  paths (auth, ai, core) merged without an explicit reviewer
+  signal. CODEOWNERS adds automatic review requests + auto-rejection
+  of PRs missing owner approval — a complementary control to the
+  diff-cover gate (which checks tests, not human judgment).
+- **Scope:** create `.github/CODEOWNERS` listing owners per
+  critical path. Requires owner identification (organizational,
+  not technical). Pair with branch-protection rule on GitHub
+  (require approval from CODEOWNERS for protected paths).
+- **Estimated:** 2-3 hours (mostly negotiation on ownership).
+- **Status:** ⏸ Deferred — wait for G-PROC-1 Phase 2
+  effectiveness data (~2 weeks post-merge, 2026-05-15) before
+  deciding if this layer is needed. If diff-cover catches >80%
+  of regressions, CODEOWNERS may be overhead without gain.
+- **Sprint:** 10.
 
 ---
 
