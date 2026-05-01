@@ -1,6 +1,50 @@
 # APEX Sprint Progress
 
-## Sprint 8 — Quality & Compliance (Q2 2026, week 1) — IN PROGRESS
+## Sprint 9 — Quality & Process (Q2 2026, week 2) — IN PROGRESS
+
+- [x] **G-PROC-1 Phase 1** — Process root-cause investigation.
+  - Branch: `sprint-9/g-proc-1-investigation` (merged PR #119)
+  - Full investigation report: `APEX_BLUEPRINT/G-PROC-1-investigation.md`
+    (328 lines, sections A-H).
+  - Refined the original "21:1 ratio" → real Sprint 7 global figure was
+    **47.7:1** (after filtering 16.3M lines of Flutter build artifacts).
+  - Three interacting root causes identified: (a) no PR-level test
+    signal, (b) G-T1.1 frontend-test-infra blocker, (c) documented vs
+    undocumented PR culture. Recommended Phase 2 = G.1 (PR-diff
+    coverage gate) + G.2 (PR template).
+
+- [x] **G-PROC-1 Phase 2** — Process controls implementation.
+  - Branch: `sprint-9/g-proc-1-phase-2-controls`
+  - **`.github/workflows/ci.yml`:** added `--cov-report=xml` to existing
+    pytest step + new "PR-diff coverage gate" step using
+    `diff-cover coverage.xml --compare-branch=origin/main
+    --include 'app/**' --fail-under=70`. Runs only on `pull_request`
+    events; skipped when label `skip-coverage-gate` present.
+    `diff-cover>=8.0` appended to inline `pip install` line.
+  - **`.github/PULL_REQUEST_TEMPLATE.md`** (new, 38 lines): six
+    sections — *What this PR does / Type / Test budget / Verification /
+    Risk / Bypass*. `proc` type checkbox added before `hotfix`.
+  - **Frontend exclusion deliberate** (`--include 'app/**'`) until
+    G-T1.1 unblocks Flutter widget tests; inline TODO ties scope
+    expansion to G-T1.1 closure.
+  - **Effectiveness review on calendar (2026-05-15):** 2 weeks
+    post-merge, evaluate label-spam %, gate-trigger %, PR-pattern.
+    If `>30%` label use → open G-PROC-1.3 with small-PR exemption.
+  - **Sprint 9 priority #1 closed.**
+
+- [ ] **G-T1.7a** ai/ coverage push (218 stmts, 1-2 days) — **next**
+- [ ] **G-A2.3** v4_groups → v5_groups (final V4 cleanup, 1-2h) — Sprint 9 #3
+- [ ] **G-T1.7b** core/ coverage restoration (1,748 stmts, 1-3 weeks)
+
+### Sprint 9 deferred (opened during this Sprint)
+
+- **G-PROC-2** — Separate `docs/` GH-Pages deploy artifact from main repo (Sprint 10)
+- **G-PROC-3** — CODEOWNERS for `app/ai/`, `app/core/`, `app/auth/` (Sprint 10, post-effectiveness-review)
+- **G-PROC-1.3** — Small-PR exemption (conditional on 2026-05-15 effectiveness review)
+
+---
+
+## Sprint 8 — Quality & Compliance (Q2 2026, week 1) — COMPLETE
 
 - [x] **G-DOCS-1**: Blueprint accuracy audit + Verify-First Protocol.
   - Branch: `sprint-8/g-docs-1-blueprint-accuracy-audit` (merged PR #110)
