@@ -1,27 +1,30 @@
-/// @deprecated V4 module — kept temporarily because 6 screens still depend on
-/// `apex_screen_host.dart` (the only file with external users). The other
-/// widgets here are an internally-consistent dead zone (0 external users) but
-/// removing them piecemeal would break `apex_launchpad`, `apex_sub_module_shell`,
-/// `apex_command_palette`, and `apex_tab_bar` which all import `v4_groups.dart`.
+/// V5 Module Hierarchy Map.
 ///
-/// Migration to V5 is tracked in G-A2.1 — see
-/// `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md`. Do NOT add new usages.
-/// APEX V4 — Module Hierarchy Data (Wave 1.5).
-///
-/// Source of truth for the V4 Module Hierarchy Map:
+/// Source of truth for the canonical Module Hierarchy:
 ///   6 Module Groups → 46 Sub-Modules → ~320 Screens.
 ///
-/// This file is intentionally pure data (no widgets, no I/O) so the
-/// shell components can be rendered, tested, and tree-shaken without
-/// importing UI dependencies.
+/// Defines the V5Screen / V5SubModule / V5ModuleGroup data structure
+/// used by the V5 launchpad and ServiceShell. The file is intentionally
+/// pure data (no widgets, no I/O) so the shell components can be
+/// rendered, tested, and tree-shaken without importing UI dependencies.
 ///
-/// See blueprints/APEX_V4_Module_Hierarchy.txt for the full narrative.
+/// History: originally created during the V4 product blueprint phase
+/// as the "V4 Module Hierarchy Map" (`lib/core/v4/v4_groups.dart`).
+/// Renamed to V5 in G-A2.3 (Sprint 9, 2026-05-01) as part of the V4
+/// cleanup chapter (Sprint 7 G-A2 → Sprint 8 G-A2.1 → Sprint 9 G-A2.3).
+/// The data shape is unchanged; only the class names and file location
+/// migrated. See `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md` § 4 for
+/// the full migration narrative.
+///
+/// Historical reference: `blueprints/APEX_V4_Module_Hierarchy.txt`
+/// remains the original spec document (intentionally not renamed —
+/// it predates the V5 rename and stays as a historical artifact).
 library;
 
 import 'package:flutter/material.dart';
 import '../theme.dart' as core_theme;
 
-import 'v4_groups_data.dart';
+import 'v5_groups_data.dart';
 
 /// Stable identifier for screen telemetry. Never renames once shipped —
 /// analytics pipelines key on these strings.
@@ -30,7 +33,7 @@ typedef ScreenId = String;
 /// A single screen slot inside a sub-module. Visible tabs render in the
 /// TabBar row; overflow entries go under the "More ▾" popover.
 @immutable
-class V4Screen {
+class V5Screen {
   /// Stable, URL-safe id. Format: `{group}-{sub}-{screen}` lowercased.
   final ScreenId id;
 
@@ -51,7 +54,7 @@ class V4Screen {
   /// Shell reads `flagsDisabled` from user prefs to hide unreleased tabs.
   final String? featureFlag;
 
-  const V4Screen({
+  const V5Screen({
     required this.id,
     required this.labelAr,
     required this.labelEn,
@@ -64,7 +67,7 @@ class V4Screen {
 /// A functional area inside a module group (Sales, Workpapers, Ratios, …).
 /// Sub-modules are the sidebar items; screens are the tabs.
 @immutable
-class V4SubModule {
+class V5SubModule {
   final String id;
   final String labelAr;
   final String labelEn;
@@ -73,13 +76,13 @@ class V4SubModule {
 
   /// Up to ~5 screens rendered as visible tabs. Order is the default;
   /// users can reorder and pin/unpin via per-user prefs.
-  final List<V4Screen> visibleTabs;
+  final List<V5Screen> visibleTabs;
 
   /// Overflow screens in the "More ▾" popover. Can be pinned up to
   /// visibleTabs by user.
-  final List<V4Screen> overflow;
+  final List<V5Screen> overflow;
 
-  const V4SubModule({
+  const V5SubModule({
     required this.id,
     required this.labelAr,
     required this.labelEn,
@@ -91,12 +94,12 @@ class V4SubModule {
 
   /// All screens regardless of visible/overflow position — useful for
   /// command palette + deep-link resolution.
-  List<V4Screen> get allScreens => [...visibleTabs, ...overflow];
+  List<V5Screen> get allScreens => [...visibleTabs, ...overflow];
 }
 
 /// A top-level card on the Launchpad (ERP, Audit, Feas, …).
 @immutable
-class V4ModuleGroup {
+class V5ModuleGroup {
   final String id;
   final String labelAr;
   final String labelEn;
@@ -107,9 +110,9 @@ class V4ModuleGroup {
   final Color color;
 
   final String descriptionAr;
-  final List<V4SubModule> subModules;
+  final List<V5SubModule> subModules;
 
-  const V4ModuleGroup({
+  const V5ModuleGroup({
     required this.id,
     required this.labelAr,
     required this.labelEn,
@@ -119,7 +122,7 @@ class V4ModuleGroup {
     required this.subModules,
   });
 
-  V4SubModule? subModuleById(String id) {
+  V5SubModule? subModuleById(String id) {
     for (final s in subModules) {
       if (s.id == id) return s;
     }
@@ -132,38 +135,38 @@ class V4ModuleGroup {
 // Keep these const so the whole registry is a compile-time graph.
 // The IDs mirror the "snake-hyphen" slug used in URLs.
 
-const _erpSales = V4SubModule(
+const _erpSales = V5SubModule(
   id: 'sales',
   labelAr: 'المبيعات',
   labelEn: 'Sales & AR',
   icon: Icons.trending_up,
   descriptionAr: 'دورة الإيرادات — عروض، فواتير، مدفوعات، كشوف حساب.',
   visibleTabs: [
-    V4Screen(
+    V5Screen(
       id: 'erp-sales-customers',
       labelAr: 'العملاء',
       labelEn: 'Customers',
       icon: Icons.people_alt_outlined,
     ),
-    V4Screen(
+    V5Screen(
       id: 'erp-sales-invoices',
       labelAr: 'الفواتير',
       labelEn: 'Invoices',
       icon: Icons.receipt_long_outlined,
     ),
-    V4Screen(
+    V5Screen(
       id: 'erp-sales-payments',
       labelAr: 'المدفوعات',
       labelEn: 'Payments',
       icon: Icons.account_balance_wallet_outlined,
     ),
-    V4Screen(
+    V5Screen(
       id: 'erp-sales-statements',
       labelAr: 'كشوف الحساب',
       labelEn: 'Statements',
       icon: Icons.description_outlined,
     ),
-    V4Screen(
+    V5Screen(
       id: 'erp-sales-quotes',
       labelAr: 'عروض الأسعار',
       labelEn: 'Quotes',
@@ -171,31 +174,31 @@ const _erpSales = V4SubModule(
     ),
   ],
   overflow: [
-    V4Screen(
+    V5Screen(
       id: 'erp-sales-credit-notes',
       labelAr: 'إشعارات دائنة',
       labelEn: 'Credit Notes',
       icon: Icons.undo,
     ),
-    V4Screen(
+    V5Screen(
       id: 'erp-sales-recurring',
       labelAr: 'فواتير متكررة',
       labelEn: 'Recurring Invoices',
       icon: Icons.repeat,
     ),
-    V4Screen(
+    V5Screen(
       id: 'erp-sales-price-lists',
       labelAr: 'قوائم الأسعار',
       labelEn: 'Price Lists',
       icon: Icons.price_change_outlined,
     ),
-    V4Screen(
+    V5Screen(
       id: 'erp-sales-aging',
       labelAr: 'تقرير الأعمار',
       labelEn: 'Aging Report',
       icon: Icons.hourglass_bottom,
     ),
-    V4Screen(
+    V5Screen(
       id: 'erp-sales-settings',
       labelAr: 'الإعدادات',
       labelEn: 'Sales Settings',
@@ -204,159 +207,159 @@ const _erpSales = V4SubModule(
   ],
 );
 
-const _erpDashboard = V4SubModule(
+const _erpDashboard = V5SubModule(
   id: 'dashboard',
   labelAr: 'اللوحة الرئيسية',
   labelEn: 'Dashboard',
   icon: Icons.dashboard_outlined,
   descriptionAr: 'نظرة شاملة على كل وحدات ERP: KPIs، تنبيهات، نشاط حديث.',
   visibleTabs: [
-    V4Screen(id: 'erp-dash-overview', labelAr: 'نظرة عامة', labelEn: 'Overview', icon: Icons.insights),
-    V4Screen(id: 'erp-dash-kpis', labelAr: 'المؤشرات', labelEn: 'KPIs', icon: Icons.leaderboard),
-    V4Screen(id: 'erp-dash-alerts', labelAr: 'التنبيهات', labelEn: 'Alerts', icon: Icons.notifications_active_outlined),
-    V4Screen(id: 'erp-dash-activity', labelAr: 'النشاط', labelEn: 'Activity', icon: Icons.timeline),
-    V4Screen(id: 'erp-dash-calendar', labelAr: 'التقويم', labelEn: 'Calendar', icon: Icons.calendar_month),
+    V5Screen(id: 'erp-dash-overview', labelAr: 'نظرة عامة', labelEn: 'Overview', icon: Icons.insights),
+    V5Screen(id: 'erp-dash-kpis', labelAr: 'المؤشرات', labelEn: 'KPIs', icon: Icons.leaderboard),
+    V5Screen(id: 'erp-dash-alerts', labelAr: 'التنبيهات', labelEn: 'Alerts', icon: Icons.notifications_active_outlined),
+    V5Screen(id: 'erp-dash-activity', labelAr: 'النشاط', labelEn: 'Activity', icon: Icons.timeline),
+    V5Screen(id: 'erp-dash-calendar', labelAr: 'التقويم', labelEn: 'Calendar', icon: Icons.calendar_month),
   ],
 );
 
-const _erpGl = V4SubModule(
+const _erpGl = V5SubModule(
   id: 'gl',
   labelAr: 'دفتر الأستاذ',
   labelEn: 'General Ledger',
   icon: Icons.account_tree_outlined,
   descriptionAr: 'شجرة الحسابات، قيود اليومية، ميزان المراجعة، القوائم المالية.',
   visibleTabs: [
-    V4Screen(id: 'erp-gl-coa', labelAr: 'شجرة الحسابات', labelEn: 'CoA Tree', icon: Icons.account_tree),
-    V4Screen(id: 'erp-gl-journals', labelAr: 'قيود اليومية', labelEn: 'Journals', icon: Icons.menu_book),
-    V4Screen(id: 'erp-gl-tb', labelAr: 'ميزان المراجعة', labelEn: 'Trial Balance', icon: Icons.balance),
-    V4Screen(id: 'erp-gl-fs', labelAr: 'القوائم المالية', labelEn: 'Financial Statements', icon: Icons.summarize),
-    V4Screen(id: 'erp-gl-close', labelAr: 'إقفال الفترة', labelEn: 'Period Close', icon: Icons.lock_clock),
+    V5Screen(id: 'erp-gl-coa', labelAr: 'شجرة الحسابات', labelEn: 'CoA Tree', icon: Icons.account_tree),
+    V5Screen(id: 'erp-gl-journals', labelAr: 'قيود اليومية', labelEn: 'Journals', icon: Icons.menu_book),
+    V5Screen(id: 'erp-gl-tb', labelAr: 'ميزان المراجعة', labelEn: 'Trial Balance', icon: Icons.balance),
+    V5Screen(id: 'erp-gl-fs', labelAr: 'القوائم المالية', labelEn: 'Financial Statements', icon: Icons.summarize),
+    V5Screen(id: 'erp-gl-close', labelAr: 'إقفال الفترة', labelEn: 'Period Close', icon: Icons.lock_clock),
   ],
 );
 
-const _erpPurchasing = V4SubModule(
+const _erpPurchasing = V5SubModule(
   id: 'purchasing',
   labelAr: 'المشتريات',
   labelEn: 'Purchasing & AP',
   icon: Icons.shopping_cart_outlined,
   descriptionAr: 'دورة المشتريات — موردون، أوامر شراء، فواتير واردة، مطابقة ثلاثية.',
   visibleTabs: [
-    V4Screen(id: 'erp-pur-vendors', labelAr: 'الموردون', labelEn: 'Vendors', icon: Icons.store),
-    V4Screen(id: 'erp-pur-pos', labelAr: 'أوامر الشراء', labelEn: 'Purchase Orders', icon: Icons.assignment),
-    V4Screen(id: 'erp-pur-bills', labelAr: 'الفواتير الواردة', labelEn: 'Bills', icon: Icons.receipt),
-    V4Screen(id: 'erp-pur-payments', labelAr: 'المدفوعات', labelEn: 'Payments', icon: Icons.payments),
-    V4Screen(id: 'erp-pur-grn', labelAr: 'إشعارات الاستلام', labelEn: 'Goods Receipts', icon: Icons.inventory),
+    V5Screen(id: 'erp-pur-vendors', labelAr: 'الموردون', labelEn: 'Vendors', icon: Icons.store),
+    V5Screen(id: 'erp-pur-pos', labelAr: 'أوامر الشراء', labelEn: 'Purchase Orders', icon: Icons.assignment),
+    V5Screen(id: 'erp-pur-bills', labelAr: 'الفواتير الواردة', labelEn: 'Bills', icon: Icons.receipt),
+    V5Screen(id: 'erp-pur-payments', labelAr: 'المدفوعات', labelEn: 'Payments', icon: Icons.payments),
+    V5Screen(id: 'erp-pur-grn', labelAr: 'إشعارات الاستلام', labelEn: 'Goods Receipts', icon: Icons.inventory),
   ],
 );
 
-const _erpTreasury = V4SubModule(
+const _erpTreasury = V5SubModule(
   id: 'treasury',
   labelAr: 'الخزينة والبنوك',
   labelEn: 'Treasury & Banking',
   icon: Icons.account_balance_outlined,
   descriptionAr: 'حسابات بنكية، تدفقات، مطابقة، تنبؤ نقدي، صرف عملات.',
   visibleTabs: [
-    V4Screen(id: 'erp-tre-accounts', labelAr: 'الحسابات البنكية', labelEn: 'Bank Accounts', icon: Icons.account_balance),
-    V4Screen(id: 'erp-tre-txns', labelAr: 'الحركات', labelEn: 'Transactions', icon: Icons.swap_vert),
-    V4Screen(id: 'erp-tre-rec', labelAr: 'المطابقة', labelEn: 'Reconciliation', icon: Icons.check_circle_outline),
-    V4Screen(id: 'erp-tre-cashflow', labelAr: 'التدفق النقدي', labelEn: 'Cash Flow', icon: Icons.waterfall_chart),
-    V4Screen(id: 'erp-tre-fx', labelAr: 'أسعار الصرف', labelEn: 'FX Rates', icon: Icons.currency_exchange),
+    V5Screen(id: 'erp-tre-accounts', labelAr: 'الحسابات البنكية', labelEn: 'Bank Accounts', icon: Icons.account_balance),
+    V5Screen(id: 'erp-tre-txns', labelAr: 'الحركات', labelEn: 'Transactions', icon: Icons.swap_vert),
+    V5Screen(id: 'erp-tre-rec', labelAr: 'المطابقة', labelEn: 'Reconciliation', icon: Icons.check_circle_outline),
+    V5Screen(id: 'erp-tre-cashflow', labelAr: 'التدفق النقدي', labelEn: 'Cash Flow', icon: Icons.waterfall_chart),
+    V5Screen(id: 'erp-tre-fx', labelAr: 'أسعار الصرف', labelEn: 'FX Rates', icon: Icons.currency_exchange),
   ],
 );
 
-const _erpHr = V4SubModule(
+const _erpHr = V5SubModule(
   id: 'hr',
   labelAr: 'الموارد البشرية والرواتب',
   labelEn: 'HR & Payroll',
   icon: Icons.groups_outlined,
   descriptionAr: 'موظفون، رواتب، إجازات، GOSI/WPS، مكافأة نهاية الخدمة.',
   visibleTabs: [
-    V4Screen(id: 'erp-hr-employees', labelAr: 'الموظفون', labelEn: 'Employees', icon: Icons.badge),
-    V4Screen(id: 'erp-hr-org', labelAr: 'الهيكل التنظيمي', labelEn: 'Org Chart', icon: Icons.schema),
-    V4Screen(id: 'erp-hr-payroll', labelAr: 'الرواتب', labelEn: 'Payroll Runs', icon: Icons.payments_outlined),
-    V4Screen(id: 'erp-hr-leaves', labelAr: 'الإجازات', labelEn: 'Leaves', icon: Icons.event_available),
-    V4Screen(id: 'erp-hr-attendance', labelAr: 'الدوام', labelEn: 'Attendance', icon: Icons.schedule),
+    V5Screen(id: 'erp-hr-employees', labelAr: 'الموظفون', labelEn: 'Employees', icon: Icons.badge),
+    V5Screen(id: 'erp-hr-org', labelAr: 'الهيكل التنظيمي', labelEn: 'Org Chart', icon: Icons.schema),
+    V5Screen(id: 'erp-hr-payroll', labelAr: 'الرواتب', labelEn: 'Payroll Runs', icon: Icons.payments_outlined),
+    V5Screen(id: 'erp-hr-leaves', labelAr: 'الإجازات', labelEn: 'Leaves', icon: Icons.event_available),
+    V5Screen(id: 'erp-hr-attendance', labelAr: 'الدوام', labelEn: 'Attendance', icon: Icons.schedule),
   ],
 );
 
-const _erpReports = V4SubModule(
+const _erpReports = V5SubModule(
   id: 'reports',
   labelAr: 'التقارير والتحليلات',
   labelEn: 'Reports & Analytics',
   icon: Icons.assessment_outlined,
   descriptionAr: 'تقارير مالية وتشغيلية، بناء مخصص، جدولة إرسال.',
   visibleTabs: [
-    V4Screen(id: 'erp-rep-financial', labelAr: 'المالية', labelEn: 'Financial', icon: Icons.pie_chart),
-    V4Screen(id: 'erp-rep-operational', labelAr: 'التشغيلية', labelEn: 'Operational', icon: Icons.bar_chart),
-    V4Screen(id: 'erp-rep-builder', labelAr: 'بناء تقرير', labelEn: 'Custom Builder', icon: Icons.edit_note),
-    V4Screen(id: 'erp-rep-scheduled', labelAr: 'مجدولة', labelEn: 'Scheduled', icon: Icons.alarm),
-    V4Screen(id: 'erp-rep-templates', labelAr: 'القوالب', labelEn: 'Templates', icon: Icons.dashboard_customize),
+    V5Screen(id: 'erp-rep-financial', labelAr: 'المالية', labelEn: 'Financial', icon: Icons.pie_chart),
+    V5Screen(id: 'erp-rep-operational', labelAr: 'التشغيلية', labelEn: 'Operational', icon: Icons.bar_chart),
+    V5Screen(id: 'erp-rep-builder', labelAr: 'بناء تقرير', labelEn: 'Custom Builder', icon: Icons.edit_note),
+    V5Screen(id: 'erp-rep-scheduled', labelAr: 'مجدولة', labelEn: 'Scheduled', icon: Icons.alarm),
+    V5Screen(id: 'erp-rep-templates', labelAr: 'القوالب', labelEn: 'Templates', icon: Icons.dashboard_customize),
   ],
 );
 
 // Remaining ERP sub-modules defined as lightweight stubs for the pilot;
 // their visibleTabs are from V4 tables but no overflow is populated yet.
-const _erpInventory = V4SubModule(
+const _erpInventory = V5SubModule(
   id: 'inventory',
   labelAr: 'المخزون',
   labelEn: 'Inventory',
   icon: Icons.inventory_2_outlined,
   descriptionAr: 'أصناف، مستودعات، حركات، جرد دوري.',
   visibleTabs: [
-    V4Screen(id: 'erp-inv-items', labelAr: 'الأصناف', labelEn: 'Items', icon: Icons.category),
-    V4Screen(id: 'erp-inv-stock', labelAr: 'الرصيد الحالي', labelEn: 'Stock On-Hand', icon: Icons.inventory),
-    V4Screen(id: 'erp-inv-moves', labelAr: 'الحركات', labelEn: 'Stock Moves', icon: Icons.swap_horiz),
-    V4Screen(id: 'erp-inv-warehouses', labelAr: 'المستودعات', labelEn: 'Warehouses', icon: Icons.warehouse),
-    V4Screen(id: 'erp-inv-counts', labelAr: 'الجرد', labelEn: 'Cycle Counts', icon: Icons.checklist),
+    V5Screen(id: 'erp-inv-items', labelAr: 'الأصناف', labelEn: 'Items', icon: Icons.category),
+    V5Screen(id: 'erp-inv-stock', labelAr: 'الرصيد الحالي', labelEn: 'Stock On-Hand', icon: Icons.inventory),
+    V5Screen(id: 'erp-inv-moves', labelAr: 'الحركات', labelEn: 'Stock Moves', icon: Icons.swap_horiz),
+    V5Screen(id: 'erp-inv-warehouses', labelAr: 'المستودعات', labelEn: 'Warehouses', icon: Icons.warehouse),
+    V5Screen(id: 'erp-inv-counts', labelAr: 'الجرد', labelEn: 'Cycle Counts', icon: Icons.checklist),
   ],
 );
 
-const _erpProjects = V4SubModule(
+const _erpProjects = V5SubModule(
   id: 'projects',
   labelAr: 'المشاريع',
   labelEn: 'Projects',
   icon: Icons.folder_outlined,
   descriptionAr: 'مشاريع، مهام، جداول زمنية، موازنات.',
   visibleTabs: [
-    V4Screen(id: 'erp-prj-list', labelAr: 'المشاريع', labelEn: 'Projects', icon: Icons.folder),
-    V4Screen(id: 'erp-prj-tasks', labelAr: 'المهام', labelEn: 'Tasks', icon: Icons.check_box_outlined),
-    V4Screen(id: 'erp-prj-time', labelAr: 'الوقت', labelEn: 'Timesheets', icon: Icons.access_time),
-    V4Screen(id: 'erp-prj-gantt', labelAr: 'الجانت', labelEn: 'Gantt', icon: Icons.view_timeline),
-    V4Screen(id: 'erp-prj-billing', labelAr: 'الفوترة', labelEn: 'Billing', icon: Icons.receipt_long),
+    V5Screen(id: 'erp-prj-list', labelAr: 'المشاريع', labelEn: 'Projects', icon: Icons.folder),
+    V5Screen(id: 'erp-prj-tasks', labelAr: 'المهام', labelEn: 'Tasks', icon: Icons.check_box_outlined),
+    V5Screen(id: 'erp-prj-time', labelAr: 'الوقت', labelEn: 'Timesheets', icon: Icons.access_time),
+    V5Screen(id: 'erp-prj-gantt', labelAr: 'الجانت', labelEn: 'Gantt', icon: Icons.view_timeline),
+    V5Screen(id: 'erp-prj-billing', labelAr: 'الفوترة', labelEn: 'Billing', icon: Icons.receipt_long),
   ],
 );
 
-const _erpCrm = V4SubModule(
+const _erpCrm = V5SubModule(
   id: 'crm',
   labelAr: 'إدارة علاقات العملاء',
   labelEn: 'CRM',
   icon: Icons.contact_mail_outlined,
   descriptionAr: 'عملاء محتملون، فرص، خط بيع، حملات.',
   visibleTabs: [
-    V4Screen(id: 'erp-crm-leads', labelAr: 'العملاء المحتملون', labelEn: 'Leads', icon: Icons.person_add),
-    V4Screen(id: 'erp-crm-opps', labelAr: 'الفرص', labelEn: 'Opportunities', icon: Icons.emoji_events),
-    V4Screen(id: 'erp-crm-pipeline', labelAr: 'خط البيع', labelEn: 'Pipeline', icon: Icons.view_kanban),
-    V4Screen(id: 'erp-crm-activities', labelAr: 'الأنشطة', labelEn: 'Activities', icon: Icons.event_note),
-    V4Screen(id: 'erp-crm-contacts', labelAr: 'جهات الاتصال', labelEn: 'Contacts', icon: Icons.contacts),
+    V5Screen(id: 'erp-crm-leads', labelAr: 'العملاء المحتملون', labelEn: 'Leads', icon: Icons.person_add),
+    V5Screen(id: 'erp-crm-opps', labelAr: 'الفرص', labelEn: 'Opportunities', icon: Icons.emoji_events),
+    V5Screen(id: 'erp-crm-pipeline', labelAr: 'خط البيع', labelEn: 'Pipeline', icon: Icons.view_kanban),
+    V5Screen(id: 'erp-crm-activities', labelAr: 'الأنشطة', labelEn: 'Activities', icon: Icons.event_note),
+    V5Screen(id: 'erp-crm-contacts', labelAr: 'جهات الاتصال', labelEn: 'Contacts', icon: Icons.contacts),
   ],
 );
 
-const _erpZatca = V4SubModule(
+const _erpZatca = V5SubModule(
   id: 'zatca',
   labelAr: 'ZATCA والضرائب',
   labelEn: 'ZATCA & Tax',
   icon: Icons.verified_outlined,
   descriptionAr: 'الفوترة الإلكترونية، إقرارات، ضريبة استقطاع، شهادات.',
   visibleTabs: [
-    V4Screen(id: 'erp-zat-clearance', labelAr: 'التخليص', labelEn: 'E-Invoice Clearance', icon: Icons.verified),
-    V4Screen(id: 'erp-zat-vat', labelAr: 'إقرار VAT', labelEn: 'VAT Return', icon: Icons.request_page),
-    V4Screen(id: 'erp-zat-wht', labelAr: 'ضريبة الاستقطاع', labelEn: 'Withholding Tax', icon: Icons.percent),
-    V4Screen(id: 'erp-zat-certs', labelAr: 'الشهادات', labelEn: 'Certificates', icon: Icons.card_membership),
-    V4Screen(id: 'erp-zat-log', labelAr: 'سجل التقديم', labelEn: 'Filings Log', icon: Icons.history),
+    V5Screen(id: 'erp-zat-clearance', labelAr: 'التخليص', labelEn: 'E-Invoice Clearance', icon: Icons.verified),
+    V5Screen(id: 'erp-zat-vat', labelAr: 'إقرار VAT', labelEn: 'VAT Return', icon: Icons.request_page),
+    V5Screen(id: 'erp-zat-wht', labelAr: 'ضريبة الاستقطاع', labelEn: 'Withholding Tax', icon: Icons.percent),
+    V5Screen(id: 'erp-zat-certs', labelAr: 'الشهادات', labelEn: 'Certificates', icon: Icons.card_membership),
+    V5Screen(id: 'erp-zat-log', labelAr: 'سجل التقديم', labelEn: 'Filings Log', icon: Icons.history),
   ],
 );
 
-const _erpModuleGroup = V4ModuleGroup(
+const _erpModuleGroup = V5ModuleGroup(
   id: 'erp',
   labelAr: 'نظام ERP',
   labelEn: 'ERP System',
@@ -382,7 +385,7 @@ const _erpModuleGroup = V4ModuleGroup(
 // Full sub-module breakdowns will land in follow-up PRs when each
 // group gets real screens wired. This keeps Wave 1.5 scope bounded.
 
-const _auditGroup = V4ModuleGroup(
+const _auditGroup = V5ModuleGroup(
   id: 'audit',
   labelAr: 'التدقيق والمراجعة',
   labelEn: 'Audit & Review',
@@ -392,7 +395,7 @@ const _auditGroup = V4ModuleGroup(
   subModules: auditSubModules,
 );
 
-const _feasGroup = V4ModuleGroup(
+const _feasGroup = V5ModuleGroup(
   id: 'feas',
   labelAr: 'دراسات الجدوى',
   labelEn: 'Feasibility Studies',
@@ -402,7 +405,7 @@ const _feasGroup = V4ModuleGroup(
   subModules: feasSubModules,
 );
 
-const _externalGroup = V4ModuleGroup(
+const _externalGroup = V5ModuleGroup(
   id: 'external',
   labelAr: 'التحليل المالي الخارجي',
   labelEn: 'External Financial Analysis',
@@ -412,7 +415,7 @@ const _externalGroup = V4ModuleGroup(
   subModules: externalSubModules,
 );
 
-const _providersGroup = V4ModuleGroup(
+const _providersGroup = V5ModuleGroup(
   id: 'providers',
   labelAr: 'مقدمو الخدمات المهنية',
   labelEn: 'Service Providers',
@@ -422,7 +425,7 @@ const _providersGroup = V4ModuleGroup(
   subModules: providersSubModules,
 );
 
-const _complianceGroup = V4ModuleGroup(
+const _complianceGroup = V5ModuleGroup(
   id: 'compliance',
   labelAr: 'الامتثال والأهلية',
   labelEn: 'Eligibility & Compliance',
@@ -433,7 +436,7 @@ const _complianceGroup = V4ModuleGroup(
 );
 
 /// The canonical list of module groups — renders the Launchpad in order.
-const List<V4ModuleGroup> v4ModuleGroups = [
+const List<V5ModuleGroup> v4ModuleGroups = [
   _erpModuleGroup,
   _auditGroup,
   _feasGroup,
@@ -443,7 +446,7 @@ const List<V4ModuleGroup> v4ModuleGroups = [
 ];
 
 /// Lookup a group by its short id (`erp`, `audit`, …). Case-insensitive.
-V4ModuleGroup? v4GroupById(String id) {
+V5ModuleGroup? v4GroupById(String id) {
   final needle = id.toLowerCase();
   for (final g in v4ModuleGroups) {
     if (g.id == needle) return g;
@@ -453,7 +456,7 @@ V4ModuleGroup? v4GroupById(String id) {
 
 /// Find any screen by its stable id across ALL groups and sub-modules.
 /// Used by the command palette and deep-link resolver.
-V4Screen? v4ScreenById(ScreenId id) {
+V5Screen? v5ScreenById(ScreenId id) {
   for (final g in v4ModuleGroups) {
     for (final s in g.subModules) {
       for (final scr in s.allScreens) {

@@ -136,28 +136,65 @@
   doesn't affect users or CI today).
 - **Sprint:** 9.
 
-### 🟠 G-A2.3. Migrate `v4_groups` → `v5_groups` (final V4 cleanup)
-- **Trigger:** G-A2.1 verify-first revealed `lib/core/v5/v5_data.dart:25`
-  and `lib/core/v5/v5_models.dart:20` import `v4_groups.dart`. The
-  blueprint G-A2 closure (2026-04-30) had asserted "0 external users"
-  for `v4_groups`; that claim was either inaccurate then or stale by
-  2026-05-01 (V5 may have added the imports between G-A2 closure and
-  G-A2.1 execution).
-- **Scope:**
-  - `git mv lib/core/v4/v4_groups.dart` → `lib/core/v5/v5_groups.dart`
-  - `git mv lib/core/v4/v4_groups_data.dart` → `lib/core/v5/v5_groups_data.dart`
-  - Update 2 V5 imports (`v5_data.dart`, `v5_models.dart`).
-  - Sweep `lib/` for class refs to `V4Group` and `V4Groups` and rename
-    to `V5Group` / `V5Groups`. Verify-first the sweep result before
-    blanket rename — there may be intentional version markers in
-    documentation comments that should NOT change.
-  - Delete `lib/core/v4/` directory entirely (including `README.md`).
-- **Risk:** the `V4Group` data model is referenced in V5 internals;
-  blanket rename may need cascading updates in serialization, JSON
-  payloads, or DB-stored identifiers. Verify-first sweep mandatory.
-- **Estimated:** 1-2 hours.
-- **Status:** ⏸ **Sprint 9 #3 priority** (after G-PROC-1, G-T1.7a).
-  Closes the V4 chapter entirely.
+### ✅ G-A2.3. ~~Migrate `v4_groups` → `v5_groups`~~ — DONE 2026-05-01 (V4 chapter closed)
+- **Verify-first scope correction:** the blueprint mentioned only
+  `V4Group` / `V4Groups`. The actual class set is **V4Screen +
+  V4SubModule + V4ModuleGroup + helper `v4ScreenById()`** — 4 symbols
+  to rename, not 2. Total 322 references across 5 files (counted
+  by the bulk-rename script). No tests reference any of them
+  (`apex_finance/test/` and `tests/` both clean), so 0 test risk.
+- **Delivered:**
+  - **2 files moved** via `git mv` (history preserved):
+    - `lib/core/v4/v4_groups.dart` → `lib/core/v5/v5_groups.dart`
+    - `lib/core/v4/v4_groups_data.dart` → `lib/core/v5/v5_groups_data.dart`
+  - **322 word-boundary substitutions** (V4Screen=244, V4SubModule=66,
+    V4ModuleGroup=11, v4ScreenById=1) across 5 files:
+    - `v5_groups.dart` (92), `v5_groups_data.dart` (216),
+      `v5_data.dart` (2), `v5_models.dart` (8),
+      `apex_v5_service_shell.dart` (4 — comments-as-types, all updated).
+  - **4 import paths updated:**
+    - `v5_groups.dart`: cross-import `'v4_groups_data.dart'` →
+      `'v5_groups_data.dart'`
+    - `v5_groups_data.dart`: cross-import `'v4_groups.dart'` →
+      `'v5_groups.dart'`
+    - `v5_data.dart`: `'../v4/v4_groups.dart'` → `'v5_groups.dart'`
+    - `v5_models.dart`: `'../v4/v4_groups.dart'` → `'v5_groups.dart'`
+  - **3 stale inline-comment cleanups:** `v5_groups_data.dart:574`
+    "consumed by v4_groups.dart" → v5; `v5_data.dart:422`
+    "not yet in v4_groups_data" → v5; `v5_groups.dart:5` (within
+    rewritten header).
+  - **Header docstrings rewritten** on `v5_groups.dart` +
+    `v5_groups_data.dart`: stale @deprecated headers from G-A2.1 era
+    replaced with current V5-accurate docstrings that **preserve
+    historical references** to "V4 product blueprint phase" and
+    "V4 Module Hierarchy Map" (intentional product-history context,
+    not stale code references).
+  - **`lib/core/v4/` deleted entirely** (was 2 files + README.md
+    — all gone).
+- **Verification:**
+  - `flutter analyze` → 306 issues baseline parity, **0 new issues**.
+  - `flutter test test/auth/auth_guard_test.dart test/widget/apex_output_chips_test.dart`
+    → 12/12 pass (no regression).
+  - `pytest tests/ -x --tb=short --ignore=tests/test_per_directory_coverage.py`
+    → 1838 passed (matches G-T1.7a baseline; backend untouched).
+  - Post-rename grep:
+    - `\bV4(Screen|SubModule|ModuleGroup)\b` in `lib/` → **0 matches**
+    - `\bv4ScreenById\b` in `lib/` → **0 matches**
+    - `import.*core/v4|import.*'\.\./v4/` in `lib/` → **0 matches**
+    - All remaining `v4` / `V4` references in `lib/` are intentional
+      historical docstring refs (5 lines across 3 files, documenting
+      the migration journey).
+- **V4 cleanup chapter closed** (3-sprint progression):
+  - Sprint 7 G-A2: removed `v4_routes.dart`, `@deprecated` headers
+  - Sprint 8 G-A2.1: moved `apex_screen_host.dart` out of v4/,
+    deleted 8 orphan v4 files (kept v4_groups.dart + data as bridge)
+  - **Sprint 9 G-A2.3 (this PR): renamed v4_groups* to v5_groups*,
+    deleted `lib/core/v4/` entirely**. The `lib/core/v4/` directory
+    no longer exists.
+- **Refs:**
+  - Parent: G-A2 (Sprint 7 — partial V4 deprecation)
+  - Sibling: G-A2.1 (Sprint 8 — apex_screen_host move + 8 orphan deletes)
+  - Closes: the V4 cleanup chapter
 - **Sprint:** 9.
 
 ### ⚠️ G-A3. ~~Alembic configured but no migration files~~ — PARTIAL: drift detected (2026-04-30, table count corrected 2026-04-30 by G-DOCS-1)
