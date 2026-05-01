@@ -85,10 +85,29 @@
     date literals).
   - Added **G-DOCS-1 evidence #11** capturing the layered-cause pattern.
 
-- [ ] **G-T1.6** (queued, immediate next): bump
-  `tests/test_per_directory_coverage.py:110` `timeout=600` → `timeout=900`
-  to accommodate `--cov=app --cov-report=json` overhead. Single-line
-  edit + comment block + verification rerun. ETA 30-60 min.
+- [x] **G-T1.6**: ~~Cascade timeout bump~~ — **OBVIATED 2026-05-01** (no commit).
+  - Branch: `sprint-8/g-t1-6-obviated-docs` (docs-only PR, no code change).
+  - Verify-first post-G-T1.4-merge re-ran the cascade and got
+    `2 failed, 21 passed in 300.82s` — half the previously measured
+    603s, no timeout breach. The 603s in G-T1.4-era data was time
+    the inner subprocess spent on the failing tax_timeline test +
+    its `-x` abort cleanup; with G-T1.4 fixed the suite is genuinely
+    ~50% leaner. The 600s ceiling has comfortable headroom now.
+  - **Two real coverage-floor failures unmasked** — `app/ai/` below
+    80% floor, `app/core/` below 85% floor. Tracked as new **G-T1.7**
+    (verify-first scoping in a separate session).
+  - Added **G-DOCS-1 evidence #12**: cascade was the **fourth**
+    verify-first save in five PRs. Pattern: prompts based on
+    snapshot timing data may misread one-off measurements as
+    steady-state. Always re-measure post-fix before scoping the
+    "next" gap built on it.
+  - Cascade fully unblocked — first time since Sprint 7 — by
+    G-T1.4 alone.
+
+- [ ] **G-T1.7** (next): real coverage-floor failures in `app/ai/`
+  (< 80%) and `app/core/` (< 85%). Verify-first scoping required
+  before any code change — measure the actual Δ and decide between
+  single PR / split PRs / Sprint-9 budget.
 
 ---
 
@@ -138,12 +157,13 @@
 - ✅ **G-T1.2** test_flutter_files refresh — DONE 2026-04-30 (PR #111)
 - ✅ **G-S2** Auth guard bypass — DONE 2026-05-01 (PR #112; old G-S2 renamed to G-S8)
 - ✅ **G-DEV-1** Local-dev trap + runbook — DONE 2026-05-01 (PR #113)
-- ✅ **G-T1.4** test_tax_timeline time-rot — DONE 2026-05-01 (narrow; cascade unblock requires G-T1.6)
-- ⏭ **G-T1.6** Cascade timeout bump — NEXT (immediate after G-T1.4 merges)
+- ✅ **G-T1.4** test_tax_timeline time-rot — DONE 2026-05-01 (PR #114)
+- ✅ **G-T1.6** Cascade timeout bump — OBVIATED 2026-05-01 (cascade fully unblocked by G-T1.4 alone)
+- ⏭ **G-T1.7** Coverage floors for `app/ai/` (<80%) + `app/core/` (<85%) — NEXT (verify-first scoping required)
 - **G-A2.1** — Migrate 6 V4-only screens to V5
 - **G-A3.1** — Alembic catch-up (25/198 → 198/198) + lifespan integration (DBA-reviewed)
 - **G-T1.1** — Fix Flutter test infra; ship login/register/onboarding tests
-- **G-T1.3** — Test infra flake + coverage thresholds (4-6 hours; depends on G-T1.6)
+- **G-T1.3** — Test infra flake + coverage thresholds (4-6 hours)
 - **G-T1.5** — Sweep `tests/` for hard-coded date literals (deferred, Sprint 9 candidate)
 - **G-S8** — JWT secret rotation (deferred, was G-S2 before 2026-05-01)
 
