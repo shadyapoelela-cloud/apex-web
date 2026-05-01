@@ -1091,14 +1091,16 @@
   G-T1.7a.1 owns the remaining 80% floor push.
 - **Sprint:** 9.
 
-### ⏭ G-T1.7b. Coverage restoration for `app/core/` (1,748 stmts)
+### 🟡 G-T1.7b. Coverage restoration for `app/core/` (1,748 stmts) — IN PROGRESS
 - **Discovered:** 2026-05-01 by G-T1.7 scoping.
 - **Scope:** restore `core/` from 74.0% floor → 85% original floor.
   Diffuse across ~80 files (top-20 = 47% of gap; remaining 53% across
   160 more files). Priority order:
-  1. **4 zero-coverage files first:** `universal_journal.py` (106 stmts),
-     `payment_service.py` (84 stmts), `saudi_knowledge_base.py` (63 stmts),
-     `error_helpers.py` (18 stmts) — easy wins, +271 stmts → ~76.3%.
+  1. ✅ **G-T1.7b.1 — 4 zero-coverage files** (DONE 2026-05-01):
+     `error_helpers.py` (0% → 100%), `saudi_knowledge_base.py` (0% → 100%),
+     `payment_service.py` (0% → 100%), `universal_journal.py` (75% → 86%).
+     **56 unit tests** across 4 new files. Aggregate `core/` 75.67% → 76.71%
+     (+1.04pp). G-T1.7b.1 closes Phase 1 of the multi-PR restoration.
   2. Sprint-7 untested modules: `workflow_engine.py` (219 missing),
      `email_inbox.py` (113), `api_keys.py` (113), `cashflow_forecast.py` (97),
      `workflow_run_history.py` (108), `notification_digest.py` (75), etc.
@@ -1107,9 +1109,57 @@
 - **Goal:** raise `DIRECTORY_FLOORS["core"]` 74.0 → 85.0 incrementally
   as PRs land. Multi-PR effort.
 - **Estimate:** **1-3 weeks** (multi-PR), 175-350 unit tests total.
-- **Status:** ⏭ Sprint 9-10. Treat as a sustained TDD initiative,
-  not a single deliverable.
-- **Sprint:** 9-10.
+  Phase 1 (G-T1.7b.1) burned ~56 tests for +1.04pp; remaining 8.3pp
+  to original floor needs the harder Sprint-7 modules (Phases 2-N).
+- **Status:** 🟡 Phase 1 done; Phases 2-N pending (Sprint 10+).
+- **Sprint:** 9-10+.
+
+### ✅ G-T1.7b.1. Zero-coverage files coverage push (Sprint 9 final) — DONE 2026-05-01
+- **Branch:** `sprint-9/g-t1-7b-1-zero-coverage-files`
+- **Scope:** First sub-PR of G-T1.7b. Cover the 4 originally-zero-coverage
+  files in `app/core/`. `universal_journal.py` was raised to 75.5% by
+  G-T1.7a's `test_ai_routes_extras.py` indirect coverage; this PR
+  finishes the push to ≥80%.
+- **56 unit tests added** across 4 NEW files:
+  - `tests/test_error_helpers.py` — 7 tests, 100% (18/18 stmts)
+  - `tests/test_saudi_knowledge_base.py` — 22 tests, 100% (63/63 stmts)
+  - `tests/test_payment_service.py` — 21 tests, 100% (84/84 stmts)
+    (StripeBackend covered via `sys.modules['stripe']` stub — no real
+    SDK call, no network)
+  - `tests/test_universal_journal_internal.py` — 6 tests, 86% combined
+    (91/106 stmts) covering `UJRow.to_dict`, import-fallback short-circuits,
+    filter-branch coverage, and `document_flow` `sales_invoice` branch.
+- **Aggregate `core/` coverage:** 75.67% → **76.71%** (+1.04pp).
+- **Cascade:** 22/23 maintained (ai/ FAIL deliberate, deferred to G-T1.7a.1).
+- **Full suite:** 1915 passed, 2 pre-existing failures (ai-80.0, G-T1.8 flake).
+  0 new regressions.
+- **Verify-first findings:**
+  1. Original blueprint estimate said "+271 stmts → ~76.3%" but the actual
+     uncovered count for the 4 files was 271-145 = 145 NEW stmts (since
+     universal_journal was already 75.5% covered indirectly by G-T1.7a's
+     46 routes_extras tests). The +1.04pp landing point is accurate.
+  2. Stripe SDK is NOT installed in dev/test env — the StripeBackend
+     `__init__` raises `RuntimeError("stripe package is required")`. Used
+     `sys.modules['stripe']` monkeypatch with a SimpleNamespace stub to
+     get full coverage of the orchestration code without depending on
+     the real SDK.
+  3. `coverage.py` requires module-style `--cov=app.core.X` (not path-style
+     `--cov=app/core/X`) — first run reported 0% with a module-not-imported
+     warning; second run with corrected flag reported 100%.
+- **Estimate vs actuals:** estimated 34-42 tests, shipped 56 (over by ~30%
+  because `payment_service.py`'s StripeBackend orchestration warranted
+  10 extra tests for the stub-based approach). Coverage gain matches estimate.
+- **Sprint:** 9.
+
+### ⏭ G-T1.7b.2. Sprint-7 untested modules (next) — Phase 2
+- **Scope:** Cover the high-stmt-count, low-coverage modules from
+  Sprint 7 that were not addressed in G-T1.7b.1. Top targets:
+  `workflow_engine.py` (219 missing), `email_inbox.py` (113),
+  `api_keys.py` (113), `cashflow_forecast.py` (97),
+  `workflow_run_history.py` (108), `notification_digest.py` (75).
+- **Estimate:** 60-100 tests, +3-5pp aggregate `core/` coverage.
+- **Status:** ⏭ Sprint 10+ candidate (multi-PR continues).
+- **Sprint:** 10+.
 
 ### ⏸ G-T1.7a.1. `app/ai/` DB-integration tests — push from 69.42% to 80%+
 - **Scope expanded 2026-05-01** by G-T1.7a closure: original entry
