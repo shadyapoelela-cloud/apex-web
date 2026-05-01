@@ -839,6 +839,72 @@
   - G-T1.1 — Fix Flutter test infra (`package:web` 1.1.1 vs Flutter 3.27.4)
   - G-T1.2 — Refresh `test_flutter_files` to current screen tree (30 min)
 
+### ✅ G-DEV-1. ~~Local-dev trap: `api_config.dart` defaults to production Render URL~~ — DONE 2026-05-01
+- **Files closed:** `LOCAL_DEV_RUNBOOK.md` (new),
+  `scripts/dev/run-backend.{ps1,sh}` (new), `scripts/dev/run-frontend.{ps1,sh}`
+  (new), `CLAUDE.md` (+1 § "Local Development"), `README.md` (+1 note in
+  Quick Start).
+- **Issue:** `apex_finance/lib/core/api_config.dart:12` sets
+  `defaultValue: 'https://apex-api-ootk.onrender.com'`. Production / CI
+  builds rely on that default — `.github/workflows/ci.yml` runs
+  `flutter build web` without any `--dart-define`. So local dev MUST
+  override at run time with `--dart-define=API_BASE=http://127.0.0.1:8000`
+  or the freshly-cloned client silently calls live production. Existing
+  `README.md` Quick Start ended at `flutter run -d chrome` with no
+  override hint; `TESTING_GUIDE_AR.md`, `app/pilot/README_PILOT.md`, and
+  the blueprint's own `_BOOTSTRAP_FOR_CLAUDE_CODE.md` all use mismatched
+  hostnames (`localhost` vs `127.0.0.1`). The user's first-time-setup
+  failure mode is "Failed to fetch" with no useful pointer to the cause.
+- **Evidence (verify-first):**
+  - `cat apex_finance/lib/core/api_config.dart` confirmed
+    `defaultValue: 'https://apex-api-ootk.onrender.com'` is intentional —
+    the comment block above it explicitly says *"Default: production
+    API on Render"*.
+  - `git grep "API_BASE" -- '*.md'` listed 9 references; 4 with
+    `localhost`, 5 with `127.0.0.1`. None warn the reader that omitting
+    the flag silently falls through to production.
+  - `ls scripts/dev` returned not-found — no convenience launcher
+    existed.
+  - Live test of `run-backend.ps1` against a fresh `pytest`-warmed
+    environment: uvicorn bound on `127.0.0.1:8000`, `GET /health` →
+    HTTP 200 (318 bytes), 168 tables loaded, clean shutdown via
+    `Stop-Process`.
+- **Resolution / scope:**
+  - **`LOCAL_DEV_RUNBOOK.md`** at the repo root — architecture diagram,
+    one-shot quick-start (Win + Mac/Linux), test-user creation via
+    `POST /auth/register`, troubleshooting matrix (Failed to fetch,
+    port-in-use, ModuleNotFoundError, **127.0.0.1 vs localhost / IPv6
+    fallback** with the explicit reason being uvicorn's IPv4-only bind
+    on `127.0.0.1`, pandas-on-Python-3.14), and a § "what the scripts
+    do NOT do" to keep scope honest.
+  - **`scripts/dev/run-backend.{ps1,sh}`** — port-8000 detection with
+    consent prompt, then `py -m uvicorn app.main:app --host 127.0.0.1
+    --port 8000 --reload`. Path resolution from `$PSScriptRoot` /
+    `$(dirname "$0")` so it works from any clone path.
+  - **`scripts/dev/run-frontend.{ps1,sh}`** — `cd apex_finance` then
+    `flutter run -d chrome --web-port 57305 --dart-define=API_BASE=...`.
+  - **`CLAUDE.md`** — new § "Local Development" between "Testing" and
+    "Common Pitfalls" (5 lines), pointing to the runbook and warning
+    not to edit `api_config.dart` defaultValue.
+  - **`README.md`** — 6-line note inserted after Frontend Setup, calling
+    out the `--dart-define` requirement and pointing to the runbook.
+- **Blast radius:** zero source-code changes (no `*.py` / `*.dart` under
+  `app/` or `apex_finance/lib/` touched). Production CI / Render deploy
+  unaffected — the `api_config.dart` default is preserved exactly.
+- **Verification:**
+  - `run-backend.ps1` end-to-end test (above) — uvicorn starts, health
+    endpoint responds, clean shutdown.
+  - `[Parser]::ParseFile run-frontend.ps1` — no syntax errors.
+  - `bash -n run-backend.sh run-frontend.sh` — no syntax errors.
+  - `flutter analyze` (whole project) — clean, no new issues introduced.
+  - Out-of-scope: `TESTING_GUIDE_AR.md` and `README_PILOT.md` still use
+    `localhost` and miss `--dart-define`. Updating those is a separate
+    documentation gap (not opened — the `README.md` redirect catches
+    most first-time users; pilot doc is a separate audience).
+- **Rollback:** delete `LOCAL_DEV_RUNBOOK.md`, `scripts/dev/`, the
+  README/CLAUDE additions. Pure additive changes.
+- **Sprint:** 8
+
 ### 🟢 G-D1. No public API docs
 - **Issue:** FastAPI auto-generates `/docs` (Swagger) but not customer-facing.
 - **Fix plan:** Generate ReDoc, host at docs.apex-platform.com. Add code examples per language.
