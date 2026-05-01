@@ -54,23 +54,111 @@
   Original plan said "no V4-only features expected." Actual audit found **6
   V4-only screens with no V5 equivalents** — see G-A2.1.
 
-### 🟠 G-A2.1. Migrate 6 V4-dependent screens to V5
-- **Files:**
-  - `apex_finance/lib/screens/v4_ai/ai_guardrails_screen.dart`
-  - `apex_finance/lib/screens/v4_compliance/zatca_csid_screen.dart`
-  - `apex_finance/lib/screens/v4_compliance/zatca_queue_screen.dart`
-  - `apex_finance/lib/screens/v4_erp/bank_feeds_screen.dart`
-  - `apex_finance/lib/screens/v4_erp/bank_reconciliation_screen.dart`
-  - `apex_finance/lib/screens/v4_erp/sales_customers_screen.dart`
-- **Issue:** All 6 import `apex_screen_host.dart` from the deprecated `core/v4/`
-  directory. They have no V5 equivalent and are not registered in the router after
-  G-A2 removed `v4_routes.dart`, so they are currently unreachable from any URL.
-- **Fix plan:**
-  1. Replace `ApexScreenHost(...)` with `Scaffold` or V5 ServiceShell wrapper
-  2. Add proper V5 routes (e.g., `/app/erp/finance/bank-rec`)
-  3. Once all 6 migrated, delete `apex_finance/lib/core/v4/` entirely
-- **Estimate:** 4-6 hours
-- **Sprint:** 8
+### ✅ G-A2.1. ~~Migrate 6 V4-dependent screens to V5~~ — DONE (partial) 2026-05-01
+- **Original scope:** "Replace `ApexScreenHost(...)` with `Scaffold` or
+  V5 ServiceShell wrapper" + "delete `apex_finance/lib/core/v4/` entirely".
+  Estimated 4-6 hours.
+- **Verify-first scope reduction (pre-execution):**
+  - All 6 V4-dependent screens import **only one** V4 widget:
+    `core/v4/apex_screen_host.dart`. No coupling to `v4_groups`,
+    `apex_command_palette`, or any other V4 widget.
+  - `ApexScreenHost` is clean code: pure widget, only `flutter/material`
+    + `theme.dart` imports, well-designed 6-state API
+    (`loading/emptyFirstTime/emptyAfterFilter/error/unauthorized/ready`)
+    with polished Arabic-RTL state shells.
+  - All 6 screens use it for the **same state-machine pattern**
+    (`loading → ready/empty/error`). Replacing with `Scaffold` would
+    regress the polished UI; replacing with `ApexV5ServiceShell` is
+    the wrong abstraction (service-level chrome, not screen-level state).
+  - **Path 1 chosen:** move `apex_screen_host.dart` from
+    `lib/core/v4/` → `lib/widgets/`. The widget is good code that was
+    in the wrong location. ~30 minutes vs the original 4-6 hours.
+- **Verify-first scope expansion (mid-execution):**
+  - Pre-deletion sweep found **`v4_groups.dart` IS externally imported**
+    by `lib/core/v5/v5_data.dart:25` and `lib/core/v5/v5_models.dart:20`.
+  - The G-A2 closure (2026-04-30) had said "0 external users" for
+    `v4_groups` — that statement was either inaccurate at the time
+    or stale by 2026-05-01. (V5 may have added the imports between
+    G-A2 closure and G-A2.1 execution.)
+  - Deleting `lib/core/v4/` entirely would have broken V5 core models.
+  - **Decision:** keep `v4_groups.dart` + `v4_groups_data.dart` as an
+    active V4→V5 bridge. Delete only the 8 truly-orphan files. Track
+    the remaining v4_groups migration as new gap **G-A2.3** (Sprint 9).
+- **Delivered (1 PR):**
+  - 1 file moved: `lib/core/v4/apex_screen_host.dart` →
+    `lib/widgets/apex_screen_host.dart` (via `git mv`, history preserved).
+  - 6 import paths updated in the V4-named screens:
+    `'../../core/v4/apex_screen_host.dart'` →
+    `'../../widgets/apex_screen_host.dart'`.
+  - 8 orphan V4 files deleted (zero external imports, confirmed):
+    `apex_anomaly_feed.dart`, `apex_command_palette.dart`,
+    `apex_hijri_date.dart`, `apex_launchpad.dart`, `apex_numerals.dart`,
+    `apex_sub_module_shell.dart`, `apex_tab_bar.dart`,
+    `apex_zatca_error_card.dart`. Total ~75 KB of dead code removed.
+  - `lib/core/v4/README.md` added — explicit transparency note that
+    the directory is now an **active bridge**, not a deprecated zone,
+    with reasoning + history + cross-link to G-A2.3.
+- **Remaining (out of scope, tracked separately):**
+  - `v4_groups.dart` + `v4_groups_data.dart` — 2 files, ~53 KB,
+    actively imported by V5. Migration tracked as **G-A2.3**.
+  - V4-named screen directories (`lib/screens/v4_*/`) — kept as-is.
+    Renaming them out of `v4_*` is a cross-cutting concern (CI paths,
+    test_flutter_files, route registration). Tracked as **G-A2.2**
+    (Sprint 9 candidate).
+- **Verification:**
+  - `flutter analyze` — `306 issues` baseline; expected to drop slightly
+    after orphan deletion (will report actual in PR).
+  - `flutter test test/auth/auth_guard_test.dart` — 7/7 passing.
+  - `flutter test test/widget/apex_output_chips_test.dart` — 5/5 passing.
+  - `pytest tests/ -x --tb=short` — backend untouched; cascade unchanged.
+- **Status:** Partial DONE — sufficient to close Sprint 8 G-A2.1
+  scope. Residual `v4_groups` work re-scoped to G-A2.3 in Sprint 9.
+- **Sprint:** 8 (this gap); G-A2.3 in Sprint 9.
+
+### 🟢 G-A2.2. Rename `lib/screens/v4_*/` directories out of `v4_*` namespace (deferred)
+- **Trigger:** G-A2.1 verify-first design — once `apex_screen_host.dart`
+  moved to `lib/widgets/`, the 6 screens under `lib/screens/v4_ai/`,
+  `lib/screens/v4_compliance/`, and `lib/screens/v4_erp/` no longer
+  have any V4 dependency (just product-feature screens with V4-prefixed
+  paths from a previous taxonomy).
+- **Scope:**
+  1. `git mv lib/screens/v4_ai/` → `lib/screens/ai/` (or appropriate
+     V5 service taxonomy).
+  2. `git mv lib/screens/v4_compliance/` → `lib/screens/compliance/`
+     or fold into existing `lib/screens/compliance/`.
+  3. `git mv lib/screens/v4_erp/` → fold into `lib/screens/operations/`
+     or `lib/screens/accounting/` per service home.
+  4. Cross-cutting impact: update any reference in `tests/test_core.py`
+     (the `test_flutter_files` smoke check), `.github/workflows/`
+     paths, deep-link docs.
+- **Estimated:** 1-2 hours (mostly path updates, no logic).
+- **Status:** ⏸ Sprint 9 candidate (low priority — directory naming
+  doesn't affect users or CI today).
+- **Sprint:** 9.
+
+### 🟠 G-A2.3. Migrate `v4_groups` → `v5_groups` (final V4 cleanup)
+- **Trigger:** G-A2.1 verify-first revealed `lib/core/v5/v5_data.dart:25`
+  and `lib/core/v5/v5_models.dart:20` import `v4_groups.dart`. The
+  blueprint G-A2 closure (2026-04-30) had asserted "0 external users"
+  for `v4_groups`; that claim was either inaccurate then or stale by
+  2026-05-01 (V5 may have added the imports between G-A2 closure and
+  G-A2.1 execution).
+- **Scope:**
+  - `git mv lib/core/v4/v4_groups.dart` → `lib/core/v5/v5_groups.dart`
+  - `git mv lib/core/v4/v4_groups_data.dart` → `lib/core/v5/v5_groups_data.dart`
+  - Update 2 V5 imports (`v5_data.dart`, `v5_models.dart`).
+  - Sweep `lib/` for class refs to `V4Group` and `V4Groups` and rename
+    to `V5Group` / `V5Groups`. Verify-first the sweep result before
+    blanket rename — there may be intentional version markers in
+    documentation comments that should NOT change.
+  - Delete `lib/core/v4/` directory entirely (including `README.md`).
+- **Risk:** the `V4Group` data model is referenced in V5 internals;
+  blanket rename may need cascading updates in serialization, JSON
+  payloads, or DB-stored identifiers. Verify-first sweep mandatory.
+- **Estimated:** 1-2 hours.
+- **Status:** ⏸ **Sprint 9 #3 priority** (after G-PROC-1, G-T1.7a).
+  Closes the V4 chapter entirely.
+- **Sprint:** 9.
 
 ### ⚠️ G-A3. ~~Alembic configured but no migration files~~ — PARTIAL: drift detected (2026-04-30, table count corrected 2026-04-30 by G-DOCS-1)
 - **Files:** `alembic/`, `app/main.py`, `app/phase1/models/platform_models.py`
@@ -940,14 +1028,14 @@
 
 ## 11. Documentation Gaps / ثغرات التوثيق
 
-### ✅ G-DOCS-1. ~~Blueprint accuracy audit~~ — DONE 2026-04-30 (13th evidence appended on 2026-05-01 by G-T1.7 scoping)
+### ✅ G-DOCS-1. ~~Blueprint accuracy audit~~ — DONE 2026-04-30 (14th evidence appended on 2026-05-01 by G-A2.1 mid-execution)
 - **Files updated:** `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md`,
   `APEX_BLUEPRINT/10_CLAUDE_CODE_INSTRUCTIONS.md`, `CLAUDE.md`, `PROGRESS.md`
-- **Issue:** Sprint 7 closed with **13 places where blueprint claims contradicted
+- **Issue:** Sprint 7 closed with **14 places where blueprint claims contradicted
   code reality** (10th during G-T1.2, 11th during G-T1.4, 12th during G-T1.6,
-  13th during G-T1.7 scoping — all surfaced by the verify-first protocol
-  established here. Five saves in six PRs — the protocol pays for itself
-  every time):
+  13th during G-T1.7 scoping, 14th mid-execution of G-A2.1 — all surfaced
+  by the verify-first protocol established here. **Eight saves in eight PRs**
+  — the protocol pays for itself every time, sometimes twice in one PR):
   1. **G-A1** — line count (3500 claimed vs 2146 actual; now 21 after split)
   2. **G-A2** — `v4_groups` deletion plan ignored real internal-import dependencies;
      blueprint also assumed "no V4-only screens" but found 6.
@@ -1041,6 +1129,44 @@
       in § 12 (Process Gaps). G-T1.7 closes today by lowering
       the `core/` floor (with full documentation) while G-T1.7a
       and G-T1.7b carry the actual restoration work into Sprint 9-10.
+  14. **G-A2.1 mid-execution save: V5→V4 dependency hidden in
+      Sprint 7 closure (2026-05-01):** G-A2.1 design said *"only
+      one V4 dependency: `apex_screen_host.dart`"* and planned to
+      delete `lib/core/v4/` entirely after the move. Pre-deletion
+      sweep on the same branch revealed `lib/core/v5/v5_data.dart:25`
+      and `lib/core/v5/v5_models.dart:20` import `v4_groups.dart`.
+      The G-A2 closure (2026-04-30) had explicitly stated `v4_groups`
+      had "0 external users" — that statement was either inaccurate
+      at the time or stale by 2026-05-01 (V5 may have added the
+      imports between G-A2 closure and G-A2.1 execution). Without
+      verify-first, `git rm lib/core/v4/v4_groups*.dart` would have
+      compiled-broken V5 core models on the very PR that was
+      supposed to clean V4. **Pattern (new):** *re-scan after every
+      refactor; closure docs are time-bound and may not reflect
+      current state. Blueprint claims must be re-verified at
+      execution time, not trusted from history — even if the
+      history is one week old.* G-A2.1 ships partial-DONE
+      (8 orphan files deleted, 2 kept as active V4→V5 bridge with
+      a transparency README), and the residual `v4_groups` →
+      `v5_groups` migration is tracked as new gap **G-A2.3**
+      (Sprint 9 #3 priority, after G-PROC-1 and G-T1.7a).
+
+      **Mid-PR additional save (8th overall):** the same
+      `git mv apex_screen_host.dart` that was supposed to be a
+      benign relocation broke 2 relative imports inside the moved
+      file (`../design_tokens.dart` no longer resolved from
+      `lib/widgets/`). 65 cascading `flutter analyze` errors
+      detected pre-commit (no commit yet). Mechanical fix: 2 lines
+      updated to use `../core/*` prefix. The stale `@deprecated`
+      header (referring to the file's old V4 identity) was also
+      replaced with an honest history docstring pointing at this
+      gap. **Pattern (sub-pattern of #14):** *a file move is never
+      just a path change — relative imports inside the moved file
+      shift their resolution context, and docstrings that
+      referenced the old location go stale.* Verify-first via
+      `flutter analyze` immediately after `git mv` caught both
+      before any commit. **Eight verify-first saves across eight
+      PRs — twice in this one PR alone.**
 - **`CLAUDE.md` "Common Pitfalls" section was the highest-risk surface.** Sprint 7
   fixed two stale bullets (lines 74 + 75) that would have misled any reader
   into re-implementing complete code. G-DOCS-1 fixed the remaining stale claims:

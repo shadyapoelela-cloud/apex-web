@@ -117,7 +117,7 @@
   - Added **G-DOCS-1 evidence #13** (5th verify-first save in 6 PRs).
 
 - [x] **G-T1.3**: Coverage gate config sync (mixed case 2).
-  - Branch: `sprint-8/g-t1-3-cov-fail-under-sync`
+  - Branch: `sprint-8/g-t1-3-cov-fail-under-sync` (merged PR #117)
   - Verify-first reclassification: original gap text said "no enforced
     coverage floor in CI"; reality was **mixed case 2** — CI gate at
     `--cov-fail-under=55` already exists (`ci.yml:86`), but
@@ -139,6 +139,42 @@
     2026-05-15). G-PROC-1 must ship in early Sprint 9.
   - 22/23 cascade still PASS (no change from G-T1.7). Zero test or
     production code changes — pure config sync.
+
+- [x] **G-A2.1**: V4 → V5 migration (Sprint 8 final gap, **partial-DONE**).
+  - Branch: `sprint-8/g-a2-1-v4-to-v5-migration`
+  - **Verify-first scope reduction (pre-execution):** all 6 V4-dependent
+    screens import only `apex_screen_host.dart` from v4/, a clean
+    state-shell widget that just lived in the wrong location.
+    Original blueprint estimate 4-6 hours collapsed to ~30 minutes
+    via Path 1 (move, don't replace).
+  - **Verify-first scope expansion (mid-execution):** pre-deletion
+    sweep revealed `lib/core/v5/v5_data.dart:25` and
+    `lib/core/v5/v5_models.dart:20` import `v4_groups.dart`. The
+    G-A2 closure (2026-04-30) said `v4_groups` had "0 external users";
+    that claim was either inaccurate then or stale by 2026-05-01.
+    Without verify-first, `git rm lib/core/v4/v4_groups*.dart` would
+    have compiled-broken V5 core models.
+  - **Delivered:**
+    - 1 file moved: `lib/core/v4/apex_screen_host.dart` →
+      `lib/widgets/apex_screen_host.dart` (`git mv`, history preserved).
+    - 6 import paths updated in `lib/screens/v4_*/` screens.
+    - 8 truly-orphan v4 files deleted (~75 KB dead code removed):
+      `apex_anomaly_feed`, `apex_command_palette`, `apex_hijri_date`,
+      `apex_launchpad`, `apex_numerals`, `apex_sub_module_shell`,
+      `apex_tab_bar`, `apex_zatca_error_card`.
+    - `lib/core/v4/README.md` added — transparency note that the
+      directory is now an **active V4→V5 bridge**, not a deprecated
+      zone (2 files remain: `v4_groups.dart` + `v4_groups_data.dart`).
+  - **Residual (tracked separately):**
+    - **G-A2.2** (Sprint 9 candidate): rename `lib/screens/v4_*/`
+      directories out of `v4_*` namespace.
+    - **G-A2.3** (Sprint 9 #3 priority): migrate `v4_groups*` →
+      `v5_groups*` in `lib/core/v5/`, then delete `lib/core/v4/`
+      entirely. Closes the V4 chapter.
+  - Added **G-DOCS-1 evidence #14** (covers BOTH Sprint 8 saves in this
+    PR: pre-execution V5→V4 dependency reveal, plus mid-execution
+    `git mv` import-break catch via `flutter analyze`. **8 verify-first
+    saves total across 8 PRs — twice in this one PR alone.**)
 
 - [ ] **G-T1.7a** (Sprint 9, queued): cover `app/ai/routes.py` + 3
   adjacent files (218 stmts) → `ai/` actual ≥ 80% real coverage.
@@ -203,15 +239,41 @@
 - ✅ **G-T1.4** test_tax_timeline time-rot — DONE 2026-05-01 (PR #114)
 - ✅ **G-T1.6** Cascade timeout bump — OBVIATED 2026-05-01 (PR #115, cascade unblocked by G-T1.4 alone)
 - ✅ **G-T1.7** Floor recalibration (`core/` 85→74) — DONE 2026-05-01 (PR #116, cascade now 22/23 PASS)
-- ✅ **G-T1.3** Coverage gate config sync (10 → 55, matches CI) — DONE 2026-05-01
-- ⏭ **G-T1.7a** ai/ coverage push (218 stmts, 1-2 days) — Sprint 9
-- ⏭ **G-T1.7b** core/ coverage restoration (1,748 stmts, 1-3 weeks) — Sprint 9-10
+- ✅ **G-T1.3** Coverage gate config sync (10 → 55, matches CI) — DONE 2026-05-01 (PR #117)
+- ✅ **G-A2.1** V4 → V5 migration (partial-DONE: 8 files deleted, 2 retained as bridge) — DONE 2026-05-01
 - ⏭ **G-PROC-1** Process control for source:test ratio — **Sprint 9 EARLY** (14-day decay deadline)
-- **G-A2.1** — Migrate 6 V4-only screens to V5 *(only remaining Sprint 8 frontend gap)*
+- ⏭ **G-T1.7a** ai/ coverage push (218 stmts, 1-2 days) — Sprint 9
+- ⏭ **G-A2.3** Migrate `v4_groups*` → `v5_groups*` (final V4 cleanup) — **Sprint 9 #3 priority**
+- ⏭ **G-T1.7b** core/ coverage restoration (1,748 stmts, 1-3 weeks) — Sprint 9-10
+- **G-A2.2** — Rename `lib/screens/v4_*/` directories (deferred, Sprint 9 candidate)
 - **G-A3.1** — Alembic catch-up (25/198 → 198/198) + lifespan integration (DBA-reviewed)
 - **G-T1.1** — Fix Flutter test infra; ship login/register/onboarding tests
 - **G-T1.5** — Sweep `tests/` for hard-coded date literals (deferred, Sprint 9 candidate)
 - **G-S8** — JWT secret rotation (deferred, was G-S2 before 2026-05-01)
+
+---
+
+## Sprint 8 wrap-up (post-G-A2.1)
+
+**9 PRs merged + 1 awaiting (this G-A2.1 PR) = 10 total deliverables.**
+
+- **Cascade fully unblocked** (was 0/23 in Sprint 7 era; now 22/23 — `ai/` FAIL is the deliberate G-T1.7a tracker).
+- **Verify-First Protocol** introduced (G-DOCS-1) and battle-tested:
+  **8 saves in 8 PRs** (twice in G-A2.1 alone) — saved against ID
+  collision, single-measurement timing, layered cascade causes,
+  blueprint stale "0 users" claims, scope-expansion mid-execution,
+  one obviated gap (G-T1.6), AND a mechanical `git mv` import break
+  caught pre-commit via `flutter analyze` re-run.
+- **Forensic finding:** Sprint 7 source:test ratio = 21:1, 0 tests removed.
+  Documented Wave deliverables (1/11/13/SMS) ALL have proper test budgets;
+  decay is from undocumented Sprint 7 commits. Process control = G-PROC-1
+  (Sprint 9 early — 14-day decay deadline before CI breaks).
+- **Sprint 8 closes here.** Sprint 9 plan ordered by deadline pressure:
+  1. **G-PROC-1** (14-day decay deadline)
+  2. **G-T1.7a** (1-2 days, achievable, restores ai/ to 80%)
+  3. **G-A2.3** (1-2 hours, closes V4 chapter)
+  4. **G-T1.7b** (multi-week, restores core/ to 85%)
+  5. Remaining infra gaps (G-T1.1, G-A3.1, G-A2.2, G-T1.5, G-S8) per priority.
 
 ---
 
