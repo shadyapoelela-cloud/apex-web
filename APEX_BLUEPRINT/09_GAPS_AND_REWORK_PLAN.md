@@ -616,23 +616,25 @@
 - **Estimate:** 2-3 days (1 day for the package version fix, 1-2 days for tests).
 - **Sprint:** 8
 
-### 🟢 G-T1.2. Refresh `test_flutter_files` to current screen tree
-- **Issue:** `tests/test_core.py::test_flutter_files` (line 118 onward) asserts
-  the existence of `apex_finance/lib/screens/clients/client_onboarding_wizard.dart`
-  among other "critical Flutter files". That file was deleted in Sprint 7 when
-  the onboarding wizard was rewritten, but the test list was not updated.
-  When the assertion fails the cascade pulls down 23 unrelated tests in
-  `tests/test_per_directory_coverage.py` (each importer of the test_core
-  module re-runs the same broken collection).
-- **Fix plan:**
-  1. Walk `apex_finance/lib/screens/**/*.dart` and rebuild the canonical "critical
-     Flutter files" list — keep router, theme, api_service, login, register,
-     dashboard, and a representative screen per service module.
-  2. Replace the hard-coded `files = [...]` list in `test_flutter_files`.
-  3. Re-run `pytest tests/test_core.py tests/test_per_directory_coverage.py -v`
-     to confirm the cascade is gone.
-- **Estimate:** 30 min
-- **Sprint:** 8 (low-risk, can ride alongside G-T1.1 or G-A2.1)
+### ✅ G-T1.2. ~~Stale `test_flutter_files` assertions~~ — DONE 2026-04-30
+- **Resolution:** Removed 1 stale path
+  (`apex_finance/lib/screens/clients/client_onboarding_wizard.dart`,
+  deleted in commit `a5cac24` — Phase 1 frontend cleanup). Test now
+  passes in isolation (`pytest tests/test_core.py::test_flutter_files`).
+- **Verify-first finding (correction to Sprint 7 diagnosis):**
+  Sprint 7 attributed the 23-error cascade in
+  `tests/test_per_directory_coverage.py` to `test_flutter_files`. After
+  G-T1.2 fixed `test_flutter_files`, the cascade **persists unchanged**:
+  the per-directory coverage gate runs pytest as a `-x` subprocess; that
+  subprocess reports `1519 passed, 1 failed` — the failure is
+  `tests/test_tax_timeline.py::test_tax_timeline_with_fiscal_year_param`,
+  which terminates the subprocess and causes the 23 parametrized
+  `test_directory_meets_coverage_floor[...]` assertions to ERROR (no
+  coverage data to read). `test_flutter_files` was a real bug, but
+  was not the cascade trigger.
+- **Scope honestly delivered:** `test_flutter_files` passes; cascade
+  **UNCHANGED**. Real cascade root cause tracked as new gap G-T1.4.
+- **Sprint:** 8
 
 ### 🟠 G-T1.3. Test infra flake + coverage thresholds
 - **Issue:** Sprint 7 surfaced multiple test-infra fragilities beyond G-T1.2 —
@@ -645,6 +647,36 @@
   3. Mark the 4 known-flaky tests with `pytest.mark.flaky(reruns=2)`.
 - **Estimate:** 4-6 hours
 - **Sprint:** 8 (alongside G-T1.1)
+
+### 🟠 G-T1.4. `test_tax_timeline_with_fiscal_year_param` cascades coverage gate
+- **Files:** `tests/test_tax_timeline.py`, `tests/test_per_directory_coverage.py`
+- **Issue:** `test_per_directory_coverage.py` runs pytest as a `-x` subprocess
+  to capture per-directory coverage data. That subprocess reports
+  `1 failed, 1519 passed, 2 skipped` — the failure is
+  `tests/test_tax_timeline.py::test_tax_timeline_with_fiscal_year_param`,
+  which terminates the subprocess and leaves the 23 parametrized
+  `test_directory_meets_coverage_floor[...]` assertions with no coverage
+  data to read, causing them to ERROR.
+- **Discovery (G-T1.2, Sprint 8 verify-first):** Sprint 7 G-T1.3 attributed
+  the cascade to `test_flutter_files`. After G-T1.2 fixed
+  `test_flutter_files` and the cascade persisted unchanged, the real
+  trigger was identified by reading the failing-subprocess summary that
+  `test_per_directory_coverage.py` captures into the assertion error.
+- **Investigation needed:**
+  1. Run `pytest tests/test_tax_timeline.py::test_tax_timeline_with_fiscal_year_param -v`
+     in isolation — does it pass when alone? Does it pass without `-x`?
+  2. Inspect fixtures the test relies on (`fiscal_year`, tenant context,
+     time-frozen clocks) — flake or order-dependence are both candidates.
+  3. Check the recent commits touching `app/copilot/services/tax_timeline_service.py`
+     and `app/phase8/services/tax_calendar.py` for behavioural changes
+     the test was not updated for.
+  4. Decide on fix: real bug fix in code, fix the test, or `pytest.mark.xfail`
+     with a tracking ticket and `strict=False` so the cascade clears.
+- **Why this matters:** the per-directory coverage gate is currently
+  fully blocked — every PR carries a falsely-failing job. A single root
+  cause unlocks 23 assertions worth of regression protection.
+- **Estimate:** 1-3 hours (depends on root cause).
+- **Sprint:** 8
 
 ### 🟠 G-T2. No load tests
 - **Issue:** Cold-start tolerated but no performance baseline.
@@ -660,11 +692,12 @@
 
 ## 11. Documentation Gaps / ثغرات التوثيق
 
-### ✅ G-DOCS-1. ~~Blueprint accuracy audit~~ — DONE 2026-04-30
+### ✅ G-DOCS-1. ~~Blueprint accuracy audit~~ — DONE 2026-04-30 (10th evidence appended on 2026-04-30 by G-T1.2)
 - **Files updated:** `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md`,
   `APEX_BLUEPRINT/10_CLAUDE_CODE_INSTRUCTIONS.md`, `CLAUDE.md`, `PROGRESS.md`
-- **Issue:** Sprint 7 closed with **9 places where blueprint claims contradicted
-  code reality** (one more was discovered during this audit):
+- **Issue:** Sprint 7 closed with **10 places where blueprint claims contradicted
+  code reality** (the 10th was discovered when the verify-first protocol
+  established by this gap saw its first production use, in G-T1.2):
   1. **G-A1** — line count (3500 claimed vs 2146 actual; now 21 after split)
   2. **G-A2** — `v4_groups` deletion plan ignored real internal-import dependencies;
      blueprint also assumed "no V4-only screens" but found 6.
@@ -688,8 +721,20 @@
        tables**, so the real coverage is **25/198 (12%) — 173 uncovered**.
      - `test_flutter_files` (`tests/test_core.py:118`) still asserts the
        presence of `apex_finance/lib/screens/clients/client_onboarding_wizard.dart`,
-       which was deleted; that single stale list cascaded into 23 failures
-       in `test_per_directory_coverage.py` during Sprint 7. Tracked as G-T1.2.
+       which was deleted; that single stale list was opened as G-T1.2.
+       Sprint 7 also assumed it was the trigger for the 23-error cascade in
+       `test_per_directory_coverage.py` — see evidence 10.
+  10. **G-T1.2 cascade misdiagnosis (Sprint 8 verify-first):** Sprint 7
+      G-T1.3 attributed the 23-error cascade in
+      `test_per_directory_coverage.py` to `test_flutter_files`. Verify-first
+      after fixing `test_flutter_files` (commit on branch
+      `sprint-8/g-t1-2-test-flutter-files-refresh`) proved the cascade
+      **persists unchanged**, originating from
+      `tests/test_tax_timeline.py::test_tax_timeline_with_fiscal_year_param`
+      instead — the per-directory-coverage subprocess fails fast on that
+      test, so the 23 parametrized assertions ERROR with no coverage data.
+      The verify-first protocol added in this very PR caught this on its
+      first production use. Real cascade tracked as new gap **G-T1.4**.
 - **`CLAUDE.md` "Common Pitfalls" section was the highest-risk surface.** Sprint 7
   fixed two stale bullets (lines 74 + 75) that would have misled any reader
   into re-implementing complete code. G-DOCS-1 fixed the remaining stale claims:

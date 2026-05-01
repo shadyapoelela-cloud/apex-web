@@ -3,7 +3,7 @@
 ## Sprint 8 — Quality & Compliance (Q2 2026, week 1) — IN PROGRESS
 
 - [x] **G-DOCS-1**: Blueprint accuracy audit + Verify-First Protocol.
-  - Branch: `sprint-8/g-docs-1-blueprint-accuracy-audit`
+  - Branch: `sprint-8/g-docs-1-blueprint-accuracy-audit` (merged PR #110)
   - Phase A audit grid (verify-first against current code):
     - G-A1, G-A2(.1), G-S1, G-Z1, G-B1, G-B2, G-T1 → **accurate**
     - G-A3 / CLAUDE.md L76 → **stale on totals** (real coverage is
@@ -12,13 +12,27 @@
     - CLAUDE.md L55 ("204 tests") → **stale**, real is **1784** (8.7× off)
     - CLAUDE.md L77 ("60+ tightly coupled classes") → **stale**, fixed
     - 9th evidence: `test_flutter_files` references deleted
-      `client_onboarding_wizard.dart` — cascaded 23 unrelated test errors;
-      tracked as G-T1.2.
+      `client_onboarding_wizard.dart`; tracked as G-T1.2.
   - Cross-linked Wave 1 / Wave 11 / Wave 13 into 09 (OAuth, ZATCA encryption,
     Bank Feeds plumbing) — G-E1 downgraded from "placeholder" to "PARTIAL".
   - Added Verify-First Protocol as § 0 of `10_CLAUDE_CODE_INSTRUCTIONS.md`
     with 5-step protocol + measurement-command grid + red-flag list +
     conventional-commit hint.
+
+- [x] **G-T1.2**: Refresh `test_flutter_files` assertions.
+  - Branch: `sprint-8/g-t1-2-test-flutter-files-refresh`
+  - Resolution: Removed 1 stale path
+    (`apex_finance/lib/screens/clients/client_onboarding_wizard.dart`,
+    deleted in commit `a5cac24`). Test now passes in isolation.
+  - **Verify-first save (G-DOCS-1 protocol's first production use):**
+    Sprint 7 attributed the 23-error cascade in
+    `tests/test_per_directory_coverage.py` to `test_flutter_files`.
+    After the fix, the cascade **persists unchanged** — real trigger
+    is `tests/test_tax_timeline.py::test_tax_timeline_with_fiscal_year_param`
+    failing under the per-directory-coverage `pytest -x` subprocess.
+    PR ships honest narrow scope (only what was actually delivered).
+  - Created **G-T1.4** for the real cascade root cause.
+  - Added **G-DOCS-1 evidence #10** capturing the misdiagnosis correction.
 
 ---
 
@@ -64,12 +78,13 @@
 
 ## Cross-cutting follow-ups (Sprint 8)
 
-- ✅ **G-DOCS-1** Blueprint accuracy audit — DONE 2026-04-30
+- ✅ **G-DOCS-1** Blueprint accuracy audit — DONE 2026-04-30 (PR #110)
+- ✅ **G-T1.2** test_flutter_files refresh — DONE 2026-04-30 (narrow scope)
 - **G-A2.1** — Migrate 6 V4-only screens to V5
 - **G-A3.1** — Alembic catch-up (25/198 → 198/198) + lifespan integration (DBA-reviewed)
 - **G-T1.1** — Fix Flutter test infra; ship login/register/onboarding tests
-- **G-T1.2** — Refresh `test_flutter_files` to current screen tree (30 min)
 - **G-T1.3** — Test infra flake + coverage thresholds (4-6 hours)
+- **G-T1.4** — `test_tax_timeline_with_fiscal_year_param` fix (real cascade trigger, 1-3 hours)
 
 ---
 

@@ -116,13 +116,23 @@ def test_routes_exist():
 
 
 def test_flutter_files():
+    """
+    Critical Flutter files smoke-check.
+
+    Each entry is asserted to exist on disk. When a screen is renamed or moved,
+    update this list — do NOT delete the test (it's the canary for cascade
+    failures in test_per_directory_coverage.py).
+
+    History:
+    - 2026-04-30 (G-T1.2): removed `screens/clients/client_onboarding_wizard.dart`
+      which was deleted in commit a5cac24 (Phase 1 frontend cleanup).
+    """
     print("Test 8: Flutter files exist...")
     files = [
         "apex_finance/lib/main.dart",
         "apex_finance/lib/core/router.dart",
         "apex_finance/lib/core/theme.dart",
         "apex_finance/lib/widgets/auth_widgets.dart",
-        "apex_finance/lib/screens/clients/client_onboarding_wizard.dart",
         "apex_finance/lib/screens/marketplace/service_catalog_screen.dart",
         "apex_finance/lib/screens/account/archive_screen.dart",
         "apex_finance/lib/screens/tasks/audit_service_screen.dart",
