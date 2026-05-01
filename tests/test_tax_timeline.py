@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
@@ -130,8 +130,15 @@ def test_tax_timeline_endpoint_horizon_clamped(client):
 
 
 def test_tax_timeline_with_fiscal_year_param(client):
+    # G-T1.4 (2026-05-01): the original test hard-coded `fiscal_year_end=2025-12-31`,
+    # which time-rotted: zakat_due = fy_end + 120 days = 2026-04-30, and the
+    # endpoint's correct semantic guard `today <= zakat_due <= horizon` started
+    # excluding it once today crossed 2026-04-30. The fix is to compute a
+    # fiscal_year_end relative to `date.today()` so zakat_due is always inside
+    # the horizon, regardless of when the suite is run.
+    fy_end = (date.today() + timedelta(days=30)).isoformat()
     r = client.get(
-        "/api/v1/ai/tax-timeline?country=sa&fiscal_year_end=2025-12-31&horizon_days=200"
+        f"/api/v1/ai/tax-timeline?country=sa&fiscal_year_end={fy_end}&horizon_days=200"
     )
     assert r.status_code == 200
     body = r.json()

@@ -48,7 +48,7 @@
     flight) renamed to **G-S8** in 09 and 2 doc files.
 
 - [x] **G-DEV-1**: Local-dev trap fixed.
-  - Branch: `sprint-8/g-dev-1-local-runbook`
+  - Branch: `sprint-8/g-dev-1-local-runbook` (merged PR #113)
   - Root cause: `apex_finance/lib/core/api_config.dart:12` defaults
     to the Render production URL (intentional for prod CI). Without
     `--dart-define=API_BASE=http://127.0.0.1:8000`, fresh clones
@@ -62,6 +62,33 @@
     production CI depends on it).
   - Live-tested `run-backend.ps1`: uvicorn started, `/health` → HTTP 200,
     168 tables, clean shutdown.
+
+- [x] **G-T1.4**: `test_tax_timeline_with_fiscal_year_param` time-rotted (narrow scope).
+  - Branch: `sprint-8/g-t1-4-tax-timeline-cascade`
+  - Root cause: hard-coded `fiscal_year_end=2025-12-31` rotted as
+    wall-clock time crossed `2026-04-30` (the computed `zakat_due`).
+    Replaced with `(date.today() + timedelta(days=30)).isoformat()`
+    so the relative date is self-healing. Production code untouched
+    — `app/core/tax_timeline.py` semantically correct.
+  - Isolated test: `FAILED → PASSED` (0.31s).
+  - **Verify-first save (second time in 2 PRs):** the G-T1.4 prompt
+    asserted the cascade unblock would follow from this fix alone.
+    Post-fix cascade run revealed a SECOND, independent gate —
+    `tests/test_per_directory_coverage.py:110` has a hard-coded
+    `timeout=600` that is tighter than the coverage-instrumented
+    suite runtime (~600-700s). Pre-fix the subprocess died at ~539s
+    on the test failure; post-fix it died cleanly at the 600s timeout.
+    **Trigger transformed, blocker remained.** PR honest narrow scope
+    (only what was actually delivered).
+  - Created **G-T1.6** (next PR, single-line timeout bump to 900s).
+  - Created **G-T1.5** (deferred — sweep `tests/` for other hard-coded
+    date literals).
+  - Added **G-DOCS-1 evidence #11** capturing the layered-cause pattern.
+
+- [ ] **G-T1.6** (queued, immediate next): bump
+  `tests/test_per_directory_coverage.py:110` `timeout=600` → `timeout=900`
+  to accommodate `--cov=app --cov-report=json` overhead. Single-line
+  edit + comment block + verification rerun. ETA 30-60 min.
 
 ---
 
@@ -110,12 +137,14 @@
 - ✅ **G-DOCS-1** Blueprint accuracy audit — DONE 2026-04-30 (PR #110)
 - ✅ **G-T1.2** test_flutter_files refresh — DONE 2026-04-30 (PR #111)
 - ✅ **G-S2** Auth guard bypass — DONE 2026-05-01 (PR #112; old G-S2 renamed to G-S8)
-- ✅ **G-DEV-1** Local-dev trap + runbook — DONE 2026-05-01
+- ✅ **G-DEV-1** Local-dev trap + runbook — DONE 2026-05-01 (PR #113)
+- ✅ **G-T1.4** test_tax_timeline time-rot — DONE 2026-05-01 (narrow; cascade unblock requires G-T1.6)
+- ⏭ **G-T1.6** Cascade timeout bump — NEXT (immediate after G-T1.4 merges)
 - **G-A2.1** — Migrate 6 V4-only screens to V5
 - **G-A3.1** — Alembic catch-up (25/198 → 198/198) + lifespan integration (DBA-reviewed)
 - **G-T1.1** — Fix Flutter test infra; ship login/register/onboarding tests
-- **G-T1.3** — Test infra flake + coverage thresholds (4-6 hours)
-- **G-T1.4** — `test_tax_timeline_with_fiscal_year_param` fix (real cascade trigger, 1-3 hours)
+- **G-T1.3** — Test infra flake + coverage thresholds (4-6 hours; depends on G-T1.6)
+- **G-T1.5** — Sweep `tests/` for hard-coded date literals (deferred, Sprint 9 candidate)
 - **G-S8** — JWT secret rotation (deferred, was G-S2 before 2026-05-01)
 
 ---
