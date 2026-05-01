@@ -1,16 +1,14 @@
-/// @deprecated V4 module — kept temporarily because 6 screens still depend on
-/// `apex_screen_host.dart` (the only file with external users). The other
-/// widgets here are an internally-consistent dead zone (0 external users) but
-/// removing them piecemeal would break `apex_launchpad`, `apex_sub_module_shell`,
-/// `apex_command_palette`, and `apex_tab_bar` which all import `v4_groups.dart`.
+/// State-shell widget for screens (loading / empty / error /
+/// ready / unauthorized).
 ///
-/// Migration to V5 is tracked in G-A2.1 — see
-/// `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md`. Do NOT add new usages.
-/// APEX V4 — Screen state host (Wave 1.5).
+/// History: lived under `lib/core/v4/` until Sprint 8 G-A2.1
+/// (2026-05-01), when verify-first revealed it was clean code in
+/// the wrong location. Moved to `lib/widgets/`. The "v4" association
+/// was directory-incidental; the widget itself has no V4 coupling.
 ///
-/// Every V4 screen wraps its content in ApexScreenHost. The host owns
-/// the five canonical states from the V4 improvement list so no screen
-/// has to reinvent loading/empty/error/unauthorized UI:
+/// Every screen that wraps its content in `ApexScreenHost` gets the
+/// six canonical states for free, so no screen has to reinvent
+/// loading/empty/error/unauthorized UI:
 ///
 ///   loading        → skeleton or spinner
 ///   empty (first)  → first-action CTA with sample-data button
@@ -24,8 +22,8 @@
 library;
 
 import 'package:flutter/material.dart';
-import '../design_tokens.dart';
-import '../theme.dart';
+import '../core/design_tokens.dart';
+import '../core/theme.dart';
 
 enum ApexScreenState {
   loading,

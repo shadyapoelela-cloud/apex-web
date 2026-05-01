@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 import '../../api_service.dart';
 import '../../core/design_tokens.dart';
 import '../../core/theme.dart';
-import '../../core/v4/apex_screen_host.dart';
+import '../../widgets/apex_screen_host.dart';
 
 class ZatcaQueueScreen extends StatefulWidget {
   const ZatcaQueueScreen({super.key});
