@@ -54,6 +54,14 @@ flutter pub get
 flutter run -d chrome
 ```
 
+> **First-time local setup?** See [`LOCAL_DEV_RUNBOOK.md`](LOCAL_DEV_RUNBOOK.md) — covers the
+> `--dart-define=API_BASE=http://127.0.0.1:8000` flag (REQUIRED to point Flutter at
+> your local backend instead of the production Render URL baked into
+> `apex_finance/lib/core/api_config.dart`), test-user creation, port conflicts,
+> the `127.0.0.1` vs `localhost` IPv6 trap, and the Python 3.14 `pandas` caveat.
+> The plain `flutter run -d chrome` above will silently talk to **production** —
+> use the runbook (or the `scripts/dev/` wrappers) for any real local work.
+
 ## Environment Variables
 
 | Variable | Purpose | Default |

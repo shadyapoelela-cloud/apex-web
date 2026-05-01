@@ -20,7 +20,7 @@
     conventional-commit hint.
 
 - [x] **G-T1.2**: Refresh `test_flutter_files` assertions.
-  - Branch: `sprint-8/g-t1-2-test-flutter-files-refresh`
+  - Branch: `sprint-8/g-t1-2-test-flutter-files-refresh` (merged PR #111)
   - Resolution: Removed 1 stale path
     (`apex_finance/lib/screens/clients/client_onboarding_wizard.dart`,
     deleted in commit `a5cac24`). Test now passes in isolation.
@@ -33,6 +33,35 @@
     PR ships honest narrow scope (only what was actually delivered).
   - Created **G-T1.4** for the real cascade root cause.
   - Added **G-DOCS-1 evidence #10** capturing the misdiagnosis correction.
+
+- [x] **G-S2**: Auth guard bypass — `/app` accessible without token.
+  - Branch: `sprint-8/g-s2-auth-guard` (merged PR #112)
+  - Added global GoRouter `redirect:` delegating to a pure
+    `authGuardRedirect(path, token)` in new `lib/core/auth_guard.dart`
+    (extracted to avoid dragging `dart:html` into tests — the same
+    blocker tracked as G-T1.1).
+  - Removed `/login → /app` override in `v5_routes.dart` (loop trigger
+    once the global guard arrived).
+  - 7 widget tests in `test/auth/auth_guard_test.dart` (3 acceptance
+    cases + 4 belt-and-suspenders). Verify-first caught an ID
+    collision pre-edit: old G-S2 (JWT rotation, deferred, 0 work in
+    flight) renamed to **G-S8** in 09 and 2 doc files.
+
+- [x] **G-DEV-1**: Local-dev trap fixed.
+  - Branch: `sprint-8/g-dev-1-local-runbook`
+  - Root cause: `apex_finance/lib/core/api_config.dart:12` defaults
+    to the Render production URL (intentional for prod CI). Without
+    `--dart-define=API_BASE=http://127.0.0.1:8000`, fresh clones
+    silently call live production → "Failed to fetch" with no useful
+    pointer to the cause.
+  - Resolution: 4 wrapper scripts under `scripts/dev/` (Win + bash);
+    `LOCAL_DEV_RUNBOOK.md` at the repo root with troubleshooting matrix
+    incl. the **127.0.0.1-vs-localhost / IPv6 fallback** trap; 5-line
+    `CLAUDE.md` § "Local Development"; 6-line `README.md` redirect note.
+  - Zero source-code changes (`api_config.dart` default preserved —
+    production CI depends on it).
+  - Live-tested `run-backend.ps1`: uvicorn started, `/health` → HTTP 200,
+    168 tables, clean shutdown.
 
 ---
 
@@ -79,12 +108,15 @@
 ## Cross-cutting follow-ups (Sprint 8)
 
 - ✅ **G-DOCS-1** Blueprint accuracy audit — DONE 2026-04-30 (PR #110)
-- ✅ **G-T1.2** test_flutter_files refresh — DONE 2026-04-30 (narrow scope)
+- ✅ **G-T1.2** test_flutter_files refresh — DONE 2026-04-30 (PR #111)
+- ✅ **G-S2** Auth guard bypass — DONE 2026-05-01 (PR #112; old G-S2 renamed to G-S8)
+- ✅ **G-DEV-1** Local-dev trap + runbook — DONE 2026-05-01
 - **G-A2.1** — Migrate 6 V4-only screens to V5
 - **G-A3.1** — Alembic catch-up (25/198 → 198/198) + lifespan integration (DBA-reviewed)
 - **G-T1.1** — Fix Flutter test infra; ship login/register/onboarding tests
 - **G-T1.3** — Test infra flake + coverage thresholds (4-6 hours)
 - **G-T1.4** — `test_tax_timeline_with_fiscal_year_param` fix (real cascade trigger, 1-3 hours)
+- **G-S8** — JWT secret rotation (deferred, was G-S2 before 2026-05-01)
 
 ---
 

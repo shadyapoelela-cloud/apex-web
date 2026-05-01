@@ -71,6 +71,12 @@
 - CI/CD: GitHub Actions (`.github/workflows/ci.yml`) — lint (Black, Ruff, Bandit) + tests + coverage + deploy
 - Config: `pyproject.toml` for Black (120 chars), Ruff, pytest, coverage settings
 
+## Local Development
+
+- Full runbook: **`LOCAL_DEV_RUNBOOK.md`** (G-DEV-1, Sprint 8). Covers the `--dart-define=API_BASE` flag (REQUIRED — `api_config.dart` defaults to the Render production URL), test-user creation, the 127.0.0.1-vs-localhost / IPv6-fallback trap, port conflicts, and the Python 3.14 pandas caveat.
+- One-shot start: `scripts/dev/run-backend.ps1` then `scripts/dev/run-frontend.ps1` (Windows) or the `.sh` equivalents (Mac/Linux). Both wrappers print the underlying `uvicorn` / `flutter run` command before executing — read once, learn the shape, drop the wrapper if you prefer.
+- **Do not edit `apex_finance/lib/core/api_config.dart` to "fix" local dev** — production CI bakes the default at build time. Use `--dart-define` instead.
+
 ## Common Pitfalls
 
 - Phase routers may shadow each other if paths overlap (e.g., `/users/me/security`)
