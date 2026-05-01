@@ -976,20 +976,82 @@
     new "green" baseline for Sprint 8.
 - **Sprint:** 8 (recalibration); G-T1.7a + G-T1.7b in Sprint 9-10.
 
-### ⏭ G-T1.7a. Coverage push for `app/ai/` (218 stmts)
-- **Discovered:** 2026-05-01 by G-T1.7 scoping.
-- **Scope:** add unit tests for the 4 ai/ files below floor.
-  - `app/ai/routes.py` — 254 missing stmts (47.4%) → priority target.
-    Endpoints to cover: tax-timeline, ai-suggestions, ai-ask, copilot
-    agent invocations. Pattern: `TestClient` + happy-path + 1-2 error paths.
-  - `app/ai/scheduler.py` — 43 missing (61.3%).
-  - `app/ai/proactive.py` — 47 missing (62.4%).
-  - `app/ai/approval_executor.py` — 43 missing (66.4%).
-- **Goal:** `ai/` actual ≥ 80% (real coverage, NOT lowered floor).
-  After this lands, `DIRECTORY_FLOORS["ai"]` stays at 80% with the
-  cascade reporting PASS.
-- **Estimate:** 1-2 days (~25-40 unit tests).
-- **Status:** ⏭ Sprint 9 (Sprint 8 budget consumed by recalibration + earlier gaps).
+### ✅ G-T1.7a. ~~Coverage push for `app/ai/`~~ — DONE (partial) 2026-05-01
+- **Delivered:**
+  - **79 unit tests** added across 5 files (3 new + 2 augmented):
+    - `tests/test_ai_routes_extras.py` — **NEW**, 46 tests covering 25
+      orphan endpoints (period-close, universal-journal, audit-chain,
+      regulatory-news, fixed-assets, multi-currency, audit/benford,
+      audit/je-sample, audit/workpapers, consolidation, islamic/*,
+      coa-templates, bank-rec).
+    - `tests/test_ai_approval_executor.py` — **NEW**, 7 tests covering
+      `execute_suggestion` orchestration (not-found / wrong-state /
+      unknown-action-type / state-persistence) and `execute_all_approved`
+      (empty-queue / limit / partial-failure accounting).
+    - `tests/test_ai_onboarding_routes.py` — **NEW**, 11 tests for
+      onboarding endpoints' early-return validation paths
+      (missing fields, blank/whitespace name, missing tenant/entity,
+      unknown entity 404). **No DB writes** — Phase 6 scope.
+    - `tests/test_ai_scheduler.py` — augmented +7 tests for the
+      approved-suggestion drain loop (enable/disable, interval floor,
+      bad-env fallback, idempotency, zero-warmup execution, no-task stop).
+    - `tests/test_ai_proactive.py` — augmented +8 tests for
+      `cash_runway_warning` edge cases (no-signal / growing-balance /
+      safe-runway), `run_all_scans` summary shape and tenant filter.
+- **Coverage transition** (measured `pytest tests/ --cov=app/ai
+  --ignore=tests/test_per_directory_coverage.py`):
+  - **`ai/` aggregate: 54.31% → 69.42%** (+15.1 pp; +128 statements covered)
+  - `app/ai/scheduler.py`:        61.3% → **85%** (+23.7 pp)
+  - `app/ai/proactive.py`:        62.4% → **74%** (+11.6 pp)
+  - `app/ai/routes.py`:           47.4% → **66%** (+18.6 pp)
+  - `app/ai/approval_executor.py`: 66.4% → **66%** (≈0; remaining gap
+    is in DB-write `_execute_*` handlers — see "Why partial" below)
+- **Why partial:** the floor at 80% is unreachable in this PR by design.
+  Verify-first revealed remaining 259 missing statements cluster in
+  three **DB-integration zones** that the strict-rule "no DB writes"
+  for this PR explicitly excluded:
+  1. `routes.py` `/onboarding/complete` body (lines 344-490, ~140 stmts)
+     — multi-step Tenant + Entity + GLAccount + FiscalPeriod creation.
+  2. `routes.py` `/onboarding/seed-demo` body (lines 521-620, ~98 stmts)
+     — sample-customer + 3 demo journal-entry insertion.
+  3. `approval_executor.py` `_execute_create_invoice` /
+     `_execute_send_reminder` / `_execute_ap_approval` (~120 stmts
+     across the 3 handlers) — real invoice/notification/AP writes.
+  4. `proactive.py` `cash_runway_warning` notification block
+     (lines 269-299, ~30 stmts) — calls `notifications_bridge.notify`.
+  G-T1.7a.1 (expanded scope below) owns these zones.
+- **Cascade impact:** **22/23 PASS maintained** (was 22/23 after
+  G-T1.7). The `ai-80.0` cascade FAIL is **deliberate** — it's the
+  signal G-T1.7a.1 will close. Cascade 23/23 milestone is deferred.
+- **First production PR through diff-cover gate:** this PR adds 79
+  test functions in 5 test files with **zero `app/**` source-code
+  changes**. The new diff-cover gate (G-PROC-1 Phase 2) reports
+  "no relevant lines added in app/**" → gate auto-passes by default.
+  No `skip-coverage-gate` label needed.
+- **Verify-first saves during implementation (6 in this PR alone):**
+  1. Cascade subprocess timeout interaction with broad `--cov=app/ai`
+     produced a 17-min runtime (vs 7-min baseline) — handled by
+     scoping subsequent measurements with `--ignore=tests/test_per_directory_coverage.py`.
+  2. `test_different_fiscal_years_isolated` flake under `--cov=app/ai`
+     — tracked as G-T1.8, not blocking.
+  3. AiSuggestion column names (`after_json` vs `after`, confidence
+     in permille) discovered via test failure — corrected pre-commit.
+  4. `execute_suggestion` no-handler path doesn't transition row state
+     (early return before `row.status = result.status`) — test
+     adjusted to assert actual behavior.
+  5. Drain scheduler env-var name was `AI_DRAIN_APPROVED_INTERVAL_SECONDS`
+     not `AI_DRAIN_INTERVAL_SECONDS` — corrected.
+  6. 80% floor mathematically unreachable within "no DB writes"
+     constraint — surfaced before scope creep, kept G-T1.7a.1
+     boundary intact.
+- **Refs:**
+  - Parent: G-T1.7 (Sprint 8, floor calibration)
+  - Children: G-T1.7a.1 (DB integration — expanded scope below)
+  - Sibling: G-T1.7b (core/ restoration, multi-PR Sprint 9-10)
+  - Related: G-T1.8 (flake), G-T1.9 (runtime variance — watch-only)
+  - Process control: G-PROC-1 Phase 2 (diff-cover gate, tested in this PR)
+- **Status:** ✅ Partial-DONE — narrow scope shipped at 69.42%.
+  G-T1.7a.1 owns the remaining 80% floor push.
 - **Sprint:** 9.
 
 ### ⏭ G-T1.7b. Coverage restoration for `app/core/` (1,748 stmts)
@@ -1011,6 +1073,103 @@
 - **Status:** ⏭ Sprint 9-10. Treat as a sustained TDD initiative,
   not a single deliverable.
 - **Sprint:** 9-10.
+
+### ⏸ G-T1.7a.1. `app/ai/` DB-integration tests — push from 69.42% to 80%+
+- **Scope expanded 2026-05-01** by G-T1.7a closure: original entry
+  was scoped only to onboarding endpoints; G-T1.7a final coverage
+  measurement (69.42%) revealed the remaining 80% floor push needs
+  ALL the DB-integration zones the strict-rule "no DB writes" of
+  G-T1.7a explicitly excluded. To avoid spawning a third gap (G-T1.7c)
+  we fold all three zones here.
+- **Three DB-integration zones (~290 missing statements total):**
+  1. **`/onboarding/complete` body** (`app/ai/routes.py:344-490`,
+     ~140 stmts) — multi-step Tenant + Entity + GLAccount +
+     FiscalPeriod creation; needs end-to-end fixtures that seed a
+     valid `coa_industry_templates` template + verify created rows.
+  2. **`/onboarding/seed-demo` body** (`app/ai/routes.py:521-620`,
+     ~98 stmts) — sample-customer + 3-JE seeding; depends on a
+     successfully-onboarded tenant + entity (chained on zone 1).
+  3. **`approval_executor._execute_*` handlers** (~120 stmts across
+     `_execute_create_invoice`, `_execute_send_reminder`,
+     `_execute_ap_approval`) — each does real domain writes via
+     `SessionLocal()` and emits audit events. Needs fixtures that
+     stage approved `AiSuggestion` rows with valid `after_json`
+     payloads matching each handler's expected schema.
+  4. **`proactive.cash_runway_warning` notification block**
+     (`app/ai/proactive.py:269-299`, ~30 stmts) — calls
+     `notifications_bridge.notify`; needs an in-memory notify mock
+     OR a real notification channel mounted in test setup.
+- **Goal:** raise `app/ai/` actual coverage 69.42% → ≥80%, allowing
+  the cascade `ai-80.0` assertion to PASS and **delivering the
+  cascade-23/23 milestone** that G-T1.7a deferred.
+- **Estimate:** **2-3 days** (was 1-2 in the original onboarding-only
+  scope). Roughly 30-40 integration tests across 3-4 new test files
+  or augmentations to the G-T1.7a additions:
+  - `test_ai_onboarding_routes.py` — augment with positive-path tests
+  - `test_ai_approval_executor.py` — augment with handler-level tests
+  - `test_ai_proactive.py` — augment with notification-mocking tests
+- **Risk:** the integration fixtures are not free-standing; they
+  depend on `coa_industry_templates`, `notifications_bridge`, and the
+  `Customer`/`JournalEntry`/`JournalLine` schemas being stable. If any
+  of those drift, tests need rework. Worth scoping fixtures carefully
+  before the test-write phase.
+- **Status:** ⏸ Deferred — Sprint 10 candidate. `app/ai/` is below
+  the 80% floor without these, but G-T1.7a partial-DONE shipped
+  +15.1pp of progress; G-T1.7a.1 closes the remaining ~10pp.
+- **Sprint:** 10.
+
+### ⏸ G-T1.9. ai/ test-suite runtime variance under broad `--cov` (watch-only)
+- **Trigger:** During G-T1.7a verify-first, the same
+  `pytest tests/ --cov=app/ai --ignore=tests/test_per_directory_coverage.py`
+  invocation produced wildly different runtimes across runs:
+  - Run 1 (during scoping): **7:33** (453s) — typical
+  - Run 2 (during impl midpoint): **17:05** (1025s) under `--cov=app/ai`
+    when `test_per_directory_coverage.py` was NOT excluded — the
+    inner cascade subprocess hit its own 600s timeout, producing
+    23 ERRORs and inflating the wrapping pytest's runtime.
+  - Run 3 (G-T1.7a final): **2:57** (177s) — fastest, in the same
+    conditions as Run 1.
+  - Run 4 (post-implementation full suite): **4:42:44** (16964s) —
+    nearly 5 hours; cause unknown but likely external system load
+    (this WSL/Windows environment had been busy during this run).
+- **Hypothesis:** the variance is dominated by the cascade-subprocess
+  interaction (`test_per_directory_coverage.py` runs `pytest -x` as a
+  600s-bounded subprocess); when broad `--cov` is set on the outer
+  invocation, the inner subprocess inherits coverage instrumentation
+  and slows down enough to hit its own timeout. Excluding the
+  cascade test from the outer invocation eliminates this — runtimes
+  are then 3-7 min consistently.
+- **Status:** ⏸ **Watch-only** — no investigation budget allocated.
+  The mitigation (exclude `test_per_directory_coverage.py` when
+  measuring per-module coverage) is documented in this entry and in
+  G-T1.7a's verify-first notes. Open as a real gap only if:
+  - Test runtime under standard `pytest tests/ --cov=app` (no exclusion)
+    starts producing >30 min runs in CI repeatedly, OR
+  - A future PR finds itself unable to measure coverage cleanly
+    because of this interaction.
+- **Related:** G-T1.6 (cascade-subprocess timeout dynamics),
+  G-T1.8 (the `--cov` order-dependent flake — likely same root cause).
+- **Sprint:** TBD (watch-only).
+
+### ⏸ G-T1.8. `test_different_fiscal_years_isolated` order-dependent flake (deferred)
+- **Trigger:** Discovered 2026-05-01 during G-T1.7a verify-first.
+  `tests/test_zatca.py::TestInvoiceBuild::test_different_fiscal_years_isolated`
+  passes in isolation (0.68s) but fails under full pytest with
+  `--cov=app/ai` instrumentation. Order-dependent / state-leakage —
+  the test is sensitive to other tests' side effects on shared state
+  (DB session, module-level caches, or coverage-instrumented timing).
+- **Hypotheses:**
+  - DB session pollution between tests
+  - Module-level state (cached imports, global config)
+  - Test execution timing interaction with coverage instrumentation
+- **Scope:** investigate test ordering, isolate state, add proper
+  teardown / fixture cleanup. 1-2 hours.
+- **Status:** ⏸ Deferred — Sprint 10 candidate. Does NOT block
+  coverage work. Only triggers under specific `--cov` flag combinations.
+- **Risk if ignored:** would surface in any future PR that runs
+  pytest with broad `--cov` scope (e.g., G-T1.7b for `core/` coverage
+  push). May need fixing before G-T1.7b starts.
+- **Sprint:** 10.
 
 ### 🟠 G-T2. No load tests
 
