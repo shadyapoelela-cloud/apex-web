@@ -717,34 +717,95 @@
 - **Estimate:** 4-6 hours
 - **Sprint:** 8 (alongside G-T1.1)
 
-### 🟠 G-T1.4. `test_tax_timeline_with_fiscal_year_param` cascades coverage gate
-- **Files:** `tests/test_tax_timeline.py`, `tests/test_per_directory_coverage.py`
-- **Issue:** `test_per_directory_coverage.py` runs pytest as a `-x` subprocess
-  to capture per-directory coverage data. That subprocess reports
-  `1 failed, 1519 passed, 2 skipped` — the failure is
-  `tests/test_tax_timeline.py::test_tax_timeline_with_fiscal_year_param`,
-  which terminates the subprocess and leaves the 23 parametrized
-  `test_directory_meets_coverage_floor[...]` assertions with no coverage
-  data to read, causing them to ERROR.
-- **Discovery (G-T1.2, Sprint 8 verify-first):** Sprint 7 G-T1.3 attributed
-  the cascade to `test_flutter_files`. After G-T1.2 fixed
-  `test_flutter_files` and the cascade persisted unchanged, the real
-  trigger was identified by reading the failing-subprocess summary that
-  `test_per_directory_coverage.py` captures into the assertion error.
-- **Investigation needed:**
-  1. Run `pytest tests/test_tax_timeline.py::test_tax_timeline_with_fiscal_year_param -v`
-     in isolation — does it pass when alone? Does it pass without `-x`?
-  2. Inspect fixtures the test relies on (`fiscal_year`, tenant context,
-     time-frozen clocks) — flake or order-dependence are both candidates.
-  3. Check the recent commits touching `app/copilot/services/tax_timeline_service.py`
-     and `app/phase8/services/tax_calendar.py` for behavioural changes
-     the test was not updated for.
-  4. Decide on fix: real bug fix in code, fix the test, or `pytest.mark.xfail`
-     with a tracking ticket and `strict=False` so the cascade clears.
-- **Why this matters:** the per-directory coverage gate is currently
-  fully blocked — every PR carries a falsely-failing job. A single root
-  cause unlocks 23 assertions worth of regression protection.
-- **Estimate:** 1-3 hours (depends on root cause).
+### ✅ G-T1.4. ~~`test_tax_timeline_with_fiscal_year_param` time-rotted~~ — DONE 2026-05-01
+- **Root cause (verify-first):** the test hard-coded
+  `fiscal_year_end=2025-12-31`, computing
+  `zakat_due = fy_end + 120 days = 2026-04-30`. The endpoint guard
+  `today <= zakat_due <= horizon` correctly excludes past-due
+  obligations. As of 2026-05-01, `zakat_due` was 1 day in the past
+  → zakat row excluded → `assert any(r["kind"] == "zakat" ...)` failed.
+  The test rotted as wall-clock time passed since it was first written.
+- **Original blueprint (incorrect):** previous text in this entry
+  blamed `pytest -x` subprocess termination — that is the *cascade
+  symptom*, not the proximate cause of the test failure. Verify-First
+  during this PR captured the actual traceback (`assert False`, no
+  `zakat` row in `body["data"]`) and corrected the diagnosis.
+- **Fix:** replaced the hard-coded date with
+  `(date.today() + timedelta(days=30)).isoformat()`, making
+  `zakat_due = today + 150 days` — always inside `horizon_days=200`,
+  regardless of when the suite runs. Sister tests in the same file
+  already pin `today=date(2026, 4, 15)` via the
+  `upcoming_obligations(today=...)` kwarg; only the HTTP-endpoint
+  test couldn't (the endpoint always uses `date.today()` internally),
+  hence the relative-date pattern.
+- **Files:** `tests/test_tax_timeline.py` (~10 lines: import +
+  comment + replacement). Production code untouched —
+  `app/core/tax_timeline.py` and `app/ai/routes.py` semantically
+  correct (excluding past-due obligations from "upcoming" is the
+  right answer).
+- **Verification:**
+  - Isolated test pre-fix: `FAILED ... assert False` in 0.24s.
+  - Isolated test post-fix: `PASSED` in 0.31s with URL using
+    `fiscal_year_end=2026-05-31` (today + 30 days).
+- **Cascade follow-up:** This PR fixed the time-rot, but the cascade
+  in `test_per_directory_coverage.py` **remained blocked** by a
+  SECOND, independent gate. Pre-fix the subprocess died at ~539s on
+  the test failure; post-fix the subprocess hits a hard-coded
+  `timeout=600` at line 110 of `test_per_directory_coverage.py`
+  (the coverage-instrumented full suite needs ~600-700s with
+  `--cov=app --cov-report=json`). Trigger transformed, blocker
+  remained. Tracked separately as **G-T1.6 (immediate next PR)**.
+- **Sprint:** 8
+
+### 🟢 G-T1.5. Audit hard-coded dates across `tests/` for time-rot
+- **Trigger:** G-T1.4 surfaced the first known time-rot bug
+  (`tests/test_tax_timeline.py:134` hard-coded `2025-12-31`).
+  Other tests likely have similar latent bugs that haven't fired yet.
+- **Scope:** sweep `tests/**/*.py` for date literals matching
+  `r'"\d{4}-\d{2}-\d{2}"'` or `r"date\(\d{4}, \d{1,2}, \d{1,2}\)"`,
+  classify each as
+  - **(a)** intentional historical fixture (e.g.
+    `today=date(2026, 4, 15)` to pin a `upcoming_obligations` call to
+    a known reference point — keep);
+  - **(b)** future-relative intent that rotted or will rot — convert
+    to `date.today() + timedelta(days=N)` per the G-T1.4 pattern;
+  - **(c)** ambiguous — leave a TODO and flag to the test owner.
+- **Estimated:** 30-60 minutes for the sweep, plus per-test
+  remediation depending on findings.
+- **Status:** ⏸ Deferred — not blocking Sprint 8. Open as a
+  standalone PR when calendar pressure on tests recurs (e.g. when
+  any other date-sensitive test starts to fail in CI without code
+  changes).
+- **Sprint:** TBD (Sprint 9 candidate).
+
+### ⏭ G-T1.6. `test_per_directory_coverage` subprocess timeout too tight
+- **Discovered:** 2026-05-01 during the post-fix cascade run for
+  G-T1.4. With the time-rotted test repaired, the subprocess no
+  longer dies at the test failure at ~539s; instead it hits a
+  hard-coded `timeout=600` cleanly:
+  ```
+  subprocess.TimeoutExpired: Command '[...pytest tests/
+    --ignore=tests/test_per_directory_coverage.py --cov=app
+    --cov-report=json:... -q --tb=no -x]' timed out after 600 seconds
+  1 warning, 23 errors in 603.08s (0:10:03)
+  ```
+- **File / line:** `tests/test_per_directory_coverage.py:110`
+  (the `subprocess.run(..., timeout=600, ...)` call).
+- **Why it grew past 600s:** coverage instrumentation
+  (`--cov=app --cov-report=json`) adds 15-30% overhead to a suite
+  that already takes ~520s without coverage. The 600s ceiling was
+  set when the suite was smaller; G-T1.4 removed the early-exit on
+  test failure, exposing it.
+- **Scope:** single line — bump `timeout=600` to `timeout=900`
+  (50% headroom on the 603s observed runtime). Add a comment block
+  linking to G-T1.4 + G-DOCS-1 evidence #11 explaining why the
+  bump was necessary.
+- **Verification:** post-bump rerun of
+  `pytest tests/test_per_directory_coverage.py` should produce
+  `23 passed` instead of `23 errors`.
+- **Estimated:** 30-60 minutes (1-line edit + verification rerun
+  + comment block + 09/PROGRESS updates).
+- **Status:** ⏭ Next — to be executed immediately after G-T1.4 merges.
 - **Sprint:** 8
 
 ### 🟠 G-T2. No load tests
@@ -761,12 +822,12 @@
 
 ## 11. Documentation Gaps / ثغرات التوثيق
 
-### ✅ G-DOCS-1. ~~Blueprint accuracy audit~~ — DONE 2026-04-30 (10th evidence appended on 2026-04-30 by G-T1.2)
+### ✅ G-DOCS-1. ~~Blueprint accuracy audit~~ — DONE 2026-04-30 (11th evidence appended on 2026-05-01 by G-T1.4)
 - **Files updated:** `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md`,
   `APEX_BLUEPRINT/10_CLAUDE_CODE_INSTRUCTIONS.md`, `CLAUDE.md`, `PROGRESS.md`
-- **Issue:** Sprint 7 closed with **10 places where blueprint claims contradicted
-  code reality** (the 10th was discovered when the verify-first protocol
-  established by this gap saw its first production use, in G-T1.2):
+- **Issue:** Sprint 7 closed with **11 places where blueprint claims contradicted
+  code reality** (the 10th was discovered during G-T1.2; the 11th during
+  G-T1.4 — both surfaced by the verify-first protocol established here):
   1. **G-A1** — line count (3500 claimed vs 2146 actual; now 21 after split)
   2. **G-A2** — `v4_groups` deletion plan ignored real internal-import dependencies;
      blueprint also assumed "no V4-only screens" but found 6.
@@ -804,6 +865,24 @@
       test, so the 23 parametrized assertions ERROR with no coverage data.
       The verify-first protocol added in this very PR caught this on its
       first production use. Real cascade tracked as new gap **G-T1.4**.
+  11. **G-T1.4 cascade root cause was layered, not single (2026-05-01):**
+      G-T1.2 evidence #10 said the cascade trigger was
+      `test_tax_timeline_with_fiscal_year_param`. The G-T1.4 prompt
+      then asserted that fixing that one test would unblock the
+      cascade. Verify-first during G-T1.4 found that BOTH were real
+      but only PARTIAL: the test had a real time-rot bug (hard-coded
+      `2025-12-31` rotted past `today`), AND the per-directory
+      coverage gate has an INDEPENDENT 600s subprocess timeout
+      (`tests/test_per_directory_coverage.py:110`) that is tighter
+      than the coverage-instrumented suite runtime. Pre-fix the
+      subprocess died at the test failure (~539s); post-fix it died
+      cleanly at the 600s timeout. **Trigger transformed, blocker
+      remained.** Cascade unblock requires both G-T1.4 (this PR)
+      and **G-T1.6** (immediate next PR — single-line timeout bump).
+      The "blueprint described the symptom, not the cause" pattern
+      now has two confirmed examples (evidence 10 and 11) — this
+      should be cited in any future cascade-related gap as the
+      default failure mode to verify against.
 - **`CLAUDE.md` "Common Pitfalls" section was the highest-risk surface.** Sprint 7
   fixed two stale bullets (lines 74 + 75) that would have misled any reader
   into re-implementing complete code. G-DOCS-1 fixed the remaining stale claims:
