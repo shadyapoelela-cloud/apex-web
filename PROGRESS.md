@@ -76,7 +76,25 @@
     refs remain in `lib/` (5 historical doc refs preserved).
   - **V4 cleanup chapter closed** (Sprint 7 G-A2 → Sprint 8 G-A2.1
     → Sprint 9 G-A2.3 — three-sprint progression).
-- [ ] **G-T1.7b** core/ coverage restoration (1,748 stmts, 1-3 weeks)
+- [x] **G-T1.7b.1** core/ zero-coverage files coverage push — **DONE** 2026-05-01 (Sprint 9 final)
+  - Branch: `sprint-9/g-t1-7b-1-zero-coverage-files`
+  - **56 unit tests added** across 4 NEW files (Phase 1 of G-T1.7b multi-PR):
+    - `tests/test_error_helpers.py` — 7 tests, 100% coverage (18/18 stmts)
+    - `tests/test_saudi_knowledge_base.py` — 22 tests, 100% coverage (63/63 stmts)
+    - `tests/test_payment_service.py` — 21 tests, 100% coverage (84/84 stmts)
+      (StripeBackend covered via `sys.modules['stripe']` stub — no real SDK call)
+    - `tests/test_universal_journal_internal.py` — 6 tests, 86% combined
+      (91/106 stmts; was 75.5% from G-T1.7a indirect coverage)
+  - **Aggregate `core/` coverage:** 75.67% → **76.71%** (+1.04pp)
+  - **Cascade: 22/23 maintained** (ai/ FAIL deliberate, deferred to G-T1.7a.1)
+  - **Full suite:** 1915 passed; 2 pre-existing failures (ai-80.0, G-T1.8 flake)
+  - 3 verify-first saves during implementation:
+    - blueprint stmt-count estimate refined (+271 stmts vs 145 NEW stmts)
+    - StripeBackend stub strategy (real SDK not installed in test env)
+    - module-style `--cov=app.core.X` flag required (path-style returns 0%)
+  - **Sprint 9 priority #3 closed.** G-T1.7b.2 (Sprint-7 untested modules)
+    deferred to Sprint 10+.
+- [ ] **G-T1.7b** core/ coverage restoration — Phase 1 done; Phases 2-N pending (Sprint 10+)
 
 ### Sprint 9 deferred (opened during this Sprint)
 
