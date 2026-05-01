@@ -1,6 +1,39 @@
 # APEX Sprint Progress
 
-## Sprint 9 — Quality & Process (Q2 2026, week 2) — IN PROGRESS
+## Sprint 10 — Coverage Restoration (Q2 2026, week 3) — IN PROGRESS
+
+- [x] **G-T1.7b.2** core/ Workflow Engine cluster — **DONE** 2026-05-02 (Phase 2 of 5)
+  - Branch: `sprint-10/g-t1-7b-2-workflow-engine-cluster`
+  - **111 test functions / 133 collected pytest cases** across 4 NEW files
+    (split per source module):
+    - `tests/test_anomaly_live.py` — 22 fn, 31.8% → **95.29%** (+63.5pp)
+    - `tests/test_cashflow_forecast.py` — 22 fn, 26.5% → **95.45%** (+68.95pp)
+    - `tests/test_workflow_run_history.py` — 28 fn, 28.9% → **100%** (+71.1pp)
+    - `tests/test_workflow_engine.py` — 39 fn / 61 collected, 23.7% → **96.86%** (+73.16pp)
+  - **Aggregate `core/` coverage:** 76.71% → **79.45%** (+2.74pp).
+    **Stretch target (79.4%) hit.**
+  - **core/ trajectory:** 74.0 (floor) → 75.67 (G-T1.7b.1 entry) →
+    76.71 (G-T1.7b.1 exit) → **79.45 (G-T1.7b.2 exit)**. Remaining to
+    original 85% floor: 5.55pp across Phases 3-5.
+  - **Cascade: 22/23 maintained** (ai/ FAIL deliberate, deferred to G-T1.7a.1).
+  - **Full suite:** 2048 passed; 2 pre-existing failures (ai-80.0, G-T1.8 flake);
+    0 new regressions.
+  - sys.modules stub strategy (G-T1.7b.1 Stripe pattern) reused for
+    slack/teams/email/notification_service/requests/approvals.
+  - **Sprint 10 progress: 1/5 priorities** (G-T1.7b.3-.5 + G-T1.7a.1 + G-T1.8 queued).
+- [ ] **G-T1.7b.3** api_keys + email_inbox cluster (next, awaiting approval)
+
+### Sprint 10 queue
+
+- **G-T1.7b.3** — api_keys + email_inbox + notification_digest (Phase 3 of 5)
+- **G-T1.7b.4** — storage_service + industry_pack_provisioner cluster (Phase 4)
+- **G-T1.7b.5** — slack/teams_backend + remaining diffuse files (Phase 5, closes G-T1.7b)
+- **G-T1.7a.1** — `app/ai/` DB-integration tests (cascade-23/23 milestone)
+- **G-T1.8** — `test_different_fiscal_years_isolated` order-dependent flake fix
+
+---
+
+## Sprint 9 — Quality & Process (Q2 2026, week 2) — COMPLETE
 
 - [x] **G-PROC-1 Phase 1** — Process root-cause investigation.
   - Branch: `sprint-9/g-proc-1-investigation` (merged PR #119)
