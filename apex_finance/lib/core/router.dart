@@ -156,6 +156,7 @@ import '../screens/marketplace/service_catalog_screen.dart' as catalog;
 import '../screens/account/archive_screen.dart' as archive;
 import '../screens/tasks/audit_service_screen.dart' as audit;
 import '../core/session.dart' show S;
+import 'auth_guard.dart';
 // client_create.dart import removed — redirected to unified /settings/entities
 import '../upload_screen.dart';
 import '../analysis_full_screen.dart';
@@ -276,7 +277,13 @@ final appRouter = GoRouter(
   // with 16-app ERP grid and horizontal layer (Cmd+K, Entity Scope, etc.)
   // Phase 27.5: V5 Launchpad is the entry point (per user request)
   initialLocation: '/app',
-  // redirect: disabled for now - auth handled in login screen,
+  // Global auth guard (G-S2 2026-05-01): if no token, force /login. The
+  // logic itself lives in `auth_guard.dart` as a pure function so it can
+  // be unit-tested without pulling `dart:html` from `session.dart` (the
+  // same blocker tracked as G-T1.1). See `auth_guard.dart` for the
+  // rationale on why auth-flow paths bypass the guard.
+  redirect: (context, state) =>
+      authGuardRedirect(path: state.uri.path, token: S.token),
     routes: [
     // ── New IA Service Hubs (Blueprint v1.0) — registered BEFORE v5/v4 ──
     // Each top-level service path now opens a Hub screen with featured

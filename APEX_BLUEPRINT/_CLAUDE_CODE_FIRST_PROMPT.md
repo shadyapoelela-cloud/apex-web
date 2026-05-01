@@ -270,8 +270,8 @@ Sprint 10 (الأسبوع 9-10): 7 مهام  — UX Polish + i18n
 1. أنشئ `EncryptedString` type
 2. طبّق على `users.email`, `users.phone` (مع migration)
 
-### G-S2 — JWT secret rotation
-**Branch:** `sprint-8/g-s2-jwt-rotation`
+### G-S8 — JWT secret rotation *(was G-S2 before 2026-05-01)*
+**Branch:** `sprint-8/g-s8-jwt-rotation`
 1. غيّر `JWT_SECRET` إلى `JWT_SECRETS` (list)
 2. توقيع بأول واحد، تحقق بكل القائمة
 3. وثّق rotation procedure في runbook
@@ -494,7 +494,7 @@ G-B1: Google OAuth code complete، لكن لا أستطيع اختبار end-to-
 - [x] G-A7: Idempotency keys — PR #12
 - [x] G-A8: Rate limiting — PR #13
 - [x] G-S4: PII encryption — PR #14
-- [x] G-S2: JWT rotation — PR #15
+- [x] G-S8: JWT rotation — PR #15  *(was G-S2 before 2026-05-01)*
 
 ## Sprint 9 — Multi-Country E-invoicing ✅
 - [x] G-Z2: CSID auto-renewal — PR #16

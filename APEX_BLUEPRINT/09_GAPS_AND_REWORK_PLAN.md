@@ -350,10 +350,69 @@
   7. ✅ All 21 existing auth tests still pass (no regression).
 - **Estimate (actual):** 1 session
 
-### 🟠 G-S2. JWT secret not rotated
-- **Issue:** Single `JWT_SECRET` env var. No rotation.
-- **Fix plan:** Add `JWT_SECRETS` (list). Sign with first, accept all for verify.
-- **Estimate:** 2 days
+### ✅ G-S2. ~~Auth guard bypass — `/app` accessible without token~~ — DONE 2026-05-01
+- **Issue:** Before this gap, `apex_finance/lib/core/router.dart:279` was a
+  literal `// redirect: disabled for now - auth handled in login screen,`.
+  That meant any visitor could open `https://apex-app.com/app` (the V5
+  Launchpad), `/settings/...`, `/sales/...`, etc. without ever
+  authenticating — `SlideAuthScreen` only blocks the user when *it* is
+  the screen on top, but GoRouter would happily navigate past it. Several
+  inner screens read `S.token` and crash gracefully on null, but several
+  read tenant data and would try to call backend APIs with `Bearer null`
+  on the wire.
+- **Sub-bug discovered while fixing the main bug:**
+  `apex_finance/lib/core/v5/v5_routes.dart:35` was
+  `GoRoute(path: '/login', redirect: (ctx, state) => '/app')`. With the
+  global guard added, an anonymous visit to `/app` redirects to `/login`,
+  which v5_routes then redirects back to `/app`, which the global guard
+  redirects to `/login`, … → infinite loop. Removing the v5_routes
+  override (the only inner-route override on `/login`) lets `/login`
+  resolve to the real `SlideAuthScreen` route in `router.dart`.
+- **Evidence (verify-first):**
+  - `git blame apex_finance/lib/core/router.dart` confirmed line 279 was
+    literally a disabled-comment, not a real redirect.
+  - Manual repro: `flutter run -d chrome --dart-define=API_BASE=...` on
+    a fresh browser session → opening `/app` directly rendered the
+    Launchpad without prompting for credentials.
+  - `S.token` returns `null` on a fresh session (no localStorage entry),
+    so the guard's null check is the right discriminator.
+- **Resolution / scope:**
+  - `apex_finance/lib/core/router.dart` — added `redirect:` that delegates
+    to `authGuardRedirect(path: state.uri.path, token: S.token)`.
+  - `apex_finance/lib/core/v5/v5_routes.dart` — removed the
+    `'/login' → '/app'` override. The other two redirects (`/`, `/home` →
+    `/app`) are kept; they are protected paths and the global guard
+    correctly bounces anonymous visits to `/login`.
+  - `apex_finance/lib/core/auth_guard.dart` — **new file**, pure function
+    `authGuardRedirect(path, token)`. Pulled out of `router.dart` so it
+    can be unit-tested without dragging `dart:html` in via `session.dart`
+    (the same blocker tracked as G-T1.1).
+  - `apex_finance/test/auth/auth_guard_test.dart` — **new file**, 7
+    tests covering the 3 acceptance cases plus 4 belt-and-suspenders
+    cases (`/register`, nested `/forgot-password/reset`, logged-in user
+    on auth path, empty-string token).
+- **Blast radius:** zero data path or backend changes. Frontend route
+  redirect only. No CI / migration / config touched. SlideAuthScreen's
+  own post-login navigation is preserved (the deliberate decision to
+  *not* bounce logged-in users off `/login` exists for this reason —
+  see `auth_guard.dart` docstring).
+- **Verification:**
+  - `flutter test test/auth/auth_guard_test.dart` — 7/7 passing.
+  - `flutter test test/widget/apex_output_chips_test.dart` — 5/5
+    passing (regression check on the only other VM-safe widget test).
+  - `flutter analyze lib/core/router.dart lib/core/auth_guard.dart` —
+    No issues found.
+  - `pytest tests/ -x --tb=short` (excluding the pre-existing G-T1.4
+    cascade) — 1749 passed, 0 failed, 2 skipped.
+- **Rollback:** `git revert <merge_commit>` is safe — the gap touches
+  4 isolated files. There is no DB migration, no schema change, no
+  config flip, no env-var rollout dependency.
+- **ID note:** The previous G-S2 (JWT secret rotation, deferred) was
+  renamed to **G-S8** below to free this slot, because the active
+  security incident took the lower number and because the code already
+  carried `(G-S2 …)` markers. JWT rotation has no work in flight, no
+  open branches, and no PRs, so the rename is a doc-only move.
+- **Sprint:** 8
 
 ### 🟠 G-S3. No 2FA enforcement option
 - **Issue:** 2FA optional everywhere.
@@ -379,6 +438,16 @@
 - **Issue:** Free Render tier has no WAF.
 - **Fix plan:** Cloudflare in front + rate limiting middleware.
 - **Estimate:** 1 day
+
+### 🟠 G-S8. JWT secret not rotated *(was G-S2 before 2026-05-01)*
+- **Issue:** Single `JWT_SECRET` env var. No rotation.
+- **Fix plan:** Add `JWT_SECRETS` (list). Sign with first, accept all for verify.
+- **Estimate:** 2 days
+- **Renamed from G-S2** when the auth-guard-bypass incident took that
+  slot (see G-S2 above). No code or PR depended on the old G-S2 ID; the
+  rename is a doc-only move. References updated in
+  `_CLAUDE_CODE_FIRST_PROMPT.md` and the `10_CLAUDE_CODE_INSTRUCTIONS.md`
+  verify-first example.
 
 ---
 
