@@ -99,7 +99,7 @@
   - Cascade fully unblocked — first time since Sprint 7 — by G-T1.4 alone.
 
 - [x] **G-T1.7**: Coverage-floor recalibration (Sprint 7 expansion exposed).
-  - Branch: `sprint-8/g-t1-7-floor-recalibration`
+  - Branch: `sprint-8/g-t1-7-floor-recalibration` (merged PR #116)
   - Verify-first scoping captured the actuals: `ai/` 54.3% (Δ −25.7pp,
     218 stmts gap), `core/` 74.7% (Δ −10.3pp, 1,748 stmts gap).
   - **Floor recalibration:** lowered `core/` 85.0% → **74.0%** with full
@@ -115,6 +115,30 @@
     (Activity Feed, Workflow Engine, Notifications, Industry Packs,
     API Keys, etc.). Tracked as **G-PROC-1** (Sprint 9 planning).
   - Added **G-DOCS-1 evidence #13** (5th verify-first save in 6 PRs).
+
+- [x] **G-T1.3**: Coverage gate config sync (mixed case 2).
+  - Branch: `sprint-8/g-t1-3-cov-fail-under-sync`
+  - Verify-first reclassification: original gap text said "no enforced
+    coverage floor in CI"; reality was **mixed case 2** — CI gate at
+    `--cov-fail-under=55` already exists (`ci.yml:86`), but
+    `pyproject.toml [tool.coverage.report].fail_under = 10` was
+    obsolete and misled developers running local pytest.
+  - **Synced** `pyproject.toml fail_under: 10 → 55` (matches CI).
+    Comment block documents calibration history + decay rate +
+    "do not lower" rule + layered-gates defense-in-depth.
+  - **`addopts` left untouched** — `--cov` deliberately NOT in
+    default args (~5× runtime overhead). Comment-only redirect to
+    explicit `--cov` runs and CI flag.
+  - **`test_flutter_files` glob conversion: out-of-scope.** G-T1.2
+    closure documented sufficient; the test is now an intentional
+    7-path smoke check with proper docstring (not the cascade canary
+    Sprint 7 mistakenly thought).
+  - **Empirical decay finding (added to G-PROC-1 § 12):** project
+    coverage drift = **−2.65 pp/week** (60.9% → 58.25% in 7 days).
+    At this rate, CI 55% gate hits floor in **~14 days** (around
+    2026-05-15). G-PROC-1 must ship in early Sprint 9.
+  - 22/23 cascade still PASS (no change from G-T1.7). Zero test or
+    production code changes — pure config sync.
 
 - [ ] **G-T1.7a** (Sprint 9, queued): cover `app/ai/routes.py` + 3
   adjacent files (218 stmts) → `ai/` actual ≥ 80% real coverage.
@@ -178,14 +202,14 @@
 - ✅ **G-DEV-1** Local-dev trap + runbook — DONE 2026-05-01 (PR #113)
 - ✅ **G-T1.4** test_tax_timeline time-rot — DONE 2026-05-01 (PR #114)
 - ✅ **G-T1.6** Cascade timeout bump — OBVIATED 2026-05-01 (PR #115, cascade unblocked by G-T1.4 alone)
-- ✅ **G-T1.7** Floor recalibration (`core/` 85→74) — DONE 2026-05-01 (cascade now 22/23 PASS)
+- ✅ **G-T1.7** Floor recalibration (`core/` 85→74) — DONE 2026-05-01 (PR #116, cascade now 22/23 PASS)
+- ✅ **G-T1.3** Coverage gate config sync (10 → 55, matches CI) — DONE 2026-05-01
 - ⏭ **G-T1.7a** ai/ coverage push (218 stmts, 1-2 days) — Sprint 9
 - ⏭ **G-T1.7b** core/ coverage restoration (1,748 stmts, 1-3 weeks) — Sprint 9-10
-- ⏭ **G-PROC-1** Process control for source:test ratio — Sprint 9 planning
-- **G-A2.1** — Migrate 6 V4-only screens to V5
+- ⏭ **G-PROC-1** Process control for source:test ratio — **Sprint 9 EARLY** (14-day decay deadline)
+- **G-A2.1** — Migrate 6 V4-only screens to V5 *(only remaining Sprint 8 frontend gap)*
 - **G-A3.1** — Alembic catch-up (25/198 → 198/198) + lifespan integration (DBA-reviewed)
 - **G-T1.1** — Fix Flutter test infra; ship login/register/onboarding tests
-- **G-T1.3** — Test infra flake + coverage thresholds (4-6 hours)
 - **G-T1.5** — Sweep `tests/` for hard-coded date literals (deferred, Sprint 9 candidate)
 - **G-S8** — JWT secret rotation (deferred, was G-S2 before 2026-05-01)
 
