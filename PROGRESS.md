@@ -2,6 +2,26 @@
 
 ## Sprint 11 — Coverage Closure + UX Track (Q2 2026, week 4) — IN PROGRESS
 
+- [x] **G-UX-1.1** Onboarding wizard auto-select entity post-completion — **DONE** 2026-05-02
+  - Branch: `sprint-11/g-ux-1-1-wizard-auto-select-entity`
+  - **Source-fix complement to G-UX-1's symptom-fix.** Closes the latent
+    gap discovered during G-UX-1 verify-first.
+  - **Fix:** 5-line addition at end of `_doStep2()` in
+    `pilot_onboarding_wizard.dart` — sets `PilotSession.entityId` to
+    first created entity's id immediately after step 2 completes.
+    Empty-list guard for defensive safety.
+  - **Placement reasoning:** end of `_doStep2()` (not `_doStep8`)
+    protects users who abandon the wizard mid-flow — they still get
+    a usable entityId after step 2.
+  - **Two-layer defense complete:**
+    - Source-fix (this PR): wizard auto-sets entityId at completion
+    - Symptom-fix (G-UX-1): `EntityResolver` covers users skipping wizard
+  - **Verification:** flutter analyze 306 baseline; flutter test 43 pass
+    (same pre-existing `ask_panel_test.dart` failure as G-UX-1, unrelated);
+    pytest sanity confirmed (no backend changes).
+  - **Manual visual test:** deferred to user (CLI agent cannot run Flutter
+    web browser session). Test plan in PR description.
+  - **Sprint 11 progress: 5/N priorities.**
 - [x] **G-UX-1** JE Builder default entity resolution — **DONE** 2026-05-02 🎨 **UX TRACK FIRST PR**
   - Branch: `sprint-11/g-ux-1-je-builder-default-entity`
   - **Trigger:** Cowork session manual test — login → `/je-builder` shows

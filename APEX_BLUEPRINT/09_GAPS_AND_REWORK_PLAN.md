@@ -2321,36 +2321,70 @@ same pattern can be applied to sibling screens with one import.
   - Related: G-DEV-1.1 (CORS trap, same Cowork session)
 - **Sprint:** 11.
 
-### ⏸ G-UX-1.1. Onboarding wizard auto-select first entity post-completion (deferred)
+### ✅ G-UX-1.1. Onboarding wizard auto-select first entity post-completion — DONE 2026-05-02
+- **Branch:** `sprint-11/g-ux-1-1-wizard-auto-select-entity`
 - **Trigger:** Discovered 2026-05-02 during G-UX-1 verify-first.
   `apex_finance/lib/pilot/screens/setup/pilot_onboarding_wizard.dart`
-  creates entities in step 2 and records `_createdEntityIds` map but
-  does NOT call `PilotSession.entityId = ...` after wizard completion.
-  Result: user finishes wizard with `hasTenant=true` but `hasEntity=false`.
-- **Workaround:** G-UX-1's `EntityResolver` covers this symptom via
-  the "tenant set, 1 entity → auto-select" branch — when the user
-  navigates to JE Builder (or any screen using the helper) right after
-  wizard completion, the resolver fetches entities, sees the just-
-  created one, and auto-selects silently. Not perfect (relies on
-  re-navigation triggering the helper), but functional.
-- **Direct fix (preferred):** ~3-line change at the wizard's final step:
+  populated `_createdEntityIds` in step 2 but did NOT call
+  `PilotSession.entityId = ...` afterward. Users finished the wizard
+  with `hasTenant=true` but `hasEntity=false` orphan state.
+- **G-UX-1's `EntityResolver` covered the symptom** via the
+  "tenant set, 1 entity → auto-select" branch. G-UX-1.1 fixes the
+  source — wizard now sets the entity itself, no fallback needed for
+  freshly-completed wizards.
+- **Fix:** 5-line addition at end of `_doStep2()` (after the line that
+  already sets `PilotSession.tenantId`):
   ```dart
+  // G-UX-1.1: Auto-select first entity post-creation so users don't
+  // land on JE Builder / AI Inbox / etc with hasTenant=true but
+  // hasEntity=false. EntityResolver still handles the fallback
+  // for users who skip the wizard entirely (G-UX-1, Sprint 11).
   if (_createdEntityIds.isNotEmpty) {
     PilotSession.entityId = _createdEntityIds.values.first;
   }
   ```
-  Sets the first-created entity as active before the wizard exits. Removes
-  the workaround dependency entirely.
-- **Why deferred:** G-UX-1's helper covers the symptom across ALL
-  entity-scoped screens, not just JE Builder. Fixing the wizard is a
-  cleaner architectural fix but adds a separate verify-first cycle to
-  confirm the wizard's existing post-step routing isn't disrupted. Sprint
-  12+ candidate alongside the wizard's own tightening (e.g., "skip steps
-  for already-onboarded users").
-- **Estimate:** 30-60 minutes (3-line change + manual test of wizard
-  completion path).
-- **Status:** ⏸ Sprint 12+ candidate.
-- **Sprint:** 12+.
+- **Placement reasoning:** end of `_doStep2()` (NOT `_doStep8` or the
+  `_advance()` switch) was chosen because:
+  - `_createdEntityIds` is fully populated the moment step 2's loop
+    completes — earliest valid time.
+  - **Protects abandoned wizards:** if user creates entities (step 2 ✓)
+    but quits before warehouses/COA/ZATCA (steps 4-8), they STILL get
+    a usable `entityId`. Resolver handles only the no-entity case.
+  - **Natural pairing** with the existing `PilotSession.tenantId =
+    _tenantId` line right above (tenant first, then entity).
+- **Empty-list guard** (`if (_createdEntityIds.isNotEmpty)`) is
+  defensive only — earlier throws (`if (_entitiesToCreate.isEmpty)
+  throw ...` and per-entity `if (!r.success) throw ...`) already
+  guarantee a populated map at this point. The guard matches the
+  codebase's defensive style.
+- **Two-layer defense complete:**
+  - **Source-fix (G-UX-1.1):** wizard auto-sets entityId at completion
+  - **Symptom-fix (G-UX-1):** `EntityResolver` covers users skipping
+    the wizard (e.g., logging in fresh after a crash, manual route
+    navigation, multi-entity tenants needing picker)
+- **Files changed:**
+  - `apex_finance/lib/pilot/screens/setup/pilot_onboarding_wizard.dart`
+    (+8 lines including comment block)
+- **Verification:**
+  - `flutter analyze`: 306 baseline maintained (0 new issues).
+  - `flutter test`: 43 passed; 1 pre-existing failure
+    (`ask_panel_test.dart` — same as G-UX-1, exists on main, unrelated).
+  - `pytest tests/`: no backend changes, sanity confirmed.
+  - **Manual visual test deferred to user** (CLI agent cannot run
+    Flutter web browser session). Test plan in PR description:
+    1. Clear localStorage. 2. Login fresh. 3. Complete wizard. 4. Check
+    `localStorage.getItem('pilot.entity_id')` returns non-null UUID.
+    5. Navigate to `/je-builder/new` → loads immediately (no resolver
+    activation). 6. (Edge) Re-run wizard, abandon after step 2 →
+    entityId still set.
+- **Risk:** minimal. 5-line change in one file. No new imports
+  (`PilotSession` already imported at line 23). No new fields/methods.
+  Defensive guard prevents any conceivable empty-list edge case.
+- **Refs:**
+  - Triggered by: G-UX-1 verify-first
+  - Companion: G-UX-1 (symptom-fix via `EntityResolver`)
+  - Related: G-DEV-1.1 (CORS trap, same Cowork session)
+- **Sprint:** 11.
 
 ---
 

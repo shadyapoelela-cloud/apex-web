@@ -1098,6 +1098,13 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
     }
     // re-bind to refresh bridge's entity list
     PilotSession.tenantId = _tenantId;
+    // G-UX-1.1: Auto-select first entity post-creation so users don't
+    // land on JE Builder / AI Inbox / etc with hasTenant=true but
+    // hasEntity=false. EntityResolver still handles the fallback
+    // for users who skip the wizard entirely (G-UX-1, Sprint 11).
+    if (_createdEntityIds.isNotEmpty) {
+      PilotSession.entityId = _createdEntityIds.values.first;
+    }
     setState(() => _loading = false);
   }
 
