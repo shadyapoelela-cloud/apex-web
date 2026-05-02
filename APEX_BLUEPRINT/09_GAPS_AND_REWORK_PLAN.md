@@ -1013,7 +1013,7 @@
     new "green" baseline for Sprint 8.
 - **Sprint:** 8 (recalibration); G-T1.7a + G-T1.7b in Sprint 9-10.
 
-### ✅ G-T1.7a. ~~Coverage push for `app/ai/`~~ — DONE (partial) 2026-05-01
+### ✅ G-T1.7a. ~~Coverage push for `app/ai/`~~ — FULLY DONE 2026-05-02 (Sprint 9 partial + Sprint 11 G-T1.7a.1 completion)
 - **Delivered:**
   - **79 unit tests** added across 5 files (3 new + 2 augmented):
     - `tests/test_ai_routes_extras.py` — **NEW**, 46 tests covering 25
@@ -1087,9 +1087,78 @@
   - Sibling: G-T1.7b (core/ restoration, multi-PR Sprint 9-10)
   - Related: G-T1.8 (flake), G-T1.9 (runtime variance — watch-only)
   - Process control: G-PROC-1 Phase 2 (diff-cover gate, tested in this PR)
-- **Status:** ✅ Partial-DONE — narrow scope shipped at 69.42%.
-  G-T1.7a.1 owns the remaining 80% floor push.
-- **Sprint:** 9.
+- **Status:** ✅ FULLY DONE 2026-05-02 — Sprint 9 partial (69.42%) +
+  Sprint 11 G-T1.7a.1 closure (85.01%, **cascade 23/23 GREEN milestone**).
+- **Sprint:** 9 (partial) + 11 (closure via G-T1.7a.1).
+
+### ✅ G-T1.7a.1. ai/ DB-integration tests — FULLY DONE 2026-05-02 🎯 CASCADE 23/23 MILESTONE
+- **Branch:** `sprint-11/g-t1-7a-1-ai-db-integration`
+- **Scope:** Closes the partial-DONE G-T1.7a from Sprint 9 by covering
+  the 3 DB-integration zones that were deliberately deferred (constraint:
+  "no DB writes" in G-T1.7a). Achieves the **cascade 23/23 milestone** —
+  first time fully green since Sprint 7.
+- **35 test functions / 39 collected pytest cases** across 3 new files
+  (split per zone):
+  - `tests/test_ai_cash_runway_notify.py` — 4 fn (Zone 3, ~30 stmts).
+    Drives `cash_runway_warning` into warning + error severity zones;
+    captures async `notify` dispatch via `sys.modules` stub. Covers the
+    notification block at lines 269-299 + severity branches 262-265.
+  - `tests/test_ai_executor_handlers.py` — 18 fn (Zone 2, ~75 stmts).
+    Covers all 3 `_execute_*` handlers in `approval_executor.py`:
+    `_execute_create_invoice` (subtotal validation, ZATCA build success +
+    ValueError + generic exception, signing-cert configured vs not),
+    `_execute_send_reminder` (missing inputs, WhatsApp happy + failure
+    fallback, notification dispatch happy + failure, parametrized tone
+    variants), `_execute_ap_approval` (bridge ok/fail/raise).
+  - `tests/test_ai_onboarding_db.py` — 13 fn (Zone 1, ~165 stmts).
+    Hits real `/api/v1/ai/onboarding/complete` + `/seed-demo` via
+    `TestClient`; verifies DB state via direct `SessionLocal()` queries.
+    Covers full Tenant→Entity→GLAccount→FiscalPeriod creation, industry
+    overlay (restaurant template), parametrized country/currency mapping
+    (sa/ae/eg/om/bh/unknown), VAT persistence, slug-collision suffix,
+    seed-demo full path (5 customers + 3 demo JEs), idempotent re-run,
+    no-fiscal-period silent skip.
+- **Coverage transition:**
+  - `ai/` aggregate: **69.42% → 85.01%** (+15.59pp; +132 stmts covered)
+  - `app/ai/approval_executor.py`: 66% → **97.66%** (+31.66pp)
+  - `app/ai/proactive.py`:        74% → **83.20%** (+9.2pp)
+  - `app/ai/routes.py`:           66% → **82.20%** (+16.2pp)
+  - `app/ai/scheduler.py`:        85% (unchanged — not in target zones)
+- **🎯 CASCADE 23/23 GREEN** — first time since Sprint 7. ai-80.0
+  assertion now PASSES naturally (85.01% > 80.0% floor with 5pp buffer).
+- **Full suite:** 2305 passed; 1 pre-existing failure (G-T1.8 flake);
+  0 new regressions. ai-80.0 is no longer in the failure list.
+- **DB strategy:** reused existing `tests/conftest.py` infrastructure
+  (`setup_test_db` autouse + `client` TestClient + direct `SessionLocal()`
+  for seed/verify). No new fixture file built. Same pattern proven by
+  2,290+ existing tests; trivially extends to onboarding-write paths.
+- **Verify-first findings:**
+  1. Existing DB infra was already battle-tested — no need to build a
+     new in-memory SQLite fixture. The existing `setup_test_db` creates
+     all tables once per session via `Base.metadata.create_all`.
+  2. Each onboarding test uses a UUID-suffixed company name → unique
+     slug per test, no cross-test collisions.
+  3. **Field-name mismatch caught early:** initial test asserted
+     `data["jes_created"]` but the route returns `journal_entries_created`.
+     Fixed by inspecting the route source. Test logic unchanged.
+  4. **Cascade-23 checkpoint passed first try** — no debugging needed.
+     The 85.01% landing matches the 85% commitment exactly. No file
+     hit the 40-fn cap (max was 18); total 35 fn well under 100.
+- **Estimate vs actuals:** estimated ~27 tests; shipped 35 fn / 39
+  collected. Per-file: 4, 18, 13 — all ≤40 cap. Total under 100.
+  Coverage gain (+15.59pp) lands above the +10-15pp band predicted.
+- **Reusable patterns documented for G-T1.7b.6:**
+  - Onboarding TestClient + DB-verify pattern reusable for any
+    multi-step DB-write route in `core/` (e.g., approvals, ap_agent).
+  - `sys.modules` stubs for async modules (notifications_bridge) using
+    coroutine-returning fakes — works with `asyncio.run_until_complete`.
+  - `AiSuggestion` seed factory (`_make_suggestion` helper) reusable
+    for any handler-level test that needs ORM rows.
+- **Refs:**
+  - Parent: G-T1.7a (now FULLY DONE)
+  - Sibling: G-T1.7b.6 (deferred core/ 80→85, will reuse these patterns)
+  - Related: G-T1.7 (floor calibration), G-PROC-1 (process controls)
+- **Sprint:** 11.
 
 ### ✅ G-T1.7b. Coverage restoration for `app/core/` (1,748 stmts) — FULLY DONE 2026-05-02
 - **Discovered:** 2026-05-01 by G-T1.7 scoping.
