@@ -1,5 +1,34 @@
 # APEX Sprint Progress
 
+## Sprint 11 — Coverage Closure + UX Track (Q2 2026, week 4) — IN PROGRESS
+
+- [x] **G-T1.7a.1** ai/ DB-integration tests — **DONE** 2026-05-02 🎯 **CASCADE 23/23 MILESTONE**
+  - Branch: `sprint-11/g-t1-7a-1-ai-db-integration`
+  - **35 test functions / 39 collected pytest cases** across 3 NEW files
+    (split per DB-integration zone):
+    - `tests/test_ai_cash_runway_notify.py` — 4 fn (Zone 3, proactive notify block 269-299)
+    - `tests/test_ai_executor_handlers.py` — 18 fn (Zone 2, all 3 `_execute_*` handlers)
+    - `tests/test_ai_onboarding_db.py` — 13 fn (Zone 1, /onboarding/complete + /seed-demo)
+  - **`ai/` aggregate: 69.42% → 85.01%** (+15.59pp).
+    - `approval_executor.py`: 66% → **97.66%** (+31.66pp)
+    - `proactive.py`: 74% → **83.20%** (+9.2pp)
+    - `routes.py`: 66% → **82.20%** (+16.2pp)
+  - **🎯 CASCADE 23/23 GREEN** — first time fully green since Sprint 7.
+    The `ai-80.0` cascade assertion now PASSES naturally (85.01% > 80%
+    floor with 5pp buffer). Sprint 8's deliberate FAIL signal closed.
+  - **Full suite:** 2305+ passed; 1 pre-existing failure (G-T1.8 flake);
+    0 new regressions. `ai-80.0` no longer in failure list.
+  - **DB strategy:** reused existing `tests/conftest.py` infrastructure
+    (`setup_test_db` + `client` + direct `SessionLocal()`) — no new
+    fixture file. Same pattern proven by 2,290+ existing tests.
+  - **G-T1.7a parent FULLY DONE** (Sprint 9 partial 69.42% + Sprint 11
+    G-T1.7a.1 closure to 85.01%). Total tests across both: 79 + 35 = 114.
+  - **Patterns unlocked for G-T1.7b.6:** onboarding TestClient + DB-verify
+    pattern; sys.modules stubs for async modules; AiSuggestion seed factory.
+  - **Sprint 11 progress: 1/N priorities** (next options: G-T1.7b.6 / UX track / G-T1.8 flake / G-DEV-1.1 docs).
+
+---
+
 ## Sprint 10 — Coverage Restoration (Q2 2026, week 3) — COMPLETE
 
 - [x] **G-T1.7b.5** core/ top-up + raise floor 74→80 — **DONE** 2026-05-02 (Phase 5 of 5, Sprint 10 final)
