@@ -175,13 +175,22 @@ class TestInvoiceBuild:
         assert b.icv == a.icv + 1
 
     def test_different_fiscal_years_isolated(self):
+        # G-T1.8 fix: use a UUID-suffixed client_id so the JournalEntrySequence
+        # row is fresh for each test run. The cascade test's subprocess
+        # (tests/test_per_directory_coverage.py) inherits the parent's cwd and
+        # DATABASE_URL=sqlite:///test.db, then writes JournalEntrySequence rows
+        # that pollute the parent's later run. A unique client_id sidesteps the
+        # shared-state path entirely. See 09 § 4 G-T1.8 for full evidence trail
+        # and G-T1.8.2 for the deferred cascade-subprocess isolation fix.
+        import uuid
+        cid = f"test-zatca-client-isolated-{uuid.uuid4().hex[:8]}"
         a = build_simplified_invoice(
             seller=_seller(), lines=_lines(),
-            client_id="test-zatca-client-3", fiscal_year="2025",
+            client_id=cid, fiscal_year="2025",
         )
         b = build_simplified_invoice(
             seller=_seller(), lines=_lines(),
-            client_id="test-zatca-client-3", fiscal_year="2026",
+            client_id=cid, fiscal_year="2026",
         )
         assert a.icv == 1
         assert b.icv == 1  # independent counter
