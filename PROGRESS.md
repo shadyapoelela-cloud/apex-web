@@ -2,6 +2,27 @@
 
 ## Sprint 11 — Coverage Closure + UX Track (Q2 2026, week 4) — IN PROGRESS
 
+- [x] **G-DEV-1.1** Local-dev `CORS_ORIGINS` auto-set + runbook entry — **DONE** 2026-05-02
+  - Branch: `sprint-11/g-dev-1-1-cors-docs`
+  - **Trigger:** First end-to-end Cowork session login failed with CORS
+    preflight error after following G-DEV-1 runbook.
+  - **Cause:** Backend default `CORS_ORIGINS=*` is incompatible with
+    `credentials: 'include'` used by the Flutter web client for HttpOnly
+    cookies. G-DEV-1's runbook didn't surface this trap.
+  - **Fix:** 3 files updated (no production code touched):
+    - `scripts/dev/run-backend.ps1` — auto-set `$env:CORS_ORIGINS` if not present
+    - `scripts/dev/run-backend.sh` — equivalent bash idiom
+    - `LOCAL_DEV_RUNBOOK.md` § 4 — new "CORS preflight error" troubleshooting subsection
+  - **Default allowlist:** `http://localhost:57305,http://127.0.0.1:57305`
+    (both hosts to handle developer setup variance).
+  - **Override:** scripts respect pre-existing `CORS_ORIGINS`.
+  - **Production safe:** `app/main.py` CORS logic untouched. Render env
+    vars override default in prod.
+  - **Verification:** `bash -n` + PowerShell parse + markdown structure
+    review — all clean.
+  - **Last small debt from G-DEV-1 era closed.**
+  - **Sprint 11 progress: 3/N priorities** (✅ G-T1.7a.1, ✅ G-T1.8,
+    ✅ G-DEV-1.1 — clean slate before UX track or G-T1.7b.6).
 - [x] **G-T1.8** test_different_fiscal_years_isolated flake fix — **DONE** 2026-05-02 🎯 **0 FAILURES MILESTONE**
   - Branch: `sprint-11/g-t1-8-zatca-flake-fix`
   - **Root cause:** cascade subprocess (`tests/test_per_directory_coverage.py`)

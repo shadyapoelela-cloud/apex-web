@@ -53,6 +53,15 @@ if ($existing) {
 
 # --- 3. Print the exact command + 4. Run ----------------------------------
 Set-Location $projectRoot
+
+# Auto-set CORS_ORIGINS for local dev (G-DEV-1.1).
+# Backend defaults to '*' which is incompatible with credentials:'include'
+# used by the Flutter web client. Setting explicit origins enables CORS.
+if (-not $env:CORS_ORIGINS) {
+    $env:CORS_ORIGINS = "http://localhost:57305,http://127.0.0.1:57305"
+    Write-Host "CORS_ORIGINS auto-set for local dev: $env:CORS_ORIGINS" -ForegroundColor Cyan
+}
+
 $reloadFlag = if ($NoReload) { "" } else { " --reload" }
 $cmd = "py -m uvicorn app.main:app --host $BindHost --port $Port$reloadFlag"
 Write-Host "[run-backend] cwd: $projectRoot" -ForegroundColor Cyan

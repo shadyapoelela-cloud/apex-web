@@ -1891,6 +1891,57 @@
   README/CLAUDE additions. Pure additive changes.
 - **Sprint:** 8
 
+### ✅ G-DEV-1.1. Local-dev `CORS_ORIGINS` auto-set + runbook entry — DONE 2026-05-02
+- **Branch:** `sprint-11/g-dev-1-1-cors-docs`
+- **Trigger:** Discovered 2026-05-02 during the first end-to-end local
+  test in a Cowork session. After following the G-DEV-1 runbook to
+  completion (`run-backend.ps1` + `run-frontend.ps1`), login failed
+  with:
+  ```
+  Access to fetch at 'http://127.0.0.1:8000/auth/login' has been blocked
+  by CORS policy: Response to preflight request doesn't pass access
+  control check: The value of the 'Access-Control-Allow-Origin' header
+  in the response must not be the wildcard '*' when the request's
+  credentials mode is 'include'.
+  ```
+- **Cause:** Backend defaults to `CORS_ORIGINS=*` (set in
+  `app/main.py:_cors_env`). Per CORS spec, a wildcard origin is
+  incompatible with `credentials: 'include'` — which the Flutter web
+  client uses for HttpOnly cookies. The two are mutually exclusive.
+  G-DEV-1's `LOCAL_DEV_RUNBOOK.md` did not mention this trap because
+  G-DEV-1's verify-first focused on connectivity (`Failed to fetch`)
+  not authentication-cookie-via-CORS.
+- **Fix:**
+  - `scripts/dev/run-backend.ps1` (+8 lines): auto-set `$env:CORS_ORIGINS`
+    if not already present, with a `Write-Host` confirmation in cyan.
+  - `scripts/dev/run-backend.sh` (+7 lines): equivalent bash idiom
+    using `[ -z "${CORS_ORIGINS:-}" ]` (handles `set -u` correctly).
+  - `LOCAL_DEV_RUNBOOK.md` § 4 (+30 lines): new "Login fails with
+    'CORS preflight error'" subsection between the existing "Failed
+    to fetch" and "Port already in use" entries. Documents symptom
+    (browser console error), cause (wildcard ↔ credentials mismatch),
+    fix (env var auto-set or manual override), verification
+    (uvicorn log absence of `CORS allows all origins` warning).
+- **Default allowlist:** `http://localhost:57305,http://127.0.0.1:57305`
+  — both hosts to handle developer setup variance (Flutter web sometimes
+  serves on `localhost`, sometimes on `127.0.0.1`).
+- **Override:** scripts respect a pre-existing `CORS_ORIGINS` env var
+  (`if (-not $env:CORS_ORIGINS)` / `if [ -z "${CORS_ORIGINS:-}" ]`).
+  Power users running on a non-standard port can pre-set the var and
+  the script will preserve it.
+- **Production safe:** `app/main.py` CORS logic is **untouched**.
+  Render production deploys set `CORS_ORIGINS` explicitly via env vars
+  (validated at startup by `_validate_environment`), so this default
+  is overridden in prod and has zero deployment impact.
+- **Verification:**
+  - `bash -n scripts/dev/run-backend.sh` → no syntax errors.
+  - PowerShell parse: `[System.Management.Automation.Language.Parser]::ParseFile(...)`
+    → no syntax errors.
+  - `LOCAL_DEV_RUNBOOK.md` markdown valid (visual review of headings + fences).
+- **Risk:** minimal (dev tooling + docs only; no Python tests touched).
+- **Cross-link:** parent G-DEV-1 (Sprint 8 runbook closure).
+- **Sprint:** 11.
+
 ### 🟢 G-D1. No public API docs
 - **Issue:** FastAPI auto-generates `/docs` (Swagger) but not customer-facing.
 - **Fix plan:** Generate ReDoc, host at docs.apex-platform.com. Add code examples per language.
