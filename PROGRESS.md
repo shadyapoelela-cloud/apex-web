@@ -2,6 +2,28 @@
 
 ## Sprint 10 — Coverage Restoration (Q2 2026, week 3) — IN PROGRESS
 
+- [x] **G-T1.7b.4** core/ storage + industry_pack + slack/teams cluster — **DONE** 2026-05-02 (Phase 4 of 5)
+  - Branch: `sprint-10/g-t1-7b-4-storage-industry-slack-teams-cluster`
+  - **83 test functions / 91 collected pytest cases** across 4 NEW files
+    (split per source module):
+    - `tests/test_teams_backend.py` — 13 fn / 17 collected, 23.1% → **100%** (+76.9pp)
+    - `tests/test_slack_backend.py` — 16 fn / 20 collected, 21.3% → **100%** (+78.7pp)
+    - `tests/test_industry_pack_provisioner.py` — 18 fn, 19.4% → **100%** (+80.6pp)
+    - `tests/test_storage_service.py` — 36 fn, 21.3% → **100%** (+78.7pp)
+  - **Aggregate `core/` coverage:** 81.34% → **82.62%** (+1.28pp).
+    **Stretch beaten** (commitment 82.46%, stretch 82.54%; landed +0.08pp
+    above stretch).
+  - **core/ trajectory:** 74.0 (floor) → 75.67 → 76.71 (G-T1.7b.1) →
+    79.45 (G-T1.7b.2) → 81.34 (G-T1.7b.3) → **82.62 (G-T1.7b.4)**.
+    Remaining to original 85% floor: 2.38pp for Phase 5.
+  - **Cascade: 22/23 maintained** (ai/ FAIL deliberate, deferred to G-T1.7a.1).
+  - **Full suite:** 2222 passed; 2 pre-existing failures (ai-80.0, G-T1.8 flake);
+    0 new regressions.
+  - boto3 mocking finished in ~5 min (defer-to-4a/4b hatch unused).
+  - All 4 files reached 100% — no missing branches.
+  - sys.modules stub strategy reused: `requests` (slack/teams), `boto3`
+    (storage S3 path), `app.core.workflow_*` (industry_pack stubs).
+  - **Sprint 10 progress: 3/4 priorities** (G-T1.7b.5 + G-T1.7a.1 + G-T1.8 queued).
 - [x] **G-T1.7b.3** core/ api_keys + email_inbox + notification_digest cluster — **DONE** 2026-05-02 (Phase 3 of 5)
   - Branch: `sprint-10/g-t1-7b-3-api-keys-email-inbox-cluster`
   - **83 test functions** across 3 NEW files (split per source module):
@@ -45,8 +67,7 @@
 
 ### Sprint 10 queue
 
-- **G-T1.7b.4** — storage_service + industry_pack_provisioner + slack/teams_backend cluster (Phase 4)
-- **G-T1.7b.5** — remaining diffuse files (Phase 5, closes G-T1.7b)
+- **G-T1.7b.5** — top-up + raise `DIRECTORY_FLOORS["core"]` 74→80+ (Phase 5, closes G-T1.7b, Sprint 10 final)
 - **G-T1.7a.1** — `app/ai/` DB-integration tests (cascade-23/23 milestone)
 - **G-T1.8** — `test_different_fiscal_years_isolated` order-dependent flake fix
 

@@ -1112,17 +1112,24 @@
      `email_inbox.py` (16.3% → 97%), `api_keys.py` (31.9% → 100%).
      **83 test functions** across 3 new files. Aggregate `core/`
      79.45% → **81.34%** (+1.89pp, stretch beaten). Phase 3 of 5 closes.
-  4. Phase 4-5 candidates: `storage_service.py` (100 missing),
-     `industry_pack_provisioner.py` (50), `slack/teams_backend.py`
-     (67 combined), and remaining diffuse files.
+  4. ✅ **G-T1.7b.4 — storage + industry_pack + slack/teams cluster**
+     (DONE 2026-05-02): `teams_backend.py` (23.1% → 100%),
+     `slack_backend.py` (21.3% → 100%), `industry_pack_provisioner.py`
+     (19.4% → 100%), `storage_service.py` (21.3% → 100%).
+     **83 test functions / 91 collected pytest cases** across 4 new files.
+     Aggregate `core/` 81.34% → **82.62%** (+1.28pp, stretch beaten).
+     Phase 4 of 5 closes.
+  5. Phase 5 candidates: top-up of remaining diffuse low-coverage files
+     + raise `DIRECTORY_FLOORS["core"]` from 74.0 → 80.0+ to lock in gains.
+     Sprint 10 final PR.
 - **Goal:** raise `DIRECTORY_FLOORS["core"]` 74.0 → 85.0 incrementally
-  as PRs land. Multi-PR effort. After Phases 1+2+3: 81.34% / 3.66pp from
+  as PRs land. Multi-PR effort. After Phases 1+2+3+4: 82.62% / 2.38pp from
   original 85% target.
 - **Estimate:** **1-3 weeks** (multi-PR), 175-350 unit tests total.
   Phase 1 burned 56 tests for +1.04pp; Phase 2 burned 111 tests for
-  +2.74pp; Phase 3 burned 83 tests for +1.89pp; remaining ~3.7pp needs
-  Phases 4-5.
-- **Status:** 🟡 Phases 1+2+3 done; Phases 4-5 pending (Sprint 10+).
+  +2.74pp; Phase 3 burned 83 tests for +1.89pp; Phase 4 burned 83 tests
+  for +1.28pp; remaining ~2.4pp needs Phase 5 (top-up + floor raise).
+- **Status:** 🟡 Phases 1+2+3+4 done; Phase 5 pending (Sprint 10 final).
 - **Sprint:** 9-10+.
 
 ### ✅ G-T1.7b.1. Zero-coverage files coverage push (Sprint 9 final) — DONE 2026-05-01
@@ -1262,13 +1269,65 @@
   Coverage gain (+1.89pp) beat the +1.5-1.8pp commitment.
 - **Sprint:** 10.
 
-### ⏭ G-T1.7b.4. storage_service + industry_pack + slack/teams cluster — Phase 4
-- **Scope:** Phase 4 of 5. Cover diffuse remaining-coverage hot spots:
-  `storage_service.py` (100 missing), `industry_pack_provisioner.py`
-  (50 missing), `slack_backend.py` + `teams_backend.py` (67 combined
-  missing). Expected aggregate gain +1.0-1.4pp on `core/`.
-- **Estimate:** ~50-70 tests, target each file ≥85%.
-- **Status:** ⏭ Sprint 10 candidate (multi-PR continues). Awaiting
+### ✅ G-T1.7b.4. storage + industry_pack + slack/teams cluster — DONE 2026-05-02
+- **Branch:** `sprint-10/g-t1-7b-4-storage-industry-slack-teams-cluster`
+- **Scope:** Phase 4 of 5 sub-PRs for G-T1.7b. Cover diffuse remaining
+  hot spots in `app/core/`: dual-backend file storage, tenant
+  pack-provisioning logic, and Slack/Teams webhook senders.
+- **83 test functions / 91 collected pytest cases** across 4 new files
+  (split per source module):
+  - `tests/test_teams_backend.py` — 13 fn / 17 collected, **100%**
+    (39/39 stmts). HTTP webhook sender (Adaptive Card). `sys.modules
+    ['requests']` stub (G-T1.7b.1 Stripe pattern); module-level
+    constants (`TEAMS_WEBHOOK_URL`, `_IS_PRODUCTION`) monkeypatched
+    directly. Parametrized severity-color matrix (5 cases).
+  - `tests/test_slack_backend.py` — 16 fn / 20 collected, **100%**
+    (47/47 stmts). HTTP webhook sender (Block Kit). Same mock pattern
+    as teams. Includes the Slack-specific "200 + text==ok" success
+    contract: 200 with non-"ok" body is treated as failure.
+  - `tests/test_industry_pack_provisioner.py` — 18 fn, **100%**
+    (62/62 stmts). Event-bus listener + workflow rule provisioning.
+    Stubbed `app.core.workflow_templates`, `app.core.workflow_engine`,
+    `app.core.industry_packs_service` via `sys.modules`. `_on_pack_applied`
+    called directly (no `emit("industry_pack.applied")`) per design
+    risk note.
+  - `tests/test_storage_service.py` — 36 fn, **100%** (127/127 stmts).
+    Multi-backend (local + S3). Local: real `tmp_path` writes.
+    S3: `sys.modules['boto3']` stub + `MagicMock` cached client with
+    controlled `put_object` / `get_object` / `delete_object` /
+    `generate_presigned_url`. Both `STORAGE_BACKEND` dispatch paths
+    exercised in TestPublicAPI.
+- **Aggregate `core/` coverage:** 81.34% → **82.62%** (+1.28pp).
+  **Stretch beaten** (commitment 82.46%, stretch 82.54%; landed +0.08pp
+  above stretch). The +1.28pp gain is within the user's stated +1.0-1.4pp
+  band.
+- **Cascade:** 22/23 maintained (ai-80.0 FAIL deliberate, deferred to G-T1.7a.1).
+- **Full suite:** 2222 passed, 2 pre-existing failures (ai-80.0, G-T1.8 flake).
+  0 new regressions.
+- **Verify-first findings:**
+  1. Per-file baselines extracted from `coverage.json` matched user's
+     projections within 0.01pp.
+  2. `--cov=app.core.X` (module-style) honored throughout per G-T1.7b.1
+     verify-first save #3.
+  3. **boto3 mocking finished in ~5 minutes** — well under the 2h budget.
+     `sys.modules['boto3']` stub pattern from G-T1.7b.1 (Stripe SDK)
+     transferred cleanly. Split-to-4a/4b hatch unused.
+  4. **All 4 files reached 100% coverage** — no missing branches. The
+     teams/slack `requests`-missing fallback (line ~62-64) and S3-no-client
+     paths reachable via `sys.modules[mod] = None` toggle.
+- **Estimate vs actuals:** estimated ~67 tests; shipped 83 fn / 91
+  collected. Per-file: 13, 16, 18, 36 — all ≤40 cap. Coverage gain
+  (+1.28pp) inside the +1.0-1.4pp band.
+- **Sprint:** 10.
+
+### ⏭ G-T1.7b.5. Sprint 10 final PR — top-up + raise `DIRECTORY_FLOORS["core"]`
+- **Scope:** Phase 5 of 5 (closes G-T1.7b). Top up remaining diffuse
+  low-coverage files in `app/core/` to push aggregate ≥83.5-84%, then
+  raise `DIRECTORY_FLOORS["core"]` from 74.0 → 80.0+ to lock in the
+  gains from Phases 1-4. After this PR, the cascade asserts the new
+  floor — preventing regressions.
+- **Estimate:** ~30-50 tests + floor edit. Sprint 10 priority #4.
+- **Status:** ⏭ Sprint 10 final PR (multi-PR closure). Awaiting
   approval before start.
 - **Sprint:** 10.
 
