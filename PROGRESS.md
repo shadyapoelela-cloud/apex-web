@@ -25,36 +25,49 @@
     fixed — UX Completion Gaps moved to § 19.
   - **Sprint 11 progress: 6/N priorities** — Sprint 11 closed cleanly.
 
-### Sprint 12 plan (LOCKED)
+### Sprint 12 plan — ✅ G-A3.1 closed 2026-05-03
 
-Sprint 12 begins with **G-A3.1 (Alembic catch-up migration)** as
-🔴 **LOCKED-IN Priority #1 (Mandatory)**. The sprint cannot start with
-any other gap until Phase 1 of G-A3.1 is in flight.
+Sprint 12 began with **G-A3.1 (Alembic catch-up migration)** as
+🔴 LOCKED-IN Priority #1 (Mandatory). Closed 2026-05-03 after three
+phases over two days.
 
-- **Week 1 — G-A3.1 Phase 1:** ✅ DONE 2026-05-02. Investigation report
-  at `APEX_BLUEPRINT/G-A3-1-investigation.md`. Schema diff complete
-  (168 production tables / 11 real alembic coverage / 157 gap),
-  4-strategy analysis, recommended **Sub-A+** approved.
-- **Week 1 — G-A3.1 Phase 2a:** ✅ DONE 2026-05-02.
-  `alembic/env.py:_MODEL_MODULES` expanded 20 → 37 modules.
+- **G-A3.1 Phase 1 — investigation:** ✅ DONE 2026-05-02 (PR #134).
+  Investigation report at `APEX_BLUEPRINT/G-A3-1-investigation.md`.
+  Schema diff complete (168 production tables / 11 real alembic
+  coverage / 157 gap), 4-strategy analysis, recommended **Sub-A+**
+  approved.
+- **G-A3.1 Phase 2a — env.py expansion:** ✅ DONE 2026-05-02 (PR #135).
+  `alembic/env.py:_MODEL_MODULES` expanded **20 → 37 modules**.
   Verification gate met: autogenerate against fresh local DB produces
   ZERO drops + ZERO creates (both `upgrade()` and `downgrade()` are
   `pass`). G-A3.1.x deferred (extract embedded models from routes file).
-- **Week 1-2 — G-A3.1 Phase 2b:** pending all of:
-  1. Maintenance window scheduled (~30 min, Sunday low-traffic).
-  2. `pg_dump` snapshot tooling confirmed against production replica.
-  3. Rollback plan documented + reviewed.
-  4. Explicit business approval to proceed.
-  Implementation: stamp head in production, re-enable
-  `RUN_MIGRATIONS_ON_STARTUP=true`, smoke test follow-up migration,
-  lift schema-change moratorium.
-- **Cannot defer to Sprint 13+** without explicit business approval.
-
-PR review constraints active until G-A3.1 Phase 2 ships:
-- ❌ Reject PRs adding alembic migrations.
-- ❌ Reject PRs with new SQLAlchemy models unless paired with a
-  G-A3.1 readiness review.
-- ❌ Reject PRs that re-enable `RUN_MIGRATIONS_ON_STARTUP=true` in prod.
+- **G-A3.1 Phase 2b — runbook + production stamp + workaround retirement:**
+  ✅ DONE 2026-05-03.
+  - PR #136 (runbook draft) merged 2026-05-03 00:33 UTC.
+  - Production stamp executed 2026-05-03 ~02:41 UTC via psycopg2
+    (PostgreSQL CLI install blocked by EnterpriseDB CDN HTTP 403 in
+    operator's region; SQL is functionally identical to
+    `alembic stamp head` — see § 2 G-A3.1 closure paragraph for the
+    exact statements run).
+  - Render `RUN_MIGRATIONS_ON_STARTUP` flipped `false` → `true`.
+  - Render apex-api deploy **`8509646`** LIVE since 2026-05-03 02:41 UTC.
+  - Smoke tests passed: `/health` 200 OK with `database: true` +
+    `all_phases_active: true`; `SELECT version_num FROM alembic_version;`
+    returns `g1e2b4c9f3d8`; `hr_employees` count query succeeded; no
+    `DuplicateTable` errors in deploy logs.
+  - Closure docs PR (this PR): retires the workaround in `CLAUDE.md`,
+    flips § 2 G-A3.1 to ✅, marks § 12 G-PROC-4 registry resolved.
+- **Workaround retired:** `RUN_MIGRATIONS_ON_STARTUP=false` (active
+  2026-05-02 → 2026-05-03) is no longer in effect. Schema-change
+  moratorium lifted. PR review constraints removed (no longer
+  rejecting new alembic migrations / SQLAlchemy models / env-flip PRs).
+- **Locked-in registry now empty.** Workaround discipline pattern
+  (§ 12 G-PROC-4) remains active for any future locked-in gap.
+- **G-A3.1.1 follow-up gap opened:** install PostgreSQL CLI on operator
+  machine OR add `psycopg2`-based fallback scripts to
+  `scripts/g-a3-1/` so the next locked-in priority does not require
+  ad-hoc SQL composition under maintenance-window pressure. Sprint 13+
+  candidate. Not blocking — production state is correct.
 
 - [x] **G-UX-1.1** Onboarding wizard auto-select entity post-completion — **DONE** 2026-05-02
   - Branch: `sprint-11/g-ux-1-1-wizard-auto-select-entity`
