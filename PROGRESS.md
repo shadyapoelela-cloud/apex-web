@@ -34,14 +34,20 @@ any other gap until Phase 1 of G-A3.1 is in flight.
 - **Week 1 — G-A3.1 Phase 1:** ✅ DONE 2026-05-02. Investigation report
   at `APEX_BLUEPRINT/G-A3-1-investigation.md`. Schema diff complete
   (168 production tables / 11 real alembic coverage / 157 gap),
-  4-strategy analysis, recommended **Sub-A+** (`alembic stamp head` +
-  fix `env.py:_MODEL_MODULES`). Phase 2 timeline scoped to half-day +
-  30-min maintenance window.
-- **Week 2 — G-A3.1 Phase 2:** pending user approval on strategy A+.
-  Implementation: audit `_MODEL_MODULES`, verify autogenerate clean
-  in staging, stamp head in production, re-enable
-  `RUN_MIGRATIONS_ON_STARTUP=true`. Smoke test follow-up migration.
-  Lift schema-change moratorium.
+  4-strategy analysis, recommended **Sub-A+** approved.
+- **Week 1 — G-A3.1 Phase 2a:** ✅ DONE 2026-05-02.
+  `alembic/env.py:_MODEL_MODULES` expanded 20 → 37 modules.
+  Verification gate met: autogenerate against fresh local DB produces
+  ZERO drops + ZERO creates (both `upgrade()` and `downgrade()` are
+  `pass`). G-A3.1.x deferred (extract embedded models from routes file).
+- **Week 1-2 — G-A3.1 Phase 2b:** pending all of:
+  1. Maintenance window scheduled (~30 min, Sunday low-traffic).
+  2. `pg_dump` snapshot tooling confirmed against production replica.
+  3. Rollback plan documented + reviewed.
+  4. Explicit business approval to proceed.
+  Implementation: stamp head in production, re-enable
+  `RUN_MIGRATIONS_ON_STARTUP=true`, smoke test follow-up migration,
+  lift schema-change moratorium.
 - **Cannot defer to Sprint 13+** without explicit business approval.
 
 PR review constraints active until G-A3.1 Phase 2 ships:

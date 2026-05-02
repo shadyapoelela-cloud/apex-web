@@ -240,9 +240,11 @@
 
 ### 🔴 G-A3.1. Alembic catch-up migration — **LOCKED-IN — Sprint 12 Priority #1 (Mandatory)**
 - **Status:** 🔴 LOCKED-IN. Phase 1 (investigation) **DONE 2026-05-02**.
-  Phase 2 (implementation) pending strategy approval. Cannot be deferred
-  to Sprint 13+ without explicit business approval. See § 12 G-PROC-4
-  for the discipline pattern.
+  Phase 2a (env.py expansion) **DONE 2026-05-02**. Phase 2b (production
+  stamp head + re-enable migrations) pending: maintenance window
+  scheduled, `pg_dump` snapshot confirmed, rollback plan documented,
+  explicit approval. Cannot be deferred to Sprint 13+ without explicit
+  business approval. See § 12 G-PROC-4 for the discipline pattern.
 - **Phase 1 deliverable:** `APEX_BLUEPRINT/G-A3-1-investigation.md`
   (full schema diff + 4-strategy analysis + recommended A+ + Phase 2
   plan + risk + rollback). **Recommended strategy: Sub-A+** (`alembic
@@ -251,6 +253,30 @@
   proposes 104 `op.drop_table` against real production tables
   (`pilot_*`, `knowledge_*`, `copilot_*`) due to incomplete `env.py`
   module list.
+- **Phase 2a deliverable:** `alembic/env.py:_MODEL_MODULES` expanded
+  20 → 37 modules (+17). Adds previously-invisible model registrations
+  from `app.pilot.models` (package re-exports 14 submodules ≈ 90 tables),
+  11 `app.core.*` cross-cutting models, `app.copilot.models.*`,
+  `app.features.ap_agent.models`, `app.hr.models`,
+  `app.integrations.zatca.retry_queue`, `app.services.copilot_memory`,
+  `app.phase1.routes.email_verify_routes` (the latter has embedded
+  models in a routes file — architectural smell tracked as G-A3.1.x).
+  **Verification gate met:** `alembic revision --autogenerate` against
+  fresh `create_all`-built local DB now produces ZERO `op.create_table`,
+  ZERO `op.drop_table`, ZERO of every other operation. Both `upgrade()`
+  and `downgrade()` are `pass`. Empirical proof autogenerate is now
+  safe for future migrations.
+- **Phase 2b plan (pending approval):**
+  - Maintenance window: ~30 min (Sunday low-traffic recommended).
+  - `pg_dump --schema-only --no-owner --no-acl > pre-g-a3-1.sql`
+    against production read replica.
+  - `alembic stamp head` on production (single UPDATE on
+    `alembic_version` row, no DDL).
+  - Re-enable `RUN_MIGRATIONS_ON_STARTUP=true` in Render `apex-api` env.
+  - Restart `apex-api`. Verify deploy succeeds.
+  - Smoke test: trivial follow-up migration applies cleanly.
+  - Update CLAUDE.md "Migration management" to remove moratorium.
+  - Lift schema-change moratorium across PR review.
 - **Issue (original):** Alembic covers only 25/198 tables (12%). Cannot
   replace `create_all` until alembic schema matches ORM schema.
 - **Risk:** HIGH — touches production schema management.
@@ -341,6 +367,30 @@ since Sprint 2-7 — no functional regression).
 
 - **Estimate:** 1-2 weeks
 - **Sprint:** 12 (LOCKED-IN — Priority #1).
+
+### ⏸ G-A3.1.x. Extract embedded models from routes files (deferred)
+- **Trigger:** G-A3.1 Phase 2a audit (Sprint 12) found that
+  `app/phase1/routes/email_verify_routes.py` contains SQLAlchemy
+  model classes (`EmailVerificationToken` + 1 other) declared
+  inline with route handlers. Architectural smell — routes should
+  not define ORM models; the two concerns belong in different files
+  for separation of layers, testability, and discoverability.
+- **Scope:** extract the 2 embedded model classes to a new file
+  `app/phase1/models/email_verify_models.py`, update import paths
+  across the codebase (≤5 sites typically), confirm
+  `alembic/env.py:_MODEL_MODULES` swaps the routes-file entry for
+  the new models-file entry, verify tests pass.
+- **Workaround (active):** `alembic/env.py:_MODEL_MODULES` includes
+  `app.phase1.routes.email_verify_routes` so alembic can see the
+  embedded models. Functional but cosmetically wrong.
+- **Estimate:** 1-2 hours (mostly grep + import-path updates + test run).
+- **Status:** ⏸ Deferred — Sprint 13+ candidate. Out-of-scope for
+  G-A3.1's main deliverables (catch-up + production stamp). Open as a
+  cleanup gap so the smell is tracked rather than absorbed silently.
+- **Risk if ignored:** the moment another route file develops a
+  similar pattern, the precedent makes it harder to argue against.
+  Worth a follow-up cleanup but no functional impact.
+- **Sprint:** 13+.
 
 ### 🟠 G-A4. Endpoint naming inconsistency
 - **Files:** All `app/phaseN/routes/*.py`
