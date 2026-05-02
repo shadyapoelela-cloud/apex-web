@@ -1091,7 +1091,7 @@
   G-T1.7a.1 owns the remaining 80% floor push.
 - **Sprint:** 9.
 
-### 🟡 G-T1.7b. Coverage restoration for `app/core/` (1,748 stmts) — IN PROGRESS
+### ✅ G-T1.7b. Coverage restoration for `app/core/` (1,748 stmts) — FULLY DONE 2026-05-02
 - **Discovered:** 2026-05-01 by G-T1.7 scoping.
 - **Scope:** restore `core/` from 74.0% floor → 85% original floor.
   Diffuse across ~80 files (top-20 = 47% of gap; remaining 53% across
@@ -1119,18 +1119,22 @@
      **83 test functions / 91 collected pytest cases** across 4 new files.
      Aggregate `core/` 81.34% → **82.62%** (+1.28pp, stretch beaten).
      Phase 4 of 5 closes.
-  5. Phase 5 candidates: top-up of remaining diffuse low-coverage files
-     + raise `DIRECTORY_FLOORS["core"]` from 74.0 → 80.0+ to lock in gains.
-     Sprint 10 final PR.
-- **Goal:** raise `DIRECTORY_FLOORS["core"]` 74.0 → 85.0 incrementally
-  as PRs land. Multi-PR effort. After Phases 1+2+3+4: 82.62% / 2.38pp from
-  original 85% target.
-- **Estimate:** **1-3 weeks** (multi-PR), 175-350 unit tests total.
-  Phase 1 burned 56 tests for +1.04pp; Phase 2 burned 111 tests for
-  +2.74pp; Phase 3 burned 83 tests for +1.89pp; Phase 4 burned 83 tests
-  for +1.28pp; remaining ~2.4pp needs Phase 5 (top-up + floor raise).
-- **Status:** 🟡 Phases 1+2+3+4 done; Phase 5 pending (Sprint 10 final).
-- **Sprint:** 9-10+.
+  5. ✅ **G-T1.7b.5 — top-up + raise core/ floor 74→80** (DONE 2026-05-02,
+     Sprint 10 final): `notifications_bridge.py` (43.6% → 100%),
+     `workflow_templates.py` (38.6% → 100%), `sms_backend.py`
+     (35.9% → 100%), `email_service.py` (36.7% → 100%). **45 test
+     functions / 69 collected pytest cases** across 4 new files.
+     Aggregate `core/` 82.62% → **83.59%** (+0.97pp, beats 83.5%
+     commitment by +0.09pp). **`DIRECTORY_FLOORS["core"]` raised 74.0
+     → 80.0** with 3.59pp buffer. G-T1.7b parent closed.
+- **Goal:** raise `DIRECTORY_FLOORS["core"]` 74.0 → **80.0 (DONE)**.
+  Climb from 75.67% to 83.59% across 5 sub-PRs in Sprints 9-10. The
+  original 85% target is deferred to G-T1.7b.6 (Sprint 12+).
+- **Cumulative tests added across G-T1.7b:** 56 (.1) + 111 (.2) + 83 (.3) +
+  83 (.4) + 45 (.5) = **378 test functions** / 16,948 stmts surface.
+- **Status:** ✅ FULLY DONE 2026-05-02. All 5 sub-PRs merged. Floor
+  raised 74→80. G-T1.7b.6 opened for future 80→85 restoration.
+- **Sprint:** 9-10. **Closed.**
 
 ### ✅ G-T1.7b.1. Zero-coverage files coverage push (Sprint 9 final) — DONE 2026-05-01
 - **Branch:** `sprint-9/g-t1-7b-1-zero-coverage-files`
@@ -1320,16 +1324,84 @@
   (+1.28pp) inside the +1.0-1.4pp band.
 - **Sprint:** 10.
 
-### ⏭ G-T1.7b.5. Sprint 10 final PR — top-up + raise `DIRECTORY_FLOORS["core"]`
-- **Scope:** Phase 5 of 5 (closes G-T1.7b). Top up remaining diffuse
-  low-coverage files in `app/core/` to push aggregate ≥83.5-84%, then
-  raise `DIRECTORY_FLOORS["core"]` from 74.0 → 80.0+ to lock in the
-  gains from Phases 1-4. After this PR, the cascade asserts the new
+### ✅ G-T1.7b.5. Sprint 10 final PR — top-up + raise core/ floor 74→80 — DONE 2026-05-02
+- **Branch:** `sprint-10/g-t1-7b-5-floor-restoration`
+- **Scope:** Phase 5 of 5 sub-PRs for G-T1.7b. Closes the parent gap.
+  Top up 4 mid-range-coverage files in `app/core/` to push aggregate
+  past 83.5%, then raise `DIRECTORY_FLOORS["core"]` from 74.0 → 80.0
+  to lock in gains from Phases 1-4. The cascade now asserts the new
   floor — preventing regressions.
-- **Estimate:** ~30-50 tests + floor edit. Sprint 10 priority #4.
-- **Status:** ⏭ Sprint 10 final PR (multi-PR closure). Awaiting
-  approval before start.
-- **Sprint:** 10.
+- **45 test functions / 69 collected pytest cases** across 4 new files
+  (split per source module):
+  - `tests/test_notifications_bridge.py` — 7 fn, **100%** (39/39 stmts).
+    Async notification dispatcher (Phase 10 DB + WebSocket). Coroutines
+    driven via `asyncio.run()` (no pytest-asyncio dependency). `sys.modules`
+    stubs for `app.phase10.models.phase10_models` + `app.core.websocket_hub`.
+    Both `notify_sync` branches covered (no-loop → asyncio.run; running-loop
+    → task scheduled, partial result).
+  - `tests/test_workflow_templates.py` — 11 fn / 21 collected, **100%**
+    (57/57 stmts). Pure-Python templates catalog + materialize logic.
+    Parametrized category-filter matrix (5 categories). Frozen-dataclass
+    immutability tested via `pytest.raises(FrozenInstanceError)`. Path-
+    setter `_set_path` tested for dict leaf, list index, mixed paths,
+    out-of-bounds.
+  - `tests/test_sms_backend.py` — 20 fn, **100%** (78/78 stmts).
+    Multi-backend SMS sender (Unifonic + Twilio + Console). `sys.modules
+    ['requests']` stub with response-toggle pattern. Each backend's
+    not-configured / requests-missing / API-success / API-error /
+    HTTP-non-200 / RequestException paths covered.
+  - `tests/test_email_service.py` — 16 fn / 21 collected, **100%**
+    (90/90 stmts). Multi-backend email (SMTP + SendGrid + Console).
+    `smtplib.SMTP` replaced with context-manager-friendly MagicMock.
+    SendGrid covered via `sys.modules['requests']` stub. Helper email
+    constructors (verification + password-reset + notification) tested
+    for Arabic body construction.
+- **Aggregate `core/` coverage:** 82.62% → **83.59%** (+0.97pp).
+  **Beats commitment** (83.5% by +0.09pp).
+- **Floor raised:** `DIRECTORY_FLOORS["core"]: 74.0 → 80.0`.
+  Buffer: 83.59 - 80 = **3.59pp** (very comfortable cushion).
+- **Comment block updated** in `tests/test_per_directory_coverage.py`
+  with full G-T1.7b trajectory: 85→74 (recalibration) → 75.67 → 76.71
+  → 79.45 → 81.34 → 82.62 → 83.59 across 5 sub-PRs.
+- **Cascade:** 22/23 maintained — `core-80.0` PASSES with new floor;
+  `ai-80.0` still FAILS (deliberate pre-existing, deferred to G-T1.7a.1).
+- **Full suite:** 2291 passed, 2 pre-existing failures (ai-80.0, G-T1.8 flake).
+  0 new regressions.
+- **Verify-first findings:**
+  1. Top 20 lowest-coverage files extracted from `coverage.json`. Of
+     the top 20, the 4 selected (sms_backend, email_service,
+     workflow_templates, notifications_bridge) all hit 100% with
+     standard patterns; the remaining 16 cluster around DB-integration
+     territory (tenant_directory, comments, approvals, etc.) — those
+     belong to G-T1.7b.6 once G-T1.7a.1 unlocks the patterns.
+  2. `pytest-asyncio` is NOT installed in this env. `notifications_bridge`
+     async tests use `asyncio.run()` directly via a `_run()` helper —
+     compatible without adding a dependency.
+  3. Floor edit gate honored: ran aggregate measurement BEFORE the
+     edit; only proceeded to edit when 83.59% ≥ 83.5% commitment was
+     proven. Cascade re-run AFTER the edit confirmed `core-80.0` PASSES.
+- **Estimate vs actuals:** estimated ~42 tests; shipped 45 fn / 69
+  collected. Per-file: 7, 11, 20, 16 — all ≤40 cap. Coverage gain
+  (+0.97pp) lands inside the +0.88-0.97pp band predicted by Option A.
+- **G-T1.7b parent closure:** This PR closes G-T1.7b after 5 sub-PRs
+  across Sprints 9-10. Cumulative: 378 test functions, +7.92pp aggregate
+  (75.67% → 83.59%), floor raised 74→80.
+- **Sprint:** 10. **Sprint 10 closed.**
+
+### ⏸ G-T1.7b.6. core/ DB-integration restoration (80→85) — deferred
+- **Trigger:** Opened 2026-05-02 by G-T1.7b.5 closure. Restoring the
+  original 85% floor needs DB-integration test patterns for the
+  remaining low-coverage `core/` cluster: `tenant_directory.py`,
+  `comments.py`, `approvals.py`, `webhook_subscriptions.py`,
+  `industry_packs_service.py`, `proactive_suggestions.py`,
+  `custom_roles.py`, `activity_feed.py`, `bank_reconciliation_ai.py`.
+  Combined ~900 missing stmts; +5.3pp aggregate ceiling if all hit ≥95%.
+- **Dependency:** G-T1.7a.1 (ai/ DB-integration tests) must land first
+  to surface reusable fixture patterns (mock SessionLocal chains for
+  large ORM walk paths).
+- **Estimate:** 100-150 tests, 1-2 weeks.
+- **Status:** ⏸ Sprint 12+ candidate. Not on Sprint 11's UX track.
+- **Sprint:** 12+.
 
 ### ⏸ G-T1.7a.1. `app/ai/` DB-integration tests — push from 69.42% to 80%+
 - **Scope expanded 2026-05-01** by G-T1.7a closure: original entry

@@ -63,11 +63,32 @@ import pytest
 # encouraged, lowering requires explicit doc + cross-link to a
 # restoration gap.
 # ══════════════════════════════════════════════════════════════════════
+# core/ trajectory:
+# 85→74 (Sprint 8 G-T1.7 recalibration — surface expanded by Sprint 7
+#         untested files; 11 new core modules added without tests.)
+# → 75.67 (G-T1.7b.1 entry post-merge)
+# → 76.71 (G-T1.7b.1 exit — 4 zero-coverage files: error_helpers,
+#          saudi_knowledge_base, payment_service, universal_journal)
+# → 79.45 (G-T1.7b.2 — workflow_engine cluster: anomaly_live,
+#          cashflow_forecast, workflow_run_history, workflow_engine)
+# → 81.34 (G-T1.7b.3 — api_keys + email_inbox + notification_digest)
+# → 82.62 (G-T1.7b.4 — storage + industry_pack + slack/teams)
+# → 83.59 (G-T1.7b.5 exit, this PR — sms_backend + email_service +
+#          workflow_templates + notifications_bridge)
+# G-T1.7b parent closed Sprint 10. Floor restored to 80% with ~3.5pp buffer.
+# Restoring to original 85% deferred to a future sprint after G-T1.7a.1
+# unlocks DB-integration test patterns reusable for tenant_directory /
+# comments / approvals / webhook_subscriptions / custom_roles /
+# proactive_suggestions clusters.
 DIRECTORY_FLOORS: dict[str, float] = {
     # Tier 1 — critical path. Keep tight.
-    "core":       74.0,   # was 85.0% (calibrated 2026-04-24); lowered 2026-05-01
-                          # by G-T1.7 to reflect Sprint 7 expansion. Restoration
-                          # to 85% tracked as G-T1.7b (Sprint 9-10).
+    "core":       80.0,   # was 85.0% (calibrated 2026-04-24); lowered to 74.0
+                          # 2026-05-01 by G-T1.7 to reflect Sprint 7 expansion;
+                          # raised to 80.0 2026-05-02 by G-T1.7b.5 after the
+                          # 5-PR restoration (Phases 1-5) climbed from 75.67%
+                          # to 83.59% across Sprints 9-10. Original 85% target
+                          # deferred to G-T1.7b.6 (Sprint 12+, gated on
+                          # G-T1.7a.1 DB-integration patterns).
     "features":   85.0,   # was 90.2%
     "hr":         80.0,   # was 86.1%
     "ai":         80.0,   # was 84.0% — holding; current actual 54.3% is the
