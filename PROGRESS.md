@@ -2,6 +2,26 @@
 
 ## Sprint 10 — Coverage Restoration (Q2 2026, week 3) — IN PROGRESS
 
+- [x] **G-T1.7b.3** core/ api_keys + email_inbox + notification_digest cluster — **DONE** 2026-05-02 (Phase 3 of 5)
+  - Branch: `sprint-10/g-t1-7b-3-api-keys-email-inbox-cluster`
+  - **83 test functions** across 3 NEW files (split per source module):
+    - `tests/test_notification_digest.py` — 19 fn, 16.7% → **100%** (+83.3pp)
+    - `tests/test_email_inbox.py` — 25 fn, 16.3% → **97.04%** (+80.7pp)
+    - `tests/test_api_keys.py` — 39 fn, 31.9% → **100%** (+68.1pp)
+  - **Aggregate `core/` coverage:** 79.45% → **81.34%** (+1.89pp).
+    **Stretch beaten** (commitment 81.00%, stretch 81.11%; landed +0.23pp
+    above stretch).
+  - **core/ trajectory:** 74.0 (floor) → 75.67 → 76.71 (G-T1.7b.1) →
+    79.45 (G-T1.7b.2) → **81.34 (G-T1.7b.3)**. Remaining to original
+    85% floor: 3.66pp across Phases 4-5.
+  - **Cascade: 22/23 maintained** (ai/ FAIL deliberate, deferred to G-T1.7a.1).
+  - **Full suite:** 2110 passed; 2 pre-existing failures (ai-80.0, G-T1.8 flake);
+    0 new regressions.
+  - IMAP mocking finished well under the 2h budget (defer-to-7b.5 hatch
+    unused). Real stdlib `EmailMessage` fixtures kept parser path realistic.
+  - sys.modules stub strategy reused: `email_service` (digest); `imaplib`
+    monkeypatch (inbox); pure stdlib crypto + tmp_path (api_keys).
+  - **Sprint 10 progress: 2/5 priorities** (G-T1.7b.4-.5 + G-T1.7a.1 + G-T1.8 queued).
 - [x] **G-T1.7b.2** core/ Workflow Engine cluster — **DONE** 2026-05-02 (Phase 2 of 5)
   - Branch: `sprint-10/g-t1-7b-2-workflow-engine-cluster`
   - **111 test functions / 133 collected pytest cases** across 4 NEW files
@@ -25,9 +45,8 @@
 
 ### Sprint 10 queue
 
-- **G-T1.7b.3** — api_keys + email_inbox + notification_digest (Phase 3 of 5)
-- **G-T1.7b.4** — storage_service + industry_pack_provisioner cluster (Phase 4)
-- **G-T1.7b.5** — slack/teams_backend + remaining diffuse files (Phase 5, closes G-T1.7b)
+- **G-T1.7b.4** — storage_service + industry_pack_provisioner + slack/teams_backend cluster (Phase 4)
+- **G-T1.7b.5** — remaining diffuse files (Phase 5, closes G-T1.7b)
 - **G-T1.7a.1** — `app/ai/` DB-integration tests (cascade-23/23 milestone)
 - **G-T1.8** — `test_different_fiscal_years_isolated` order-dependent flake fix
 
