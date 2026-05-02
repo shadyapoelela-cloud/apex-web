@@ -44,8 +44,28 @@ from app.knowledge_brain.models.db_models import Base as _KnowledgeBrainBase  # 
 # Importing the module triggers the class-definition side effect that
 # registers the mapped class with its Base. Optional modules (sprint2)
 # may be missing from a given checkout — handle ImportError gracefully.
+# NOTE (G-A3.1 Phase 2a, Sprint 12): expanded from 20 → 37 modules so
+# `target_metadata = PhaseBase.metadata` reflects every model registered
+# anywhere in the codebase. Before this expansion, `alembic revision
+# --autogenerate` proposed 104 op.drop_table statements against real
+# production tables (pilot_*, knowledge_*, copilot_*, etc.) because
+# their model modules were never imported during alembic-time. The
+# 17 new entries cover ~135 previously-invisible tables.
+#
+# Verification gate (Phase 2a merge bar): autogenerate against a fresh
+# create_all-built local DB must produce ZERO op.create_table AND ZERO
+# op.drop_table. See APEX_BLUEPRINT/G-A3-1-investigation.md § B.
 _MODEL_MODULES = (
+    # ── Phase 1 — Core platform ─────────────────────────────────
     "app.phase1.models.platform_models",
+    # NEW (P2a): contains EmailVerificationToken + 1 other model defined
+    # inline in a routes file. Architectural smell tracked as G-A3.1.x —
+    # extract to app/phase1/models/email_verify_models.py in a future
+    # cleanup. Importing the routes file here makes alembic see the
+    # embedded models without disturbing the smell-fix sequencing.
+    "app.phase1.routes.email_verify_routes",
+
+    # ── Phase 2-11 — Business modules ───────────────────────────
     "app.phase2.models.phase2_models",
     "app.phase2.models.onboarding_models",
     "app.phase2.models.archive_models",
@@ -58,14 +78,47 @@ _MODEL_MODULES = (
     "app.phase9.models.phase9_models",
     "app.phase10.models.phase10_models",
     "app.phase11.models.phase11_models",
+
+    # ── Sprint 1-6 — Wave-style additions ───────────────────────
     "app.sprint1.models.sprint1_models",
-    "app.sprint2.models.sprint2_models",  # optional
+    "app.sprint2.models.sprint2_models",   # optional
     "app.sprint3.models.sprint3_models",
     "app.sprint4_tb.models.tb_models",
     "app.sprint5_analysis.models.analysis_models",
     "app.sprint6_registry.models.registry_models",
-    # Wave 5 + 7 additions that declare tables on PhaseBase.
-    "app.core.compliance_models",
+
+    # ── Pilot — multi-tenant retail ERP ─────────────────────────
+    # NEW (P2a): single package import re-exports 14 submodules
+    # (tenant, entity, currency, rbac, product, barcode, warehouse,
+    # pricing, pos, gl, customer, purchasing, compliance, attachment).
+    # ~90 tables — the largest single bucket of the alembic gap.
+    "app.pilot.models",
+
+    # ── Core / cross-cutting models ─────────────────────────────
+    "app.core.compliance_models",          # Wave 5+7 (already-tracked)
+    # NEW (P2a) — every module below registers tables on PhaseBase but
+    # was previously invisible to alembic autogenerate.
+    "app.core.activity_log",                # 3 classes
+    "app.core.ai_usage_log",                # 1 class (also tracked by alembic)
+    "app.core.dimensional_accounting",      # 7 classes (largest core file)
+    "app.core.governed_ai",                 # 1 class
+    "app.core.marketplace_enhanced",        # 3 classes
+    "app.core.offline_sync",                # 4 classes
+    "app.core.period_close",                # 2 classes
+    "app.core.saved_views",                 # 3 classes
+    "app.core.tenant_branding",             # 2 classes (also alembic-tracked)
+    "app.core.webhooks",                    # 4 classes
+
+    # ── Feature modules ─────────────────────────────────────────
+    "app.features.ap_agent.models",         # 2 classes (NEW P2a)
+
+    # ── HR + integrations ───────────────────────────────────────
+    "app.hr.models",                        # 4 classes (NEW P2a; HR/AP-tracked)
+    "app.integrations.zatca.retry_queue",   # 1 class (NEW P2a)
+
+    # ── Copilot ─────────────────────────────────────────────────
+    "app.copilot.models.copilot_models",    # 3 classes (NEW P2a)
+    "app.services.copilot_memory",          # 3 classes (NEW P2a)
 )
 
 
