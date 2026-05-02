@@ -2248,4 +2248,110 @@ quadrantChart
 
 ---
 
+## 16. UX Completion Gaps / ثغرات إكمال تجربة المستخدم
+
+The UX Completion track captures gaps where existing functionality
+works at the API/data layer but the user-facing flow has dead-ends,
+missing affordances, or required state without graceful resolution.
+Discovered through manual testing — typically a real user (or the
+Cowork-session pattern from G-DEV-1.1) hitting an error message with
+no obvious next step.
+
+Pattern: prefer frontend-only fixes that reuse existing infrastructure
+(wizards, pickers, API endpoints). Helper extraction encouraged so the
+same pattern can be applied to sibling screens with one import.
+
+### ✅ G-UX-1. JE Builder default entity resolution — DONE 2026-05-02
+- **Branch:** `sprint-11/g-ux-1-je-builder-default-entity`
+- **Trigger:** Discovered 2026-05-02 during Cowork session manual test.
+  Login → `/app/erp/finance/je-builder` shows dead-end error
+  *"اختر الكيان من شريط العنوان أولاً"* with no action affordance.
+  Test user (`shady2`) had no tenant or entity assigned.
+- **Verify-First findings:**
+  1. `je_builder_live_v52.dart:150-156` — `_load()` checks
+     `PilotSession.hasEntity` and shows error-only branch.
+  2. `PilotSession` (localStorage-backed) has `entityId`, `tenantId`,
+     `hasEntity`, `hasTenant` getters. Setter at
+     `tenant_tree_picker.dart:181` is the canonical entity-select path.
+  3. **Latent gap discovered:** `pilot_onboarding_wizard.dart`
+     creates entities (step 2) and records `_createdEntityIds` map but
+     **does NOT call `PilotSession.entityId = ...`** after wizard
+     completion. Even after running onboarding, user lands with
+     `hasTenant=true` but `hasEntity=false`. Tracked as G-UX-1.1 below.
+  4. Backend API ready: `pilotClient.listEntities(tid)` →
+     `GET /pilot/tenants/{tid}/entities`. **No backend changes needed.**
+- **Fix applied (Option C — Smart Resolver):** new helper
+  `lib/pilot/services/entity_resolver.dart` with `ensureEntitySelected()`
+  static method that runs the decision tree:
+  1. Already has entity → return true (no-op).
+  2. No tenant at all → snackbar + redirect to onboarding.
+  3. Tenant set, 0 entities → snackbar + redirect to onboarding.
+  4. Tenant set, 1 entity → auto-select silently, return true.
+  5. Tenant set, multiple → show `TenantTreePicker`, return based on pick.
+  JE Builder's `_load()` updated to call the helper instead of dead-ending.
+  All `context.mounted` guards in place for async-gap safety.
+- **Why Option C beat A and B:** Option A (always redirect to wizard)
+  would create an infinite loop with the G-UX-1.1 wizard gap (wizard
+  doesn't auto-set entity → JE Builder bounces back to wizard). Option B
+  (always show picker) costs an extra click for the most common case
+  (single-entity tenant). Option C handles all 5 states gracefully.
+- **Files changed:**
+  - `apex_finance/lib/pilot/services/entity_resolver.dart` (NEW, 102 lines)
+  - `apex_finance/lib/pilot/screens/setup/je_builder_live_v52.dart`
+    (+1 import, ~+15 lines in `_load()`)
+- **Verification:**
+  - `flutter analyze`: 306 baseline maintained (0 new issues).
+  - `flutter test`: 43 passed; 1 pre-existing failure
+    (`ask_panel_test.dart` `package:web` 1.1.1 incompatibility — verified
+    on `main` before this PR).
+  - `pytest tests/`: 2328 passed, 0 regressions (no backend changes).
+  - **Manual visual test deferred to user** (CLI agent cannot run a
+    Flutter web browser session). Test plan documented in PR description:
+    login as no-entity user → navigate to `/je-builder/new` → verify
+    snackbar + redirect (not dead-end error) → complete wizard → re-navigate
+    → verify auto-select + load.
+- **Risk:** low — UI-only, non-destructive, reuses existing wizard +
+  picker + API endpoint. Multi-tenant safety guard untouched.
+- **Reusable pattern:** the `EntityResolver.ensureEntitySelected()`
+  helper applies to any entity-scoped screen. G-UX-2/3/N will use it
+  with `await EntityResolver.ensureEntitySelected(context); if (!ok) ...`
+- **Refs:**
+  - Triggered by: Cowork session manual test (2026-05-02)
+  - Companion: G-UX-1.1 (deferred — wizard auto-select)
+  - Related: G-DEV-1.1 (CORS trap, same Cowork session)
+- **Sprint:** 11.
+
+### ⏸ G-UX-1.1. Onboarding wizard auto-select first entity post-completion (deferred)
+- **Trigger:** Discovered 2026-05-02 during G-UX-1 verify-first.
+  `apex_finance/lib/pilot/screens/setup/pilot_onboarding_wizard.dart`
+  creates entities in step 2 and records `_createdEntityIds` map but
+  does NOT call `PilotSession.entityId = ...` after wizard completion.
+  Result: user finishes wizard with `hasTenant=true` but `hasEntity=false`.
+- **Workaround:** G-UX-1's `EntityResolver` covers this symptom via
+  the "tenant set, 1 entity → auto-select" branch — when the user
+  navigates to JE Builder (or any screen using the helper) right after
+  wizard completion, the resolver fetches entities, sees the just-
+  created one, and auto-selects silently. Not perfect (relies on
+  re-navigation triggering the helper), but functional.
+- **Direct fix (preferred):** ~3-line change at the wizard's final step:
+  ```dart
+  if (_createdEntityIds.isNotEmpty) {
+    PilotSession.entityId = _createdEntityIds.values.first;
+  }
+  ```
+  Sets the first-created entity as active before the wizard exits. Removes
+  the workaround dependency entirely.
+- **Why deferred:** G-UX-1's helper covers the symptom across ALL
+  entity-scoped screens, not just JE Builder. Fixing the wizard is a
+  cleaner architectural fix but adds a separate verify-first cycle to
+  confirm the wizard's existing post-step routing isn't disrupted. Sprint
+  12+ candidate alongside the wizard's own tightening (e.g., "skip steps
+  for already-onboarded users").
+- **Estimate:** 30-60 minutes (3-line change + manual test of wizard
+  completion path).
+- **Status:** ⏸ Sprint 12+ candidate.
+- **Sprint:** 12+.
+
+---
+
 **Continue → `10_CLAUDE_CODE_INSTRUCTIONS.md`**

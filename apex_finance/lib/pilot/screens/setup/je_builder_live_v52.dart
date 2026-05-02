@@ -22,6 +22,7 @@ import 'package:flutter/services.dart';
 import '../../../core/theme.dart' as core_theme;
 import '../../../core/v5/templates/object_page_template.dart';
 import '../../api/pilot_client.dart';
+import '../../services/entity_resolver.dart';
 import '../../session.dart';
 
 // ─────────────────────────────────────────────────────────────────────
@@ -147,12 +148,24 @@ class _JeBuilderLiveV52ScreenState extends State<JeBuilderLiveV52Screen> {
   // LOAD — accounts (+ JE if id provided)
   // ─────────────────────────────────────────────────────────────────
   Future<void> _load() async {
+    // G-UX-1 (Sprint 11): replace the historic dead-end error with a
+    // smart resolver that auto-selects the only entity, shows the
+    // existing tree picker for multi-entity tenants, or routes to the
+    // onboarding wizard when no entity exists yet. See
+    // lib/pilot/services/entity_resolver.dart for the decision tree.
     if (!PilotSession.hasEntity) {
-      setState(() {
-        _loading = false;
-        _error = 'اختر الكيان من شريط العنوان أولاً';
-      });
-      return;
+      final resolved = await EntityResolver.ensureEntitySelected(context);
+      if (!resolved) {
+        // User was redirected to onboarding or cancelled the picker —
+        // stop loading and let the screen show its empty state.
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+          _error = null;
+        });
+        return;
+      }
+      // Entity is now set — fall through to the normal load path.
     }
     setState(() {
       _loading = true;
