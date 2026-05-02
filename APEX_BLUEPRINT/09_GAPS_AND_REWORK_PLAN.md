@@ -1549,25 +1549,91 @@
   G-T1.8 (the `--cov` order-dependent flake — likely same root cause).
 - **Sprint:** TBD (watch-only).
 
-### ⏸ G-T1.8. `test_different_fiscal_years_isolated` order-dependent flake (deferred)
+### ✅ G-T1.8. `test_different_fiscal_years_isolated` order-dependent flake — DONE 2026-05-02
+- **Branch:** `sprint-11/g-t1-8-zatca-flake-fix`
 - **Trigger:** Discovered 2026-05-01 during G-T1.7a verify-first.
   `tests/test_zatca.py::TestInvoiceBuild::test_different_fiscal_years_isolated`
-  passes in isolation (0.68s) but fails under full pytest with
-  `--cov=app/ai` instrumentation. Order-dependent / state-leakage —
-  the test is sensitive to other tests' side effects on shared state
-  (DB session, module-level caches, or coverage-instrumented timing).
-- **Hypotheses:**
-  - DB session pollution between tests
-  - Module-level state (cached imports, global config)
-  - Test execution timing interaction with coverage instrumentation
-- **Scope:** investigate test ordering, isolate state, add proper
-  teardown / fixture cleanup. 1-2 hours.
-- **Status:** ⏸ Deferred — Sprint 10 candidate. Does NOT block
-  coverage work. Only triggers under specific `--cov` flag combinations.
-- **Risk if ignored:** would surface in any future PR that runs
-  pytest with broad `--cov` scope (e.g., G-T1.7b for `core/` coverage
-  push). May need fixing before G-T1.7b starts.
-- **Sprint:** 10.
+  passed in isolation (0.21s) but failed under full pytest with the
+  cascade test (`tests/test_per_directory_coverage.py`) included.
+- **🎯 Root cause (resolved during G-T1.8):** The cascade test runs
+  `pytest tests/ --cov=app` as a `subprocess.run()` with `cwd=repo_root`.
+  Both the outer pytest session and the inner subprocess use the same
+  relative `DATABASE_URL=sqlite:///test.db` declared in `tests/conftest.py:9`.
+  Sequence:
+  1. Outer session starts → `setup_test_db` (autouse session-scoped)
+     creates schema in `test.db`.
+  2. pytest collects alphabetically → `test_per_directory_coverage.py`
+     runs *before* `test_zatca.py`.
+  3. Cascade subprocess fires with same cwd → tries to delete `test.db`
+     (fails on Windows due to outer process lock) → falls back to truncating
+     tables → recreates schema → runs tests inside subprocess.
+  4. Inside subprocess, `test_different_fiscal_years_isolated` writes
+     `JournalEntrySequence(client_id=test-zatca-client-3, fiscal_year=2025/2026,
+     last_number=1)` rows.
+  5. Subprocess exits, leaving those rows in `test.db`.
+  6. Outer session continues to `test_zatca.py::test_different_fiscal_years_isolated`
+     → `next_journal_entry_number(test-zatca-client-3, 2025)` finds existing
+     row with `last_number=1` → increments to `2` → returns `icv=2`.
+  7. Assertion `a.icv == 1` fails.
+- **Evidence trail:**
+  - `app/core/compliance_service.py:55-91` — `next_journal_entry_number`
+    upserts `JournalEntrySequence` keyed on `(client_id, fiscal_year)`.
+  - `tests/test_per_directory_coverage.py:152-164` — subprocess inherits
+    parent cwd + env, no isolated `DATABASE_URL`.
+  - `tests/conftest.py:9, 24-77` — relative `DATABASE_URL=sqlite:///test.db`
+    + session-scoped `setup_test_db` (does not reset between cascade pollution
+    and `test_zatca.py`).
+  - Grep confirmed `test-zatca-client-3` is used in NO other test — sole
+    contamination path is the cascade subprocess.
+- **Fix applied (Option A):** UUID-suffixed client_id in
+  `test_different_fiscal_years_isolated` — 4-line test change. Each test
+  run uses a fresh, never-before-seen client_id, sidestepping the
+  shared-state path entirely. Zero production code change. Pattern
+  consistent with G-T1.7a.1 onboarding tests.
+- **Verification:** isolated PASS (0.40s), `test_zatca.py` 25/25 PASS,
+  cascade 23/23 PASS, full suite 5× consecutive runs all green
+  (0 failures across all 5 runs).
+- **🎯 Milestone:** suite is 100% green for the first time since Sprint 7.
+  Combined with cascade 23/23 (G-T1.7a.1), APEX has 0 known test failures.
+- **Refs:**
+  - Triggered investigation: G-T1.7a (Sprint 9)
+  - Related deferred: G-T1.8.2 (cascade subprocess DATABASE_URL isolation)
+  - Related: G-T1.9 (ai/ runtime variance — watch-only, also caused by
+    cascade subprocess interaction)
+- **Sprint:** 11.
+
+### ⏸ G-T1.8.2. Cascade subprocess DATABASE_URL isolation (deferred)
+- **Trigger:** G-T1.8 root cause analysis (Sprint 11) revealed that
+  `tests/test_per_directory_coverage.py` runs `pytest tests/` as a
+  subprocess inheriting parent's cwd + `DATABASE_URL`. The subprocess
+  writes to the same `test.db` as parent, causing state pollution that
+  surfaced as the `test_different_fiscal_years_isolated` flake.
+- **G-T1.8 fixed the specific symptom** (UUID-suffixed client_id in the
+  affected test). G-T1.8.2 fixes the architectural root cause: the
+  cascade subprocess should use an isolated `DATABASE_URL`.
+- **Scope:** Edit `tests/test_per_directory_coverage.py:145-151` to
+  inject a per-subprocess `DATABASE_URL` via env, e.g.:
+  ```python
+  env = {
+      ...,
+      "DATABASE_URL": f"sqlite:///{tmp_path}/cascade_test.db",
+      ...
+  }
+  ```
+  ~10-line change. Verify cascade still parses coverage JSON correctly
+  (the subprocess's coverage data is what matters, not its DB state).
+- **Why not now:** G-T1.8 surgical fix is sufficient for the single
+  known instance. G-T1.8.2 prevents a class of *future* flakes from the
+  same mechanism — important but not blocking. The cascade test is
+  critical-path infra; an isolated-DB-URL change wants its own verify-
+  first cycle (run cascade 3× confirming it still produces correct
+  per-directory JSON).
+- **Risk if ignored:** any future test that writes to `JournalEntrySequence`,
+  `Tenant`, `Entity`, or any other shared-key table without UUID
+  isolation will be at risk for the same flake pattern.
+- **Estimate:** 1-2 hours.
+- **Status:** ⏸ Deferred — Sprint 12+ candidate.
+- **Sprint:** 12+.
 
 ### 🟠 G-T2. No load tests
 

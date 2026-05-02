@@ -2,6 +2,29 @@
 
 ## Sprint 11 — Coverage Closure + UX Track (Q2 2026, week 4) — IN PROGRESS
 
+- [x] **G-T1.8** test_different_fiscal_years_isolated flake fix — **DONE** 2026-05-02 🎯 **0 FAILURES MILESTONE**
+  - Branch: `sprint-11/g-t1-8-zatca-flake-fix`
+  - **Root cause:** cascade subprocess (`tests/test_per_directory_coverage.py`)
+    runs `pytest tests/` with same `cwd` + relative `DATABASE_URL=sqlite:///test.db`,
+    polluting parent's `test.db` with `JournalEntrySequence` rows that
+    incremented the ICV counter for `test-zatca-client-3`. When parent
+    later reached `test_different_fiscal_years_isolated`, ICV came back
+    as 2 (not 1), failing the assertion.
+  - **Fix:** UUID-suffixed `client_id` (4-line test-side change).
+    Pattern consistent with G-T1.7a.1 onboarding tests. Zero production
+    code touched.
+  - **Verification:** isolated PASS, `test_zatca.py` 25/25 PASS, cascade
+    23/23 PASS, full suite 5× consecutive runs all green (0 failures).
+  - **🎯 0 test failures milestone:** suite is 100% green for the first
+    time since Sprint 7. Combined with cascade 23/23 (G-T1.7a.1), APEX
+    has 0 known test failures.
+  - **G-T1.8.2 opened (deferred):** cascade subprocess `DATABASE_URL`
+    isolation — addresses architectural root cause. Sprint 12+ candidate.
+  - **Patterns reinforced:** UUID-based test isolation prevents shared-
+    state flakes in any future tests using common DB tables (Tenant,
+    Entity, JournalEntrySequence, etc.).
+  - **Sprint 11 progress: 2/N priorities** (next options: G-T1.7b.6
+    / UX track / G-DEV-1.1).
 - [x] **G-T1.7a.1** ai/ DB-integration tests — **DONE** 2026-05-02 🎯 **CASCADE 23/23 MILESTONE**
   - Branch: `sprint-11/g-t1-7a-1-ai-db-integration`
   - **35 test functions / 39 collected pytest cases** across 3 NEW files
