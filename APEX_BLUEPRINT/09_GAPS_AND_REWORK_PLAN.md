@@ -14,6 +14,20 @@
 | 🟡 P2 | Important — fix this quarter | مهم — يصلح هذا الربع |
 | 🟢 P3 | Polish — when we have time | تجميل — عند توفر الوقت |
 
+### Cross-cutting status markers
+
+- ✅ DONE — work shipped, gap closed.
+- ⏸ Deferred — sprint-bumped, no commitment to a specific later sprint.
+- ⏭ Carried — committed to the next sprint (lighter than LOCKED-IN).
+- 🔴 **LOCKED-IN** — Cannot be deferred. Bound to a specific sprint with
+  explicit business commitment. Any PR conflicting with the lock must
+  be rejected at review. Reserved for gaps where:
+  (a) a workaround is in production, AND
+  (b) the workaround has real consequences (functional / security / scale), AND
+  (c) deferring further would compound technical debt.
+  Listed individually in their natural section + indexed in
+  § 12 G-PROC-4 "Locked-In Priorities" registry.
+
 ---
 
 ## 2. Architectural Gaps / ثغرات معمارية
@@ -224,24 +238,99 @@
   G-A3.1 created to address full alembic catch-up.
 - **Sprint:** 7 (current — partial); continued in 8 (G-A3.1)
 
-### 🟠 G-A3.1. Alembic catch-up migration — production-safe
-- **Issue:** Alembic covers only 25/198 tables (12%). Cannot replace `create_all` until
-  alembic schema matches ORM schema.
+### 🔴 G-A3.1. Alembic catch-up migration — **LOCKED-IN — Sprint 12 Priority #1 (Mandatory)**
+- **Status:** 🔴 LOCKED-IN. Cannot be deferred to Sprint 13+ without
+  explicit business approval. See § 12 G-PROC-4 for the discipline pattern.
+- **Issue (original):** Alembic covers only 25/198 tables (12%). Cannot
+  replace `create_all` until alembic schema matches ORM schema.
 - **Risk:** HIGH — touches production schema management.
-- **Plan (multi-step, requires DBA review):**
-  1. **Audit** existing 7 migrations to understand original intent (KB-only baseline?
-     incremental HR/AP/infra additions?).
-  2. **Decision A — squash + restamp:** consolidate the 7 into a single comprehensive
-     baseline + `alembic stamp head` on production.
+
+#### Sprint 11 incident summary (2026-05-02)
+
+Production deploys had been failing for **12+ Sprint 8-11 PRs** (PRs
+#121-#132 era). Symptom: `apex-api` Render deploys hung or failed
+during startup with `DuplicateTable: relation "hr_employees" already
+exists` after `Base.metadata.create_all()` ran successfully — alembic
+then tried to run its own `CREATE TABLE hr_employees` from a tracked
+migration. Two systems racing for schema management, both winning,
+neither yielding.
+
+#### Workaround applied 2026-05-02
+
+`RUN_MIGRATIONS_ON_STARTUP=false` set in Render `apex-api` Environment
+variables. `app/core/db_migrations.py` honors this flag and skips
+`alembic upgrade head` at startup. System falls back entirely to
+`Base.metadata.create_all()` (the production pattern in continuous use
+since Sprint 2-7 — no functional regression).
+
+##### Workaround consequences (honest accounting)
+
+- ✅ All Sprint 8-11 deploys now succeed.
+- ✅ Production runs all 198 tables via `create_all()`.
+- ❌ **Cannot run any new alembic migrations** — they would hit the same
+  conflict against the create_all schema.
+- ❌ **Schema changes blocked** until G-A3.1 ships. New SQLAlchemy models
+  in code work (create_all picks them up) but cannot be expressed as
+  alembic migrations.
+- ❌ **Alembic state permanently inconsistent** with actual production
+  schema (alembic thinks 25 tables exist; create_all built 198).
+  Reconciling this is the entire scope of G-A3.1.
+
+#### Root fix scope (G-A3.1, Sprint 12)
+
+1. **Snapshot** current production schema (198 tables) via
+   `pg_dump --schema-only` against a production read replica.
+2. **Compare** with alembic migrations (25 tracked, 173 missing). Generate
+   diff report.
+3. **Decision (DBA-reviewed):**
+   - **Decision A — squash + restamp:** consolidate the 7 existing
+     migrations into a single comprehensive baseline matching production +
+     `alembic stamp head` on production.
      OR
-     **Decision B — incremental catch-up:** generate migration #8 covering all 173
-     missing tables, run on populated production DB only after careful review of
-     `op.create_table(... if_not_exists=True)` semantics.
-  3. **Test exhaustively** on production-clone DB before cutover.
-  4. **Cutover:** maintenance window → stamp head → switch lifespan to `alembic upgrade head`.
-- **Pre-requisite:** DBA review + production DB snapshot + rollback plan
-- **Estimate:** 1-2 weeks (NOT a Sprint 7 task)
-- **Sprint:** 8 (with allocated DBA review time)
+   - **Decision B — incremental catch-up:** generate migration #8
+     covering all 173 missing tables; run on populated production DB
+     after careful review of `op.create_table(... if_not_exists=True)`
+     semantics.
+4. **Test exhaustively** in staging with a clone of production schema +
+   data sample.
+5. **Production cutover** (maintenance window): backup + apply +
+   `alembic stamp head` + verify.
+6. **Re-enable** `RUN_MIGRATIONS_ON_STARTUP=true` in Render env.
+7. **Validate** by adding a trivial follow-up migration (e.g., a CHECK
+   constraint) and confirming it applies cleanly on next deploy.
+
+#### Sprint 12 commitment
+
+- **Week 1 — Phase 1:** investigation + schema diff + DBA review + decision
+  between A and B.
+- **Week 2 — Phase 2:** implementation + staging verification + production
+  cutover + re-enable migrations.
+- **Cannot be deferred to Sprint 13+** without explicit business approval.
+- **Pre-requisite:** DBA consultation, staging environment, schema diff
+  tooling, production DB snapshot + rollback plan.
+
+#### Constraints until G-A3.1 ships (PR review checklist)
+
+- ❌ **Reject any PR adding alembic migrations** — they will fail to apply
+  in production.
+- ❌ **Reject any PR introducing new SQLAlchemy models** unless paired
+  with a G-A3.1 readiness review (model goes into create_all today,
+  must be representable in the catch-up migration).
+- ❌ **Reject any PR that re-enables** `RUN_MIGRATIONS_ON_STARTUP=true`
+  in production env until Phase 2 cutover.
+- ✅ Schema-touching changes must wait or be explicitly carried into
+  G-A3.1's PR.
+
+#### Cross-references
+
+- § 12 G-PROC-4 — workaround discipline pattern + Locked-In registry.
+- `CLAUDE.md` "Migration management" subsection.
+- `LOCAL_DEV_RUNBOOK.md` § 4 "DuplicateTable error" troubleshooting.
+- `app/core/db_migrations.py` source (the env-var honoring code).
+- `app/main.py` `_run_startup()` lifespan ordering.
+
+- **Estimate:** 1-2 weeks
+- **Sprint:** 12 (LOCKED-IN — Priority #1).
 
 ### 🟠 G-A4. Endpoint naming inconsistency
 - **Files:** All `app/phaseN/routes/*.py`
@@ -2093,6 +2182,58 @@
   of regressions, CODEOWNERS may be overhead without gain.
 - **Sprint:** 10.
 
+### ✅ G-PROC-4. Workaround discipline + Locked-In Priorities registry — DONE 2026-05-02
+- **Branch:** `sprint-11/g-proc-4-locked-priorities`
+- **Trigger:** 2026-05-02 production incident — `apex-api` deploys had
+  been failing for 12+ Sprint 8-11 PRs due to alembic DuplicateTable
+  conflict against `Base.metadata.create_all()`. Workaround
+  `RUN_MIGRATIONS_ON_STARTUP=false` applied to unblock the deploy
+  pipeline. The user raised a meta-question:
+  *"should we always root-fix? what's the discipline for accepting
+  workarounds?"*
+- **Decision:** hybrid pattern formalized.
+- **Pattern rule:**
+  - ✅ **Workaround acceptable IF** all three hold:
+    1. A root-fix gap exists with a deadline.
+    2. The gap is marked 🔴 LOCKED-IN.
+    3. Workaround consequences are documented honestly (functional
+       limits, security implications, scale ceiling, etc.).
+  - ❌ **Workaround unacceptable IF** any of:
+    - No committed root-fix gap.
+    - No deadline (vague "we'll get to it").
+    - Consequences hidden or softened ("temporary" without a date).
+- **Locked-In Priorities registry:**
+  | Gap | Status | Sprint | Workaround in production |
+  |---|---|---|---|
+  | **G-A3.1** | 🔴 LOCKED-IN — Priority #1 | Sprint 12 | `RUN_MIGRATIONS_ON_STARTUP=false` (Render env) |
+  - (Future locked-in gaps added here as they're identified.)
+- **Severity marker added** to § 1 Legend: 🔴 LOCKED-IN. The marker is
+  reserved for this specific class of gap — workaround-in-prod with a
+  deadline-bound root fix.
+- **Effects of this PR:**
+  - § 1 Severity Legend gains the 🔴 LOCKED-IN marker.
+  - § 2 G-A3.1 elevated from 🟠 deferred to 🔴 LOCKED-IN with full
+    Sprint 11 incident context, workaround consequences, Sprint 12
+    commitment, and PR-review constraints until ship.
+  - `CLAUDE.md` "Migration management" subsection rewrites the
+    pre-existing Alembic warning to reflect post-Sprint-11 reality.
+  - `LOCAL_DEV_RUNBOOK.md` § 4 adds a "DuplicateTable error"
+    troubleshooting entry pointing local devs at the same env var.
+  - **Cleanup:** § 16 numbering collision (introduced by my G-UX-1 PR
+    when "UX Completion Gaps" was added without checking that § 16
+    was already "Suggested Sprint Plan") fixed by renaming UX
+    Completion Gaps → § 19.
+- **Risk if discipline lapses:** workarounds accumulate without
+  root-fix, technical debt compounds, and the "we'll fix it later"
+  graveyard becomes the default mode. The G-T1.7 calibration story
+  (Sprint 8 floor recalibration after Sprint 7 surface expansion)
+  is an adjacent example of the same failure mode caught in time.
+- **Cross-references:**
+  - § 2 G-A3.1 (the locked-in commitment).
+  - `CLAUDE.md` "Migration management" subsection.
+  - `LOCAL_DEV_RUNBOOK.md` § 4 "DuplicateTable error" entry.
+- **Sprint:** 11.
+
 ---
 
 ## 13. Deployment & DevOps Gaps
@@ -2248,7 +2389,12 @@ quadrantChart
 
 ---
 
-## 16. UX Completion Gaps / ثغرات إكمال تجربة المستخدم
+## 19. UX Completion Gaps / ثغرات إكمال تجربة المستخدم
+
+> Renumbered from § 16 (collision with the original "Suggested Sprint
+> Plan" at § 16) by G-PROC-4, Sprint 11. The G-UX-1 PR that introduced
+> this section did not check existing section numbering — fixed here
+> rather than letting the duplicate persist.
 
 The UX Completion track captures gaps where existing functionality
 works at the API/data layer but the user-facing flow has dead-ends,

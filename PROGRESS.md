@@ -2,6 +2,49 @@
 
 ## Sprint 11 — Coverage Closure + UX Track (Q2 2026, week 4) — IN PROGRESS
 
+- [x] **G-PROC-4** Workaround discipline + Locked-In Priorities registry — **DONE** 2026-05-02
+  - Branch: `sprint-11/g-proc-4-locked-priorities`
+  - **Trigger:** 2026-05-02 production incident — `apex-api` deploys
+    failed for 12+ Sprint 8-11 PRs due to alembic DuplicateTable.
+    Workaround `RUN_MIGRATIONS_ON_STARTUP=false` applied to unblock.
+    User raised the meta-question of how to discipline workaround vs
+    root-fix.
+  - **Decision:** hybrid pattern formalized.
+    - ✅ Workaround acceptable IFF: root-fix gap exists with deadline,
+      gap is 🔴 LOCKED-IN, consequences documented honestly.
+    - ❌ Workaround unacceptable if no committed root-fix or no deadline.
+  - **🔴 LOCKED-IN severity marker** added to 09 § 1 Severity Legend.
+  - **G-A3.1 elevated:** 🟠 deferred → 🔴 LOCKED-IN Sprint 12 Priority #1
+    (Mandatory). Cannot be deferred to Sprint 13+ without explicit
+    business approval.
+  - **CLAUDE.md** "Migration management" subsection rewritten to reflect
+    post-Sprint-11 reality (env var workaround, schema-change moratorium).
+  - **LOCAL_DEV_RUNBOOK.md** § 4 gains "DuplicateTable error" entry
+    documenting the env var for local dev.
+  - **Cleanup:** § 16 numbering collision (introduced by G-UX-1)
+    fixed — UX Completion Gaps moved to § 19.
+  - **Sprint 11 progress: 6/N priorities** — Sprint 11 closed cleanly.
+
+### Sprint 12 plan (LOCKED)
+
+Sprint 12 begins with **G-A3.1 (Alembic catch-up migration)** as
+🔴 **LOCKED-IN Priority #1 (Mandatory)**. The sprint cannot start with
+any other gap until Phase 1 of G-A3.1 is in flight.
+
+- **Week 1 — G-A3.1 Phase 1:** investigation + schema diff against
+  production replica + DBA review + decision between squash-and-restamp
+  vs incremental-catch-up.
+- **Week 2 — G-A3.1 Phase 2:** implementation + staging verification +
+  production cutover (maintenance window) + re-enable
+  `RUN_MIGRATIONS_ON_STARTUP=true`.
+- **Cannot defer to Sprint 13+** without explicit business approval.
+
+PR review constraints active until G-A3.1 Phase 2 ships:
+- ❌ Reject PRs adding alembic migrations.
+- ❌ Reject PRs with new SQLAlchemy models unless paired with a
+  G-A3.1 readiness review.
+- ❌ Reject PRs that re-enable `RUN_MIGRATIONS_ON_STARTUP=true` in prod.
+
 - [x] **G-UX-1.1** Onboarding wizard auto-select entity post-completion — **DONE** 2026-05-02
   - Branch: `sprint-11/g-ux-1-1-wizard-auto-select-entity`
   - **Source-fix complement to G-UX-1's symptom-fix.** Closes the latent

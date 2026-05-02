@@ -85,12 +85,24 @@
 - Phase model `init_db()` functions are called at startup via lifespan -- if one fails, others still run
 - Social auth (Google/Apple) tokens **are** validated. `app/core/social_auth_verify.py` (Wave 1 PR#2/PR#3) verifies Google id_tokens via `google-auth.verify_oauth2_token()` against Google's JWKs, and Apple identity_tokens via `PyJWT` + `PyJWKClient` against `https://appleid.apple.com/auth/keys` (audience + issuer + signature checks). Production needs `GOOGLE_OAUTH_CLIENT_ID` + `APPLE_CLIENT_ID` env vars; dev mode allows a logged dev-bypass when they're unset so integration tests stay green. Coverage in `tests/test_social_auth.py` + `tests/test_social_auth_verify.py` (26 cases).
 - SMS verification uses pluggable backends in `app/core/sms_backend.py`: Unifonic (Saudi +966), Twilio (international), Console (dev/test). OTP storage in `app/core/otp_store.py` with TTL=5min + attempt limit=5 + hash-at-rest. Backend selected via `SMS_BACKEND` env var (default `console` — logs only, never sends). Coverage: `tests/test_sms_otp.py` (10 cases passing).
-- Alembic configured with 7 migrations covering **25 of 198 distinct tables**
-  (knowledge_brain 14, HR/AP 6, infra 4, ai_usage_log 1; the remaining 3 migrations
-  add RLS policies / constraints / dimensions only). Full schema is currently
-  managed by `Base.metadata.create_all()` in `app/main.py` `_run_startup()`. Catch-up
-  tracked as G-A3.1 (Sprint 8, DBA-reviewed). **Do NOT replace `create_all()` with
-  `alembic upgrade head` until G-A3.1 ships** — would deploy production with **173
-  missing tables** (`clients`, `analysis_*`, `audit_*`, `archive_*`, `bank_feed_*`,
-  and most of the post-Phase-2 schema). Earlier figures in this file said
-  "108 tables / 83 uncovered"; both were stale and were corrected by G-DOCS-1.
+- **Migration management (post-Sprint 11):**
+  - Production runs schema management via `Base.metadata.create_all()`
+    in `app/main.py` `_run_startup()`. Alembic migrations are present
+    (covering 25 of 198 tables) but **disabled at startup**.
+  - **Render production env:** `RUN_MIGRATIONS_ON_STARTUP=false`
+    (workaround applied 2026-05-02 after 12+ Sprint 8-11 deploy failures
+    with alembic `DuplicateTable: relation "hr_employees" already exists`
+    — alembic and `create_all()` both racing to manage schema).
+  - **Schema changes via alembic BLOCKED** until G-A3.1 ships (Sprint 12
+    🔴 LOCKED-IN priority #1). Any new SQLAlchemy model addition requires
+    G-A3.1 readiness review. Reject PRs that introduce new alembic
+    migrations or that re-enable `RUN_MIGRATIONS_ON_STARTUP=true` in prod.
+  - **Local dev:** default behavior is `create_all()` only (env var unset);
+    to test alembic locally set `RUN_MIGRATIONS_ON_STARTUP=true`.
+  - See `APEX_BLUEPRINT/09 § 2 G-A3.1` (locked-in priority + Sprint 11
+    incident summary + Sprint 12 commitment) and `§ 12 G-PROC-4`
+    (workaround discipline pattern).
+  - The 173 currently-untracked tables (`clients`, `analysis_*`,
+    `audit_*`, `archive_*`, `bank_feed_*`, and most of post-Phase-2
+    schema) work correctly today via `create_all()`. The risk lives
+    in *future* schema changes, not in the current production state.
