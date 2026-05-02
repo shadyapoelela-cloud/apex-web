@@ -239,8 +239,18 @@
 - **Sprint:** 7 (current — partial); continued in 8 (G-A3.1)
 
 ### 🔴 G-A3.1. Alembic catch-up migration — **LOCKED-IN — Sprint 12 Priority #1 (Mandatory)**
-- **Status:** 🔴 LOCKED-IN. Cannot be deferred to Sprint 13+ without
-  explicit business approval. See § 12 G-PROC-4 for the discipline pattern.
+- **Status:** 🔴 LOCKED-IN. Phase 1 (investigation) **DONE 2026-05-02**.
+  Phase 2 (implementation) pending strategy approval. Cannot be deferred
+  to Sprint 13+ without explicit business approval. See § 12 G-PROC-4
+  for the discipline pattern.
+- **Phase 1 deliverable:** `APEX_BLUEPRINT/G-A3-1-investigation.md`
+  (full schema diff + 4-strategy analysis + recommended A+ + Phase 2
+  plan + risk + rollback). **Recommended strategy: Sub-A+** (`alembic
+  stamp head` + fix `env.py:_MODEL_MODULES`). Strategy B (full
+  autogenerate catch-up) was empirically proven dangerous — autogenerate
+  proposes 104 `op.drop_table` against real production tables
+  (`pilot_*`, `knowledge_*`, `copilot_*`) due to incomplete `env.py`
+  module list.
 - **Issue (original):** Alembic covers only 25/198 tables (12%). Cannot
   replace `create_all` until alembic schema matches ORM schema.
 - **Risk:** HIGH — touches production schema management.
