@@ -1107,18 +1107,22 @@
      (23.7% → 97%). **111 test functions / 133 collected pytest cases**
      across 4 new files. Aggregate `core/` 76.71% → **79.45%** (+2.74pp,
      stretch target hit). Phase 2 of 5 closes.
-  3. Phase 3 candidates: `email_inbox.py` (113 missing), `api_keys.py`
-     (113 missing), `notification_digest.py` (75 missing) — likely the
-     api_keys + email_inbox cluster as G-T1.7b.3.
-  4. Pre-existing files that bulked up: `storage_service.py` (100 missing),
-     `industry_pack_provisioner.py` (50), `slack/teams_backend.py` (67 combined).
+  3. ✅ **G-T1.7b.3 — api_keys + email_inbox + notification_digest cluster**
+     (DONE 2026-05-02): `notification_digest.py` (16.7% → 100%),
+     `email_inbox.py` (16.3% → 97%), `api_keys.py` (31.9% → 100%).
+     **83 test functions** across 3 new files. Aggregate `core/`
+     79.45% → **81.34%** (+1.89pp, stretch beaten). Phase 3 of 5 closes.
+  4. Phase 4-5 candidates: `storage_service.py` (100 missing),
+     `industry_pack_provisioner.py` (50), `slack/teams_backend.py`
+     (67 combined), and remaining diffuse files.
 - **Goal:** raise `DIRECTORY_FLOORS["core"]` 74.0 → 85.0 incrementally
-  as PRs land. Multi-PR effort. After Phase 1+2: 79.45% / 5.55pp from
+  as PRs land. Multi-PR effort. After Phases 1+2+3: 81.34% / 3.66pp from
   original 85% target.
 - **Estimate:** **1-3 weeks** (multi-PR), 175-350 unit tests total.
   Phase 1 burned 56 tests for +1.04pp; Phase 2 burned 111 tests for
-  +2.74pp; remaining ~5.5pp needs Phases 3-5.
-- **Status:** 🟡 Phases 1+2 done; Phases 3-5 pending (Sprint 10+).
+  +2.74pp; Phase 3 burned 83 tests for +1.89pp; remaining ~3.7pp needs
+  Phases 4-5.
+- **Status:** 🟡 Phases 1+2+3 done; Phases 4-5 pending (Sprint 10+).
 - **Sprint:** 9-10+.
 
 ### ✅ G-T1.7b.1. Zero-coverage files coverage push (Sprint 9 final) — DONE 2026-05-01
@@ -1208,12 +1212,62 @@
   24 cases. Coverage gain (+2.74pp) beat the +2.35pp commitment.
 - **Sprint:** 10.
 
-### ⏭ G-T1.7b.3. api_keys + email_inbox cluster (next) — Phase 3
-- **Scope:** Phase 3 of G-T1.7b. Cover the next-largest untested
-  surface: `api_keys.py` (113 missing), `email_inbox.py` (113 missing),
-  `notification_digest.py` (75 missing). Combined ~301 missing stmts;
-  expected aggregate gain +1.5-1.8pp on `core/`.
-- **Estimate:** ~40-60 tests, target each file ≥85%.
+### ✅ G-T1.7b.3. api_keys + email_inbox + notification_digest cluster — DONE 2026-05-02
+- **Branch:** `sprint-10/g-t1-7b-3-api-keys-email-inbox-cluster`
+- **Scope:** Phase 3 of 5 sub-PRs for G-T1.7b. Cover the next-largest
+  untested surface in `app/core/`: api_keys (HMAC + JSON persistence),
+  email_inbox (IMAP listener), notification_digest (DB-backed digest aggregator).
+- **83 test functions** across 3 new files (split per source module):
+  - `tests/test_notification_digest.py` — 19 fn, **100%** (90/90 stmts).
+    DB-backed digest aggregator covered via `SessionLocal` MagicMock-chain
+    pattern from G-T1.7b.2 cashflow_forecast. `email_service.send_email`
+    stubbed via `sys.modules` (G-T1.7b.1 Stripe pattern).
+  - `tests/test_email_inbox.py` — 25 fn, **97.04%** (131/135 stmts).
+    IMAP poll covered via `imaplib.IMAP4_SSL` / `IMAP4` MagicMock with
+    `(status, [(metadata, raw_bytes)])` fetch payloads. Real
+    `email.message.EmailMessage` fixtures for the `email.message_from_bytes`
+    parse path. `tmp_path` for attachment writes; `emit` monkeypatched
+    to capture event-bus dispatches. Missing 4 stmts: `_decode_field`
+    decoder-failure path (line 95-96), empty-payload skip (112), and
+    `imap.close` finally-block exception handler (267) — all defensive
+    branches with low test value.
+  - `tests/test_api_keys.py` — 39 fn, **100%** (166/166 stmts). Pure
+    stdlib crypto (HMAC + SHA-256) + JSON file persistence. `_PATH`
+    redirected to `tmp_path / "api_keys.json"`; `_STORE` reset between
+    tests. Every `verify_key` reason branch covered: not_found (no apex_
+    prefix / wrong hash), revoked, disabled, expired, malformed expires_at
+    fallback, ip_not_allowed, ok-with-audit-bump.
+- **Aggregate `core/` coverage:** 79.45% → **81.34%** (+1.89pp).
+  **Stretch beaten** (commitment was 81.00%, stretch was 81.11%; landed
+  +0.23pp above stretch).
+- **Cascade:** 22/23 maintained (ai-80.0 FAIL deliberate, deferred to G-T1.7a.1).
+- **Full suite:** 2110 passed, 2 pre-existing failures (ai-80.0, G-T1.8 flake).
+  0 new regressions. +83 collected tests vs G-T1.7b.2 baseline.
+- **Verify-first findings:**
+  1. Per-file baselines extracted from `coverage.json` matched user's
+     projections within 0.01pp (api_keys 31.9%, email_inbox 16.3%,
+     notification_digest 16.7%).
+  2. `--cov=app.core.X` (module-style) honored throughout.
+  3. **IMAP mocking finished well under the 2h budget** — defer-to-7b.5
+     hatch was unused. Real stdlib `email.message.EmailMessage` for
+     fixtures kept the parser path realistic; only IMAP4 connection
+     itself needed mocking.
+  4. **One verify-first save during email_inbox impl:** initial test
+     assumed `application/zip` would pass the attachment filter
+     (`_INVOICE_MEDIA_PREFIXES = ("application/pdf", "image/")`). Reading
+     the constant carefully showed only `application/pdf` and `image/*`
+     pass. Test assertion fixed; coverage unchanged.
+- **Estimate vs actuals:** estimated 65-80 tests; shipped 83 fn. Per-file
+  function counts: 19, 25, 39 — all ≤40 cap. Total 83 ≤ 100 cap.
+  Coverage gain (+1.89pp) beat the +1.5-1.8pp commitment.
+- **Sprint:** 10.
+
+### ⏭ G-T1.7b.4. storage_service + industry_pack + slack/teams cluster — Phase 4
+- **Scope:** Phase 4 of 5. Cover diffuse remaining-coverage hot spots:
+  `storage_service.py` (100 missing), `industry_pack_provisioner.py`
+  (50 missing), `slack_backend.py` + `teams_backend.py` (67 combined
+  missing). Expected aggregate gain +1.0-1.4pp on `core/`.
+- **Estimate:** ~50-70 tests, target each file ≥85%.
 - **Status:** ⏭ Sprint 10 candidate (multi-PR continues). Awaiting
   approval before start.
 - **Sprint:** 10.
