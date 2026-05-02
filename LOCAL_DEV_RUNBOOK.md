@@ -105,6 +105,44 @@ Almost always one of:
    `flutter run -d chrome --web-port 57305 --dart-define=API_BASE=http://127.0.0.1:8000`
 3. **Backend bound to a different host.** See § 4.4 below.
 
+### Login fails with "CORS preflight error"
+
+**Symptom:** Browser console shows:
+
+```
+Access to fetch at 'http://127.0.0.1:8000/auth/login' has been blocked
+by CORS policy: Response to preflight request doesn't pass access
+control check: The value of the 'Access-Control-Allow-Origin' header
+in the response must not be the wildcard '*' when the request's
+credentials mode is 'include'.
+```
+
+**Cause:** Backend's default CORS allows all origins (`*`), which is
+incompatible with the frontend sending `credentials: 'include'` for
+HttpOnly cookies. The two are mutually exclusive per CORS spec.
+
+**Fix:** `scripts/dev/run-backend.{ps1,sh}` now auto-sets `CORS_ORIGINS`
+to a localhost-allowlist (G-DEV-1.1). If running uvicorn manually, set
+the env var:
+
+```powershell
+# PowerShell
+$env:CORS_ORIGINS = "http://localhost:57305,http://127.0.0.1:57305"
+py -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+```bash
+# Bash
+export CORS_ORIGINS="http://localhost:57305,http://127.0.0.1:57305"
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+**Verify:** uvicorn startup logs should NOT show:
+`WARNING root — CORS allows all origins — set CORS_ORIGINS env var`.
+
+The wrapper script prints `CORS_ORIGINS auto-set for local dev: ...`
+on startup so you can confirm at a glance.
+
 ### "Port already in use" / "address already in use"
 
 The wrapper scripts detect this on Windows and offer to kill the

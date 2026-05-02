@@ -51,6 +51,14 @@ fi
 reload_flag="--reload"
 [ "$NO_RELOAD" = "1" ] && reload_flag=""
 
+# Auto-set CORS_ORIGINS for local dev (G-DEV-1.1).
+# Backend defaults to '*' which is incompatible with credentials:'include'
+# used by the Flutter web client. Setting explicit origins enables CORS.
+if [ -z "${CORS_ORIGINS:-}" ]; then
+    export CORS_ORIGINS="http://localhost:57305,http://127.0.0.1:57305"
+    echo "[run-backend] CORS_ORIGINS auto-set for local dev: $CORS_ORIGINS"
+fi
+
 echo "[run-backend] cwd: $PROJECT_ROOT"
 echo "[run-backend] cmd: $PY -m uvicorn app.main:app --host $BIND_HOST --port $PORT $reload_flag"
 echo "[run-backend] (Ctrl+C to stop)"
