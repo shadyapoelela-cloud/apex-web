@@ -31,12 +31,17 @@ Sprint 12 begins with **G-A3.1 (Alembic catch-up migration)** as
 🔴 **LOCKED-IN Priority #1 (Mandatory)**. The sprint cannot start with
 any other gap until Phase 1 of G-A3.1 is in flight.
 
-- **Week 1 — G-A3.1 Phase 1:** investigation + schema diff against
-  production replica + DBA review + decision between squash-and-restamp
-  vs incremental-catch-up.
-- **Week 2 — G-A3.1 Phase 2:** implementation + staging verification +
-  production cutover (maintenance window) + re-enable
-  `RUN_MIGRATIONS_ON_STARTUP=true`.
+- **Week 1 — G-A3.1 Phase 1:** ✅ DONE 2026-05-02. Investigation report
+  at `APEX_BLUEPRINT/G-A3-1-investigation.md`. Schema diff complete
+  (168 production tables / 11 real alembic coverage / 157 gap),
+  4-strategy analysis, recommended **Sub-A+** (`alembic stamp head` +
+  fix `env.py:_MODEL_MODULES`). Phase 2 timeline scoped to half-day +
+  30-min maintenance window.
+- **Week 2 — G-A3.1 Phase 2:** pending user approval on strategy A+.
+  Implementation: audit `_MODEL_MODULES`, verify autogenerate clean
+  in staging, stamp head in production, re-enable
+  `RUN_MIGRATIONS_ON_STARTUP=true`. Smoke test follow-up migration.
+  Lift schema-change moratorium.
 - **Cannot defer to Sprint 13+** without explicit business approval.
 
 PR review constraints active until G-A3.1 Phase 2 ships:
