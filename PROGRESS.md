@@ -2,6 +2,31 @@
 
 ## Sprint 11 — Coverage Closure + UX Track (Q2 2026, week 4) — IN PROGRESS
 
+- [x] **G-UX-1** JE Builder default entity resolution — **DONE** 2026-05-02 🎨 **UX TRACK FIRST PR**
+  - Branch: `sprint-11/g-ux-1-je-builder-default-entity`
+  - **Trigger:** Cowork session manual test — login → `/je-builder` shows
+    dead-end error *"اختر الكيان من شريط العنوان أولاً"* with no action.
+  - **Fix:** new `EntityResolver` helper +
+    `EntityResolver.ensureEntitySelected()` integration in JE Builder.
+    Smart decision tree handles all 5 states (no-tenant / 0 entities /
+    1 entity auto-select / multi-entity picker / already-set).
+  - **Files:**
+    - `apex_finance/lib/pilot/services/entity_resolver.dart` (NEW, 102 lines)
+    - `apex_finance/lib/pilot/screens/setup/je_builder_live_v52.dart` (+1 import, ~+15 lines)
+  - **Verification:** flutter analyze 306 baseline (0 new); flutter test
+    43 passed (1 pre-existing `ask_panel_test.dart` package:web failure
+    unrelated to PR); pytest 2328 passed (no backend changes).
+  - **Manual visual test:** deferred to user (CLI agent cannot run Flutter
+    web browser session). Detailed test plan in PR description.
+  - **Latent gap discovered & opened:** G-UX-1.1 — onboarding wizard
+    creates entities but doesn't auto-set `PilotSession.entityId`. The
+    G-UX-1 helper masks the symptom via the auto-select-singleton branch;
+    G-UX-1.1 fixes at the source (Sprint 12+, ~3-line wizard change).
+  - **Reusable helper:** `EntityResolver.ensureEntitySelected()` applies
+    to any entity-scoped screen — G-UX-2/3/N will use the same import
+    + 3-line check at the top of their `_load()` methods.
+  - **🎨 UX Completion track active.** First PR in Sprint 11's main thread.
+  - **Sprint 11 progress: 4/N priorities.**
 - [x] **G-DEV-1.1** Local-dev `CORS_ORIGINS` auto-set + runbook entry — **DONE** 2026-05-02
   - Branch: `sprint-11/g-dev-1-1-cors-docs`
   - **Trigger:** First end-to-end Cowork session login failed with CORS
