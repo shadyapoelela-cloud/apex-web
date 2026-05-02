@@ -143,6 +143,38 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 The wrapper script prints `CORS_ORIGINS auto-set for local dev: ...`
 on startup so you can confirm at a glance.
 
+### "DuplicateTable" error on startup / migrations seem skipped
+
+**Symptom:** uvicorn startup logs show
+`DuplicateTable: relation "hr_employees" already exists`,
+OR `Migrations skipped: RUN_MIGRATIONS_ON_STARTUP=false`.
+
+**Cause:** Alembic migrations cover only 25 of 198 production tables.
+Running `alembic upgrade head` on top of `Base.metadata.create_all()`
+fails because the covered tables already exist. Production sets
+`RUN_MIGRATIONS_ON_STARTUP=false` as a workaround (G-PROC-4, Sprint 11)
+until **G-A3.1** catches alembic up to the actual schema (Sprint 12
+🔴 LOCKED-IN priority #1).
+
+**Local dev:** the env var is unset by default — `create_all()` builds
+the schema, alembic stays out of the way. To exercise alembic locally:
+
+```powershell
+# PowerShell
+$env:RUN_MIGRATIONS_ON_STARTUP = "true"; py -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+```bash
+# Bash
+RUN_MIGRATIONS_ON_STARTUP=true python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+**Sprint 12:** G-A3.1 catches alembic up to production schema. After
+that PR ships, `RUN_MIGRATIONS_ON_STARTUP=true` will be the default
+again and alembic becomes the primary schema-management mechanism.
+See `APEX_BLUEPRINT/09 § 2 G-A3.1` for the full locked-in commitment +
+PR-review constraints until ship.
+
 ### "Port already in use" / "address already in use"
 
 The wrapper scripts detect this on Windows and offer to kill the
