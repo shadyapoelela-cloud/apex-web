@@ -238,13 +238,88 @@
   G-A3.1 created to address full alembic catch-up.
 - **Sprint:** 7 (current — partial); continued in 8 (G-A3.1)
 
-### 🔴 G-A3.1. Alembic catch-up migration — **LOCKED-IN — Sprint 12 Priority #1 (Mandatory)**
-- **Status:** 🔴 LOCKED-IN. Phase 1 (investigation) **DONE 2026-05-02**.
-  Phase 2a (env.py expansion) **DONE 2026-05-02**. Phase 2b (production
-  stamp head + re-enable migrations) pending: maintenance window
-  scheduled, `pg_dump` snapshot confirmed, rollback plan documented,
-  explicit approval. Cannot be deferred to Sprint 13+ without explicit
-  business approval. See § 12 G-PROC-4 for the discipline pattern.
+### ✅ G-A3.1. Alembic catch-up migration — **FULLY DONE 2026-05-03**
+- **Status:** ✅ FULLY DONE 2026-05-03. Sprint 12 Priority #1 cleared.
+  Phase 1 (investigation) **DONE 2026-05-02**. Phase 2a (env.py
+  expansion) **DONE 2026-05-02**. Phase 2b (production stamp head +
+  re-enable migrations) **DONE 2026-05-03 02:41 UTC**. Locked-in
+  registry (§ 12 G-PROC-4) now empty.
+
+#### Phase 2b production closure (2026-05-03)
+
+Production stamp + workaround retirement executed by operator on
+2026-05-03 ~02:41 UTC. Render `apex-api` deploy id **`8509646`** is
+LIVE on the post-Phase-2b configuration.
+
+**Production deploy:** `8509646` (Render apex-api, also the git short
+hash of `main` HEAD after PR #136 merge).
+
+**Stamped revision:** `g1e2b4c9f3d8` (alembic chain head, single-head
+verified Step 1 of Phase 2b).
+
+**Render env var change:** `RUN_MIGRATIONS_ON_STARTUP` flipped
+**`false` → `true`**. The pre-Phase-2b workaround (set 2026-05-02 after
+12+ deploy failures) is retired.
+
+**Smoke tests (operator-confirmed, 2026-05-03):**
+- `GET /health` → 200 OK; body reports `database: true`,
+  `all_phases_active: true`.
+- `SELECT version_num FROM alembic_version;` on `apex-db` →
+  `g1e2b4c9f3d8`.
+- `hr_employees` table exists, count query succeeded (the table that
+  caused the 12-deploy-failure cascade pre-workaround).
+- No `DuplicateTable` / `relation "..." already exists` lines in the
+  `8509646` deploy log.
+
+**Execution path divergence from runbook (operator note, recorded for
+honesty):** Phase 2b's pre-flight check A (`psql --version`) failed —
+PostgreSQL CLI was not installed on the operator's Windows machine,
+and two retries against the EnterpriseDB CDN returned **HTTP 403
+Forbidden** in the operator's region. Rather than block the
+maintenance window, the operator executed the equivalent SQL directly
+via `psycopg2` from a local Python 3.14 shell. The exact statements
+run were:
+
+```sql
+CREATE TABLE IF NOT EXISTS alembic_version (
+    version_num VARCHAR(32) NOT NULL,
+    CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
+);
+INSERT INTO alembic_version (version_num) VALUES ('g1e2b4c9f3d8')
+    ON CONFLICT (version_num) DO NOTHING;
+```
+
+This is **functionally identical** to `alembic stamp head`:
+- `CREATE TABLE IF NOT EXISTS alembic_version (...)` matches alembic's
+  internal table definition (single VARCHAR(32) primary key).
+- `INSERT ... ON CONFLICT ... DO NOTHING` matches alembic's
+  idempotent-stamp semantics (alembic's stamp upserts; the
+  `ON CONFLICT DO NOTHING` clause is the SQL-spec equivalent for
+  PostgreSQL).
+- No DDL beyond the version table itself; no DROP / ALTER on any other
+  schema object.
+
+Verification that the manual stamp was equivalent to `alembic stamp
+head`:
+- Post-stamp `SELECT version_num FROM alembic_version;` → `g1e2b4c9f3d8` ✓
+- `8509646` redeploy with `RUN_MIGRATIONS_ON_STARTUP=true` succeeded
+  without any `Running upgrade ... -> g1e2b4c9f3d8` lines (alembic
+  saw the DB at-head and made `upgrade head` a no-op) ✓
+- No `DuplicateTable` errors ✓
+
+**G-A3.1.1 follow-up gap (deferred):** install PostgreSQL CLI on the
+operator's machine OR add `psycopg2`-based fallback scripts to
+`scripts/g-a3-1/` so a future locked-in priority does not need ad-hoc
+SQL composition under maintenance-window pressure. Not blocking — the
+production state is correct — but the next operator should not have
+to reinvent this. Sprint 13+ candidate.
+
+**Pre-Phase-2b workaround now retired** — `CLAUDE.md` "Migration
+management" rewritten in this PR to reflect alembic-authoritative
+production. PR-review constraints active during the moratorium are
+lifted: alembic migrations welcome again, new SQLAlchemy models do
+not require G-A3.1 readiness review, `RUN_MIGRATIONS_ON_STARTUP=true`
+is the default in production.
 - **Phase 1 deliverable:** `APEX_BLUEPRINT/G-A3-1-investigation.md`
   (full schema diff + 4-strategy analysis + recommended A+ + Phase 2
   plan + risk + rollback). **Recommended strategy: Sub-A+** (`alembic
@@ -2265,8 +2340,13 @@ since Sprint 2-7 — no functional regression).
 - **Locked-In Priorities registry:**
   | Gap | Status | Sprint | Workaround in production |
   |---|---|---|---|
-  | **G-A3.1** | 🔴 LOCKED-IN — Priority #1 | Sprint 12 | `RUN_MIGRATIONS_ON_STARTUP=false` (Render env) |
-  - (Future locked-in gaps added here as they're identified.)
+  | ~~G-A3.1~~ | ✅ Resolved 2026-05-03 (Phase 2b shipped, deploy `8509646`) | ~~12~~ | ~~`RUN_MIGRATIONS_ON_STARTUP=false`~~ — retired |
+
+  **Locked-in registry currently empty.** Workaround discipline pattern
+  remains active for any future locked-in gap. The G-A3.1 closure
+  pattern (investigation → env.py expansion → production stamp + flip)
+  is the reference implementation for future schema-state-mismatch
+  classes of problem.
 - **Severity marker added** to § 1 Legend: 🔴 LOCKED-IN. The marker is
   reserved for this specific class of gap — workaround-in-prod with a
   deadline-bound root fix.

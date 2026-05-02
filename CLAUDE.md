@@ -85,24 +85,43 @@
 - Phase model `init_db()` functions are called at startup via lifespan -- if one fails, others still run
 - Social auth (Google/Apple) tokens **are** validated. `app/core/social_auth_verify.py` (Wave 1 PR#2/PR#3) verifies Google id_tokens via `google-auth.verify_oauth2_token()` against Google's JWKs, and Apple identity_tokens via `PyJWT` + `PyJWKClient` against `https://appleid.apple.com/auth/keys` (audience + issuer + signature checks). Production needs `GOOGLE_OAUTH_CLIENT_ID` + `APPLE_CLIENT_ID` env vars; dev mode allows a logged dev-bypass when they're unset so integration tests stay green. Coverage in `tests/test_social_auth.py` + `tests/test_social_auth_verify.py` (26 cases).
 - SMS verification uses pluggable backends in `app/core/sms_backend.py`: Unifonic (Saudi +966), Twilio (international), Console (dev/test). OTP storage in `app/core/otp_store.py` with TTL=5min + attempt limit=5 + hash-at-rest. Backend selected via `SMS_BACKEND` env var (default `console` — logs only, never sends). Coverage: `tests/test_sms_otp.py` (10 cases passing).
-- **Migration management (post-Sprint 11):**
-  - Production runs schema management via `Base.metadata.create_all()`
-    in `app/main.py` `_run_startup()`. Alembic migrations are present
-    (covering 25 of 198 tables) but **disabled at startup**.
-  - **Render production env:** `RUN_MIGRATIONS_ON_STARTUP=false`
-    (workaround applied 2026-05-02 after 12+ Sprint 8-11 deploy failures
-    with alembic `DuplicateTable: relation "hr_employees" already exists`
-    — alembic and `create_all()` both racing to manage schema).
-  - **Schema changes via alembic BLOCKED** until G-A3.1 ships (Sprint 12
-    🔴 LOCKED-IN priority #1). Any new SQLAlchemy model addition requires
-    G-A3.1 readiness review. Reject PRs that introduce new alembic
-    migrations or that re-enable `RUN_MIGRATIONS_ON_STARTUP=true` in prod.
-  - **Local dev:** default behavior is `create_all()` only (env var unset);
-    to test alembic locally set `RUN_MIGRATIONS_ON_STARTUP=true`.
-  - See `APEX_BLUEPRINT/09 § 2 G-A3.1` (locked-in priority + Sprint 11
-    incident summary + Sprint 12 commitment) and `§ 12 G-PROC-4`
-    (workaround discipline pattern).
-  - The 173 currently-untracked tables (`clients`, `analysis_*`,
-    `audit_*`, `archive_*`, `bank_feed_*`, and most of post-Phase-2
-    schema) work correctly today via `create_all()`. The risk lives
-    in *future* schema changes, not in the current production state.
+- **Migration management (post-Sprint 12, G-A3.1 closed 2026-05-03):**
+  - Schema changes are managed via **alembic**. Run
+    `alembic revision --autogenerate -m "..."` to generate a new
+    migration; alembic + `create_all()` coexist on production but
+    **alembic is authoritative**.
+  - **Render production env:** `RUN_MIGRATIONS_ON_STARTUP=true`
+    (default; flipped from `false` on 2026-05-03 after G-A3.1 Phase 2b
+    stamped production at head `g1e2b4c9f3d8`).
+  - **Local dev:** `app/main.py` `_run_startup()` calls
+    `run_migrations_on_startup()` which honors the env var. Default
+    in dev is to skip alembic (no-op without `RUN_MIGRATIONS_ON_STARTUP=true`);
+    set the var to `true` to test migration paths locally.
+  - **Autogenerate is safe:** `alembic/env.py:_MODEL_MODULES` was
+    expanded 20 → 37 entries in Phase 2a (PR #135) so
+    `target_metadata = PhaseBase.metadata` reflects every model
+    registered anywhere in the codebase. The verification gate at
+    Phase 2a merge required ZERO `op.create_table` AND ZERO
+    `op.drop_table` against a fresh `create_all`-built local DB — that
+    bar holds. Future `alembic revision --autogenerate` produces
+    clean diffs; spurious DROPs against `pilot_*` / `knowledge_*` /
+    `copilot_*` are no longer possible.
+  - **Historical context (resolved):** alembic originally covered only
+    25 of 198 tables (12%). The 173 untracked tables (`clients`,
+    `analysis_*`, `audit_*`, `archive_*`, `bank_feed_*`, most of
+    post-Phase-2 schema) worked via `create_all()` but were invisible
+    to alembic autogenerate. G-A3.1's resolution path was
+    "stamp + expand `_MODEL_MODULES`", not a full catch-up migration —
+    the catch-up migration approach was empirically proven dangerous
+    in Phase 1 (104 spurious `op.drop_table` proposed). The historical
+    drift is now closed; alembic sees the same tables `create_all`
+    builds.
+  - **Knowledge Brain runs on a separate database** (`KB_DATABASE_URL`)
+    with its own `Base` (`app.knowledge_brain.models.db_models.Base`).
+    Alembic targets only `PhaseBase.metadata`. KB schema is still
+    managed by `create_all()` against the KB engine — this is by
+    design, not a gap.
+  - See `APEX_BLUEPRINT/09 § 2 G-A3.1` (full closure history with
+    Sprint 11 incident, workaround retirement, and the psycopg2
+    execution divergence) and `§ 12 G-PROC-4` (workaround discipline
+    pattern, registry now empty).
