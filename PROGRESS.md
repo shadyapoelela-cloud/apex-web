@@ -1,7 +1,31 @@
 # APEX Sprint Progress
 
-## Sprint 10 — Coverage Restoration (Q2 2026, week 3) — IN PROGRESS
+## Sprint 10 — Coverage Restoration (Q2 2026, week 3) — COMPLETE
 
+- [x] **G-T1.7b.5** core/ top-up + raise floor 74→80 — **DONE** 2026-05-02 (Phase 5 of 5, Sprint 10 final)
+  - Branch: `sprint-10/g-t1-7b-5-floor-restoration`
+  - **45 test functions / 69 collected pytest cases** across 4 NEW files
+    (split per source module):
+    - `tests/test_notifications_bridge.py` — 7 fn, 43.6% → **100%** (+56.4pp)
+    - `tests/test_workflow_templates.py` — 11 fn / 21 collected, 38.6% → **100%** (+61.4pp)
+    - `tests/test_sms_backend.py` — 20 fn, 35.9% → **100%** (+64.1pp)
+    - `tests/test_email_service.py` — 16 fn / 21 collected, 36.7% → **100%** (+63.3pp)
+  - **Aggregate `core/` coverage:** 82.62% → **83.59%** (+0.97pp).
+    **Beats commitment** (83.5% by +0.09pp).
+  - **Floor raised:** `DIRECTORY_FLOORS["core"]: 74.0 → 80.0` with **3.59pp buffer**.
+  - **Comment block updated** with full G-T1.7b trajectory across 5 sub-PRs.
+  - **core/ trajectory final:** 74.0 (floor recalibrated Sprint 8) →
+    75.67 → 76.71 (G-T1.7b.1) → 79.45 (G-T1.7b.2) → 81.34 (G-T1.7b.3)
+    → 82.62 (G-T1.7b.4) → **83.59 (G-T1.7b.5)**.
+  - **Cascade: 22/23 maintained** — `core-80.0` PASSES with new floor;
+    `ai-80.0` still FAILS (deliberate pre-existing, deferred to G-T1.7a.1).
+  - **Full suite:** 2291 passed; 2 pre-existing failures (ai-80.0, G-T1.8 flake);
+    0 new regressions.
+  - **G-T1.7b parent closed.** 5 sub-PRs across Sprints 9-10. Cumulative
+    378 test functions, +7.92pp aggregate, floor raised 74→80.
+  - **G-T1.7b.6 opened** for future 80→85 restoration (DB-integration cluster,
+    Sprint 12+, gated on G-T1.7a.1 patterns).
+  - **Sprint 10 priority #4 closed → Sprint 10 COMPLETE (4/4 priorities).**
 - [x] **G-T1.7b.4** core/ storage + industry_pack + slack/teams cluster — **DONE** 2026-05-02 (Phase 4 of 5)
   - Branch: `sprint-10/g-t1-7b-4-storage-industry-slack-teams-cluster`
   - **83 test functions / 91 collected pytest cases** across 4 NEW files
@@ -65,11 +89,20 @@
   - **Sprint 10 progress: 1/5 priorities** (G-T1.7b.3-.5 + G-T1.7a.1 + G-T1.8 queued).
 - [ ] **G-T1.7b.3** api_keys + email_inbox cluster (next, awaiting approval)
 
-### Sprint 10 queue
+### Sprint 10 closure summary
 
-- **G-T1.7b.5** — top-up + raise `DIRECTORY_FLOORS["core"]` 74→80+ (Phase 5, closes G-T1.7b, Sprint 10 final)
+- **G-T1.7b parent fully closed** (5 sub-PRs across Sprints 9-10)
+- **core/ trajectory:** 74.0 → 83.59% (+9.59pp on the recalibrated floor; +7.92pp from G-T1.7b.1 entry baseline of 75.67%)
+- **Floor raised:** `DIRECTORY_FLOORS["core"]: 74.0 → 80.0` (locked)
+- **Cumulative tests added:** 378 functions across 16 new test files
+- **Cascade:** 22/23 (only ai-80.0 still failing per G-T1.7a.1 deferral)
+
+### Carried into Sprint 11+
+
 - **G-T1.7a.1** — `app/ai/` DB-integration tests (cascade-23/23 milestone)
+- **G-T1.7b.6** — restore core/ floor 80→85 (DB-integration cluster, Sprint 12+, gated on G-T1.7a.1 patterns)
 - **G-T1.8** — `test_different_fiscal_years_isolated` order-dependent flake fix
+- **Sprint 11 — UX Completion track + remaining gaps (awaits user retrospective)**
 
 ---
 
