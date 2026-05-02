@@ -100,3 +100,9 @@ industry_pack_assignments.json
 tenant_directory.json
 workflow_runs.json
 activity_feed.json
+
+# G-A3.1 Phase 2b — production schema dumps must NEVER be committed.
+# Method A (Render dashboard manual backup) is preferred. Method B
+# fallback (pg_dump) writes here and stays here.
+scripts/g-a3-1/pre-phase-2b-schema.sql
+scripts/g-a3-1/*.sql
