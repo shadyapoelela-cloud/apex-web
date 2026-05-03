@@ -2510,6 +2510,34 @@ since Sprint 2-7 — no functional regression).
   G-T1.10 (~8 LOC YAML, `fetch-depth: 0` on the test job's checkout).
   Lesson: **red ≠ red.** Always read the specific failed step before
   hypothesizing — especially when fixing one layer reveals another.
+- **Verify-First success case #6 (Sprint 14 / Live UX Audit F-002 —
+  CRM module is frontend-only, confirmed via Network panel):** During
+  the 2026-05-04 live UX audit, `/app/erp/crm-marketing/dashboard`
+  rendered a Salesforce-like KPI surface that *looked* like a working
+  CRM dashboard. The audit could have reported "CRM works (em-dash KPIs
+  pending real data)." Instead, Verify-First opened the browser
+  Network panel, clicked the "تحديث" (refresh) button, and observed
+  **zero API calls fire**. Cross-referenced with `35_STATUS_AUDIT_2026-05-03.md`
+  § 11.A which had already documented `app/crm/` as missing. The
+  beautiful frontend was sitting on a non-existent backend. Without
+  the network-panel verification, the audit would have under-reported
+  the depth of the gap (5 modules, not just 1) and the demo-risk
+  would have remained hidden behind plausible-looking KPIs. Lesson:
+  **a beautiful UI is not evidence of a working module — verify with
+  the network panel before reporting "works."**
+- **Verify-First success case #7 (Sprint 14 / Live UX Audit F-015 —
+  Reports route renders Workflows page):** The Pillar 1 launcher tile
+  for "التقارير والذكاء" links to `/app/erp/reports/dashboard`. The
+  audit could have clicked the tile, seen *some* page render, and
+  reported "Reports works" by visual inspection. Instead, Verify-First
+  read the page heading directly and noticed it said *"مسارات
+  الاعتماد"* (Approval Workflows) — not Reports. The route was either
+  unregistered (falling back to a default) or genuinely duplicated to
+  Workflows. Without checking the actual page content against the
+  expected route name, the audit would have missed F-015 entirely and
+  customers would have hit the same wrong-screen issue post-launch.
+  Lesson: **a rendered page is not evidence of the *correct* page —
+  verify the heading + URL together before reporting a route works.**
 - **Sprint:** 11.
 
 ---
@@ -2919,6 +2947,382 @@ same pattern can be applied to sibling screens with one import.
   insufficient coverage.
 - **Estimate:** 1-2 days.
 - **Sprint target:** 14+.
+
+---
+
+## 20. Live UX Audit Findings (Sprint 14)
+
+> Live walkthrough of <https://shadyapoelela-cloud.github.io/apex-web/>
+> via Claude in Chrome on 2026-05-04 (~80 min browser-driven testing).
+> Source docs: `APEX_LIVE_UX_AUDIT_2026-05-04.md` (final, 301 lines)
+> + `APEX_LIVE_UX_AUDIT_2026-05-03.md` (in-progress checkpoint, 218 lines).
+> Coverage: 5/5 pillar launchers + 12/16 Pillar 1 modules + 1/7 Pillar 2
+> (ZATCA only) + ~5 cross-screen flows. Pillars 3-5 sub-modules untested.
+> Method: Verify-First — every finding backed by URL + screenshot +
+> (where applicable) network-panel evidence.
+>
+> **Headline:** Platform looks ~80% complete but is functionally
+> ~20-30% complete. ~5-10 routes return 404 or wrong content; ~80% of
+> `/erp/*` dashboards are mock-data shells; 5 designed modules
+> (CRM/PM/DMS/Helpdesk/BI) are frontend-only. Pilot/JE-Builder is the
+> gold-standard reference (works perfectly with `/pilot/*` API).
+
+### 20.1 Critical findings (Phase A — damage control)
+
+#### 🔴 G-UI-1. Trial Balance route 404
+- **Severity:** 🔴 P0 Blocker
+- **Path:** Left sidebar chart-bars icon (visible on every ERP screen) →
+  `https://shadyapoelela-cloud.github.io/apex-web/#/app/erp/finance/trial-balance`
+  → `"المسار غير موجود"` (Path not found).
+- **Evidence:** F-001 in audit doc (line 27-30 of `APEX_LIVE_UX_AUDIT_2026-05-04.md`).
+- **Fix proposal:** Either (a) wire the existing `FinancialReportsScreen`
+  (which has Trial Balance as tab 0) to this route, or (b) remove the
+  sidebar icon if Trial Balance lives elsewhere. Net: routing-only fix.
+- **Effort:** ~1-3 days.
+- **Owner:** TBD.
+- **Blocking?** No (workaround: navigate to `/erp/finance/statements`).
+- **Sprint target:** 14 — Phase A.
+
+#### 🔴 G-UI-7. Hotel PMS route 404
+- **Severity:** 🔴 P0 Blocker
+- **Path:** `/app/erp/hotel/dashboard` → "المسار غير موجود".
+- **Evidence:** F-017 in audit doc (line 80-82).
+- **Fix proposal:** Either remove the launcher tile (Hotel PMS may be
+  designed-only) or wire to the V5.2 stub `HotelPmsV52Screen` if it
+  exists. Verify-first which path makes sense.
+- **Effort:** ~1 day.
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase A.
+
+#### 🔴 G-UI-2. Audit ALL sidebar/launcher icons for 404
+- **Severity:** 🔴 P0 Blocker
+- **Path:** Every sidebar icon + every Pillar launcher tile.
+- **Evidence:** Audit found 2 confirmed 404s (G-UI-1, G-UI-7); pattern
+  suggests more. Audit doc line 188 ("Likely surfaces more broken
+  routes; should run BEFORE individual fixes").
+- **Fix proposal:** Script-walk every router-defined and v5_wired_screens
+  route, fetch each, record HTTP/route status. Output: list of broken
+  routes for batch fix.
+- **Effort:** ~1 day (the audit, not the fixes).
+- **Owner:** TBD.
+- **Note:** Should run **before** individual route fixes — efficient to
+  fix in one pass.
+- **Sprint target:** 14 — Phase A.
+
+#### 🔴 G-CONTENT-1. Sanitize mock data of real Saudi bank names
+- **Severity:** 🔴 P0 Blocker — brand/legal risk
+- **Path:** `/erp/treasury/dashboard` + `/erp/consolidation/dashboard`.
+- **Evidence:** F-013 in audit doc (line 64-66). String "بنك الراجحي
+  والأهلي" hardcoded in mock UI; implies non-existent partnership with
+  these banks.
+- **Fix proposal:** Replace real bank names with "بنك تجريبي" / "Bank A"
+  / generic placeholders OR add explicit "بيانات تجريبية" badge on
+  every mock dashboard. Consult ops/legal before production demos.
+- **Effort:** ~2 hours.
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase A (do FIRST — fastest win).
+
+#### 🔴 G-CONTENT-2. Audit duplicated mock strings across modules
+- **Severity:** 🔴 P0 Blocker — sloppy demo data
+- **Path:** Cross-module.
+- **Evidence:** F-014 in audit doc (line 68-70). Same template
+  "17 معاملات + من بنك الراجحي والأهلي" appears verbatim in BOTH
+  Treasury and Consolidation dashboards.
+- **Fix proposal:** Grep apex_finance/lib for duplicated mock strings;
+  either differentiate per module or replace with empty-state pattern
+  (see G-UI-3).
+- **Effort:** ~1 day.
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase A.
+
+#### 🔴 G-S9. Verify auth gate on `/app/*` (or document demo mode)
+- **Severity:** 🔴 P0 Blocker — security
+- **Path:** `https://shadyapoelela-cloud.github.io/apex-web/#/login` →
+  silently redirects to `/#/app` without rendering login.
+- **Evidence:** F-003 in audit doc (line 37-41). Backend calls to
+  `/pilot/entities/{id}/*` succeed without visible JWT.
+- **Fix proposal:** Verify whether this is intentional demo mode. If
+  intentional: gate the demo entity to a sandbox tenant + clearly
+  label "demo mode" in UI. If unintentional: add real auth guard at
+  router level (GoRouter redirect) checking `PilotSession.tenantId`.
+- **Effort:** ~4 hours (verification) + variable depending on outcome.
+- **Owner:** TBD.
+- **Note:** This must be answered BEFORE any production launch.
+- **Sprint target:** 14 — Phase A.
+
+#### 🔴 G-DOCS-2. Doc-truth pass on stale numerical claims
+- **Severity:** 🔴 P0 Blocker — documentation hygiene
+- **Path:** `CLAUDE.md` § Testing ("204 automated tests across 8 test
+  files") + `APEX_BLUEPRINT/00_MASTER_INDEX.md` lines 32, 129-138.
+- **Evidence:** Cross-referenced from `35_STATUS_AUDIT_2026-05-03.md`
+  § 12 — actual test count is 2,330 across 134 files (~11× drift);
+  endpoints 213 → 761 (~3.5×); routes 70+ → 303 (~4.3×).
+- **Fix proposal:** ~2-hour edit pass updating 7 stale counts in
+  `00_MASTER_INDEX.md` + `CLAUDE.md` test-count claim. No code touched.
+- **Effort:** ~2 hours.
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase A.
+
+#### 🔴 G-MOD-CRM-1. Decide: build / archive / hybrid CRM module
+- **Severity:** 🔴 P0 Blocker — strategic decision required
+- **Path:** Frontend `/app/erp/crm-marketing/dashboard` exists; backend
+  `app/crm/` does NOT exist.
+- **Evidence:** F-002 in audit doc (line 32-35). Network panel
+  confirmed: clicking "تحديث" triggered ZERO API calls. Status Audit
+  § 11.A confirms `app/crm/` directory absent.
+- **Fix proposal:** Strategic decision required —
+  (a) **Build:** open Sprint 14+ implementation gap; reuse
+      `app/sprint5_analysis` patterns; estimate 4-6 weeks.
+  (b) **Archive:** move `24_CRM_MODULE_DESIGN.md` to
+      `APEX_BLUEPRINT/_archive/` with README; remove frontend tile.
+  (c) **Hybrid:** keep frontend as "preview" with explicit "قيد
+      البناء" badge per F-018 model.
+- **Effort:** ~2 days planning + execution.
+- **Owner:** TBD (operator decision, then engineering owner).
+- **Sprint target:** 14 — Phase B (decision); execution multi-week if (a).
+
+#### 🔴 G-MOD-PM-1. Decide: build / archive / hybrid Project Management
+- **Severity:** 🔴 P0 Blocker
+- **Path:** `25_PROJECT_MANAGEMENT.md` (750 lines designed); no
+  `app/project_mgmt/` directory.
+- **Evidence:** Status Audit § 11.A; pattern same as G-MOD-CRM-1.
+- **Fix proposal:** Same a/b/c as G-MOD-CRM-1.
+- **Effort:** ~2 days planning.
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase B.
+
+#### 🔴 G-MOD-DMS-1. Decide: build / archive / hybrid Document Management
+- **Severity:** 🔴 P0 Blocker
+- **Path:** `26_DOCUMENT_MANAGEMENT_SYSTEM.md` (901 lines); no `app/dms/`.
+- **Evidence:** Status Audit § 11.A.
+- **Fix proposal:** Same a/b/c as G-MOD-CRM-1.
+- **Effort:** ~2 days planning.
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase B.
+
+#### 🔴 G-MOD-HELPDESK-1. Decide: build / archive / hybrid Helpdesk
+- **Severity:** 🔴 P0 Blocker
+- **Path:** `30_HELPDESK_AND_SUPPORT.md` (sampled, full read deferred);
+  no `app/helpdesk/`.
+- **Evidence:** Status Audit § 11.A.
+- **Fix proposal:** Same a/b/c.
+- **Effort:** ~2 days planning.
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase B.
+
+#### 🔴 G-MOD-BI-1. Decide: build / archive / hybrid Business Intelligence
+- **Severity:** 🔴 P0 Blocker
+- **Path:** `28_BUSINESS_INTELLIGENCE.md`; no `app/bi/`.
+- **Evidence:** Status Audit § 11.A. Note: some BI capability may
+  already exist in `app/sprint5_analysis/` — verify before deciding.
+- **Fix proposal:** Same a/b/c, plus pre-step: audit
+  `app/sprint5_analysis/` to see what BI features are already built
+  under a different name.
+- **Effort:** ~2 days planning.
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase B.
+
+### 20.2 Major findings (Phase B/C — strategic + UX consolidation)
+
+#### 🟠 G-UI-3. Replace hardcoded mocks with real-or-empty pattern
+- **Severity:** 🟠 P1 Critical
+- **Path:** 8+ module dashboards across Pillar 1.
+- **Evidence:** F-011 in audit doc (line 43-52). Specific fake numbers:
+  Inventory `12 أصناف، منها 3 حرجة` (×2 cards, identical),
+  Purchasing `8 أوامر شراء، قيمة 245,000 ريال`,
+  Treasury `17 معاملات بنكية + 4.8 مليون رصيد + 320 ألف USD`,
+  Consolidation `17 معاملات بين الشركات` (same 17 as Treasury),
+  ZATCA `5 فواتير زاتكا فشلت + 124,500 ريال + 2 CSID + 94% امتثال`.
+- **Fix proposal:** Replace mocks with one of three patterns:
+  (a) Connect to backend → real data; OR
+  (b) Empty state with explicit "0 معاملات" + CTA to create;  OR
+  (c) "قيد البناء" placeholder per F-018 (Construction module model).
+  **Reference implementation:** `/erp/construction/dashboard` (F-018) +
+  `/erp/finance/je-builder` (F-006 — gold standard).
+- **Effort:** ~2 weeks (across all dashboards).
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase C (after damage control + decisions).
+- **Note:** This is the most-impactful single fix — eliminates the
+  "looks 80% complete, is 20% complete" demo discrepancy.
+
+#### 🟠 G-UI-4. Sales/CRM dashboard distinction (or unify)
+- **Severity:** 🟠 P1 Critical
+- **Path:** `/erp/sales/dashboard` and `/erp/crm-marketing/dashboard`
+  render IDENTICAL 3-card UI.
+- **Evidence:** F-012 in audit doc (line 54-61). Same icons, same
+  labels (`عملاء جُدد هذا الشهر`, `فواتير صدرت اليوم`, `فرص مفتوحة`),
+  same em-dashes.
+- **Fix proposal:** Either differentiate (Sales = invoicing/AR;
+  CRM = pipeline/leads) or unify into a single route with cross-link
+  from the launcher.
+- **Effort:** ~3 days.
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase C.
+
+#### 🟠 G-UX-4. Home dashboard navigation consolidation
+- **Severity:** 🟠 P1 Critical
+- **Path:** Home `/app` shows 3 competing patterns simultaneously:
+  Hero grid (15 cards) + Quick Shortcuts (4) + Service Pillars (5).
+- **Evidence:** F-004 in audit doc (line 88-90). User can reach the
+  same feature 3 ways with 3 different labels.
+- **Fix proposal:** Service Pillars (Alt+1..5) is the canonical pattern
+  (already keyboard-accessible). Demote Hero grid → "Recent" or
+  "Favorites"; demote Quick Shortcuts → optional sidebar widget.
+  Reduces ~24 entry points to ~5 + a contextual section.
+- **Effort:** ~1 week.
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase C.
+
+### 20.3 Minor findings (Phase D — polish)
+
+#### 🟡 G-UI-5. `/erp/reports/dashboard` renders Workflows page
+- **Severity:** 🟡 P2 Important
+- **Path:** `/app/erp/reports/dashboard` → renders Workflows
+  ("مسارات الاعتماد") Kanban — wrong screen entirely.
+- **Evidence:** F-015 in audit doc (line 72-74). Verified by direct URL
+  test (Verify-First: caught BEFORE reporting "Reports works").
+- **Fix proposal:** Either route to a real Reports screen (likely
+  `FinancialReportsScreen` or new dashboard) or remove the launcher tile.
+- **Effort:** ~1 day.
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase D / 15.
+
+#### 🟡 G-UI-6. `/erp/hr/dashboard` renders empty launcher
+- **Severity:** 🟡 P2 Important
+- **Path:** `/app/erp/hr/dashboard` → header "العمليات اليومية - 16
+  تطبيق متخصص" with NO tiles below.
+- **Evidence:** F-016 in audit doc (line 76-78).
+- **Fix proposal:** Wire actual HR-tile content (16 apps already exist
+  per `app/hr/`) OR remove the standalone dashboard route.
+- **Effort:** ~2 days.
+- **Owner:** TBD.
+- **Sprint target:** 14 — Phase D / 15.
+
+#### 🟡 G-UX-5. Label canonicalization (4 phrasings for same feature)
+- **Severity:** 🟡 P2 Important
+- **Path:** Hero "قيد يومية جديد" / Quick "قيود اليومية" / Pillar
+  launcher "المحاسبة المالية" / Inside JE "القيود اليومية" — same
+  feature, four labels.
+- **Evidence:** F-007 in audit doc (line 117-121).
+- **Fix proposal:** Pick one canonical label per feature; create a
+  small constants file `apex_finance/lib/core/labels.dart` for the
+  common ones; refactor call sites.
+- **Effort:** ~3 days.
+- **Owner:** TBD.
+- **Sprint target:** 15+.
+
+#### 🟡 G-UX-6. Notification badges (8, 15, 6) without tooltips
+- **Severity:** 🟡 P2 Important
+- **Path:** Multiple launcher tiles show numeric badges with no
+  explanation when hovered.
+- **Evidence:** F-008 in audit doc (line 123).
+- **Fix proposal:** Add `Tooltip` wrapper on each badge with
+  contextual count description (e.g. "8 invoices pending").
+- **Effort:** ~1 day.
+- **Owner:** TBD.
+- **Sprint target:** 15+.
+
+#### 🟡 G-CONTENT-3. Localize country tax codes in news ticker
+- **Severity:** 🟡 P2 Important
+- **Path:** Home news ticker shows raw codes: FTA_AE, ETA_EG, OTA_OM,
+  ZATCA, SAMA — un-localized to Arabic context.
+- **Evidence:** F-009 in audit doc (line 125).
+- **Fix proposal:** Map raw codes to Arabic labels in the ticker
+  rendering layer.
+- **Effort:** ~1 day.
+- **Owner:** TBD.
+- **Sprint target:** 15+.
+
+### 20.4 Continued audit (next session — explicitly deferred)
+
+> Audit Session 1 covered Pillar 1 deeply, Pillar 2 shallowly (ZATCA
+> only), Pillars 3-5 launcher-only. The following gaps reserve
+> session-2 budget; **do NOT close them as findings until session 2
+> runs**.
+
+#### ⏸ G-AUDIT-2. Sample Pillar 2 sub-modules (6 untested)
+- **Status:** ⏸ Deferred — Session 2 of UX walkthrough.
+- **Coverage so far:** 1/7 (ZATCA only).
+- **Pending:** إقرارات / IFRS / عمالي / AML / حوكمة / قانون.
+- **Estimated session-2 budget:** ~1 hour.
+- **Sprint target:** 14 (audit), 14+ (any findings).
+
+#### ⏸ G-AUDIT-3. Sample Pillar 3 sub-modules (7 untested)
+- **Status:** ⏸ Deferred — Session 2.
+- **Coverage so far:** 0/7.
+- **Pending:** الارتباط / تقييم مخاطر / أوراق عمل / اختبار ضوابط /
+  تحليلات / رأي / جودة.
+- **Estimated session-2 budget:** ~1 hour.
+- **Sprint target:** 14.
+
+#### ⏸ G-AUDIT-4. Sample Pillar 4 sub-modules (8 untested)
+- **Status:** ⏸ Deferred — Session 2.
+- **Coverage so far:** 0/8.
+- **Pending:** حاسبات / IFRS / ائتماني / نسب / AI / رفع وقراءة /
+  نماذج تقييم / دراسات جدوى.
+- **Estimated session-2 budget:** ~1 hour.
+- **Sprint target:** 14.
+
+#### ⏸ G-AUDIT-5. Sample Pillar 5 sub-modules (6 untested)
+- **Status:** ⏸ Deferred — Session 2.
+- **Coverage so far:** 0/6.
+- **Pending:** تصفّح / طلبات / فوترة وضمان / ملف مزوّد / عمليات /
+  تقييمات.
+- **Estimated session-2 budget:** ~45 min.
+- **Sprint target:** 14.
+
+#### ⏸ G-AUDIT-6. Auth + Onboarding + Settings + Knowledge Brain + Copilot
+- **Status:** ⏸ Deferred — Session 2.
+- **Coverage so far:** Auth checked superficially (F-003); rest 0/N.
+- **Pending:** Login flow, signup, OAuth, onboarding wizard, settings
+  panel, profile, subscription, Knowledge Brain, Copilot floating
+  button.
+- **Estimated session-2 budget:** ~1 hour.
+- **Sprint target:** 14.
+
+#### ⏸ G-AUDIT-7. Mobile responsive walkthrough
+- **Status:** ⏸ Deferred — Session 3 (after sessions 1+2 complete).
+- **Coverage so far:** 0%.
+- **Pending:** All ~50 already-tested + untested screens at iPhone +
+  iPad + Android-tablet breakpoints.
+- **Estimated session-3 budget:** ~3 hours.
+- **Sprint target:** 15+.
+
+### 20.5 Positive findings (preserve as references)
+
+These are NOT gaps — they're the **gold standards** the broken
+modules should match.
+
+#### ✅ F-006 reference — JE Builder works perfectly (control sample)
+- **Path:** `/app/erp/finance/je-builder`.
+- **Evidence:** F-006 in audit doc (line 106-112). Empty state shows
+  3 designed CTAs (manual N hotkey, AI document reading, Excel
+  import). Network confirmed real `/pilot/*` API calls succeed.
+  EntityResolver auto-selects entity.
+- **Use as:** **Gold standard** for what every other ERP screen should
+  match when fixing G-UI-3 (mocks → real-or-empty).
+
+#### ✅ F-018 reference — Construction "قيد البناء" honesty model
+- **Path:** `/app/erp/construction/dashboard`.
+- **Evidence:** F-018 in audit doc (line 101-104). Explicit
+  "لوحة المعلومات قيد البناء — سترى KPIs حية قريباً" with
+  "قيد البناء" badge. No fake numbers.
+- **Use as:** **Honesty model** — the placeholder pattern G-UI-3 should
+  adopt for unfinished modules until backend ships. Avoids the
+  "looks 80% done" demo trap.
+
+### 20.6 Cross-references
+
+- **Audit source docs:**
+  - `APEX_LIVE_UX_AUDIT_2026-05-04.md` (final, 301 lines) — primary source.
+  - `APEX_LIVE_UX_AUDIT_2026-05-03.md` (in-progress checkpoint, 218 lines).
+- **Status Audit (related):** `35_STATUS_AUDIT_2026-05-03.md` — already
+  flagged the 5 designed-but-unbuilt modules (CRM/PM/DMS/Helpdesk/BI)
+  in § 11.A; this audit confirms those modules are also frontend-shells.
+- **G-PROC-4 Verify-First Protocol** (§ 12) — gained two new
+  success-case bullets from this audit (F-002 CRM zero-API verification
+  and F-015 Reports-route direct-URL verification).
+- **Severity legend** (§ 1) — used here without modification.
 
 ---
 
