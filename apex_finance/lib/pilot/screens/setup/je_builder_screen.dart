@@ -21,6 +21,7 @@ import '../../../widgets/apex_list_toolbar.dart';
 
 import '../../api/pilot_client.dart';
 import '../../num_utils.dart';
+import '../../services/entity_resolver.dart';
 import '../../session.dart';
 import '../../widgets/attachments_panel.dart';
 
@@ -294,20 +295,24 @@ class _JeBuilderScreenState extends State<JeBuilderScreen> {
   }
 
   Future<void> _load() async {
-    // ignore: avoid_print
-    print('[JeBuilder] _load start — hasTenant=${PilotSession.hasTenant}, hasEntity=${PilotSession.hasEntity}, entityId=${PilotSession.entityId}');
     if (!mounted) return;
     setState(() {
       _loading = true;
       _error = null;
     });
+    // G-UX-2 (Sprint 13): replace dead-end error with smart resolver
+    // (auto-select singleton entity / picker for multi / onboarding for none).
+    // See lib/pilot/services/entity_resolver.dart.
     if (!PilotSession.hasEntity) {
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-        _error = 'يجب اختيار الكيان من شريط العنوان أولاً.';
-      });
-      return;
+      final resolved = await EntityResolver.ensureEntitySelected(context);
+      if (!resolved) {
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+          _error = null;
+        });
+        return;
+      }
     }
     final eid = PilotSession.entityId!;
     try {

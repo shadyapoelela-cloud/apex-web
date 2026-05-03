@@ -24,6 +24,7 @@ import '../../../core/theme.dart' as core_theme;
 import '../../api/pilot_client.dart';
 import '../../export_utils.dart';
 import '../../num_utils.dart';
+import '../../services/entity_resolver.dart';
 import '../../session.dart';
 import '../../widgets/import_dialog.dart';
 
@@ -205,12 +206,19 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
       _loading = true;
       _error = null;
     });
+    // G-UX-2 (Sprint 13): replace dead-end error with smart resolver
+    // (auto-select singleton entity / picker for multi / onboarding for none).
+    // See lib/pilot/services/entity_resolver.dart.
     if (!PilotSession.hasEntity) {
-      setState(() {
-        _loading = false;
-        _error = 'يجب اختيار الكيان من شريط العنوان أولاً.';
-      });
-      return;
+      final resolved = await EntityResolver.ensureEntitySelected(context);
+      if (!resolved) {
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+          _error = null;
+        });
+        return;
+      }
     }
     final eid = PilotSession.entityId!;
     final ar = await _client.listAccounts(eid, includeInactive: _includeInactive);

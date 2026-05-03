@@ -14,6 +14,7 @@ import '../../../core/theme.dart' as core_theme;
 import '../../api/pilot_client.dart';
 import '../../export_utils.dart';
 import '../../num_utils.dart';
+import '../../services/entity_resolver.dart';
 import '../../session.dart';
 
 Color get _gold => core_theme.AC.gold;
@@ -74,20 +75,24 @@ class _FinancialReportsScreenState extends State<FinancialReportsScreen>
   }
 
   Future<void> _load() async {
-    // ignore: avoid_print
-    print('[FinReports] _load start — hasEntity=${PilotSession.hasEntity}, tabIndex=${_tab.index}');
     if (!mounted) return;
     setState(() {
       _loading = true;
       _error = null;
     });
+    // G-UX-2 (Sprint 13): replace dead-end error with smart resolver
+    // (auto-select singleton entity / picker for multi / onboarding for none).
+    // See lib/pilot/services/entity_resolver.dart.
     if (!PilotSession.hasEntity) {
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-        _error = 'يجب اختيار الكيان من شريط العنوان أولاً.';
-      });
-      return;
+      final resolved = await EntityResolver.ensureEntitySelected(context);
+      if (!resolved) {
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+          _error = null;
+        });
+        return;
+      }
     }
     final eid = PilotSession.entityId!;
     try {

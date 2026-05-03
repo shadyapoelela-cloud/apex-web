@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme.dart' as core_theme;
 
 import '../../pilot/api/pilot_client.dart';
+import '../../pilot/services/entity_resolver.dart';
 import '../../pilot/session.dart';
 
 Color get _gold => core_theme.AC.gold;
@@ -49,12 +50,19 @@ class _WarehouseManagementScreenState extends State<WarehouseManagementScreen> {
       _loading = true;
       _error = null;
     });
+    // G-UX-2 (Sprint 13): replace dead-end error with smart resolver
+    // (auto-select singleton entity / picker for multi / onboarding for none).
+    // See lib/pilot/services/entity_resolver.dart.
     if (!PilotSession.hasEntity) {
-      setState(() {
-        _loading = false;
-        _error = 'لم يتم تحديد الكيان. اذهب لإعدادات الشركة أولاً.';
-      });
-      return;
+      final resolved = await EntityResolver.ensureEntitySelected(context);
+      if (!resolved) {
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+          _error = null;
+        });
+        return;
+      }
     }
     try {
       final bR = await _client.listBranches(PilotSession.entityId!);
