@@ -2426,12 +2426,15 @@ since Sprint 2-7 — no functional regression).
   | Gap | Status | Sprint | Workaround in production |
   |---|---|---|---|
   | ~~G-A3.1~~ | ✅ Resolved 2026-05-03 (Phase 2b shipped, deploy `8509646`) | ~~12~~ | ~~`RUN_MIGRATIONS_ON_STARTUP=false`~~ — retired |
+  | **G-S9** | 🔴 **ACTIVE — diagnosed 2026-05-04, patch awaiting operator approval** | 14 (emergency) | None — auth bypass is unconditional; no production workaround active. The "deadline-bound root fix" (router-level `Depends(get_current_user)` on all 11 pilot routers) is the only path. See § 20.1 G-S9 for the full diagnosis + proposed minimal patch. |
 
-  **Locked-in registry currently empty.** Workaround discipline pattern
-  remains active for any future locked-in gap. The G-A3.1 closure
-  pattern (investigation → env.py expansion → production stamp + flip)
-  is the reference implementation for future schema-state-mismatch
-  classes of problem.
+  **Locked-in registry status:** **NOT empty as of 2026-05-04.** G-S9
+  has entered the registry as the second-ever locked-in priority (the
+  first, G-A3.1, was resolved in Sprint 12). Sprint 14 cannot ship any
+  PR that conflicts with the G-S9 patch — and the G-S9 patch itself
+  is the highest-priority PR in the sprint, blocking everything else
+  on `/pilot/*` routes until merged + deployed + JWT_SECRET rotated
+  on `apex-api-ootk.onrender.com`.
 - **Severity marker added** to § 1 Legend: 🔴 LOCKED-IN. The marker is
   reserved for this specific class of gap — workaround-in-prod with a
   deadline-bound root fix.
@@ -3077,20 +3080,119 @@ same pattern can be applied to sibling screens with one import.
 - **Owner:** TBD.
 - **Sprint target:** 14 — Phase A.
 
-#### 🔴 G-S9. Verify auth gate on `/app/*` (or document demo mode)
-- **Severity:** 🔴 P0 Blocker — security
-- **Path:** `https://shadyapoelela-cloud.github.io/apex-web/#/login` →
-  silently redirects to `/#/app` without rendering login.
-- **Evidence:** F-003 in audit doc (line 37-41). Backend calls to
-  `/pilot/entities/{id}/*` succeed without visible JWT.
-- **Fix proposal:** Verify whether this is intentional demo mode. If
-  intentional: gate the demo entity to a sandbox tenant + clearly
-  label "demo mode" in UI. If unintentional: add real auth guard at
-  router level (GoRouter redirect) checking `PilotSession.tenantId`.
-- **Effort:** ~4 hours (verification) + variable depending on outcome.
-- **Owner:** TBD.
-- **Note:** This must be answered BEFORE any production launch.
-- **Sprint target:** 14 — Phase A.
+#### 🔴 **LOCKED-IN** G-S9. Backend auth bypass on `/pilot/*` — diagnosed 2026-05-04
+- **Branch:** `sprint-14/g-s9-auth-gate-investigation` (investigation only — NO fix yet, awaiting operator approval).
+- **Severity:** 🔴 P0 Blocker → **🔴 LOCKED-IN** post-investigation.
+- **Path:** Entire `/pilot/*` API surface (164 endpoints across 11 router files in `app/pilot/routes/`).
+- **Original evidence:** F-003 in `APEX_LIVE_UX_AUDIT_2026-05-04.md`
+  (line 37-41). Backend calls to `/pilot/entities/{id}/*` succeed
+  without visible JWT.
+- **Diagnosis: DIAGNOSIS 3 — auth genuinely bypassed at the backend.**
+  This is NOT intentional demo mode (no `DEMO_MODE` / `AUTH_DISABLED`
+  / `ANONYMOUS_*` flag exists anywhere in the codebase, code-grepped
+  2026-05-04). It is NOT a stale-token misreading by the auditor
+  (the audit's localStorage entity ID `f883d5ba-5429-44a0-a8e6-1d3232efa8a6`
+  does not appear anywhere in `app/` or `apex_finance/`). The `/pilot/*`
+  routes simply have no auth dependency wired — any anonymous caller
+  can read or mutate any entity's data via the public Render service
+  `https://apex-api-ootk.onrender.com`.
+- **Evidence chain (Verify-First, code-only — no production calls made):**
+  1. **Frontend auth IS enforced (UI level only).** `auth_guard.dart`
+     (G-S2, Sprint 11) defines `authGuardRedirect()`:
+     `auth_guard.dart:25-32` — null/empty token → forces `/login`.
+     `router.dart:285-286` wires it as the global GoRouter redirect.
+     Without a token in localStorage the user *cannot reach* `/app/*`
+     in the browser. **But the UI redirect is the only enforcement.**
+  2. **Frontend Bearer token IS attached when present.**
+     `apex_finance/lib/pilot/api/pilot_client.dart:39`:
+     `if (S.token != null) 'Authorization': 'Bearer ${S.token}'`.
+     Conditional — when `S.token` is null, the header is omitted and
+     the request goes anonymous.
+  3. **Backend `/pilot/*` routes have ZERO auth dependencies.**
+     Greps run 2026-05-04:
+     - `grep -rE "Depends\([^)]+\)" app/pilot/routes/ --include="*.py"`
+       → **150 results, all `Depends(get_db)`. Zero auth Depends.**
+     - `grep -rE "extract_user_id|get_current_user|require_auth|Authorization"
+       app/pilot/routes/` → **zero matches.**
+     - `grep -nE "router = APIRouter\(" app/pilot/routes/*.py` → 11
+       routers, none with `dependencies=[...]` argument.
+  4. **Other phases DO enforce auth — pilot is the outlier.**
+     Comparison:
+     - `app/phase1/routes/`: 18 endpoints use `Depends(get_current_user)`.
+     - `app/phase2/routes/`: 25 endpoints use `Depends(get_current_user)`.
+     - `app/pilot/routes/`: **0**. The `get_current_user` dependency
+       (defined in `app/phase1/routes/phase1_routes.py:29`) raises
+       `HTTPException(401, "غير مصرّح — يرجى تسجيل الدخول")` when
+       no token is supplied — but pilot routes never invoke it.
+  5. **No global auth middleware compensates.** `app/main.py` registers
+     three `@app.middleware("http")` layers: `rate_limit_middleware`
+     (1092), `request_logging_middleware` (1142),
+     `security_headers_middleware` (1154). None checks authentication.
+     `TenantContextMiddleware` (`app/core/tenant_context.py`) decodes
+     a JWT *without verifying signature* (line 79:
+     `jwt.decode(token, options={"verify_signature": False})`) for
+     tenant routing only. `TENANT_STRICT` defaults to `false`, so
+     missing tenant_id is allowed — request proceeds with `tenant_id=None`.
+  6. **Production exposure confirmed — pilot routes are mounted in prod.**
+     `app/main.py:1660-1669` mounts all 11 pilot routers
+     (`pilot_router`, `pilot_catalog_router`, `pilot_pricing_router`,
+     `pilot_pos_router`, `pilot_gl_router`, `pilot_compliance_router`,
+     `pilot_purchasing_router`, `pilot_attachment_router`,
+     `pilot_ai_router`, `pilot_customer_router`). `render.yaml`
+     deploys `app/main:app` to `apex-api-ootk.onrender.com` on every
+     `main` push. No deployment-time guard exists.
+- **Risk surface (all `/pilot/*` endpoints):**
+  - **Read:** anonymous GET on `/pilot/entities/{id}/journal-entries`,
+    `/accounts`, `/reports/trial-balance`, `/reports/income-statement`,
+    `/reports/balance-sheet`, `/cash-flow`, `/comparative`,
+    `/posting-counts/{...}`, every catalog/POS/customer/vendor list.
+  - **Write:** anonymous POST/PATCH/DELETE on JE creation/post/reverse,
+    fiscal-period close, COA edits, product create/update, POS
+    transactions, payments, ZATCA submission queue, attachments.
+  - **Cross-tenant:** the URL pattern `/pilot/entities/{entity_id}/...`
+    is path-keyed only; if an attacker learns or guesses any entity
+    UUID they read+write its data. UUID v4 collision is statistically
+    negligible BUT entity IDs are also in URLs the platform itself
+    leaks (e.g., screenshot in this audit).
+- **Has real customer data been exposed?** Unknown from this audit —
+  Rule #3 of the investigation prompt forbids production calls. The
+  operator (Shadi) needs to confirm whether `apex-db` currently
+  contains real customer records or only seed/demo data. The auth
+  bypass is unconditional — *if* prod has been used by real users at
+  any point since pilot routes were mounted, that data has been
+  reachable to anonymous callers throughout the exposure window.
+- **Workaround pattern required (per G-PROC-4):**
+  - **Minimal patch (~30 LOC):** add `dependencies=[Depends(get_current_user)]`
+    to each of the 11 `APIRouter(prefix="/pilot", ...)` declarations
+    in `app/pilot/routes/*.py`, plus an import of `get_current_user`
+    from `app.phase1.routes.phase1_routes`. This is a router-level
+    dependency injection — applies to all 150 endpoints in one shot
+    without per-handler edits. Tests will likely need an `auth_header`
+    fixture in pilot test suites; the existing `auth_header` fixture
+    in `tests/conftest.py:97-109` already provides one — just needs
+    threading through pilot tests (~134 test files; many already use it).
+  - **Verification gate:** confirm no `/pilot/*` endpoint returns 200
+    without a valid JWT (test against local `test.db`).
+  - **Production redeploy** + JWT_SECRET rotation immediately on
+    `apex-api-ootk.onrender.com` (operator action, not in this PR).
+- **Production posture:** REAL DATA EXPOSED at `apex-api-ootk.onrender.com/pilot/*`
+  until patched. Per G-PROC-4 LOCKED-IN policy this enters the
+  registry as a workaround-with-deadline gap. The "workaround" here
+  is unusual — there is no production workaround active; rather,
+  the **deadline-bound root fix** is the only path. Listed in § 12
+  G-PROC-4 registry.
+- **Investigation status:** Step 7 docs update complete. Steps 8 + 9
+  (apply patch, commit, push, redeploy) **HALTED pending operator
+  approval** per the investigation prompt's CRITICAL ESCALATION RULE.
+- **Owner:** Shady (operator decision) → engineering owner TBD.
+- **Sprint target:** 14 — emergency patch (no later than 24h after
+  operator approval).
+- **Cross-references:**
+  - `APEX_LIVE_UX_AUDIT_2026-05-04.md` F-003 (the symptom).
+  - § 12 G-PROC-4 Locked-In Priorities registry — G-S9 row added.
+  - `app/core/auth_utils.py` — canonical `extract_user_id` helper.
+  - `app/phase1/routes/phase1_routes.py:29` — canonical
+    `get_current_user` dependency.
 
 #### ✅ G-DOCS-2. Doc-truth pass on stale numerical claims — DONE 2026-05-04
 - **Branch:** `sprint-14/g-docs-2-doc-truth-pass`
