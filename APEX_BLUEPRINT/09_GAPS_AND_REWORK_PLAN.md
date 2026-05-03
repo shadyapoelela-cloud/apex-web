@@ -2372,6 +2372,14 @@ since Sprint 2-7 — no functional regression).
   - § 2 G-A3.1 (the locked-in commitment).
   - `CLAUDE.md` "Migration management" subsection.
   - `LOCAL_DEV_RUNBOOK.md` § 4 "DuplicateTable error" entry.
+- **Verify-First success case (Sprint 13 / G-UX-2 Commit 6):** Step 2
+  design proposed deleting `je_builder_screen.dart` as dead code
+  based on a grep against `core/router.dart` + `core/v5/v5_routes.dart`.
+  Pre-Commit 6 verify caught that `lib/core/v5/v5_wired_screens.dart:245`
+  actively routes the file for `erp/finance/je-builder`. Plan corrected
+  to refactor (apply `EntityResolver`) instead of delete. Textbook case
+  of Verify-First preventing a live-screen deletion. See § 19 G-UX-2
+  for the full story.
 - **Sprint:** 11.
 
 ---
@@ -2671,6 +2679,116 @@ same pattern can be applied to sibling screens with one import.
   - Companion: G-UX-1 (symptom-fix via `EntityResolver`)
   - Related: G-DEV-1.1 (CORS trap, same Cowork session)
 - **Sprint:** 11.
+
+### ✅ G-UX-2. EntityResolver sweep across remaining entity-scoped screens — DONE 2026-05-03
+- **Branch:** `sprint-13/g-ux-2-entity-resolver-sweep`
+- **Trigger:** G-UX-1's `EntityResolver` was designed for reuse
+  ("any entity-scoped screen"). Six other screens still had the
+  same dead-end gate pattern (`if (!PilotSession.hasEntity) ...
+  _error = 'يجب اختيار الكيان...'`). User flagged the sweep at the
+  start of Sprint 13.
+- **Verify-First findings (vs. user's mental model):**
+  1. ❌ User named Bank Rec / AI Inbox / ZATCA as targets — none
+     of those have the dead-end gate (Bank Rec uses different state
+     pattern, AI Inbox/ZATCA aren't entity-scoped at the gate level).
+     Tracked as G-UX-3 deferred below.
+  2. ❌ `retail_pos_screen.dart` has divergent "graceful skip"
+     semantic (no error, just shows empty state). Different shape
+     from the EntityResolver pattern. Tracked as G-UX-2.1 deferred
+     below.
+  3. ✅ Six screens confirmed in scope: `stock_movements`,
+     `coa_editor`, `financial_reports`, `warehouse_management`,
+     `purchasing`, `je_builder`.
+- **Fix applied:** Same 3-line resolver pattern as G-UX-1's
+  `je_builder_live_v52.dart` applied to all six screens. No new
+  abstractions, no resolver modifications, no backend changes.
+- **Co-located cleanups:**
+  - `financial_reports_screen.dart`: removed leftover `print()`
+    debug statement (was suppressed by `// ignore: avoid_print`).
+  - `je_builder_screen.dart`: same `print()` cleanup.
+  - Defensive runtime guards (e.g., `coa_editor:672`,
+    `je_builder:3849+4987`) intentionally untouched — those are
+    inside action handlers, not the dead-end gate this sweep
+    targets.
+- **Verify-First save (Commit 6):** Step 2 design proposed deleting
+  `je_builder_screen.dart` based on a grep that missed
+  `lib/core/v5/v5_wired_screens.dart:245` (the route registry).
+  Pre-Commit 6 grep caught the routing — file is live, and was
+  refactored instead of deleted. See § 12 G-PROC-4 for the same
+  story as a Verify-First success case.
+- **Files changed (6 commits + docs):**
+  - `apex_finance/lib/pilot/screens/setup/stock_movements_screen.dart`
+  - `apex_finance/lib/pilot/screens/setup/coa_editor_screen.dart`
+  - `apex_finance/lib/pilot/screens/setup/financial_reports_screen.dart`
+  - `apex_finance/lib/screens/v4_erp/warehouse_management_screen.dart`
+  - `apex_finance/lib/pilot/screens/setup/purchasing_screen.dart`
+  - `apex_finance/lib/pilot/screens/setup/je_builder_screen.dart`
+  - `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md`
+- **LOC delta:** ~+80 / -36 across 6 commits.
+- **Verification:**
+  - `flutter analyze`: zero NEW issues on each touched file
+    (per-commit pre-gate). `je_builder_screen.dart`'s 17 pre-existing
+    warnings confirmed identical pre/post via stash-based baseline
+    check.
+  - `flutter test`: deferred to final pre-push gate.
+  - **Manual visual test deferred to user** (CLI agent cannot run
+    Flutter web). Test plan in PR: load each of the 6 screens with
+    no entity, verify resolver behavior matches G-UX-1.
+- **Risk:** low — UI-only, six screens routed through the same
+  helper that already shipped on G-UX-1. Behavior change for users
+  is "no longer get a dead-end" → graceful resolver outcome.
+- **Sprint:** 13.
+
+### 🟠 G-UX-3. EntityResolver coverage for non-gate entity-scoped flows — DEFERRED
+- **Trigger:** G-UX-2 verify-first surfaced that user-named targets
+  (Bank Reconciliation v1/v2/AI, Email/Suggestion/Approval Inboxes,
+  ZATCA CSID/queue screens) are entity-scoped at the data layer
+  but do NOT have the dead-end `PilotSession.hasEntity` gate G-UX-2
+  fixes. They each have different UX patterns for the no-entity
+  state (some show empty lists, some redirect, some throw).
+- **Why deferred:** Each target needs its own UX investigation.
+  Forcing `EntityResolver` into divergent contexts violates the
+  G-UX-1 reuse principle ("works wherever the dead-end-gate pattern
+  lives, doesn't try to be a universal entity-state policeman").
+- **Fix plan:** Per-screen verify-first. May need 2-3 distinct
+  patterns: (a) resolver-equivalent for empty-list UX, (b) explicit
+  redirect-only for inbox flows, (c) leave-alone for screens where
+  the empty state is informationally correct.
+- **Estimate:** 1-2 days per screen (8-12 days total).
+- **Sprint target:** 14+ (after Sprint 13 UX work is verified live).
+
+### 🟡 G-UX-2.1. retail_pos_screen graceful-skip semantic — DEFERRED
+- **Trigger:** G-UX-2 verify-first found that
+  `pilot/screens/setup/retail_pos_screen.dart` has a divergent
+  "graceful skip" pattern: when `!hasEntity`, it shows an empty
+  POS surface rather than an error, and lets the user navigate
+  away. Different shape from the dead-end gate G-UX-2 targets.
+- **Why deferred:** User confirmed in Step 2 decisions to skip
+  this in Sprint 13's umbrella sweep. The graceful-skip pattern
+  may actually be CORRECT for POS (entity-scoped data should
+  load lazily; you don't want to redirect a cashier mid-shift).
+- **Fix plan:** UX review whether to: (a) leave alone (current
+  behavior matches POS use case), (b) add a softer "select entity"
+  call-to-action without redirect, (c) apply EntityResolver to
+  match other setup screens.
+- **Estimate:** 0.5-1 day after UX direction confirmed.
+- **Sprint target:** TBD.
+
+### 🟡 G-UX-2-tests. Per-screen widget tests for EntityResolver flow — DEFERRED
+- **Trigger:** G-UX-2 shipped with no per-screen widget tests for
+  the resolver flow (matches G-UX-1 precedent). User confirmed in
+  Step 2 decisions.
+- **Why deferred:** Existing test infrastructure
+  (`ask_panel_test.dart` has a pre-existing failure unrelated to
+  this work) needs evaluation before adding more flutter widget
+  tests. The resolver itself is plain-Dart logic, easier to test
+  in isolation than per-screen.
+- **Fix plan:** Add `test/services/entity_resolver_test.dart`
+  covering the 5 decision-tree branches. Per-screen integration
+  tests deferred to G-UX-2-tests-phase2 if the unit tests reveal
+  insufficient coverage.
+- **Estimate:** 1-2 days.
+- **Sprint target:** 14+.
 
 ---
 
