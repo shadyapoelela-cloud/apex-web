@@ -59,6 +59,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # G-T1.10 (Sprint 13): full history required so diff-cover can
+          # resolve `origin/main` for the PR-diff coverage gate (step
+          # below). Default fetch-depth=1 left only the PR's head commit
+          # locally; diff-cover failed with "Could not find the branch
+          # to compare to". The lint job's checkout doesn't need this —
+          # Black/Ruff/Bandit/pip-audit operate on the working tree.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:

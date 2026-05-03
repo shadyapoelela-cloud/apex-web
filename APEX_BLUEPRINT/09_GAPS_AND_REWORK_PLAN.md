@@ -1893,6 +1893,57 @@ since Sprint 2-7 — no functional regression).
     is the third).
 - **Sprint:** 13.
 
+### ✅ G-T1.10. PR-diff coverage gate fetch-depth fix — DONE 2026-05-03
+- **Branch:** `sprint-13/g-t1-10-pr-diff-fetch-depth`
+- **Trigger:** After G-T1.8.2 closed (PR #140, merged 2026-05-03), CI on
+  `main` went green for the first time since 2026-05-02 — but the PR
+  build for #140 itself still showed red. Reading the actual job log
+  revealed the failure was at step "PR-diff coverage gate" (not test
+  execution) with:
+  ```
+  ValueError:
+  Could not find the branch to compare to. Does 'origin/main' exist?
+  the `--compare-branch` argument allows you to set a different branch.
+  Error: Process completed with exit code 1
+  ```
+- **Root cause:** `actions/checkout@v4` defaults to `fetch-depth: 1`
+  — only the PR's head commit, no other refs. `diff-cover` (line
+  103-106 of `.github/workflows/ci.yml`) needs `origin/main` to compute
+  the diff. Without history, the ref doesn't exist locally.
+- **Why this surfaced now (layered failure):** The issue was always
+  present, but masked by the cascade DB pollution (G-T1.8.2) that
+  crashed tests before they reached the PR-diff gate. Once G-T1.8.2
+  fixed test execution, the next layer's failure became visible.
+  This is the same "fix one layer, the next is exposed" pattern as
+  G-A3.1 Phase 2b (Sprint 12).
+- **Why main CI passed:** The PR-diff gate is gated by
+  `if: github.event_name == 'pull_request'` (line 101). On push to
+  `main` the step skips entirely — only PR builds hit it.
+- **Fix (~8 LOC YAML):** Add `with: fetch-depth: 0` to the
+  `actions/checkout@v4` step in the `test` job only. The `lint` job's
+  checkout doesn't need it — Black/Ruff/Bandit/pip-audit operate on
+  the working tree, not git history. `fetch-depth: 0` is the idiomatic
+  GitHub Actions solution for any workflow step that needs git history
+  (compared to alternatives like a separate `git fetch origin main`
+  step, which is more brittle).
+- **Files changed (1 + docs):**
+  - `.github/workflows/ci.yml` (+8 / -0): `with: fetch-depth: 0` on
+    the `test` job's `actions/checkout@v4`, with comment explaining
+    why and noting that the `lint` job intentionally doesn't need it.
+- **Risk:** very low — CI workflow only, no production paths. No
+  existing logic depends on shallow checkout. Cache keys for
+  `setup-python`'s `pip` cache aren't affected by `fetch-depth`.
+  Workflow trigger conditions unchanged.
+- **Layered with:** G-T1.8.2. The fix order matters — G-T1.10 couldn't
+  have been diagnosed before G-T1.8.2 closed, because tests never
+  reached the PR-diff gate when the cascade DB pollution still crashed
+  them first.
+- **Cross-references:**
+  - PR #140 (G-T1.8.2) — the merge whose PR build first surfaced this.
+  - § 12 G-PROC-4 — Verify-First success-case bullet #5 (red ≠ red,
+    always read the specific failed step).
+- **Sprint:** 13.
+
 ### 🟠 G-T2. No load tests
 
 ### 🟠 G-T2. No load tests
@@ -2446,6 +2497,19 @@ since Sprint 2-7 — no functional regression).
   implemented (env injection + `setdefault`) now matches spec-as-
   required. Lesson: even a pre-designed fix benefits from Verify-First
   on the surrounding code, not just on the reported symptom.
+- **Verify-First success case #5 (Sprint 13 / G-T1.10 layered failure
+  pattern — red ≠ red):** After G-T1.8.2 (PR #140) merged, `main` CI
+  went green for the first time but the PR build for #140 itself
+  still showed red. The high-level red status invited the reading
+  *"G-T1.8.2 didn't work on Linux."* Verify-First on the actual job
+  log revealed the failure was at step "PR-diff coverage gate" (not
+  test execution) with a completely different error — `origin/main`
+  not fetched because `actions/checkout@v4` defaults to `fetch-depth: 1`.
+  Trusting the high-level red status without reading the specific
+  failed step would have led to chasing the wrong root cause. Fix:
+  G-T1.10 (~8 LOC YAML, `fetch-depth: 0` on the test job's checkout).
+  Lesson: **red ≠ red.** Always read the specific failed step before
+  hypothesizing — especially when fixing one layer reveals another.
 - **Sprint:** 11.
 
 ---
