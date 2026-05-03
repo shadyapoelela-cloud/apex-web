@@ -3,7 +3,7 @@
 ## Architecture
 
 - **Backend**: FastAPI (Python 3.11), modular phase-based architecture (Phases 1-11 + Sprints 1-6)
-- **Frontend**: Flutter Web (Dart), Riverpod state management, GoRouter navigation (37 routes)
+- **Frontend**: Flutter Web (Dart), Riverpod state management, GoRouter navigation (~257 GoRoute entries in `router.dart`; ~268 across all `.dart` files. Verify: `grep -c "GoRoute(" apex_finance/lib/core/router.dart`)
 - **Database**: PostgreSQL + SQLAlchemy ORM (SQLite fallback for dev)
 - **Auth**: JWT (HS256) via `JWT_SECRET` env var, bcrypt password hashing
 - **Deployment**: Render.com free tier (cold-start tolerant) + GitHub Pages (frontend)
@@ -52,10 +52,14 @@
 
 ## Testing
 
-- **~1,784 automated tests** collected across the `tests/` tree (verified
-  2026-04-30 via `pytest tests/ --collect-only -q`). The count grew over
-  Phases 1-11 and Sprints 1-7; an earlier "204 tests" figure that lived here
-  was retired by G-DOCS-1 (Sprint 8). Highlights of long-running suites:
+- **2,330 automated tests** collected across **134 test files** in the
+  `tests/` tree (verified 2026-05-04 by G-DOCS-2 via
+  `py -m pytest tests/ --collect-only -q | tail -3`). The count grew over
+  Phases 1-11 and Sprints 1-13; the original "204 tests" figure was
+  retired by G-DOCS-1 (Sprint 8) and the intermediate "~1,784" figure
+  was retired by G-DOCS-2 (Sprint 14). When this number drifts again
+  re-measure with the same command and update both this line and
+  `APEX_BLUEPRINT/00_MASTER_INDEX.md`. Highlights of long-running suites:
   - `test_integration_v10.py`: 93 integration tests (response format, CORS, security, auth, legal, account)
   - `test_clients_coa.py`: 26 tests (clients, COA upload/classify/approve, TB binding, onboarding, archive)
   - `test_providers_marketplace.py`: 25 tests (providers, marketplace, subscriptions, service catalog, audit)

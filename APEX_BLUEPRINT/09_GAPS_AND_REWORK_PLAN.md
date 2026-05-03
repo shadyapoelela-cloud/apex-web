@@ -3092,18 +3092,69 @@ same pattern can be applied to sibling screens with one import.
 - **Note:** This must be answered BEFORE any production launch.
 - **Sprint target:** 14 — Phase A.
 
-#### 🔴 G-DOCS-2. Doc-truth pass on stale numerical claims
-- **Severity:** 🔴 P0 Blocker — documentation hygiene
-- **Path:** `CLAUDE.md` § Testing ("204 automated tests across 8 test
-  files") + `APEX_BLUEPRINT/00_MASTER_INDEX.md` lines 32, 129-138.
-- **Evidence:** Cross-referenced from `35_STATUS_AUDIT_2026-05-03.md`
-  § 12 — actual test count is 2,330 across 134 files (~11× drift);
-  endpoints 213 → 761 (~3.5×); routes 70+ → 303 (~4.3×).
-- **Fix proposal:** ~2-hour edit pass updating 7 stale counts in
-  `00_MASTER_INDEX.md` + `CLAUDE.md` test-count claim. No code touched.
-- **Effort:** ~2 hours.
-- **Owner:** TBD.
-- **Sprint target:** 14 — Phase A.
+#### ✅ G-DOCS-2. Doc-truth pass on stale numerical claims — DONE 2026-05-04
+- **Branch:** `sprint-14/g-docs-2-doc-truth-pass`
+- **Severity (was):** 🔴 P0 Blocker — documentation hygiene
+- **Path:** `CLAUDE.md` § Testing + § Architecture ("204 tests" /
+  "37 routes") + `APEX_BLUEPRINT/00_MASTER_INDEX.md` (Document Map
+  rows 03 + 05, Phase 4 validation note, Platform Numbers table,
+  Quick Tech Stack box) + `03_NAVIGATION_MAP.md` line 4 +
+  `05_API_ENDPOINTS_MASTER.md` line 10.
+- **Evidence:** `35_STATUS_AUDIT_2026-05-03.md` § 12 — original counts
+  drifted 3×–11× from reality.
+- **Verify-First findings during execution (2026-05-04):**
+  - **Re-measured fresh** rather than trusting the 2026-05-03 audit
+    snapshot. Three numbers had moved: endpoints 761 → **770** (+9 from
+    PRs #139–144 era); blueprint docs 43 → **44** (this folder gained
+    `35_STATUS_AUDIT_2026-05-03.md` from PR #142); GoRoute count
+    re-counted as **257 in `router.dart`** + **268 across all `.dart`**
+    (the audit's 303 had used a broader Explore-agent count that
+    likely included `v5_routes.dart` + `v5_wired_screens.dart` chip
+    IDs).
+  - **SQLAlchemy class regex correction.** The Status Audit reported
+    "278 classes" using a broad `class .*\(.*Base.*\):` pattern that
+    catches Pydantic `BaseModel`, ABC subclasses, and other non-ORM
+    types. A precise count using a Python script (`^class \w+\(Base\):`)
+    gives **200** (199 inheriting `Base`, 1 inheriting `AuditBase`).
+    This audit publishes the precise ORM count.
+  - **`CLAUDE.md` line 6 caught.** "GoRouter navigation (37 routes)"
+    was even more stale than the Status Audit had spotted (audit only
+    flagged `00_MASTER_INDEX.md` lines). Updated to ~257 + reproducer.
+  - **Line 114 of `CLAUDE.md` ("25 of 198 tables") deliberately
+    untouched** — it's framed as "Historical context (resolved)" and
+    accurately records the pre-G-A3.1 state. Per Rule #2 of the
+    G-DOCS-2 prompt: stale ≠ wrong-architecture; don't restructure
+    correctly-labelled history.
+- **Fix applied (4 files, +56 / -29 LOC across docs):**
+  - `CLAUDE.md`: replaced "37 routes" with "~257 GoRoute entries +
+    reproducer"; replaced "~1,784 automated tests" with "2,330 across
+    134 test files" + reproducer; both lines now name G-DOCS-2 + the
+    next refresh trigger.
+  - `00_MASTER_INDEX.md`: 6 stale counts updated in the Document Map,
+    Phase 4 validation step, the Platform Numbers table, and the
+    Quick Tech Stack box. Platform Numbers gained a 4th column
+    "Reproducer" so future readers can self-verify each row, plus a
+    drift note at the bottom of the table.
+  - `03_NAVIGATION_MAP.md`: line 4 updated to ~257 GoRoute (with
+    `wc -l` showing the file is now 1,019 lines, not 858) + cross-link
+    to G-DOCS-3 deferred catalog automation.
+  - `05_API_ENDPOINTS_MASTER.md`: line 10 updated to ~770; added an
+    explicit "Catalog drift warning" paragraph telling readers to
+    treat `/docs` (Swagger UI) as the live source until G-DOCS-3 ships.
+- **What this fix does NOT include (deliberately):**
+  - Per-phase endpoint counts (the per-phase tables in
+    `05_API_ENDPOINTS_MASTER.md` still reflect the original ~240
+    snapshot); manual backfill is wasted work — see G-DOCS-3.
+  - Per-route names in `03_NAVIGATION_MAP.md` (same reason).
+  - `PROGRESS.md`, chapters 12–23 deep dives, or any chapter not
+    flagged by the Status Audit.
+- **Verification:** `git diff --stat` confirms 4 files touched
+  totalling +62/-29 LOC; manual eyeball of each diff confirms only
+  numbers + reproducer text changed, no markdown structure broken,
+  no unrelated edits.
+- **Sprint:** 14 — Phase A.
+- **Cross-references:** opens **G-DOCS-3** (catalog auto-generation,
+  deferred Sprint 15+, see § 20.4).
 
 #### 🔴 G-MOD-CRM-1. Decide: build / archive / hybrid CRM module
 - **Severity:** 🔴 P0 Blocker — strategic decision required
@@ -3274,6 +3325,43 @@ same pattern can be applied to sibling screens with one import.
 - **Effort:** ~1 day.
 - **Owner:** TBD.
 - **Sprint target:** 15+.
+
+#### ⏸ G-DOCS-3. Auto-generate API + route catalogs (replaces hand-maintained 03 + 05)
+- **Severity:** 🟡 P2 Important — documentation infrastructure
+- **Trigger:** Opened during G-DOCS-2 closure (2026-05-04). The
+  per-phase tables in `05_API_ENDPOINTS_MASTER.md` (~240 entries)
+  and the per-route entries in `03_NAVIGATION_MAP.md` were
+  hand-maintained against a snapshot from ~2026-Q1 and have drifted
+  to ~770 endpoints / ~257 routes today. G-DOCS-2 corrected only
+  the headline counts; per-entry backfill would cost ~10 hours of
+  manual work and would drift again within weeks of any new sprint.
+- **Status:** ⏸ Deferred — Sprint 15+.
+- **Fix plan:**
+  1. **Backend:** add a `scripts/generate_api_catalog.py` that
+     introspects FastAPI's `app.routes` (or imports `app.main:app`
+     and walks `app.routes`) and writes a regenerated
+     `05_API_ENDPOINTS_MASTER.md` with per-phase tables.
+  2. **Frontend:** add a `scripts/generate_route_catalog.dart`
+     (or a small Python script using regex on `router.dart`) that
+     emits the per-route catalog for `03_NAVIGATION_MAP.md`.
+  3. **CI integration:** add a workflow step that runs both
+     generators and `git diff --exit-code` against the committed
+     catalogs. Fails the PR if a route was added without
+     regenerating the catalog. Same shape as `diff-cover` gate
+     introduced by G-PROC-1.
+  4. **Header section preservation:** the generators only rewrite
+     the per-entry tables; the manually-curated header sections
+     (purpose, audience, conventions) stay editable.
+- **Why deferred:** the G-DOCS-2 headline-fix is enough to remove
+  the misleading-onboarding effect. Auto-generation is the right
+  long-term fix but needs its own design pass + verify-first cycle.
+- **Estimate:** ~2 days (~1 day each script + CI wiring + first run +
+  verification).
+- **Sprint target:** 15+.
+- **Cross-references:** `35_STATUS_AUDIT_2026-05-03.md` § 4 + § 12
+  Recommendation #2 ("either auto-generate endpoint inventory from
+  FastAPI's `app.routes` at CI time, or retire the catalog and rely
+  on `/docs` (Swagger UI) as the source of truth").
 
 ### 20.4 Continued audit (next session — explicitly deferred)
 
