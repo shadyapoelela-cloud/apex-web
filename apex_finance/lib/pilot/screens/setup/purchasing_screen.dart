@@ -14,6 +14,7 @@ import '../../../core/theme.dart' as core_theme;
 import '../../api/pilot_client.dart';
 import '../../export_utils.dart';
 import '../../num_utils.dart';
+import '../../services/entity_resolver.dart';
 import '../../session.dart';
 
 Color get _gold => core_theme.AC.gold;
@@ -98,12 +99,21 @@ class _PurchasingScreenState extends State<PurchasingScreen>
       _loading = true;
       _error = null;
     });
-    if (!PilotSession.hasTenant || !PilotSession.hasEntity) {
-      setState(() {
-        _loading = false;
-        _error = 'يجب اختيار الشركة والكيان من شريط العنوان أولاً.';
-      });
-      return;
+    // G-UX-2 (Sprint 13): replace dead-end error with smart resolver.
+    // EntityResolver handles both no-tenant (onboarding redirect) and
+    // no-entity (auto-select singleton / picker / onboarding) — covers
+    // the previous compound !hasTenant || !hasEntity gate.
+    // See lib/pilot/services/entity_resolver.dart.
+    if (!PilotSession.hasEntity) {
+      final resolved = await EntityResolver.ensureEntitySelected(context);
+      if (!resolved) {
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+          _error = null;
+        });
+        return;
+      }
     }
     final tid = PilotSession.tenantId!;
     final eid = PilotSession.entityId!;
