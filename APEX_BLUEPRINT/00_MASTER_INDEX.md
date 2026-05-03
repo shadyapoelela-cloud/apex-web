@@ -27,9 +27,9 @@
 | 00 | `00_MASTER_INDEX.md` | This file — entry point | هذا الملف — نقطة الدخول |
 | 01 | `01_ARCHITECTURE_OVERVIEW.md` | System architecture diagrams | مخططات معمارية النظام |
 | 02 | `02_USER_JOURNEYS_FLOWCHART.md` | Per-user-type journeys | رحلات لكل نوع مستخدم |
-| 03 | `03_NAVIGATION_MAP.md` | All 70+ Flutter routes | كل مسارات Flutter (70+) |
+| 03 | `03_NAVIGATION_MAP.md` | Flutter routes (~257 in `router.dart`) | مسارات Flutter (~257) |
 | 04 | `04_SCREENS_AND_BUTTONS_CATALOG.md` | Every screen, every button | كل شاشة، كل زر |
-| 05 | `05_API_ENDPOINTS_MASTER.md` | All 213 backend endpoints | كل نقاط API الخلفية (213) |
+| 05 | `05_API_ENDPOINTS_MASTER.md` | Backend endpoints (~770 decorators) | نقاط API الخلفية (~770) |
 | 06 | `06_PERMISSIONS_AND_PLANS_MATRIX.md` | RBAC × Plans matrix | مصفوفة الصلاحيات × الخطط |
 | 07 | `07_DATA_MODEL_ER.md` | Database ER diagrams | مخططات ER لقاعدة البيانات |
 | 08 | `08_GLOBAL_BENCHMARKS.md` | Research synthesis | تركيب الأبحاث العالمية |
@@ -108,13 +108,13 @@
 
 ### Phase 4: Validate (Stay Consistent)
 **EN:** Before committing:
-- Run `pytest tests/ -v` (must keep 204 tests green)
+- Run `pytest tests/ -v` (must keep all ~2,330 tests green; verify count with `py -m pytest tests/ --collect-only -q | tail -3`)
 - Verify Arabic RTL renders correctly
 - Confirm role/plan gating in both backend and frontend
 - Update the relevant blueprint document if behavior changed
 
 **AR:** قبل الالتزام:
-- شغّل `pytest tests/ -v` (يجب الحفاظ على 204 اختبار خضراء)
+- شغّل `pytest tests/ -v` (يجب الحفاظ على ~2,330 اختبار خضراء)
 - تحقق من ظهور RTL العربي بشكل صحيح
 - أكد تقييد الدور/الخطة في كل من الخلفية والواجهة
 - حدّث وثيقة المخطط ذات الصلة إذا تغير السلوك
@@ -123,23 +123,35 @@
 
 ## 📊 Platform Numbers at a Glance / أرقام المنصة
 
-| Metric | Value | المقياس |
-|--------|-------|---------|
-| Backend phases | 11 + 6 sprints | المراحل الخلفية |
-| API endpoints | 240+ | نقاط API |
-| Frontend routes | 70+ | المسارات الأمامية |
-| User roles | 5 (guest, registered_user, client_user, client_admin, provider_user) | أدوار المستخدمين |
-| Subscription plans | 5 (free, pro, business, expert, enterprise) | خطط الاشتراك |
-| Database models | 109 tables | نماذج قاعدة البيانات |
-| Automated tests | 204 | الاختبارات المؤتمتة |
-| Themes | 12 (6 families × light/dark) | السمات |
-| Blueprint documents | 35 (~1.25MB total) | وثائق المخطط |
-| Mermaid diagrams | 200+ | المخططات |
-| SE diagram type coverage | 95% (UML 12/14, C4 L1-3, BPMN, DFD, IA) | تغطية المخططات |
-| Global systems researched | 30+ (SAP, Odoo, Frappe, NetSuite, Dynamics, CaseWare, AuditBoard, MindBridge, Xero, QBO, Wave, Zoho, Daftra, Qoyod, ZATCA, FTA, ETA, ISA, SOCPA, PCAOB, IIA, Stripe, SAMA Open Banking, ...) | الأنظمة المرجعية |
-| Bounded contexts proposed | 20 | السياقات المحدودة |
-| Domain events catalog | 86+ | أحداث المجال |
-| Industry templates | 12 verticals | قوالب الصناعات |
+> **Counts re-verified 2026-05-04 by G-DOCS-2 (Sprint 14).** The
+> reproducer command for each measured metric is in the rightmost
+> column — re-run to confirm currency before quoting these numbers.
+
+| Metric | Value | المقياس | Reproducer |
+|--------|-------|---------|------------|
+| Backend phases + sprint dirs | 11 phases + 7 sprint-named dirs | المراحل الخلفية | `ls -d app/phase* app/sprint*` |
+| API endpoint decorators | ~770 | نقاط API (~770) | `grep -rE "@(router\|app)\.(get\|post\|put\|delete\|patch)" app/ --include="*.py" \| wc -l` |
+| GoRoute entries (`router.dart`) | ~257 | المسارات الأمامية (~257) | `grep -c "GoRoute(" apex_finance/lib/core/router.dart` |
+| User roles | 5 (guest, registered_user, client_user, client_admin, provider_user) | أدوار المستخدمين | — |
+| Subscription plans | 5 (free, pro, business, expert, enterprise) | خطط الاشتراك | — |
+| SQLAlchemy ORM model classes | ~200 (199 `Base` + 1 `AuditBase`) | نماذج قاعدة البيانات (~200) | Python script counting `^class \w+\(Base\):` patterns under `app/` |
+| Alembic revisions (linear chain) | 7 | إصدارات Alembic | `ls alembic/versions/*.py \| wc -l` |
+| Test files | 134 | ملفات الاختبارات | `ls tests/test_*.py \| wc -l` |
+| Tests collected | 2,330 | الاختبارات المؤتمتة | `py -m pytest tests/ --collect-only -q \| tail -3` |
+| Themes | 12 (6 families × light/dark) | السمات | — |
+| Blueprint documents | 44 (this folder) | وثائق المخطط (44) | `find APEX_BLUEPRINT -maxdepth 1 -name "*.md" \| wc -l` |
+| Mermaid diagrams | 200+ (across blueprint) | المخططات (200+) | — |
+| SE diagram type coverage | 95% (UML 12/14, C4 L1-3, BPMN, DFD, IA) | تغطية المخططات | — |
+| Global systems researched | 30+ (SAP, Odoo, Frappe, NetSuite, Dynamics, CaseWare, AuditBoard, MindBridge, Xero, QBO, Wave, Zoho, Daftra, Qoyod, ZATCA, FTA, ETA, ISA, SOCPA, PCAOB, IIA, Stripe, SAMA Open Banking, ...) | الأنظمة المرجعية | — |
+| Bounded contexts proposed | 20 | السياقات المحدودة | — |
+| Domain events catalog | 86+ | أحداث المجال (86+) | — |
+| Industry templates | 12 verticals | قوالب الصناعات (12) | — |
+
+> **Drift note (2026-05-03 → 2026-05-04):** the original blueprint
+> figures of "240+ endpoints / 70+ routes / 109 tables / 204 tests
+> / 35 blueprint docs" were retired by the 2026-05-03 Status Audit
+> (`35_STATUS_AUDIT_2026-05-03.md`) and updated to fresh counts here.
+> See `09 § 20.1 G-DOCS-2` for the full closure history.
 
 ---
 
@@ -208,7 +220,7 @@ Email:     SendGrid / SMTP / console (toggle: EMAIL_BACKEND)
 Storage:   Local FS / S3 (toggle: STORAGE_BACKEND)
 Deploy:    Render.com (backend) + GitHub Pages (frontend)
 ZATCA:     UBL 2.1 XML, TLV QR code, CSID/PCSID onboarding (Saudi Phase 2)
-Tests:     pytest (204 tests) · Black 120ch · Ruff · Bandit
+Tests:     pytest (~2,330 tests collected — 2026-05-04) · Black 120ch · Ruff · Bandit
 ```
 
 ---

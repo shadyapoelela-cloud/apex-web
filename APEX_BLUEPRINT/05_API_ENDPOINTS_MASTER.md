@@ -7,7 +7,19 @@
 
 ## 1. Endpoint Inventory by Phase / فهرس النقاط حسب المرحلة
 
-**Total: 240+ endpoints across 11 Phases + 6 Sprints + Pilot/AI/ZATCA modules.**
+**Total: ~770 endpoint decorators across 11 Phases + 7 sprint-named directories + Pilot/AI/ZATCA/Copilot/COA-Engine/Knowledge-Brain modules.** (2026-05-04 G-DOCS-2 re-measure; the original "240+" figure was retired by the 2026-05-03 Status Audit which counted 761.)
+
+> Reproducer: `grep -rE "@(router|app)\.(get|post|put|delete|patch)" app/ --include="*.py" | wc -l`
+>
+> **Catalog drift warning.** This document was hand-maintained against the
+> original ~240 endpoints; the per-phase tables below reflect that
+> snapshot, not the current ~770. Per-endpoint backfill is out of scope
+> for G-DOCS-2 — it would take ~10 hours of manual work and would
+> drift again within weeks. The right fix is **G-DOCS-3** (deferred
+> Sprint 15+) which auto-generates this catalog from FastAPI's
+> `app.routes` at CI time. Until then, treat the per-phase tables
+> below as design-intent reference and `/docs` (Swagger UI) as the
+> live source of truth.
 
 ### Phase 1 — Auth & Account Management (35 endpoints)
 

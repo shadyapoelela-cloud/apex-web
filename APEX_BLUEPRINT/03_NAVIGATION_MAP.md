@@ -1,7 +1,12 @@
 # 03 — Navigation Map / خريطة التنقل
 
 > Reference: continues from `02_USER_JOURNEYS_FLOWCHART.md`. Next: `04_SCREENS_AND_BUTTONS_CATALOG.md`.
-> **Source of truth:** `lib/core/router.dart` (858 lines, 70+ GoRoutes).
+> **Source of truth:** `lib/core/router.dart` (1,019 lines, ~257 GoRoute entries — 2026-05-04 G-DOCS-2 re-measure).
+> Reproducer: `wc -l apex_finance/lib/core/router.dart && grep -c "GoRoute(" apex_finance/lib/core/router.dart`.
+> Note: additional routes live in `apex_finance/lib/core/v5/v5_routes.dart` (~11) and ~268 GoRoute calls
+> exist across all `.dart` files. The 70+ figure was retired by the 2026-05-03 Status Audit.
+> Catalog auto-generation tracked under G-DOCS-3 (deferred Sprint 15+) — until then this header is the
+> single re-verified anchor; the rest of this catalog reflects the original blueprint's design intent.
 
 ---
 
