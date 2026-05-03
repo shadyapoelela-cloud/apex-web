@@ -263,7 +263,12 @@ class _ActionListCard extends StatelessWidget {
     if (label.contains('قيود')) return 'قيمة إجمالية: 87,250 ريال';
     if (label.contains('إجازات')) return 'منذ 3-7 أيام';
     if (label.contains('أوامر')) return 'قيمة إجمالية: 245,000 ريال';
-    if (label.contains('معاملات')) return 'من بنك الراجحي والأهلي';
+    // G-CONTENT-1 (Sprint 14): was 'من بنك الراجحي والأهلي' — sanitised
+    // to a neutral placeholder. Real bank names in mock UI implied a
+    // non-existent partnership (brand/legal risk per F-013 + F-014).
+    // The numeric mock (17) is intentionally untouched here — that
+    // belongs to G-UI-3's broader real-or-empty rework.
+    if (label.contains('معاملات')) return 'من بنوك متعددة';
     if (label.contains('CSID')) return 'ينتهي في 15 يوم';
     return 'اضغط للعرض';
   }

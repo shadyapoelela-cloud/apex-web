@@ -3009,18 +3009,60 @@ same pattern can be applied to sibling screens with one import.
   fix in one pass.
 - **Sprint target:** 14 — Phase A.
 
-#### 🔴 G-CONTENT-1. Sanitize mock data of real Saudi bank names
-- **Severity:** 🔴 P0 Blocker — brand/legal risk
+#### ✅ G-CONTENT-1. Sanitize mock data of real Saudi bank names — DONE 2026-05-04
+- **Branch:** `sprint-14/g-content-1-sanitize-bank-names`
+- **Severity (was):** 🔴 P0 Blocker — brand/legal risk
 - **Path:** `/erp/treasury/dashboard` + `/erp/consolidation/dashboard`.
 - **Evidence:** F-013 in audit doc (line 64-66). String "بنك الراجحي
   والأهلي" hardcoded in mock UI; implies non-existent partnership with
   these banks.
-- **Fix proposal:** Replace real bank names with "بنك تجريبي" / "Bank A"
-  / generic placeholders OR add explicit "بيانات تجريبية" badge on
-  every mock dashboard. Consult ops/legal before production demos.
-- **Effort:** ~2 hours.
-- **Owner:** TBD.
-- **Sprint target:** 14 — Phase A (do FIRST — fastest win).
+- **Verify-First findings (2026-05-04):**
+  - **One source, two displays.** Both dashboards funnel through the
+    same shared widget `apex_finance/lib/core/v5/apex_v5_action_dashboard.dart`
+    (`_KpiCard._mockDetailFor()` at lines 260-269). The Treasury card
+    `labelAr: 'معاملات بنكية غير مطابقة'` (`v5_data.dart:89`) and the
+    Consolidation card `labelAr: 'معاملات بين الشركات تنتظر التسوية'`
+    (`v5_data.dart:371`) both contain the substring "معاملات", so
+    line 266's `if (label.contains('معاملات')) return 'من بنك الراجحي والأهلي'`
+    fires for both. This explained the F-014 "templated copy-paste"
+    finding — there was no copy-paste; it was a single hardcoded line
+    routed through a shared widget.
+  - **~50 other matches for "الراجحي" / ~40 for "الأهلي" across the
+    repo are out of scope for this PR** (per Rule #6 single-PR
+    discipline). They are: V5.2 prototype mock customer names
+    ("شركة الراجحي للتجارة"), legitimate bank-feed setup integration
+    lists (`bank_feed_setup_screen.dart`, `integrations_hub_v52_screen.dart`),
+    backend bank-OCR PDF parser detection (`app/integrations/bank_ocr/pdf_parser.py`),
+    the App Store metadata listing, archived screens, test fixtures,
+    and demo data in V4 ERP screens. Distinct from F-013's mock-UI
+    risk; tracked under future G-CONTENT-2 broader sweep if needed.
+- **Fix applied:** one-line replacement at `apex_v5_action_dashboard.dart:266`:
+  - Before: `if (label.contains('معاملات')) return 'من بنك الراجحي والأهلي';`
+  - After: `if (label.contains('معاملات')) return 'من بنوك متعددة';`
+  - Comment block above the line documents what changed and why,
+    cross-linking F-013 + F-014 + G-UI-3 (the broader real-or-empty
+    rework that will eventually replace the numeric mock too).
+- **Files changed (1):**
+  - `apex_finance/lib/core/v5/apex_v5_action_dashboard.dart` (+7 / -1).
+- **Verification:**
+  - `flutter analyze lib/core/v5/apex_v5_action_dashboard.dart`:
+    **No issues found! (ran in 3.5s)**
+  - `grep "بنك الراجحي والأهلي" apex_finance/lib/`: zero matches
+    in code (only the new comment line referencing the historical
+    string).
+  - Both audit URLs (`/erp/treasury/dashboard` +
+    `/erp/consolidation/dashboard`) consume the same patched widget;
+    one fix sanitises both.
+- **Out of scope (deliberately preserved):**
+  - The numeric "17" / "245K" / "124K" mocks remain — those are
+    G-UI-3 (replace mocks with real-or-empty pattern across all
+    dashboards), a multi-week PR.
+  - Other-screen bank-name occurrences (V5.2 prototypes, demo data,
+    helpdesk, marketplace) are separate from F-013 and not addressed
+    here.
+- **Risk:** very low — one-line frontend string change, no logic
+  touched, no production paths affected, `flutter analyze` clean.
+- **Sprint:** 14 — Phase A.
 
 #### 🔴 G-CONTENT-2. Audit duplicated mock strings across modules
 - **Severity:** 🔴 P0 Blocker — sloppy demo data
