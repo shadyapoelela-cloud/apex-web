@@ -139,6 +139,18 @@ def coverage_by_directory(tmp_path_factory) -> dict[str, tuple[int, int]]:
     repo_root = Path(__file__).resolve().parent.parent
     out_json = tmp_path_factory.mktemp("covreport") / "coverage.json"
 
+    # G-T1.8.2 (Sprint 13): isolate the subprocess's DATABASE_URL onto a
+    # per-cascade tmp DB. Without this, the inner pytest inherits the
+    # parent's DATABASE_URL=sqlite:///test.db, both processes touch the
+    # same file, and Linux fd/inode races between parent and child can
+    # surface as "attempt to write a readonly database" inside autouse
+    # fixtures (e.g. tests/test_zatca_retry_queue.py::_reset_queue's
+    # DELETE FROM zatca_submission_queue). This was the documented
+    # G-T1.8.2 root cause; G-T1.8 patched one symptom (ICV counter
+    # collision), this addresses the architectural source for the whole
+    # class of flakes.
+    cascade_db_path = tmp_path_factory.mktemp("cascade-db") / "cascade_test.db"
+
     # Run pytest as a subprocess so it doesn't recurse into itself.
     # Exclude this file to avoid infinite recursion, and skip the
     # cookie-auth + openapi tests that pollute logs for nothing.
@@ -148,6 +160,7 @@ def coverage_by_directory(tmp_path_factory) -> dict[str, tuple[int, int]]:
         "ADMIN_SECRET": "test-admin",
         "ANTHROPIC_API_KEY": "sk-ant-fake",
         "SKIP_PER_DIR_COVERAGE": "1",  # prevent nested-fixture recursion
+        "DATABASE_URL": f"sqlite:///{cascade_db_path.as_posix()}",
     }
     cmd = [
         sys.executable, "-m", "pytest",

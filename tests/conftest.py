@@ -5,8 +5,10 @@ APEX Platform -- Shared pytest fixtures
 import os
 import pytest
 
-# Set test environment variables BEFORE any app imports
-os.environ["DATABASE_URL"] = "sqlite:///test.db"
+# Set test environment variables BEFORE any app imports.
+# setdefault (not =) so the cascade subprocess env injection survives
+# — see G-T1.8.2 in 09 § 4 + tests/test_per_directory_coverage.py.
+os.environ.setdefault("DATABASE_URL", "sqlite:///test.db")
 # 32+ bytes keeps PyJWT's InsecureKeyLengthWarning quiet (PyJWT requires
 # SHA-256 HMAC keys to meet the RFC 7518 §3.2 minimum). Deterministic so
 # token fixtures below remain stable across test runs.

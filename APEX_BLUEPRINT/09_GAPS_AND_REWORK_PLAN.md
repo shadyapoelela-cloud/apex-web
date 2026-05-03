@@ -1826,7 +1826,8 @@ since Sprint 2-7 — no functional regression).
     cascade subprocess interaction)
 - **Sprint:** 11.
 
-### ⏸ G-T1.8.2. Cascade subprocess DATABASE_URL isolation (deferred)
+### ✅ G-T1.8.2. Cascade subprocess DATABASE_URL isolation — DONE 2026-05-03
+- **Branch:** `sprint-13/g-t1-8-2-cascade-db-isolation`
 - **Trigger:** G-T1.8 root cause analysis (Sprint 11) revealed that
   `tests/test_per_directory_coverage.py` runs `pytest tests/` as a
   subprocess inheriting parent's cwd + `DATABASE_URL`. The subprocess
@@ -1834,30 +1835,63 @@ since Sprint 2-7 — no functional regression).
   surfaced as the `test_different_fiscal_years_isolated` flake.
 - **G-T1.8 fixed the specific symptom** (UUID-suffixed client_id in the
   affected test). G-T1.8.2 fixes the architectural root cause: the
-  cascade subprocess should use an isolated `DATABASE_URL`.
-- **Scope:** Edit `tests/test_per_directory_coverage.py:145-151` to
-  inject a per-subprocess `DATABASE_URL` via env, e.g.:
-  ```python
-  env = {
-      ...,
-      "DATABASE_URL": f"sqlite:///{tmp_path}/cascade_test.db",
-      ...
-  }
-  ```
-  ~10-line change. Verify cascade still parses coverage JSON correctly
-  (the subprocess's coverage data is what matters, not its DB state).
-- **Why not now:** G-T1.8 surgical fix is sufficient for the single
-  known instance. G-T1.8.2 prevents a class of *future* flakes from the
-  same mechanism — important but not blocking. The cascade test is
-  critical-path infra; an isolated-DB-URL change wants its own verify-
-  first cycle (run cascade 3× confirming it still produces correct
-  per-directory JSON).
-- **Risk if ignored:** any future test that writes to `JournalEntrySequence`,
-  `Tenant`, `Entity`, or any other shared-key table without UUID
-  isolation will be at risk for the same flake pattern.
-- **Estimate:** 1-2 hours.
-- **Status:** ⏸ Deferred — Sprint 12+ candidate.
-- **Sprint:** 12+.
+  cascade subprocess uses an isolated `DATABASE_URL`.
+- **Reactivation trigger (2026-05-03):** CI on `main` had been red since
+  `a497d97` (Sprint 9, the commit that introduced
+  `test_per_directory_coverage.py`). Symptom escalated from the original
+  "ICV counter pollution" flake to *"attempt to write a readonly
+  database"* errors inside `test_zatca_retry_queue.py::_reset_queue`'s
+  `DELETE FROM zatca_submission_queue` — a Linux-specific fd/inode race
+  between outer and inner pytest both writing to the shared
+  `sqlite:///test.db`. Discovered while triaging the CI status of
+  G-UX-2 PR #139 (#139 itself is UI-only and didn't cause the failure).
+- **Two findings during execution (both via Verify-First):**
+  1. **Initial WAL/SHM cleanup hypothesis was wrong.** Considered
+     extending `setup_test_db` to remove `test.db-wal` / `test.db-shm`
+     sidecars. Verify-First (grep for `journal_mode`, ls of `test.db*`)
+     showed `test.db` runs in default DELETE mode — no persistent WAL
+     sidecars exist. Only `coa_engine.db` uses WAL. Hypothesis rejected
+     before any `conftest.py` change was made.
+  2. **Original spec was incomplete.** Sprint 11 spec said "inject
+     `DATABASE_URL` via env" but didn't address that
+     `tests/conftest.py:9` does
+     `os.environ["DATABASE_URL"] = "sqlite:///test.db"` *unconditionally*
+     at module-load time. The subprocess's env injection was clobbered
+     by the inner `conftest.py` reload. Required a complementary 1-line
+     change: `os.environ["..."] = ...` → `os.environ.setdefault("...", ...)`.
+- **Final fix (~17 LOC across 2 files):**
+  - `tests/test_per_directory_coverage.py`: allocate
+    `cascade_db_path = tmp_path_factory.mktemp("cascade-db") / "cascade_test.db"`
+    and inject `DATABASE_URL=sqlite:///{cascade_db_path.as_posix()}` into
+    the subprocess env. `as_posix()` keeps the URL valid on both Linux
+    (CI) and Windows (local).
+  - `tests/conftest.py:9`:
+    `os.environ["DATABASE_URL"] = "sqlite:///test.db"` →
+    `os.environ.setdefault("DATABASE_URL", "sqlite:///test.db")`. Preserves
+    existing default behavior; allows cascade env injection to survive.
+- **Empirical verification (4 runs, all green):**
+  - **Gate test (proves `setdefault` mechanism):** Loaded `conftest.py`
+    with `DATABASE_URL=<custom>` pre-set in env → conftest preserved
+    the custom value. Match: `True`.
+  - **`test_zatca_retry_queue.py`:** 24/24 passed in 2.75s (the test
+    that surfaced the readonly-DB symptom).
+  - **`test_per_directory_coverage.py`:** **23/23 passed in 5:25** —
+    pre-fix this was timing out at 600s (`subprocess.TimeoutExpired`).
+    Fix is also performance-positive: subprocess completes faster
+    without lock contention against the outer process's `test.db`.
+  - **Smoke slice (full suite minus cascade):** 2305 passed, 2 skipped
+    in 3:05. Zero readonly-DB errors anywhere.
+- **Risk:** low — test infrastructure only, no production paths. The
+  `setdefault` change is the standard idiom for "default if not provided"
+  and is what callers reading `DATABASE_URL` already expect.
+- **Cross-references:**
+  - PR #139 (G-UX-2 sweep) — the trigger that surfaced this on CI.
+  - G-T1.8 — the original Sprint 11 surgical symptom-fix.
+  - § 12 G-PROC-4 — Verify-First success-case bullet for this fix
+    (third in Sprint 13: G-UX-2 Commit 6 was the first; G-T1.9 → G-T1.8.2
+    pivot was the second; spec-vs-required gap caught at execution time
+    is the third).
+- **Sprint:** 13.
 
 ### 🟠 G-T2. No load tests
 
@@ -2372,7 +2406,7 @@ since Sprint 2-7 — no functional regression).
   - § 2 G-A3.1 (the locked-in commitment).
   - `CLAUDE.md` "Migration management" subsection.
   - `LOCAL_DEV_RUNBOOK.md` § 4 "DuplicateTable error" entry.
-- **Verify-First success case (Sprint 13 / G-UX-2 Commit 6):** Step 2
+- **Verify-First success case #1 (Sprint 13 / G-UX-2 Commit 6):** Step 2
   design proposed deleting `je_builder_screen.dart` as dead code
   based on a grep against `core/router.dart` + `core/v5/v5_routes.dart`.
   Pre-Commit 6 verify caught that `lib/core/v5/v5_wired_screens.dart:245`
@@ -2380,6 +2414,38 @@ since Sprint 2-7 — no functional regression).
   to refactor (apply `EntityResolver`) instead of delete. Textbook case
   of Verify-First preventing a live-screen deletion. See § 19 G-UX-2
   for the full story.
+- **Verify-First success case #2 (Sprint 12 / G-A3.1 Phase 2b — psycopg2
+  vs psql fallback):** Phase 2b runbook initially assumed `psql` would
+  be installable on the operator's machine. Pre-execution verify on
+  2026-05-03 caught that `winget install PostgreSQL.PostgreSQL.{17,16}`
+  consistently returned HTTP 403 from the EnterpriseDB CDN against the
+  operator's Saudi-region IP (two retries, both at 134/350 MB).
+  Operator pivoted to inline `psycopg2` SQL execution — already in the
+  production stack, no CDN dependency. Maintenance window stretched
+  30 → 90 min but the production stamp succeeded. Lesson encoded in
+  `scripts/g-a3-1/install_prereqs.{ps1,sh}` which now intentionally
+  never auto-installs psql; psycopg2 covers all DB ops needed.
+- **Verify-First success case #3 (Sprint 13 / G-T1.9 → G-T1.8.2 pivot):**
+  When triaging the post-G-UX-2 CI red on `main`, initial hypothesis was
+  "stale SQLite WAL/SHM sidecars from pytest-in-pytest." Verify-First
+  rejected the hypothesis before any code change: grep for
+  `journal_mode` showed only `coa_engine.db` uses WAL — `test.db` runs
+  in DELETE mode, no persistent sidecars. `ls test.db*` confirmed
+  empirically. The actual root cause was already documented in this
+  registry as G-T1.8.2 (Sprint 11) with a pre-designed fix. ~30
+  minutes saved by reading docs before coding. Lesson: always grep
+  the gaps registry for a matching pattern before building a new
+  hypothesis.
+- **Verify-First success case #4 (Sprint 13 / G-T1.8.2 spec-vs-required
+  gap):** Original Sprint 11 spec for G-T1.8.2 said "inject
+  `DATABASE_URL` via env in the cascade subprocess" but didn't account
+  for `tests/conftest.py:9` doing `os.environ["DATABASE_URL"] = ...`
+  unconditionally at module load — which would clobber the injection
+  in the inner pytest. Caught during execution by tracing the env
+  propagation path *before* committing the env-only fix. Spec-as-
+  implemented (env injection + `setdefault`) now matches spec-as-
+  required. Lesson: even a pre-designed fix benefits from Verify-First
+  on the surrounding code, not just on the reported symptom.
 - **Sprint:** 11.
 
 ---
