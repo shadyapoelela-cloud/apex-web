@@ -66,6 +66,22 @@ class V5MainModule {
   /// Optional app group for sidebar coloring/headers (ERP 16 apps → 5 groups).
   final AppGroup? group;
 
+  /// G-CLEANUP-4 (Sprint 15): when `false`, the module is hidden from
+  /// app-launcher grids (`AppsHubScreen._filteredApps`) and direct-URL
+  /// access to its dashboard renders the `ComingSoonScreen` ("قيد
+  /// البناء") shell instead of the empty/broken default. Used to
+  /// defer non-functional modules (frontend shells without backends,
+  /// 404 routes, misroutes) without removing them from source — the
+  /// definitions stay as audit trail of intent.
+  ///
+  /// Set `false` here AND add a brief comment on the V5MainModule(...)
+  /// invocation explaining WHY this module is hidden + what unlocks
+  /// re-enabling it (e.g. a tracked gap-id).
+  ///
+  /// Default `true` keeps every existing module visible without
+  /// per-call-site changes.
+  final bool enabled;
+
   const V5MainModule({
     required this.id,
     required this.labelAr,
@@ -74,6 +90,7 @@ class V5MainModule {
     required this.descriptionAr,
     required this.chips,
     this.group,
+    this.enabled = true,
   });
 
   V5Chip? chipById(String id) {

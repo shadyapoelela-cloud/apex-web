@@ -179,7 +179,14 @@ class _AppsHubScreenState extends State<AppsHubScreen> {
 
   List<V5MainModule> _filteredApps() {
     final q = _search;
-    var apps = widget.service.mainModules.toList(growable: true);
+    // G-CLEANUP-4 (Sprint 15): hide modules with `enabled == false`.
+    // These are non-functional shells / 404s / misroutes that the
+    // 2026-05-04 live UX audit flagged. Direct-URL access still
+    // shows ComingSoonScreen via the v5_routes.dart guard. See
+    // APEX_BLUEPRINT/09 § 20.1 G-CLEANUP-4 + V5MainModule.enabled.
+    var apps = widget.service.mainModules
+        .where((m) => m.enabled)
+        .toList(growable: true);
     if (q.isNotEmpty) {
       apps = apps
           .where((m) =>
