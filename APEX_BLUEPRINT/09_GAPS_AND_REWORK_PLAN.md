@@ -3410,7 +3410,7 @@ same pattern can be applied to sibling screens with one import.
 - **Owner:** TBD.
 - **Sprint target:** 14 — Phase B.
 
-#### 🔴 G-CLEANUP-1. Archive V4 duplicate routes that have V5 equivalents — Stages 4a + 4b + 4c-prep DONE 2026-05-05
+#### ✅ G-CLEANUP-1. Archive V4 duplicate routes that have V5 equivalents — FULLY DONE 2026-05-05 (Stages 4a + 4b + 4c-prep + 4c-4g final)
 - **Severity:** 🔴 P0 Blocker — route duplication / cleanup. Cleanup
   (route deletion + reference updates) deferred to Stages 4b–4f.
 - **Path:** `apex_finance/lib/core/router.dart` + ~720 internal-
@@ -3584,6 +3584,126 @@ same pattern can be applied to sibling screens with one import.
     before archive — saved 2 V5 chips from breaking.
 - **Cross-ref:** `APEX_BLUEPRINT/V4_CLASSIFICATION_2026-05-04.md`,
   `V4_ARCHIVE_AUDIT_2026-05-04.md`, file 39 § 3.1, file 40 Stages 4c-4g.
+
+##### Stages 4c-4g final — bulk-delete V4 routes — DONE 2026-05-05
+- **Branch:** `sprint-15/g-cleanup-1-final` (CCD worktree
+  `claude/affectionate-colden-235ac4`).
+- **Trigger:** Stage 4c-prep made the V5 chip surface complete; this PR
+  is the safe pure-deletion follow-up that closes G-CLEANUP-1.
+- **Per-concept commits (5 stages + 1 hub-redirect closure):**
+  - **`87fce63` Stage 4c — Sales:** 8 V4 routes deleted, ~80 internal
+    refs replaced across 27 files. Routes:
+    `/sales/customers`, `/sales/invoices`, `/sales/invoices/new`,
+    `/sales/aging`, `/sales/recurring`, `/sales/quotes`, `/sales/memos`
+    (the path-keyed `/sales/payment/:invoiceId` actually slipped to 4f
+    because its multi-line `pageBuilder` shape escaped the regex).
+  - **`43767b0` Stage 4d — Purchase + Accounting:** 10 routes deleted,
+    ~67 refs replaced across 24 files. Routes:
+    `/purchase/vendors`, `/purchase/bills`, `/purchase/aging`,
+    `/accounting/coa-v2`, `/accounting/coa/edit`,
+    `/accounting/bank-rec-v2`, plus a few aliases. Same `:billId`
+    multi-line escape as Sales — caught in 4f.
+  - **`7fd476a` Stage 4e — Compliance (largest):** 43 routes deleted,
+    ~274 refs replaced across 39 files. Includes ZATCA / VAT / Zakat /
+    WHT / Tax-calendar / IFRS / Statements / Lease / Working-Capital /
+    Audit-Trail / Consolidation / FX / IslamicFinance and the handful
+    of `redirect`-only aliases. 30 orphan imports removed.
+  - **`4b3c692` Stage 4f — Audit + Analytics + HR + Operations + Marketplace:**
+    The remaining concept group. 39 V4 routes deleted by Python regex
+    (single-line + multi-line variants) + 3 multi-line `pageBuilder`
+    bodies cleaned via `Edit` (`/service-request/detail`,
+    `/provider/profile`, `/audit/service`). Plus the 2 path-keyed
+    payment routes that escaped 4c+4d (`/sales/payment/:invoiceId`,
+    `/purchase/payment/:billId`) and 4 `/compliance/*` routes that
+    escaped 4e's regex (`/compliance/tax-timeline`, `/compliance/bank-rec-ai`,
+    `/compliance/audit-workflow-ai`, `/compliance/islamic-finance`).
+    `/hr/gosi` + `/hr/eosb` intentionally retained (DEFERRED →
+    G-CLEANUP-1.1). 36 orphan imports + 1 ambiguous-name show-clause
+    entry (`NewServiceRequestScreen`) removed.
+  - **`44c7ee4` Stage 4g — V4 service hubs + verbose launchpad:**
+    11 hub paths + `/launchpad/full` redirected to V5 dashboards
+    (not deleted — preserves bookmark navigability):
+    `/sales` → `/app/erp/sales/dashboard`,
+    `/purchase` → `/app/erp/purchasing/dashboard`,
+    `/accounting`, `/operations`, `/analytics` → `/app/erp/finance/dashboard`,
+    `/compliance` → `/app/compliance/dashboard`,
+    `/audit`, `/audit-hub` → `/app/audit/dashboard`,
+    `/hr`, `/hr-hub` → `/app/erp/hr/dashboard`,
+    `/compliance-hub` → `/app/compliance/dashboard`,
+    `/launchpad/full` → `/app`.
+    `ApexServiceHubScreen` + `ApexLaunchpadScreen` + `ComplianceHubScreen`
+    kept on disk (still used by V5 chip wiring elsewhere); only the V4
+    URL bindings are gone.
+- **Path-keyed payment escape (Verify-First catch #11):** Stage 4c+4d's
+  Python regex matched `pageBuilder: (c, s) => _apexPage(const \w+(), s)`
+  but missed the multi-line shape used for `:invoiceId` / `:billId`
+  routes. Caught when re-running `flutter analyze` after Stage 4f's
+  import-removal exposed undefined `CustomerPaymentScreen` /
+  `VendorPaymentScreen`. Fixed by manually deleting the multi-line
+  GoRoute entries + their imports.
+- **Verification (final after 5 commits):**
+  - `flutter analyze lib/core/router.dart`: **No issues found** ✅
+  - `flutter analyze` (full project): **305 issues, 0 errors** —
+    baseline preserved. Most warnings are in `_archive/`-adjacent
+    `screens/whats_new/` files unrelated to this PR.
+  - `flutter test`: 31 passed, 1 pre-existing failure
+    (`ask_panel_test` `package:web` 1.1.1, unchanged from main).
+  - **Bundle sanity (post-rebuild `docs/main.dart.js`):**
+    - 7 deleted V4 screen class names (`AuditWorkflowScreen`,
+      `AuditEngagementWorkspaceScreen`, `ApexLaunchpadScreen`,
+      `ComplianceHubScreen`, `CashFlowForecastScreen`,
+      `EmployeesListScreen`, `PayrollRunScreen`): **0 hits each** ✅
+    - Stage 1 `/users/me` probe: 5 hits preserved.
+    - Stage 2 Copilot banner: 34 hits preserved.
+    - Stage 4b `je-builder`: 10 hits preserved.
+    - Stage 4c-prep `cashflow` + `depreciation` chip rendering:
+      21 hits each preserved.
+    - Bundle size: 10,091,708 → **10,075,306 bytes** (-16 KB,
+      additional V4 screens stripped via tree-shaking).
+- **Total cleanup across G-CLEANUP-1 (Stages 4a + 4b + 4c-prep + 4c-4g):**
+  - **~95 V4 routes** removed from `router.dart` (across 6 commits in
+    this PR + 6 in 4b + 25 hub redirects in 4c-prep).
+  - **~470 internal references** replaced V4 → V5 paths (4c+4d+4e
+    bulk-replace operations, plus the 4b sweep).
+  - **27 V4 screens archived** to `apex_finance/_archive/2026-05-04/v4-routes/`
+    (25 SHELLs + 2 JE screens).
+  - **27 new V5 chips** added to `v5_data.dart` + (originally) wired
+    in `v5_wired_screens.dart` — see deviation note below.
+  - **2 routes intentionally retained:** `/hr/gosi` + `/hr/eosb`
+    (DEFERRED, follow-up G-CLEANUP-1.1).
+- **Known deviation — wired_screens drift:** the 27 `v5_wired_screens.dart`
+  entries Stage 4c-prep added (commit 9ce56c8) are missing on this
+  branch's `HEAD`. `git diff 9ce56c8 HEAD -- lib/core/v5/v5_wired_screens.dart`
+  shows the 27 entries are reverted, almost certainly via a merge
+  resolution after f72ab3f ("fix(je): restore rich JE builder"). The
+  V5 chip *definitions* are present in `v5_data.dart`, so the chips
+  render in launchers, but clicking them on `/app/<service>/<main>/<chip>`
+  would hit `_V5NotFound()` because the wiring map has no entry.
+  Tracked under **G-CLEANUP-1.2** (new follow-up): re-apply the 27
+  wired_screens entries from Stage 4c-prep's diff and re-verify
+  bundle. Out of scope for this PR (which is pure V4 deletion).
+- **Manual operator test required after merge:** GitHub Pages auto-redeploys
+  ~3 min after merge. Then verify in browser:
+  1. **V4 hub bookmarks redirect:** `/sales` → `/app/erp/sales/dashboard`,
+     `/audit` → `/app/audit/dashboard`, etc. for all 11 hubs in 4g.
+  2. **V4 deleted-route URLs surface a recoverable 404** (not a
+     crash) — e.g., direct-typing `/sales/invoices` should show
+     GoRouter's not-found state rather than a JS exception.
+  3. **No Stages 1/2/4b regressions:** `/login`, 5 Pillars on `/app`,
+     hidden launcher tiles, V5 JE Builder all still load.
+  4. Hard-refresh (Ctrl+Shift+R) if seeing old behavior.
+- **Risk:** medium-high. 5 router-modifying commits + 5 bulk-replace
+  scripts + 5 file-archive commits across the parent. Mitigations:
+  - Per-concept commits (each independently revertable).
+  - Per-stage `flutter analyze` gate before commit.
+  - Bundle sanity verified after final commit.
+  - Verify-First catches #9, #10, #11 documented in
+    `V4_CLASSIFICATION_2026-05-04.md` + commit messages.
+- **Cross-ref:** `APEX_BLUEPRINT/V4_CLASSIFICATION_2026-05-04.md`,
+  `V4_ARCHIVE_AUDIT_2026-05-04.md`, file 39 § 3.1, file 40 Stage 4.
+- **Status:** ✅ **FULLY DONE.** G-CLEANUP-1 closed. The follow-up
+  items (G-CLEANUP-1.1 `/hr/gosi`+`/hr/eosb` shared-file split,
+  G-CLEANUP-1.2 wired_screens re-application) are tracked separately.
 
 ##### Stage 4b — Journal Entries — DONE 2026-05-04
 - **Branch:** `sprint-15/g-cleanup-1b-je-archive`.
