@@ -110,10 +110,10 @@ class _Vendor360ScreenState extends State<Vendor360Screen> {
                       const SizedBox(height: 12),
                       _billsCard(),
                       const ApexOutputChips(items: [
-                        ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
-                        ApexChipLink('أعمار AP', '/purchase/aging', Icons.timeline),
+                        ApexChipLink('فواتير الموردين', '/app/erp/finance/purchase-bills', Icons.receipt_outlined),
+                        ApexChipLink('أعمار AP', '/app/erp/purchasing/ap-aging', Icons.timeline),
                         ApexChipLink('استقطاع المصدر WHT', '/compliance/wht-v2', Icons.percent),
-                        ApexChipLink('قائمة الموردين', '/purchase/vendors', Icons.business),
+                        ApexChipLink('قائمة الموردين', '/app/erp/purchasing/suppliers', Icons.business),
                       ]),
                     ]),
                   ),

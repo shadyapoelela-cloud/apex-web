@@ -1,5 +1,5 @@
 /// APEX — CoA Editor (full-featured account creation)
-/// /accounting/coa/edit — add/edit/move accounts in the tree
+/// /app/erp/finance/coa-editor — add/edit/move accounts in the tree
 library;
 
 import 'package:flutter/material.dart';
@@ -91,7 +91,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
             ),
           ),
           const ApexOutputChips(items: [
-            ApexChipLink('شجرة الحسابات', '/accounting/coa-v2', Icons.account_tree),
+            ApexChipLink('شجرة الحسابات', '/app/erp/finance/coa-editor', Icons.account_tree),
             ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
             ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
           ]),

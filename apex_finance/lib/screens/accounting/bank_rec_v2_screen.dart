@@ -1,5 +1,5 @@
 /// APEX — Bank Reconciliation AI v2 (Xero JAX pattern)
-/// /accounting/bank-rec-v2 — auto-match >95% + suggestions for the rest
+/// /app/erp/treasury/recon — auto-match >95% + suggestions for the rest
 library;
 
 import 'package:flutter/material.dart';

@@ -1,5 +1,5 @@
 /// APEX — Bills List (purchase invoices)
-/// /purchase/bills — mirror of Invoices List
+/// /app/erp/finance/purchase-bills — mirror of Invoices List
 library;
 
 import 'package:flutter/material.dart';
@@ -118,7 +118,7 @@ class _BillsListScreenState extends State<BillsListScreen> {
       error: _error,
       onRefresh: _load,
       listFooter: const ApexOutputChips(items: [
-        ApexChipLink('أعمار AP', '/purchase/aging', Icons.timeline),
+        ApexChipLink('أعمار AP', '/app/erp/purchasing/ap-aging', Icons.timeline),
         ApexChipLink('استقطاع المصدر WHT', '/compliance/wht-v2', Icons.percent),
         ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
         ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),

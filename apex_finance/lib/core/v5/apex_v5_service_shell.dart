@@ -1000,7 +1000,7 @@ const _kAllPins = <_Pin>[
       id: 'vendors',
       labelAr: 'الموردون',
       icon: Icons.local_shipping,
-      route: '/app/erp/purchase/vendors'),
+      route: '/app/erp/app/erp/purchasing/suppliers'),
 ];
 
 class _QuickAccessRail extends StatefulWidget {

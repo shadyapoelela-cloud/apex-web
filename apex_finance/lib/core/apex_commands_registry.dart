@@ -126,7 +126,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'كل الموردين',
       kind: ApexCommandKind.navigation,
       icon: Icons.local_shipping_outlined,
-      onRun: (_) => go('/purchase/vendors'),
+      onRun: (_) => go('/app/erp/purchasing/suppliers'),
     ),
     ApexCommand(
       id: 'nav_invoices',
@@ -159,7 +159,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'مسودة / مرحلة / متأخرة / مدفوعة',
       kind: ApexCommandKind.navigation,
       icon: Icons.receipt_outlined,
-      onRun: (_) => go('/purchase/bills'),
+      onRun: (_) => go('/app/erp/finance/purchase-bills'),
     ),
     ApexCommand(
       id: 'nav_ap_aging',
@@ -167,7 +167,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'AP Aging buckets',
       kind: ApexCommandKind.navigation,
       icon: Icons.timeline,
-      onRun: (_) => go('/purchase/aging'),
+      onRun: (_) => go('/app/erp/purchasing/ap-aging'),
     ),
     ApexCommand(
       id: 'nav_reports_hub',
@@ -184,7 +184,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'auto-match >95% (Xero JAX pattern)',
       kind: ApexCommandKind.navigation,
       icon: Icons.account_balance_wallet,
-      onRun: (_) => go('/accounting/bank-rec-v2'),
+      onRun: (_) => go('/app/erp/treasury/recon'),
     ),
     ApexCommand(
       id: 'nav_je_list_v2',
@@ -200,7 +200,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: '38+ حساب — drill إلى Account Ledger',
       kind: ApexCommandKind.navigation,
       icon: Icons.account_tree_outlined,
-      onRun: (_) => go('/accounting/coa-v2'),
+      onRun: (_) => go('/app/erp/finance/coa-editor'),
     ),
     ApexCommand(
       id: 'nav_budget_builder',
@@ -224,7 +224,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'إنشاء/تعديل/نقل حساب',
       kind: ApexCommandKind.navigation,
       icon: Icons.edit_note,
-      onRun: (_) => go('/accounting/coa/edit'),
+      onRun: (_) => go('/app/erp/finance/coa-editor'),
     ),
     ApexCommand(
       id: 'nav_risk_register',

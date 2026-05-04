@@ -1,5 +1,5 @@
 /// APEX — AP Aging (مرآة AR Aging)
-/// /purchase/aging — buckets: Current / 1-30 / 31-60 / 61-90 / 90+
+/// /app/erp/purchasing/ap-aging — buckets: Current / 1-30 / 31-60 / 61-90 / 90+
 library;
 
 import 'package:flutter/material.dart';
@@ -122,8 +122,8 @@ class _ApAgingScreenState extends State<ApAgingScreen> {
                       const ApexOutputChips(
                         title: 'مرتبطة بـ',
                         items: [
-                          ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
-                          ApexChipLink('الموردون', '/purchase/vendors', Icons.business),
+                          ApexChipLink('فواتير الموردين', '/app/erp/finance/purchase-bills', Icons.receipt_outlined),
+                          ApexChipLink('الموردون', '/app/erp/purchasing/suppliers', Icons.business),
                           ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),
                         ],
                       ),

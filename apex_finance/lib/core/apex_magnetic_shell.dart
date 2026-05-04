@@ -149,11 +149,11 @@ final List<ApexAppEntry> kApexApps = [
     routePrefix: '/purchase',
     categories: [
       ApexCategory('الموردون', Icons.local_shipping_rounded, [
-        ApexSubItemRef('قائمة الموردين', '/purchase/vendors', Icons.local_shipping_outlined),
+        ApexSubItemRef('قائمة الموردين', '/app/erp/purchasing/suppliers', Icons.local_shipping_outlined),
       ]),
       ApexCategory('الفواتير الواردة', Icons.description_rounded, [
-        ApexSubItemRef('كل الفواتير', '/purchase/bills', Icons.description_rounded),
-        ApexSubItemRef('أعمار المستحقات', '/purchase/aging', Icons.bar_chart_outlined),
+        ApexSubItemRef('كل الفواتير', '/app/erp/finance/purchase-bills', Icons.description_rounded),
+        ApexSubItemRef('أعمار المستحقات', '/app/erp/purchasing/ap-aging', Icons.bar_chart_outlined),
       ]),
       ApexCategory('دورة الشراء', Icons.sync_alt_rounded, [
         ApexSubItemRef('دورة الشراء الكاملة', '/operations/purchase-cycle',
@@ -170,9 +170,9 @@ final List<ApexAppEntry> kApexApps = [
     routePrefix: '/accounting',
     categories: [
       ApexCategory('شجرة الحسابات', Icons.account_tree_rounded, [
-        ApexSubItemRef('شجرة الحسابات', '/accounting/coa-v2', Icons.account_tree_rounded),
+        ApexSubItemRef('شجرة الحسابات', '/app/erp/finance/coa-editor', Icons.account_tree_rounded),
         ApexSubItemRef('عرض شجري', '/coa-tree', Icons.account_tree_outlined),
-        ApexSubItemRef('محرر COA', '/accounting/coa/edit', Icons.edit_rounded),
+        ApexSubItemRef('محرر COA', '/app/erp/finance/coa-editor', Icons.edit_rounded),
       ]),
       ApexCategory('قيود اليومية', Icons.edit_note_rounded, [
         ApexSubItemRef('سجل القيود', '/app/erp/finance/je-builder', Icons.list_alt_rounded,
@@ -182,7 +182,7 @@ final List<ApexAppEntry> kApexApps = [
         ApexSubItemRef('سجل التدقيق', '/compliance/audit-trail', Icons.lock_outline_rounded),
       ]),
       ApexCategory('التسوية البنكية', Icons.account_balance_rounded, [
-        ApexSubItemRef('المطابقة الذكية', '/accounting/bank-rec-v2',
+        ApexSubItemRef('المطابقة الذكية', '/app/erp/treasury/recon',
             Icons.compare_arrows_rounded),
         ApexSubItemRef('تغذية البنوك', '/settings/bank-feeds', Icons.cloud_sync_rounded),
       ]),

@@ -7,8 +7,8 @@
 ///   • Group-by:      none / status / vendor / month / quarter / due-week
 ///   • Sort:          date↓↑ · number · total↓↑ · due-date↑
 ///   • View modes:    list, cards
-///   • CTAs:          + جديد   → /purchase/bills/new
-///                    ✨ ذكاء   → /purchase/bills/new?ai=1   (OCR upload)
+///   • CTAs:          + جديد   → /app/erp/finance/purchase-bills/new
+///                    ✨ ذكاء   → /app/erp/finance/purchase-bills/new?ai=1   (OCR upload)
 library;
 
 import 'package:flutter/material.dart';
@@ -22,7 +22,7 @@ import '../../core/theme.dart';
 import '../../widgets/apex_copilot_drawer.dart';
 import '../../widgets/apex_list_toolbar.dart';
 
-const String _kScreenKey = '/purchase/bills';
+const String _kScreenKey = '/app/erp/finance/purchase-bills';
 
 class PurchaseInvoicesScreen extends StatefulWidget {
   const PurchaseInvoicesScreen({super.key});
@@ -504,7 +504,7 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey =
       GlobalKey<ScaffoldState>();
 
-  // No dedicated /purchase/bills/new screen yet (parallel to sales has
+  // No dedicated /app/erp/finance/purchase-bills/new screen yet (parallel to sales has
   // SalesInvoiceCreateScreen at /app/erp/sales/invoice-create). Route to the
   // purchase hub for now — the user picks the right action there.
   // TODO(wave-4): build PurchaseInvoiceCreateScreen + register route.

@@ -98,7 +98,7 @@ class _CashFlowForecastScreenState extends State<CashFlowForecastScreen> {
           _liveForecastCard(),
           const ApexOutputChips(items: [
             ApexChipLink('أعمار AR', '/app/erp/sales/ar-aging', Icons.timeline),
-            ApexChipLink('أعمار AP', '/purchase/aging', Icons.timeline),
+            ApexChipLink('أعمار AP', '/app/erp/purchasing/ap-aging', Icons.timeline),
             ApexChipLink('بناء الموازنة', '/analytics/budget-builder', Icons.calculate),
             ApexChipLink('Health Score', '/analytics/health-score-v2', Icons.health_and_safety),
           ]),

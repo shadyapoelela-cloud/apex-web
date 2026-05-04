@@ -91,9 +91,6 @@ import '../screens/audit/audit_engagement_workspace_screen.dart';
 import '../screens/operations/vendor_360_screen.dart';
 import '../screens/operations/receipt_capture_screen.dart';
 import '../screens/settings/unified_settings_screen.dart';
-import '../screens/operations/vendors_list_screen.dart';
-import '../screens/operations/bills_list_screen.dart';
-import '../screens/operations/ap_aging_screen.dart';
 import '../screens/notifications/notifications_panel_screen.dart';
 import '../screens/operations/pos_quick_sale_screen.dart';
 import '../screens/operations/customer_payment_screen.dart';
@@ -102,9 +99,7 @@ import '../screens/operations/vendor_payment_screen.dart';
 import '../screens/compliance/tax_calendar_screen.dart';
 // G-CLEANUP-1 Stage 4b: JeListScreen archived to _archive/2026-05-04/v4-routes/.
 // Replaced by V5 list at /app/erp/finance/je-builder.
-import '../screens/accounting/coa_tree_v2_screen.dart';
 import '../screens/hr/employees_list_screen.dart';
-import '../screens/accounting/bank_rec_v2_screen.dart';
 import '../screens/reports/reports_hub_screen.dart';
 import '../screens/compliance/zatca_invoice_viewer_screen.dart';
 import '../screens/hr/payroll_run_screen.dart';
@@ -729,11 +724,11 @@ final appRouter = GoRouter(
     GoRoute(path: '/operations/consolidation-ui', redirect: (c, s) => '/app/erp/consolidation/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/operations/live-sales-cycle', pageBuilder: (c, s) => _apexPage(const LiveSalesCycleScreen(), s)),
     // /today and /sales etc. moved to top of routes list — see above
-    GoRoute(path: '/accounting/coa', redirect: (c, s) => '/coa-tree'),
+        // Sprint 15 Stage 4d: V4 /accounting/coa archived → V5 /app/erp/finance/coa-editor
     // G-CLEANUP-1 Stage 4b: V4 /accounting/journal-entries redirect deleted.
     // V5: /app/erp/finance/je-builder.
-    GoRoute(path: '/accounting/trial-balance', redirect: (c, s) => '/compliance/financial-statements'),
-    GoRoute(path: '/accounting/period-close', redirect: (c, s) => '/operations/period-close'),
+        // Sprint 15 Stage 4d: V4 /accounting/trial-balance archived → V5 /app/erp/finance/statements
+        // Sprint 15 Stage 4d: V4 /accounting/period-close archived → V5 /app/erp/finance/period-close
     // /financial-statements canonical (with optional apiData/pickedFile) defined below at line ~805 — duplicate redirect removed (Stage 1 bugfix 2026-04-29).
     GoRoute(path: '/audit/engagements', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
     GoRoute(path: '/audit/engagement-workspace', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
@@ -762,14 +757,14 @@ final appRouter = GoRouter(
         // Sprint 15 Stage 4c: V4 /sales/invoices archived → V5 /app/erp/sales/invoices
         // Sprint 15 Stage 4c: V4 /sales/invoices/new archived → V5 /app/erp/sales/invoice-create
         // Sprint 15 Stage 4c: V4 /sales/aging archived → V5 /app/erp/sales/ar-aging
-    GoRoute(path: '/purchase/vendors', pageBuilder: (c, s) => _apexPage(const VendorsListScreen(), s)),
-    GoRoute(path: '/purchase/bills', pageBuilder: (c, s) => _apexPage(const BillsListScreen(), s)),
+        // Sprint 15 Stage 4d: V4 /purchase/vendors archived → V5 /app/erp/purchasing/suppliers
+        // Sprint 15 Stage 4d: V4 /purchase/bills archived → V5 /app/erp/finance/purchase-bills
     // /purchase/bills/new doesn't exist yet (no PurchaseBillCreateScreen
     // sibling to SalesInvoiceCreateScreen). Redirect to the purchase hub
     // so any old links the user (or another screen) navigates to don't
     // crash with GoException.
-    GoRoute(path: '/purchase/bills/new', redirect: (_, __) => '/purchase'),
-    GoRoute(path: '/purchase/aging', pageBuilder: (c, s) => _apexPage(const ApAgingScreen(), s)),
+        // Sprint 15 Stage 4d: V4 /purchase/bills/new archived → V5 /app/erp/finance/purchase-bills
+        // Sprint 15 Stage 4d: V4 /purchase/aging archived → V5 /app/erp/purchasing/ap-aging
     GoRoute(path: '/notifications/panel', pageBuilder: (c, s) => _apexPage(const NotificationsPanelScreen(), s)),
     GoRoute(path: '/pos/quick-sale', pageBuilder: (c, s) => _apexPage(const PosQuickSaleScreen(), s)),
     GoRoute(
@@ -791,10 +786,10 @@ final appRouter = GoRouter(
     // G-CLEANUP-1 Stage 4b: V4 /accounting/je-list pageBuilder deleted.
     // JeListScreen archived to _archive/2026-05-04/v4-routes/.
     // V5: /app/erp/finance/je-builder (JeBuilderScreen via v5_wired_screens).
-    GoRoute(path: '/accounting/coa-v2', pageBuilder: (c, s) => _apexPage(const CoaTreeV2Screen(), s)),
+        // Sprint 15 Stage 4d: V4 /accounting/coa-v2 archived → V5 /app/erp/finance/coa-editor
     GoRoute(path: '/hr/employees', pageBuilder: (c, s) => _apexPage(const EmployeesListScreen(), s)),
     // /hr now serves the HR Hub (registered earlier at top of routes)
-    GoRoute(path: '/accounting/bank-rec-v2', pageBuilder: (c, s) => _apexPage(const BankRecV2Screen(), s)),
+        // Sprint 15 Stage 4d: V4 /accounting/bank-rec-v2 archived → V5 /app/erp/treasury/recon
     // /reports moved to top of routes list — see above
     GoRoute(path: '/reports/hub', redirect: (c, s) => '/reports'),
     GoRoute(
@@ -832,7 +827,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/operations/stock-card/:sku', redirect: (c, s) => '/app/erp/inventory/stock-movements'),
     GoRoute(path: '/audit/anomaly/:id', redirect: (c, s) => '/app/erp/finance/anomalies'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived (V4 screen has zero backend; redirected to V5 home)
     GoRoute(path: '/workflow/approvals', pageBuilder: (c, s) => _apexPage(const ApprovalsInboxScreen(), s)),
-    GoRoute(path: '/accounting/coa/edit', pageBuilder: (c, s) => _apexPage(const CoaEditorScreen(), s)),
+        // Sprint 15 Stage 4d: V4 /accounting/coa/edit archived → V5 /app/erp/finance/coa-editor
     GoRoute(path: '/compliance/risk-register', pageBuilder: (c, s) => _apexPage(const RiskRegisterScreen(), s)),
     GoRoute(path: '/analytics/budget-builder', redirect: (c, s) => '/app/erp/finance/budget-planning'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/compliance/kyc-aml', redirect: (c, s) => '/app/compliance/aml-ethics/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend

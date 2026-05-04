@@ -1,5 +1,5 @@
 /// APEX — Vendor Payment recording (mirror of Customer Payment)
-/// /purchase/payment/:billId
+/// /app/erp/purchasing/payment/:billId
 library;
 
 import 'package:flutter/material.dart';
@@ -62,7 +62,7 @@ class _VendorPaymentScreenState extends State<VendorPaymentScreen> {
         backgroundColor: AC.ok,
         content: Text('تم تسجيل دفعة للمورد بقيمة ${amount.toStringAsFixed(2)} ريال'),
       ));
-      context.go('/purchase/bills');
+      context.go('/app/erp/finance/purchase-bills');
     }
   }
 

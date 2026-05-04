@@ -53,9 +53,9 @@ class _ApexLaunchpadScreenState extends State<ApexLaunchpadScreen> {
       color: 0xFF2196F3,
       apps: [
         _App('دورة الشراء', 'Purchase Cycle', '/operations/purchase-cycle', Icons.shopping_basket),
-        _App('الموردون', 'قائمة + Vendor 360', '/purchase/vendors', Icons.business),
-        _App('فواتير الموردين', 'Bills List + filters', '/purchase/bills', Icons.receipt_outlined),
-        _App('أعمار AP', 'AP Aging buckets', '/purchase/aging', Icons.timeline),
+        _App('الموردون', 'قائمة + Vendor 360', '/app/erp/purchasing/suppliers', Icons.business),
+        _App('فواتير الموردين', 'Bills List + filters', '/app/erp/finance/purchase-bills', Icons.receipt_outlined),
+        _App('أعمار AP', 'AP Aging buckets', '/app/erp/purchasing/ap-aging', Icons.timeline),
       ],
     ),
     _Service(
@@ -66,10 +66,10 @@ class _ApexLaunchpadScreenState extends State<ApexLaunchpadScreen> {
       color: 0xFF9C27B0,
       apps: [
         _App('قائمة القيود', 'JE List canonical', '/app/erp/finance/je-builder', Icons.book),
-        _App('شجرة الحسابات', 'CoA Tree v2 (SOCPA)', '/accounting/coa-v2', Icons.account_tree),
-        _App('محرر الحسابات', 'CoA Editor', '/accounting/coa/edit', Icons.edit_note),
+        _App('شجرة الحسابات', 'CoA Tree v2 (SOCPA)', '/app/erp/finance/coa-editor', Icons.account_tree),
+        _App('محرر الحسابات', 'CoA Editor', '/app/erp/finance/coa-editor', Icons.edit_note),
         _App('ميزان المراجعة', 'TB + drill chain', '/compliance/financial-statements', Icons.assessment),
-        _App('التسوية البنكية AI', 'Auto-match >95%', '/accounting/bank-rec-v2', Icons.account_balance_wallet),
+        _App('التسوية البنكية AI', 'Auto-match >95%', '/app/erp/treasury/recon', Icons.account_balance_wallet),
         _App('إقفال الفترة', 'NetSuite checklist', '/operations/period-close', Icons.lock_clock),
       ],
     ),

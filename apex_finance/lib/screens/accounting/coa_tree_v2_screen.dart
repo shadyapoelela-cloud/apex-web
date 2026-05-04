@@ -1,5 +1,5 @@
 /// APEX — Chart of Accounts (canonical, hierarchical with category filters)
-/// /accounting/coa-v2 — replaces legacy /coa-tree
+/// /app/erp/finance/coa-editor — replaces legacy /coa-tree
 library;
 
 import 'package:flutter/material.dart';
@@ -96,7 +96,7 @@ class _CoaTreeV2ScreenState extends State<CoaTreeV2Screen> {
       listFooter: const ApexOutputChips(items: [
         ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
         ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
-        ApexChipLink('محرر الحسابات', '/accounting/coa/edit', Icons.edit_note),
+        ApexChipLink('محرر الحسابات', '/app/erp/finance/coa-editor', Icons.edit_note),
       ]),
       emptyState: ApexEmptyState(
         icon: Icons.account_tree_outlined,
