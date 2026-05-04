@@ -3410,7 +3410,7 @@ same pattern can be applied to sibling screens with one import.
 - **Owner:** TBD.
 - **Sprint target:** 14 — Phase B.
 
-#### 🔴 G-CLEANUP-1. Archive V4 duplicate routes that have V5 equivalents — Stages 4a (audit) + 4b (Journal Entries) DONE 2026-05-04
+#### 🔴 G-CLEANUP-1. Archive V4 duplicate routes that have V5 equivalents — Stages 4a + 4b + 4c-prep DONE 2026-05-05
 - **Severity:** 🔴 P0 Blocker — route duplication / cleanup. Cleanup
   (route deletion + reference updates) deferred to Stages 4b–4f.
 - **Path:** `apex_finance/lib/core/router.dart` + ~720 internal-
@@ -3486,8 +3486,104 @@ same pattern can be applied to sibling screens with one import.
 - **Owner:** TBD per sub-PR.
 - **Cross-ref:** `APEX_BLUEPRINT/V4_ARCHIVE_AUDIT_2026-05-04.md`,
   file 39 § 3.1, file 38 § 2-3, file 40 Stage 4 prompts.
-- **Sprint target:** 15 — Stages 4a (audit) + 4b (this PR) + 4c–4g
-  (subsequent execution PRs).
+- **Sprint target:** 15 — Stages 4a + 4b + 4c-prep (this PR) + final
+  bulk-delete PR (Stages 4c-4g).
+
+##### Stage 4c-prep — V4 classification + new V5 chips + SHELL archive — DONE 2026-05-05
+- **Branch:** `sprint-15/g-cleanup-1-prep-classify`.
+- **Trigger:** during the abandoned 4c-4g attempt, Verify-First catch
+  surfaced that the audit's V5 mappings were optimistic for ~half the
+  routes — many V4 paths had no V5 chip wiring, which would have
+  caused `_V5NotFound()` regressions if bulk-deleted directly.
+- **Operator-approved approach (Option B):** classify each remaining
+  V4 route into HAS_V5 / REAL_NEW_V5 / SHELL / DEFERRED, then in
+  this PR add the missing V5 chips (REAL_NEW_V5) + archive the
+  shells, leaving the bulk V4 deletion safe for the follow-up PR.
+- **Classification matrix:** `APEX_BLUEPRINT/V4_CLASSIFICATION_2026-05-04.md`
+  — 86 V4 routes classified across 4 buckets.
+  - 🟢 HAS_V5: 27 (deferred to bulk-delete PR)
+  - 🔵 REAL_NEW_V5: 31 routes → 27 unique new V5 chips (this PR adds them)
+  - 🟡 SHELL: 26 (this PR archives 25 — see V5-wired re-classification below)
+  - ⚪ DEFERRED: 2 (`/hr/gosi` + `/hr/eosb`, shared file)
+- **Verify-First catch during execution (#10):** 2 of the SHELL
+  candidates turned out to be V5-wired despite the 0-api-call
+  heuristic flagging them — `RiskRegisterScreen` (used by
+  `compliance/regulatory/risk-register` chip) and
+  `ProjectProfitabilityScreen` (used by 2 V5 chips). Reclassified
+  HAS_V5 in real-time; **25 SHELLs archived** instead of the
+  matrix's stated 26.
+- **Files changed:**
+  - **25 V4 screens archived** via `git mv` to
+    `apex_finance/_archive/2026-05-04/v4-routes/{sales,compliance,audit,analytics,hr,operations,marketplace}/`.
+  - **`apex_finance/lib/core/router.dart`:** 25 SHELL pageBuilders
+    converted to one-line redirects to V5 dashboards; 24 orphan
+    imports removed; 2 DEFERRED routes (`/hr/gosi`, `/hr/eosb`)
+    annotated with G-CLEANUP-1.1 follow-up comment.
+  - **`apex_finance/lib/core/v5/v5_data.dart`:** 27 new V5 chips
+    added across 11 main modules (sales 5, purchasing 4, finance 3,
+    treasury 1, pos 1, zatca 1, tax 1, ifrs 4, advisory/ratios 3,
+    advisory/valuation 1, audit/engagement 1, marketplace/browse 2).
+  - **`apex_finance/lib/core/v5/v5_wired_screens.dart`:** 27 new
+    `'<service>/<main>/<chip>': (ctx) => Screen()` entries +
+    new imports for 28 V4 screens. 2 imports aliased
+    (`ops_customer_360`, `cmp_deferred_tax`) to disambiguate from
+    same-named V4-era duplicates.
+- **V5 chip naming convention** (operator-stated 2026-05-05) applied
+  consistently:
+  - Sales/AR/customer payments → `/app/erp/sales/...`
+  - Purchase/AP/vendor payments → `/app/erp/purchasing/...`
+  - GL/accounting/cashflow/depreciation → `/app/erp/finance/...`
+  - Treasury/FX → `/app/erp/treasury/...`
+  - ZATCA/Tax/VAT/Zakat → `/app/compliance/zatca/...` and `/app/compliance/tax/...`
+  - IFRS/Islamic → `/app/compliance/ifrs/...`
+  - Audit/workpapers → `/app/audit/...`
+  - Ratios/valuation/investment → `/app/advisory/...`
+  - Marketplace/catalog → `/app/marketplace/browse/...`
+- **Operator-directed reclassifications (DEFERRED → SHELL, 2026-05-05):**
+  `/compliance/executive`, `/operations/universal-journal`,
+  `/audit/service`, `/analytics/investment-portfolio-v2`,
+  `/analytics/project-profitability` — 5 routes that were parked
+  under G-MOD-* tracks with no roadmap timeline. Operator decided
+  to archive rather than wait. (Note: `project-profitability` was
+  then reclassified HAS_V5 because its screen is V5-wired.)
+- **Verification:**
+  - `flutter analyze`: **288 issues** (down 17 from 305 baseline —
+    archived V4 screens carried pre-existing warnings; archiving
+    removed them). Zero new warnings.
+  - `flutter test`: 43 passed, 1 pre-existing failure
+    (`ask_panel_test.dart` `package:web` 1.1.1, unchanged).
+  - **Bundle sanity (post-rebuild `docs/main.dart.js`):**
+    - 23 archived V4 screen class names: **0 hits** ✅
+    - All 12 sample new V5 chip paths verified present (1 hit each)
+    - Stage 1 `/users/me` probe: 6 hits (preserved)
+    - Stage 2 Copilot banner: 36 hits (preserved)
+    - Stage 4b `/app/erp/finance/je-builder`: 38 hits (preserved)
+    - Bundle size: 10,268,983 → **10,091,708** (**-177 KB** — 25
+      V4 screens stripped from production build).
+- **What's left for the follow-up PR (Stages 4c-4g final):**
+  - Bulk-delete all 27 HAS_V5 V4 route definitions from `router.dart`
+    (now safe — every target is a confirmed-wired V5 chip).
+  - Bulk-update internal references from V4 paths to V5 paths
+    (~600 refs across the codebase per the audit's reference count;
+    minus the JE refs already updated in 4b and the SHELL refs that
+    already point to redirects).
+  - Wire path-keyed V5 routes (e.g. `/app/erp/sales/customer-360/:id`)
+    in `v5_routes.dart` for the customer-360, vendor-360, customer-payment,
+    vendor-payment, zatca-invoice/:id chips.
+  - Archive the remaining V4 screens that became orphan after bulk
+    delete (some V4 screens are dual-wired and should NOT be
+    archived; per Stage 4b precedent).
+  - Stage 4g — V4 service hubs (`/sales`, `/purchase`, etc.) +
+    verbose launchpad — the V4-era IA layer that depended on V4
+    children; safe to delete now that the children are migrated.
+- **Risk:** medium. 28 source files touched + 25 file moves. Mitigations:
+  - Bulk-replaces script-driven (deterministic, traceable).
+  - Per-bucket execution with analyze gates between groups.
+  - Bundle sanity confirmed every new V5 chip path lands.
+  - V5-wired re-classification caught 2 SHELL false-positives
+    before archive — saved 2 V5 chips from breaking.
+- **Cross-ref:** `APEX_BLUEPRINT/V4_CLASSIFICATION_2026-05-04.md`,
+  `V4_ARCHIVE_AUDIT_2026-05-04.md`, file 39 § 3.1, file 40 Stages 4c-4g.
 
 ##### Stage 4b — Journal Entries — DONE 2026-05-04
 - **Branch:** `sprint-15/g-cleanup-1b-je-archive`.

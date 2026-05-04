@@ -26,16 +26,12 @@ import '../screens/whats_new/white_label_settings_screen.dart';
 import '../screens/whats_new/syncfusion_grid_demo_screen.dart';
 import '../screens/financial/financial_ops_screen.dart';
 import '../screens/knowledge/knowledge_brain_screen.dart';
-import '../screens/audit/audit_workflow_screen.dart';
 import '../screens/dashboard/enhanced_dashboard.dart';
-import '../screens/providers/provider_kanban_screen.dart';
 import '../screens/settings/enhanced_settings_screen.dart';
 import '../screens/coa/coa_tree_screen.dart';
 import '../screens/legal/legal_acceptance_screen.dart';
 import '../screens/compliance/provider_compliance_detail.dart';
 import '../screens/clients/client_detail_screen.dart';
-import '../screens/marketplace/service_request_detail.dart';
-import '../screens/providers/provider_profile_screen.dart';
 import '../screens/notifications/notification_detail_screen.dart';
 import '../screens/auth/register_screen.dart' show RegScreen;
 import '../screens/upgrade_plan_screen.dart' show UpgradePlanScreen;
@@ -78,11 +74,9 @@ import '../screens/activity_feed_screen.dart';
 // import '../screens/operations/je_creator_screen.dart';
 // import '../screens/operations/financial_statements_formatted_screen.dart';
 // import '../screens/operations/financial_analysis_screen.dart';
-import '../screens/operations/universal_journal_screen.dart';
 import '../screens/operations/period_close_screen.dart';
 import '../screens/operations/pos_session_screen.dart';
 import '../screens/operations/purchase_cycle_screen.dart';
-import '../screens/operations/consolidation_ui_screen.dart';
 import '../screens/operations/live_sales_cycle_screen.dart';
 import '../screens/home/today_dashboard_screen.dart';
 import '../screens/home/apex_launchpad_screen.dart';
@@ -118,35 +112,18 @@ import '../screens/accounting/bank_rec_v2_screen.dart';
 import '../screens/reports/reports_hub_screen.dart';
 import '../screens/compliance/zatca_invoice_viewer_screen.dart';
 import '../screens/hr/payroll_run_screen.dart';
-import '../screens/operations/inventory_v2_screen.dart';
-import '../screens/operations/fixed_assets_v2_screen.dart';
-import '../screens/analytics/budget_variance_v2_screen.dart';
-import '../screens/analytics/multi_currency_v2_screen.dart';
-import '../screens/analytics/health_score_v2_screen.dart';
-import '../screens/compliance/lease_schedule_v2_screen.dart';
 import '../screens/compliance/zatca_status_center_screen.dart';
 import '../screens/compliance/consolidation_v2_screen.dart';
 import '../screens/admin/ai_suggestions_queue_v2_screen.dart';
-import '../screens/analytics/investment_portfolio_v2_screen.dart';
 import '../screens/analytics/project_profitability_screen.dart';
 import '../screens/settings/bank_feed_setup_screen.dart';
-import '../screens/compliance/activity_log_v2_screen.dart';
 import '../screens/sales/recurring_invoices_screen.dart';
 import '../screens/knowledge/knowledge_search_v2_screen.dart';
-import '../screens/sales/quotes_list_screen.dart';
-import '../screens/sales/credit_memos_screen.dart';
 import '../screens/hr/expense_reports_screen.dart';
-import '../screens/analytics/cost_variance_v2_screen.dart';
 import '../screens/compliance/wht_v2_screen.dart';
-import '../screens/hr/timesheet_screen.dart';
-import '../screens/operations/petty_cash_screen.dart';
-import '../screens/operations/stock_card_screen.dart';
-import '../screens/audit/anomaly_detail_screen.dart';
 import '../screens/workflow/approvals_inbox_screen.dart';
 import '../screens/accounting/coa_editor_screen.dart';
 import '../screens/compliance/risk_register_screen.dart';
-import '../screens/analytics/budget_builder_screen.dart';
-import '../screens/compliance/kyc_aml_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
 import '../screens/extracted/legal_screens_v2.dart';
@@ -157,7 +134,8 @@ import '../screens/auth/slide_auth_screen.dart';
 // client_onboarding_wizard removed — redirected to unified /settings/entities
 import '../screens/marketplace/service_catalog_screen.dart' as catalog;
 import '../screens/account/archive_screen.dart' as archive;
-import '../screens/tasks/audit_service_screen.dart' as audit;
+// G-CLEANUP-1 Stage 4c-prep: AuditServiceScreen archived to _archive/2026-05-04/v4-routes/audit/.
+// V4 /audit/service redirects to /app/marketplace/dashboard.
 import '../core/session.dart' show S;
 import 'auth_guard.dart';
 // client_create.dart import removed — redirected to unified /settings/entities
@@ -194,7 +172,6 @@ import '../screens/compliance/investment_screen.dart';
 // import '../screens/compliance/aging_screen.dart';           // → /sales/aging
 import '../screens/compliance/working_capital_screen.dart';
 // import '../screens/compliance/health_score_screen.dart'; // deduplicated → /analytics/health-score-v2
-import '../screens/compliance/executive_dashboard_screen.dart';
 import '../screens/compliance/ocr_screen.dart';
 import '../screens/compliance/dscr_screen.dart';
 import '../screens/compliance/valuation_screen.dart';
@@ -443,6 +420,15 @@ final appRouter = GoRouter(
     // GOSI + EOSB calculators promoted to production HR features (Stage 5b
     // follow-up, 2026-04-29). Old /*-demo paths kept as redirects for
     // backward compatibility with bookmarks and external links.
+    // G-CLEANUP-1 Stage 4c-prep (Sprint 15): /hr/gosi + /hr/eosb routes
+    // marked DEFERRED in V4_CLASSIFICATION_2026-05-04.md. Both screens
+    // (GosiCalcScreen + EosbCalcScreen) live as sub-classes of the
+    // larger screens/whats_new/feature_demos_screen.dart file alongside
+    // ~10 other unrelated demo screens. Splitting that shared file into
+    // per-screen modules is a separate cleanup (track G-CLEANUP-1.1)
+    // that needs to land before these V4 routes can be archived. Until
+    // then the V4 paths stay; the V5 home will be /app/erp/hr/gosi and
+    // /app/erp/hr/eosb after the split.
     GoRoute(
       path: '/hr/gosi',
       pageBuilder: (c, s) => _apexPage(const GosiCalcScreen(), s),
@@ -527,10 +513,7 @@ final appRouter = GoRouter(
       pageBuilder: (c, s) => _apexPage(const WorkingCapitalScreen(), s),
     ),
     GoRoute(path: '/compliance/health-score', redirect: (c, s) => '/analytics/health-score-v2'),
-    GoRoute(
-      path: '/compliance/executive',
-      pageBuilder: (c, s) => _apexPage(const ExecutiveDashboardScreen(), s),
-    ),
+    GoRoute(path: '/compliance/executive', redirect: (c, s) => '/app/erp/finance/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived (V4 screen has zero backend; redirected to V5 home)
     GoRoute(
       path: '/compliance/ocr',
       pageBuilder: (c, s) => _apexPage(const OcrScreen(), s),
@@ -622,14 +605,14 @@ final appRouter = GoRouter(
     GoRoute(path: '/admin/providers/documents', pageBuilder: (c, s) => _apexPage(const ProviderDocumentUploadScreen(), s)),
     GoRoute(path: '/admin/providers/compliance', pageBuilder: (c, s) => _apexPage(const ProviderComplianceScreen(), s)),
     GoRoute(path: '/admin/policies', pageBuilder: (c, s) => _apexPage(const PolicyManagementScreen(), s)),
-    GoRoute(path: '/provider-kanban', pageBuilder: (c, s) => _apexPage(const ProviderKanbanScreen(), s)),
+    GoRoute(path: '/provider-kanban', redirect: (c, s) => '/app/marketplace/provider-ops/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/client-detail', pageBuilder: (c, s) { final args = s.extra as Map<String,dynamic>? ?? {}; return _apexPage(ClientDetailScreen(clientId: args['id'] ?? '', clientName: args['name'] ?? ''), s); }),
     GoRoute(path: '/legal-acceptance', pageBuilder: (c, s) => _apexPage(const LegalAcceptanceLogger(), s)),
     GoRoute(path: '/compliance-detail', pageBuilder: (c, s) => _apexPage(const ProviderComplianceDetailScreen(), s)),
     GoRoute(path: '/coa-tree', pageBuilder: (c, s) => _apexPage(const CoaTreeScreen(), s)),
     GoRoute(path: '/settings', pageBuilder: (c, s) => _apexPage(const EnhancedSettingsScreen(), s)),
     GoRoute(path: '/dashboard', pageBuilder: (c, s) => _apexPage(const EnhancedDashboard(), s)),
-    GoRoute(path: '/audit-workflow', pageBuilder: (c, s) => _apexPage(const AuditWorkflowScreen(), s)),
+    GoRoute(path: '/audit-workflow', redirect: (c, s) => '/app/audit/engagement/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/knowledge-brain', pageBuilder: (c, s) => _apexPage(const KnowledgeBrainScreen(), s)),
     GoRoute(path: '/financial-ops', pageBuilder: (c, s) => _apexPage(const FinancialOpsScreen(), s)),
     GoRoute(path: '/copilot', pageBuilder: (c, s) => _apexPage(const CopilotScreen(), s)),
@@ -744,11 +727,11 @@ final appRouter = GoRouter(
     // V5: /app/erp/finance/je-builder/new.
     GoRoute(path: '/operations/financial-statements', redirect: (c, s) => '/compliance/financial-statements'),
     GoRoute(path: '/operations/financial-analysis', redirect: (c, s) => '/compliance/ratios'),
-    GoRoute(path: '/operations/universal-journal', pageBuilder: (c, s) => _apexPage(const UniversalJournalScreen(), s)),
+    GoRoute(path: '/operations/universal-journal', redirect: (c, s) => '/app/erp/finance/je-builder'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/operations/period-close', pageBuilder: (c, s) => _apexPage(const PeriodCloseScreen(), s)),
     GoRoute(path: '/operations/pos-sessions', pageBuilder: (c, s) => _apexPage(const PosSessionScreen(), s)),
     GoRoute(path: '/operations/purchase-cycle', pageBuilder: (c, s) => _apexPage(const PurchaseCycleScreen(), s)),
-    GoRoute(path: '/operations/consolidation-ui', pageBuilder: (c, s) => _apexPage(const ConsolidationUiScreen(), s)),
+    GoRoute(path: '/operations/consolidation-ui', redirect: (c, s) => '/app/erp/consolidation/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/operations/live-sales-cycle', pageBuilder: (c, s) => _apexPage(const LiveSalesCycleScreen(), s)),
     // /today and /sales etc. moved to top of routes list — see above
     GoRoute(path: '/accounting/coa', redirect: (c, s) => '/coa-tree'),
@@ -827,45 +810,37 @@ final appRouter = GoRouter(
       ),
     ),
     GoRoute(path: '/hr/payroll-run', pageBuilder: (c, s) => _apexPage(const PayrollRunScreen(), s)),
-    GoRoute(path: '/operations/inventory-v2', pageBuilder: (c, s) => _apexPage(const InventoryV2Screen(), s)),
-    GoRoute(path: '/operations/fixed-assets-v2', pageBuilder: (c, s) => _apexPage(const FixedAssetsV2Screen(), s)),
-    GoRoute(path: '/analytics/budget-variance-v2', pageBuilder: (c, s) => _apexPage(const BudgetVarianceV2Screen(), s)),
-    GoRoute(path: '/analytics/multi-currency-v2', pageBuilder: (c, s) => _apexPage(const MultiCurrencyV2Screen(), s)),
-    GoRoute(path: '/analytics/health-score-v2', pageBuilder: (c, s) => _apexPage(const HealthScoreV2Screen(), s)),
-    GoRoute(path: '/compliance/lease-v2', pageBuilder: (c, s) => _apexPage(const LeaseScheduleV2Screen(), s)),
+    GoRoute(path: '/operations/inventory-v2', redirect: (c, s) => '/app/erp/inventory/inventory'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
+    GoRoute(path: '/operations/fixed-assets-v2', redirect: (c, s) => '/app/erp/finance/fixed-assets'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
+    GoRoute(path: '/analytics/budget-variance-v2', redirect: (c, s) => '/app/erp/finance/budget-actual'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
+    GoRoute(path: '/analytics/multi-currency-v2', redirect: (c, s) => '/app/erp/treasury/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
+    GoRoute(path: '/analytics/health-score-v2', redirect: (c, s) => '/app/erp/finance/health-score'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
+    GoRoute(path: '/compliance/lease-v2', redirect: (c, s) => '/app/compliance/ifrs/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/compliance/zatca-status', pageBuilder: (c, s) => _apexPage(const ZatcaStatusCenterScreen(), s)),
     GoRoute(path: '/compliance/consolidation-v2', pageBuilder: (c, s) => _apexPage(const ConsolidationV2Screen(), s)),
     GoRoute(path: '/admin/ai-suggestions-v2', pageBuilder: (c, s) => _apexPage(const AiSuggestionsQueueV2Screen(), s)),
-    GoRoute(path: '/analytics/investment-portfolio-v2', pageBuilder: (c, s) => _apexPage(const InvestmentPortfolioV2Screen(), s)),
+    GoRoute(path: '/analytics/investment-portfolio-v2', redirect: (c, s) => '/app/advisory/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/analytics/project-profitability', pageBuilder: (c, s) => _apexPage(const ProjectProfitabilityScreen(), s)),
     GoRoute(path: '/settings/bank-feeds', pageBuilder: (c, s) => _apexPage(const BankFeedSetupScreen(), s)),
-    GoRoute(path: '/compliance/activity-log-v2', pageBuilder: (c, s) => _apexPage(const ActivityLogV2Screen(), s)),
+    GoRoute(path: '/compliance/activity-log-v2', redirect: (c, s) => '/app/erp/finance/activity-log'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/sales/recurring', pageBuilder: (c, s) => _apexPage(const RecurringInvoicesScreen(), s)),
     GoRoute(path: '/knowledge/search', pageBuilder: (c, s) => _apexPage(const KnowledgeSearchV2Screen(), s)),
-    GoRoute(path: '/sales/quotes', pageBuilder: (c, s) => _apexPage(const QuotesListScreen(), s)),
-    GoRoute(path: '/sales/memos', pageBuilder: (c, s) => _apexPage(const CreditMemosScreen(), s)),
+    GoRoute(path: '/sales/quotes', redirect: (c, s) => '/app/erp/sales/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
+    GoRoute(path: '/sales/memos', redirect: (c, s) => '/app/erp/sales/credit-notes'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/hr/expense-reports', pageBuilder: (c, s) => _apexPage(const ExpenseReportsScreen(), s)),
-    GoRoute(path: '/analytics/cost-variance-v2', pageBuilder: (c, s) => _apexPage(const CostVarianceV2Screen(), s)),
+    GoRoute(path: '/analytics/cost-variance-v2', redirect: (c, s) => '/app/erp/finance/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/compliance/wht-v2', pageBuilder: (c, s) => _apexPage(const WhtV2Screen(), s)),
-    GoRoute(path: '/hr/timesheet', pageBuilder: (c, s) => _apexPage(const TimesheetScreen(), s)),
-    GoRoute(path: '/operations/petty-cash', pageBuilder: (c, s) => _apexPage(const PettyCashScreen(), s)),
-    GoRoute(path: '/operations/stock-card', pageBuilder: (c, s) => _apexPage(const StockCardScreen(), s)),
-    GoRoute(
-      path: '/operations/stock-card/:sku',
-      pageBuilder: (c, s) => _apexPage(StockCardScreen(sku: s.pathParameters['sku']!), s),
-    ),
-    GoRoute(
-      path: '/audit/anomaly/:id',
-      pageBuilder: (c, s) => _apexPage(
-        AnomalyDetailScreen(anomalyId: s.pathParameters['id']!),
-        s,
-      ),
-    ),
+    GoRoute(path: '/hr/timesheet', redirect: (c, s) => '/app/erp/hr/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
+    GoRoute(path: '/operations/petty-cash', redirect: (c, s) => '/app/erp/finance/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
+    GoRoute(path: '/operations/stock-card', redirect: (c, s) => '/app/erp/inventory/stock-movements'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
+    // G-CLEANUP-1 Stage 4c-prep: V4 /operations/stock-card/:sku SHELL archived alongside its non-keyed variant.
+    GoRoute(path: '/operations/stock-card/:sku', redirect: (c, s) => '/app/erp/inventory/stock-movements'),
+    GoRoute(path: '/audit/anomaly/:id', redirect: (c, s) => '/app/erp/finance/anomalies'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived (V4 screen has zero backend; redirected to V5 home)
     GoRoute(path: '/workflow/approvals', pageBuilder: (c, s) => _apexPage(const ApprovalsInboxScreen(), s)),
     GoRoute(path: '/accounting/coa/edit', pageBuilder: (c, s) => _apexPage(const CoaEditorScreen(), s)),
     GoRoute(path: '/compliance/risk-register', pageBuilder: (c, s) => _apexPage(const RiskRegisterScreen(), s)),
-    GoRoute(path: '/analytics/budget-builder', pageBuilder: (c, s) => _apexPage(const BudgetBuilderScreen(), s)),
-    GoRoute(path: '/compliance/kyc-aml', pageBuilder: (c, s) => _apexPage(const KycAmlScreen(), s)),
+    GoRoute(path: '/analytics/budget-builder', redirect: (c, s) => '/app/erp/finance/budget-planning'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
+    GoRoute(path: '/compliance/kyc-aml', redirect: (c, s) => '/app/compliance/aml-ethics/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
     // G-CLEANUP-1 Stage 4b: V4 /compliance/journal-entry/:id pageBuilder
@@ -955,15 +930,13 @@ final appRouter = GoRouter(
     }),
 
     // ─── Detail Screens ───
-    GoRoute(path: '/service-request/detail', pageBuilder: (c, s) {
-      return _apexPage(ServiceRequestDetail(request: s.extra as Map<String, dynamic>? ?? {}), s);
-    }),
+    // G-CLEANUP-1 Stage 4c-prep: V4 /service-request/detail SHELL archived (zero backend).
+    GoRoute(path: '/service-request/detail', redirect: (c, s) => '/app/marketplace/dashboard'),
     GoRoute(path: '/notification/detail', pageBuilder: (c, s) {
       return _apexPage(NotificationDetailScreen(notification: s.extra as Map<String, dynamic>? ?? {}), s);
     }),
-    GoRoute(path: '/provider/profile', pageBuilder: (c, s) {
-      return _apexPage(ProviderProfileScreen(provider: s.extra as Map<String, dynamic>? ?? {}), s);
-    }),
+    // G-CLEANUP-1 Stage 4c-prep: V4 /provider/profile SHELL archived (zero backend).
+    GoRoute(path: '/provider/profile', redirect: (c, s) => '/app/marketplace/provider/dashboard'),
     // Unified entity/company/branch setup (single source of truth).
     // Old onboarding paths below all redirect here to eliminate the
     // duplicate setup journeys the user reported.
@@ -1008,14 +981,8 @@ final appRouter = GoRouter(
       path: '/clients/create',
       redirect: (c, s) => '/settings/entities?action=new-company',
     ),
-    GoRoute(path: '/audit/service', pageBuilder: (c, s) {
-      final args = s.extra as Map<String, dynamic>? ?? {};
-      return _apexPage(audit.AuditServiceScreen(
-        caseId: args['caseId'] ?? '',
-        clientName: args['clientName'] ?? '',
-        token: args['token'] as String?,
-      ), s);
-    }),
+    // G-CLEANUP-1 Stage 4c-prep: V4 /audit/service SHELL archived (marketplace audit-tier wrapper, no ownership).
+    GoRoute(path: '/audit/service', redirect: (c, s) => '/app/marketplace/dashboard'),
   ],
 );
 
