@@ -3509,25 +3509,119 @@ same pattern can be applied to sibling screens with one import.
 - **Cross-ref:** file 39 § 5, file 40 Stage 1 prompt, F-003 audit
   finding, G-S2 (auth_guard, Sprint 11).
 
-#### 🔴 G-CLEANUP-3. Clean home dashboard to 5 pillars only
-- **Severity:** 🔴 P0 Blocker — IA / UX consolidation
-- **Path:** `/app` home (the Launchpad / V5 landing screen).
-- **Evidence:** `APEX_LIVE_UX_AUDIT_2026-05-04.md` F-004 + file 39
-  § 2.2. The home currently shows three competing nav patterns:
-  1. Hero grid (15 large action cards).
-  2. Quick Shortcuts (4 small cards).
-  3. Service Pillars (5 pillars with `Alt+1..5` shortcut).
-  This is the same "three doorbells" problem flagged earlier in
-  G-UX-4 — but at the home-screen level rather than within a single
-  app.
-- **Fix proposal:** Keep ONLY the 5 Service Pillars. Delete Hero grid
-  and Quick Shortcuts entirely. Final home contains: APEX header,
-  Copilot AI banner (top), 5 pillars, news ticker, floating "اسأل
-  أبكس" button — and nothing else.
-- **Effort:** ~2 days.
-- **Owner:** TBD.
-- **Cross-ref:** file 39 § 2.2, file 40 Stage 2 prompt.
-- **Sprint target:** 15 — Stage 2.
+#### ✅ G-CLEANUP-3. Clean home dashboard to 5 pillars only — FULLY DONE 2026-05-04
+- **Branch:** `sprint-15/g-cleanup-3-clean-home`.
+- **Severity (was):** 🔴 P0 Blocker — IA / UX consolidation.
+- **Path:** `apex_finance/lib/core/v5/v5_routes.dart` — the `V5Launchpad`
+  widget (`/app` route).
+- **Original evidence:** `APEX_LIVE_UX_AUDIT_2026-05-04.md` F-004 +
+  file 39 § 2.2. The home was showing five competing nav patterns
+  stacked vertically (Verify-First counted them — the original
+  audit had said "three", but the actual file revealed a fifth
+  pattern hidden between sections).
+- **Verify-First findings (2026-05-04):**
+  - **The canonical home file is `v5_routes.dart`, NOT
+    `apex_launchpad_screen.dart`.** The latter is mounted at
+    `/launchpad/full` as a "verbose" power-user variant; the actual
+    `/app` route renders the inline `V5Launchpad` widget at line 171
+    of `v5_routes.dart`. Reading the wrong file would have left the
+    real home untouched.
+  - **Five sections to delete (not three).** The original audit
+    spotted Hero grid + Quick Shortcuts + Pillars as "three
+    competing patterns." The actual build() method had:
+      1. AI quick-links grid (12 `_AiQuickLink` cards in 4 rows of 3)
+      2. SAP ACDOCA inline banner ("السجل الموحّد")
+      3. Operations Center inline banner ("مركز العمليات المالية")
+      4. V5.1 Showcase CTA banner ("معرض V5.1 — 18 تحسين")
+      5. Quick Shortcuts grid (4 `_LaunchpadQuickCard`s)
+      6. Workspaces section (`_WorkspaceCard` × `v5Workspaces`)
+    All six sections deleted. Plus the three helper widgets that
+    powered them (`_AiQuickLink`, `_LaunchpadQuickCard`,
+    `_WorkspaceCard`) — none of which were used outside V5Launchpad.
+  - **`v5Workspaces` data structure stays.** Used by
+    `V5WorkspaceShell` at the `/workspace/:id` route — that's a
+    separate route, not on the home. Only the home's PRESENTATION
+    of workspaces is removed.
+  - **Imports unchanged.** Every one of the 13 imports in
+    `v5_routes.dart` is still used by the kept content (header,
+    Copilot banner, 5 Pillars, news ticker, FAB) or by other
+    routes in the same file.
+- **Fix applied (root delete, no flags, no workarounds):**
+  - Deleted ~390 LOC from `V5Launchpad.build()`: the 6 sections
+    listed above plus their inter-section spacers.
+  - Deleted ~230 LOC of helper classes:
+    `_WorkspaceCard` (+ State), `_AiQuickLink`,
+    `_LaunchpadQuickCard` (+ State).
+  - Comment block in v5_routes.dart at the deletion site documents
+    what was removed and why, cross-linking file 39 § 2.2 and
+    this entry. Three additional one-line audit-trail comments
+    mark the helper-class deletions.
+  - Total: **~620 LOC removed**, no separate files to delete.
+- **Final home contents** (in render order):
+  1. APEX header (logo + title + IconButton "اسأل أبكس Ctrl+/").
+  2. Copilot AI banner ("اسأل أبكس — Copilot ذكاء اصطناعي" — the
+     gradient hero CTA).
+  3. Services title ("الخدمات").
+  4. 5 Service Pillars grid (`Alt+1..5` keyboard shortcuts intact).
+  5. News ticker (`bottomNavigationBar`, tax compliance dates).
+  6. Floating "اسأل أبكس" FAB.
+  Nothing else. The cleanest home this codebase has ever shipped.
+- **Files touched:**
+  - `apex_finance/lib/core/v5/v5_routes.dart` (-620 LOC inside the
+    file; only this one source file changed).
+  - `docs/` (flutter web bundle rebuild — see below).
+  - `APEX_BLUEPRINT/09_GAPS_AND_REWORK_PLAN.md` (this closure).
+- **Verification:**
+  - `flutter analyze lib/core/v5/v5_routes.dart`: **No issues found!
+    (2.5s)** — clean per-file.
+  - `flutter analyze` (full): 306 issues — **identical to G-DOCS-2
+    documented baseline; zero new warnings**.
+  - `flutter test`: 43 passed, 1 pre-existing failure
+    (`ask_panel_test.dart` `package:web` 1.1.1 incompatibility,
+    documented since G-UX-1 Sprint 11; unchanged from main).
+  - **Bundle sanity (`docs/main.dart.js` post-rebuild):**
+    - All 5 deleted-section markers ("السجل الموحّد",
+      "مركز العمليات المالية", "معرض V5.1 — 18", "اختصارات سريعة",
+      "بيئات العمل"): **0 hits**.
+    - Kept content ("اسأل أبكس — Copilot", `Alt+`, `users/me`):
+      **34 hits across 3 patterns** — Copilot banner + 5 pillar
+      shortcuts + Stage 1 G-CLEANUP-2 validation probe all preserved.
+    - Bundle size: 10,305,859 → 10,290,751 bytes (**-15 KB** in
+      production minified output).
+  - **Single-PR rebuild:** `flutter build web --release
+    --base-href=/apex-web/ --no-tree-shake-icons` succeeded in
+    ~57s. `cp -r build/web/. docs/` overwrote only Flutter-managed
+    files — hand-written marketing pages (`contact.html`,
+    `customers.html`, `pricing.html`, `product.html`,
+    `resources.html`, `solutions.html`, `audit/`, `css/`) and the
+    nested `docs/app/` Flutter bundle preserved (untouched). This
+    PR includes both source changes and rebuilt bundle, avoiding
+    the Stage 1 hotfix repeat.
+- **Manual verification deferred to operator (per Step 9):**
+  - **Acceptance:** logged-in browser → `/app` → confirm only the
+    5 Pillars are visible (no Hero grid, no Quick Shortcuts, no
+    SAP ACDOCA banner, no V5.1 promo, no Workspaces section).
+  - **Pillar shortcuts work:** press `Alt+1` → Pillar 1 launcher
+    opens.
+  - **No regressions:** APEX header + Copilot banner + News ticker
+    + FAB still present.
+  - **Stage 1 still works:** Incognito → bare URL → `/login`
+    (unchanged from PR #148/#149).
+- **Risk:** medium. The home dashboard is the most-trafficked
+  screen in the app; any visual regression is high-visibility.
+  Mitigations:
+  - All deletions are scoped — no shared widgets touched.
+  - The 5 Pillars (`_LaunchpadServiceCard`) are unchanged; same
+    rendering, same `Alt+1..5` keyboard shortcuts via
+    `shortcutNumber: i + 1`.
+  - Bundle sanity confirmed deleted strings are gone AND kept
+    strings are present — leaves no doubt about what shipped.
+- **Sprint:** 15 — Stage 2. **Second Stage 2 win after Stage 1
+  (G-CLEANUP-2) merged 2026-05-04.**
+- **Cross-ref:** file 39 § 2.2 (Canonical Journey & Archive
+  Mandate, the destination state), file 40 Stage 2 prompt
+  (execution plan), F-004 audit finding, G-UX-4 (the broader
+  "three doorbells" pattern this fix is one instance of).
 
 #### 🔴 G-CLEANUP-4. Hide non-working apps from launchers
 - **Severity:** 🔴 P0 Blocker — UX honesty
