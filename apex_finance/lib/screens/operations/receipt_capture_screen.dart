@@ -104,7 +104,7 @@ class _ReceiptCaptureScreenState extends State<ReceiptCaptureScreen> {
           if (_imageBytes != null || _vendorCtl.text.isNotEmpty) _fieldsCard(),
           const ApexOutputChips(items: [
             ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
-            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
             ApexChipLink('تقارير المصاريف', '/hr/expense-reports', Icons.receipt_long),
           ]),
         ]),

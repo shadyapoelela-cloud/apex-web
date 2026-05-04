@@ -175,9 +175,9 @@ final List<ApexAppEntry> kApexApps = [
         ApexSubItemRef('محرر COA', '/accounting/coa/edit', Icons.edit_rounded),
       ]),
       ApexCategory('قيود اليومية', Icons.edit_note_rounded, [
-        ApexSubItemRef('سجل القيود', '/accounting/je-list', Icons.list_alt_rounded,
+        ApexSubItemRef('سجل القيود', '/app/erp/finance/je-builder', Icons.list_alt_rounded,
             badge: '128'),
-        ApexSubItemRef('بنّاء القيود', '/compliance/journal-entry-builder',
+        ApexSubItemRef('بنّاء القيود', '/app/erp/finance/je-builder/new',
             Icons.edit_note_rounded),
         ApexSubItemRef('سجل التدقيق', '/compliance/audit-trail', Icons.lock_outline_rounded),
       ]),
@@ -346,7 +346,7 @@ final List<ApexSubItemRef> kApexPinned = [
 // Quick-create actions for the FAB.
 const List<ApexSubItemRef> _kQuickCreate = [
   ApexSubItemRef('فاتورة مبيعات', '/sales/invoices/new', Icons.receipt_long_rounded),
-  ApexSubItemRef('قيد محاسبي', '/compliance/journal-entry-builder', Icons.edit_note_rounded),
+  ApexSubItemRef('قيد محاسبي', '/app/erp/finance/je-builder/new', Icons.edit_note_rounded),
   ApexSubItemRef('فاتورة ZATCA', '/compliance/zatca-invoice', Icons.qr_code_2_rounded),
   ApexSubItemRef('شركة جديدة', '/settings/entities?action=new-company',
       Icons.domain_add_rounded),

@@ -192,7 +192,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'كل القيود مع filters: مرحّل / مسودة / معكوس',
       kind: ApexCommandKind.navigation,
       icon: Icons.book_outlined,
-      onRun: (_) => go('/accounting/je-list'),
+      onRun: (_) => go('/app/erp/finance/je-builder'),
     ),
     ApexCommand(
       id: 'nav_coa_v2',
@@ -571,7 +571,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'منشئ القيود مع القوالب + ترقيم ZATCA',
       kind: ApexCommandKind.navigation,
       icon: Icons.edit_note,
-      onRun: (_) => go('/compliance/journal-entry-builder'),
+      onRun: (_) => go('/app/erp/finance/je-builder/new'),
     ),
     ApexCommand(
       id: 'nav_je_list',
@@ -579,7 +579,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'عرض / مراجعة / فحص توازن',
       kind: ApexCommandKind.navigation,
       icon: Icons.list_alt,
-      onRun: (_) => go('/compliance/journal-entries'),
+      onRun: (_) => go('/app/erp/finance/je-builder'),
     ),
     ApexCommand(
       id: 'nav_fs',
@@ -665,7 +665,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       label: 'قيود اليومية',
       kind: ApexCommandKind.navigation,
       icon: Icons.receipt_long_outlined,
-      onRun: (_) => go('/compliance/journal-entries'),
+      onRun: (_) => go('/app/erp/finance/je-builder'),
     ),
     ApexCommand(
       id: 'nav_zatca',
@@ -838,7 +838,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'إنشاء قيد بالدائن والمدين',
       icon: Icons.add_box_outlined,
       shortcut: 'N J',
-      onRun: (ctx) => GoRouter.of(ctx).go('/compliance/journal-entries/new'),
+      onRun: (ctx) => GoRouter.of(ctx).go('/app/erp/finance/je-builder/new'),
     ),
     ApexCommand.action(
       id: 'action_new_zatca_invoice',

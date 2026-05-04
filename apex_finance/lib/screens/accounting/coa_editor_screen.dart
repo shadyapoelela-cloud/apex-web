@@ -92,7 +92,7 @@ class _CoaEditorScreenState extends State<CoaEditorScreen> {
           ),
           const ApexOutputChips(items: [
             ApexChipLink('شجرة الحسابات', '/accounting/coa-v2', Icons.account_tree),
-            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
             ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
           ]),
         ]),

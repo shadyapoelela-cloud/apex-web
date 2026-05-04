@@ -320,7 +320,7 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: OutlinedButton.icon(
-              onPressed: () => context.go('/compliance/journal-entry/${r['je_id']}'),
+              onPressed: () => context.go('/app/erp/finance/je-builder/${r['je_id']}'),
               icon: Icon(Icons.receipt, color: AC.gold),
               label: Text('عرض القيد', style: TextStyle(color: AC.gold)),
               style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold)),

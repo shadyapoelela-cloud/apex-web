@@ -89,8 +89,10 @@ import '../screens/home/apex_launchpad_screen.dart';
 import '../screens/home/apex_service_hub_screen.dart';
 import '../screens/home/apex_services_screen.dart';
 import '../screens/operations/customer_360_screen.dart';
-import '../pilot/screens/setup/je_builder_live_v52.dart'
-    as je_builder_live_v52;
+// G-CLEANUP-1 Stage 4b (Sprint 15, 2026-05-04): je_builder_live_v52 prefix
+// import deleted alongside the V4 /compliance/journal-entry/:id route.
+// V5 routes for the JE Builder (under /app/erp/finance/je-builder/...)
+// are wired in lib/core/v5/v5_routes.dart, not here.
 import '../screens/audit/audit_engagement_workspace_screen.dart';
 import '../screens/operations/vendor_360_screen.dart';
 import '../screens/operations/receipt_capture_screen.dart';
@@ -108,7 +110,8 @@ import '../screens/operations/customer_payment_screen.dart';
 import '../screens/analytics/cash_flow_forecast_screen.dart';
 import '../screens/operations/vendor_payment_screen.dart';
 import '../screens/compliance/tax_calendar_screen.dart';
-import '../screens/accounting/je_list_screen.dart';
+// G-CLEANUP-1 Stage 4b: JeListScreen archived to _archive/2026-05-04/v4-routes/.
+// Replaced by V5 list at /app/erp/finance/je-builder.
 import '../screens/accounting/coa_tree_v2_screen.dart';
 import '../screens/hr/employees_list_screen.dart';
 import '../screens/accounting/bank_rec_v2_screen.dart';
@@ -195,7 +198,9 @@ import '../screens/compliance/executive_dashboard_screen.dart';
 import '../screens/compliance/ocr_screen.dart';
 import '../screens/compliance/dscr_screen.dart';
 import '../screens/compliance/valuation_screen.dart';
-import '../screens/compliance/journal_entry_builder_screen.dart';
+// G-CLEANUP-1 Stage 4b: JournalEntryBuilderScreen archived to
+// _archive/2026-05-04/v4-routes/. Replaced by V5.2 builder at
+// /app/erp/finance/je-builder/new (lib/core/v5/v5_routes.dart).
 import '../screens/compliance/fx_converter_screen.dart';
 // import '../screens/compliance/cost_variance_screen.dart'; // deduplicated → /analytics/cost-variance-v2
 import '../screens/compliance/fin_statements_screen.dart';
@@ -467,7 +472,8 @@ final appRouter = GoRouter(
       pageBuilder: (c, s) => _apexPage(const ComplianceHubScreen(), s),
     ),
     // Legacy → canonical (Phase 26 dedup)
-    GoRoute(path: '/compliance/journal-entries', redirect: (c, s) => '/accounting/je-list'),
+    // G-CLEANUP-1 Stage 4b: V4 /compliance/journal-entries redirect deleted.
+    // V5: /app/erp/finance/je-builder (LIST).
     GoRoute(
       path: '/compliance/audit-trail',
       pageBuilder: (c, s) => _apexPage(const AuditTrailScreen(), s),
@@ -537,10 +543,10 @@ final appRouter = GoRouter(
       path: '/compliance/valuation',
       pageBuilder: (c, s) => _apexPage(const ValuationScreen(), s),
     ),
-    GoRoute(
-      path: '/compliance/journal-entry-builder',
-      pageBuilder: (c, s) => _apexPage(const JournalEntryBuilderScreen(), s),
-    ),
+    // G-CLEANUP-1 Stage 4b: V4 /compliance/journal-entry-builder pageBuilder
+    // deleted. JournalEntryBuilderScreen archived to
+    // _archive/2026-05-04/v4-routes/. V5: /app/erp/finance/je-builder/new
+    // (JeBuilderLiveV52Screen, wired in lib/core/v5/v5_routes.dart).
     GoRoute(
       path: '/compliance/fx-converter',
       pageBuilder: (c, s) => _apexPage(const FxConverterScreen(), s),
@@ -734,7 +740,8 @@ final appRouter = GoRouter(
     ),
     // ── Operations routes redirect to pre-existing screens (avoid duplication) ──
     GoRoute(path: '/operations/hub', redirect: (c, s) => '/financial-ops'),
-    GoRoute(path: '/operations/je-creator', redirect: (c, s) => '/compliance/journal-entry-builder'),
+    // G-CLEANUP-1 Stage 4b: V4 /operations/je-creator redirect deleted.
+    // V5: /app/erp/finance/je-builder/new.
     GoRoute(path: '/operations/financial-statements', redirect: (c, s) => '/compliance/financial-statements'),
     GoRoute(path: '/operations/financial-analysis', redirect: (c, s) => '/compliance/ratios'),
     GoRoute(path: '/operations/universal-journal', pageBuilder: (c, s) => _apexPage(const UniversalJournalScreen(), s)),
@@ -745,7 +752,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/operations/live-sales-cycle', pageBuilder: (c, s) => _apexPage(const LiveSalesCycleScreen(), s)),
     // /today and /sales etc. moved to top of routes list — see above
     GoRoute(path: '/accounting/coa', redirect: (c, s) => '/coa-tree'),
-    GoRoute(path: '/accounting/journal-entries', redirect: (c, s) => '/compliance/journal-entries'),
+    // G-CLEANUP-1 Stage 4b: V4 /accounting/journal-entries redirect deleted.
+    // V5: /app/erp/finance/je-builder.
     GoRoute(path: '/accounting/trial-balance', redirect: (c, s) => '/compliance/financial-statements'),
     GoRoute(path: '/accounting/period-close', redirect: (c, s) => '/operations/period-close'),
     // /financial-statements canonical (with optional apiData/pickedFile) defined below at line ~805 — duplicate redirect removed (Stage 1 bugfix 2026-04-29).
@@ -802,7 +810,9 @@ final appRouter = GoRouter(
       ),
     ),
     GoRoute(path: '/compliance/tax-calendar', pageBuilder: (c, s) => _apexPage(const TaxCalendarScreen(), s)),
-    GoRoute(path: '/accounting/je-list', pageBuilder: (c, s) => _apexPage(const JeListScreen(), s)),
+    // G-CLEANUP-1 Stage 4b: V4 /accounting/je-list pageBuilder deleted.
+    // JeListScreen archived to _archive/2026-05-04/v4-routes/.
+    // V5: /app/erp/finance/je-builder (JeBuilderScreen via v5_wired_screens).
     GoRoute(path: '/accounting/coa-v2', pageBuilder: (c, s) => _apexPage(const CoaTreeV2Screen(), s)),
     GoRoute(path: '/hr/employees', pageBuilder: (c, s) => _apexPage(const EmployeesListScreen(), s)),
     // /hr now serves the HR Hub (registered earlier at top of routes)
@@ -858,19 +868,11 @@ final appRouter = GoRouter(
     GoRoute(path: '/compliance/kyc-aml', pageBuilder: (c, s) => _apexPage(const KycAmlScreen(), s)),
     GoRoute(path: '/account', redirect: (c, s) => '/settings/unified'),
     GoRoute(path: '/integrations', redirect: (c, s) => '/settings/unified'),
-    // Redirect the legacy JE-detail route into the new v5.2 live
-    // builder so clicking a row in قيود اليومية opens the same
-    // screen used for create — same visual identity, same balance
-    // assistant, same chevron status flow — pre-loaded with the
-    // entry data via the jeId parameter.
-    GoRoute(
-      path: '/compliance/journal-entry/:id',
-      pageBuilder: (c, s) => _apexPage(
-        je_builder_live_v52.JeBuilderLiveV52Screen(
-            jeId: s.pathParameters['id']!),
-        s,
-      ),
-    ),
+    // G-CLEANUP-1 Stage 4b: V4 /compliance/journal-entry/:id pageBuilder
+    // deleted. The same V5.2 live builder it routed to lives at
+    // /app/erp/finance/je-builder/:id (lib/core/v5/v5_routes.dart) and is
+    // the canonical detail/edit route for journal entries. The
+    // je_builder_live_v52 prefix import was removed alongside this route.
 
     // ─── COA Workflow ───
     GoRoute(path: '/upload', pageBuilder: (c, s) => _apexPage(const UploadScreen(), s)),

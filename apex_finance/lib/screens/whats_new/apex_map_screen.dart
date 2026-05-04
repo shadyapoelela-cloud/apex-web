@@ -239,7 +239,7 @@ class ApexMapScreen extends StatelessWidget {
             icon: Icons.calculate_outlined),
         _Item(
             title: 'قيود اليومية',
-            route: '/compliance/journal-entries',
+            route: '/app/erp/finance/je-builder',
             icon: Icons.receipt_long_outlined),
         _Item(
             title: 'Audit Trail',

@@ -3410,7 +3410,7 @@ same pattern can be applied to sibling screens with one import.
 - **Owner:** TBD.
 - **Sprint target:** 14 — Phase B.
 
-#### 🔴 G-CLEANUP-1. Archive V4 duplicate routes that have V5 equivalents — Stage 4a (audit) DONE 2026-05-04
+#### 🔴 G-CLEANUP-1. Archive V4 duplicate routes that have V5 equivalents — Stages 4a (audit) + 4b (Journal Entries) DONE 2026-05-04
 - **Severity:** 🔴 P0 Blocker — route duplication / cleanup. Cleanup
   (route deletion + reference updates) deferred to Stages 4b–4f.
 - **Path:** `apex_finance/lib/core/router.dart` + ~720 internal-
@@ -3486,8 +3486,98 @@ same pattern can be applied to sibling screens with one import.
 - **Owner:** TBD per sub-PR.
 - **Cross-ref:** `APEX_BLUEPRINT/V4_ARCHIVE_AUDIT_2026-05-04.md`,
   file 39 § 3.1, file 38 § 2-3, file 40 Stage 4 prompts.
-- **Sprint target:** 15 — Stages 4a (this audit) + 4b–4g
+- **Sprint target:** 15 — Stages 4a (audit) + 4b (this PR) + 4c–4g
   (subsequent execution PRs).
+
+##### Stage 4b — Journal Entries — DONE 2026-05-04
+- **Branch:** `sprint-15/g-cleanup-1b-je-archive`.
+- **Audit slice:** V4_ARCHIVE_AUDIT § "Stage 4b — Journal Entries"
+  (5 routes / ~50 refs / ~1 day estimate).
+- **Verify-First update vs audit:** the actual reference count was
+  **59 across 41 files** (audit estimate ~50). Six V4 JE routes
+  confirmed for deletion (audit listed 5; the 6th is the
+  `/compliance/journal-entry/:id` detail route which the audit listed
+  separately under the same concept).
+- **Routes deleted from `apex_finance/lib/core/router.dart`:**
+  | Was at | Path | Type |
+  |---|---|---|
+  | line 470 | `/compliance/journal-entries` | redirect → `/accounting/je-list` |
+  | lines 541-543 | `/compliance/journal-entry-builder` | pageBuilder → `JournalEntryBuilderScreen` |
+  | line 737 | `/operations/je-creator` | redirect → `/compliance/journal-entry-builder` |
+  | line 748 | `/accounting/journal-entries` | redirect → `/compliance/journal-entries` |
+  | line 805 | `/accounting/je-list` | pageBuilder → `JeListScreen` |
+  | lines 866-873 | `/compliance/journal-entry/:id` | pageBuilder → `JeBuilderLiveV52Screen(jeId)` |
+
+  Plus 3 import lines at the top of the file (the `je_builder_live_v52`
+  prefix import, `je_list_screen.dart`, `journal_entry_builder_screen.dart`).
+  Each deletion replaced with a one-line audit-trail comment pointing
+  at the V5 equivalent.
+- **Screen files archived (`git mv` to preserve history):**
+  - `apex_finance/lib/screens/accounting/je_list_screen.dart` →
+    `apex_finance/_archive/2026-05-04/v4-routes/je_list_screen.dart`
+  - `apex_finance/lib/screens/compliance/journal_entry_builder_screen.dart` →
+    `apex_finance/_archive/2026-05-04/v4-routes/journal_entry_builder_screen.dart`
+
+  `analysis_options.yaml` already excludes `_archive/**`, so the
+  archived screens don't surface in `flutter analyze` going forward.
+- **Internal references updated (59 across 41 files):**
+  - `/compliance/journal-entry-builder` → `/app/erp/finance/je-builder/new`
+  - `/compliance/journal-entries/new` → `/app/erp/finance/je-builder/new`
+  - `/compliance/journal-entry/$xxx` → `/app/erp/finance/je-builder/$xxx`
+  - `/compliance/journal-entries` → `/app/erp/finance/je-builder`
+  - `/accounting/je-list` → `/app/erp/finance/je-builder`
+
+  Files touched include `apex_commands_registry.dart` (Cmd+K palette,
+  5 refs), `apex_magnetic_shell.dart` (sidebar, 3 refs),
+  `hybrid_sidebar.dart` (3 refs), `apex_service_hub_screen.dart` (V4
+  service hub, 8 refs — itself a Stage 4g cleanup target), plus 36
+  individual screens that linked to JE list / detail / builder.
+- **V4 service hubs (`/sales`, `/purchase`, `/accounting`, etc.)
+  intentionally left in place** per V4_ARCHIVE_AUDIT edge case #2 —
+  they're V4-era IA scheduled for Stage 4g final cleanup once every
+  V4 child route has been migrated.
+- **Verification:**
+  - `flutter analyze`: **305 issues** — *one fewer* than the
+    documented 306 baseline (a pre-existing warning lived in one of
+    the archived V4 JE screens). Zero new warnings.
+  - `flutter test`: 43 passed, 1 pre-existing failure
+    (`ask_panel_test.dart` `package:web` 1.1.1, unchanged from main).
+  - **Bundle sanity (post-rebuild `docs/main.dart.js`):**
+    - All 6 V4 JE paths: **0 hits** in bundle.
+    - V5 path `/app/erp/finance/je-builder`: **38 hits**
+      (sidebar + Cmd+K + 41 updated screen-links + V5 wired chips).
+    - Stage 1 `/users/me` validation probe: **6 hits** preserved.
+    - Stage 2 Copilot banner: **41 hits** preserved.
+    - Stage 3 ComingSoonScreen: still in bundle (re-verified
+      indirectly via successful build + no symbol-deletion warnings).
+    - Bundle size: 10,292,812 → **10,268,983 bytes** (-24 KB —
+      V4 screens removed from build).
+  - **Orphan grep (live code only):**
+    `grep -rE "/compliance/journal-(entry-builder|entries|entry/)|/accounting/je-list|/operations/je-creator" apex_finance/lib/ --include="*.dart"`
+    → 0 hits outside `_archive/` and audit-trail comments in router.dart.
+- **Single-PR rebuild:** same recipe as Stages 1–3
+  (`flutter build web --release --base-href=/apex-web/ --no-tree-shake-icons`,
+  then `cp -r build/web/. docs/`). Hand-written marketing pages
+  + nested `docs/app/` preserved.
+- **Manual verification deferred to operator (post-merge):**
+  - **🎯 Acceptance:** `/app/erp/finance/je-builder` still works (V5).
+    Click "+ New" → V5.2 builder. Click row → V5.2 detail with `:id`.
+  - **Cmd+K palette:** Ctrl+/ → search "قيود" → all results route
+    to `/app/erp/finance/je-builder*`.
+  - **Sidebar (hybrid_sidebar):** "بنّاء القيود" + "أرقام القيود"
+    + "سجل القيود" all link to V5 paths.
+  - **404 check:** typing `/compliance/journal-entry-builder`
+    directly → no longer routes (V4 deleted); falls through to
+    GoRouter's default 404 / not-found. *Note:* G-CLEANUP-4's
+    `ComingSoonScreen` only catches disabled `V5MainModule`s under
+    `/app/*`; deleted V4 paths get GoRouter's standard 404.
+- **Risk:** medium. 41 files touched + 6 routes deleted. Mitigations:
+  - Bulk-replace was script-driven (deterministic, traceable).
+  - Each replacement is a string substitution (no logic change).
+  - Bundle sanity confirmed both V4 absence + V5 presence.
+  - V5 routes were already live (Stages 1-3 verified them in production).
+- **Cross-ref:** `APEX_BLUEPRINT/V4_ARCHIVE_AUDIT_2026-05-04.md`
+  § Stage 4b — Journal Entries; file 40 Stage 4b.
 
 #### ✅ G-CLEANUP-2. Force login screen on bare URL visit — FULLY DONE 2026-05-04
 - **Branch:** `sprint-15/g-cleanup-2-force-login`.

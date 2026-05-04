@@ -153,7 +153,7 @@ class _BillsListScreenState extends State<BillsListScreen> {
         return InkWell(
           onTap: () {
             final jeId = b['journal_entry_id'] as String?;
-            if (jeId != null) context.go('/compliance/journal-entry/$jeId');
+            if (jeId != null) context.go('/app/erp/finance/je-builder/$jeId');
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),

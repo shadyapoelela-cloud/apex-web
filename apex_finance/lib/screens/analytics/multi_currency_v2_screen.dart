@@ -47,7 +47,7 @@ class _MultiCurrencyV2ScreenState extends State<MultiCurrencyV2Screen> {
           const ApexOutputChips(items: [
             ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),
             ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
-            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
           ]),
         ]),
       ),

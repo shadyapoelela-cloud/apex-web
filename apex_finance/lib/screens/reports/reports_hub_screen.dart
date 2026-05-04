@@ -113,7 +113,7 @@ class ReportsHubScreen extends StatelessWidget {
           if (i == _sections.length) {
             return const ApexOutputChips(items: [
               ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
-              ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+              ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
               ApexChipLink('Health Score', '/analytics/health-score-v2', Icons.health_and_safety),
               ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),
             ]);

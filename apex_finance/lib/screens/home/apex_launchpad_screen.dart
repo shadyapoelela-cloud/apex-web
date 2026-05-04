@@ -65,7 +65,7 @@ class _ApexLaunchpadScreenState extends State<ApexLaunchpadScreen> {
       icon: Icons.account_balance,
       color: 0xFF9C27B0,
       apps: [
-        _App('قائمة القيود', 'JE List canonical', '/accounting/je-list', Icons.book),
+        _App('قائمة القيود', 'JE List canonical', '/app/erp/finance/je-builder', Icons.book),
         _App('شجرة الحسابات', 'CoA Tree v2 (SOCPA)', '/accounting/coa-v2', Icons.account_tree),
         _App('محرر الحسابات', 'CoA Editor', '/accounting/coa/edit', Icons.edit_note),
         _App('ميزان المراجعة', 'TB + drill chain', '/compliance/financial-statements', Icons.assessment),

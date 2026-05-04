@@ -107,7 +107,7 @@ class _FixedAssetsV2ScreenState extends State<FixedAssetsV2Screen> {
       onRefresh: () async {},
       listHeader: _summaryCard(),
       listFooter: const ApexOutputChips(items: [
-        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
         ApexChipLink('IFRS 16 — الإيجارات', '/compliance/lease-v2', Icons.apartment),
         ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
       ]),

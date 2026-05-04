@@ -65,7 +65,7 @@ class _WhtV2ScreenState extends State<WhtV2Screen> {
           _filingCard(),
           const ApexOutputChips(items: [
             ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
-            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
             ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
           ]),
         ]),

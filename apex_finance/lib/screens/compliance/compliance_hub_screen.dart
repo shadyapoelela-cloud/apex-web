@@ -113,7 +113,7 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     title: 'أرقام القيود',
                     subtitle: 'ترقيم متسلسل بدون فجوات',
                     color: AC.info,
-                    onTap: () => context.go('/compliance/journal-entries'),
+                    onTap: () => context.go('/app/erp/finance/je-builder'),
                   ),
                   _toolCard(
                     icon: Icons.lock_outline,
@@ -246,7 +246,7 @@ class _ComplianceHubScreenState extends State<ComplianceHubScreen> {
                     title: 'بنّاء القيود',
                     subtitle: 'قيود متوازنة + 10 قوالب',
                     color: AC.purple,
-                    onTap: () => context.go('/compliance/journal-entry-builder'),
+                    onTap: () => context.go('/app/erp/finance/je-builder/new'),
                   ),
                   _toolCard(
                     icon: Icons.swap_horiz,
