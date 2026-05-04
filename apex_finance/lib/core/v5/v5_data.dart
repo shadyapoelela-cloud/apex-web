@@ -174,7 +174,7 @@ const _salesDashboardWidgets = <V5DashboardWidget>[
     labelEn: 'Invoices issued today',
     icon: Icons.receipt,
     kind: V5WidgetKind.kpi,
-    actionRoute: '/app/erp/sales/invoices',
+    actionRoute: '/app/erp/app/erp/sales/invoices',
     severity: V5WidgetSeverity.success,
   ),
   V5DashboardWidget(

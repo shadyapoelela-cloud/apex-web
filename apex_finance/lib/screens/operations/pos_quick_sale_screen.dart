@@ -179,7 +179,7 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
             ),
           ),
           const ApexOutputChips(items: [
-            ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
+            ApexChipLink('الفواتير', '/app/erp/sales/invoices', Icons.receipt),
             ApexChipLink('المخزون', '/operations/inventory-v2', Icons.inventory_2),
             ApexChipLink('بطاقة الصنف', '/operations/stock-card', Icons.timeline),
             ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),

@@ -327,7 +327,7 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // ── 1.4 Sales & AR ───────────────────────────────────────────────
   'erp/sales/sales-workflow': (ctx) => const SalesWorkflowScreen(),
-  'erp/sales/invoices': (ctx) => const InvoicesV52Screen(),  // V5.2 MultiView
+  'erp/app/erp/sales/invoices': (ctx) => const InvoicesV52Screen(),  // V5.2 MultiView
   'erp/sales/credit-notes': (ctx) => const CreditNotesScreen(),
   'erp/sales/contracts': (ctx) => const ContractV52Screen(),  // V5.2 ObjectPage
   'erp/sales/subscription-billing': (ctx) => const SubscriptionBillingScreen(),

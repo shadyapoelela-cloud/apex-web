@@ -37,12 +37,12 @@ class _ApexLaunchpadScreenState extends State<ApexLaunchpadScreen> {
       color: 0xFF4CAF50,
       apps: [
         _App('دورة المبيعات', 'Live Sales Cycle', '/operations/live-sales-cycle', Icons.shopping_cart),
-        _App('العملاء', 'قائمة + Customer 360', '/sales/customers', Icons.people),
-        _App('الفواتير', '5 filters + WhatsApp', '/sales/invoices', Icons.receipt),
-        _App('عروض الأسعار', 'Pipeline + Win %', '/sales/quotes', Icons.description),
-        _App('الإشعارات الدائنة/المدينة', 'Credit/Debit notes', '/sales/memos', Icons.note),
-        _App('فواتير متكررة', 'MRR + ARR tracking', '/sales/recurring', Icons.repeat),
-        _App('أعمار AR', '5 buckets ملوّنة', '/sales/aging', Icons.timeline),
+        _App('العملاء', 'قائمة + Customer 360', '/app/erp/finance/sales-customers', Icons.people),
+        _App('الفواتير', '5 filters + WhatsApp', '/app/erp/sales/invoices', Icons.receipt),
+        _App('عروض الأسعار', 'Pipeline + Win %', '/app/erp/sales/dashboard', Icons.description),
+        _App('الإشعارات الدائنة/المدينة', 'Credit/Debit notes', '/app/erp/sales/credit-notes', Icons.note),
+        _App('فواتير متكررة', 'MRR + ARR tracking', '/app/erp/finance/recurring-entries', Icons.repeat),
+        _App('أعمار AR', '5 buckets ملوّنة', '/app/erp/sales/ar-aging', Icons.timeline),
       ],
     ),
     _Service(
@@ -225,7 +225,7 @@ class _ApexLaunchpadScreenState extends State<ApexLaunchpadScreen> {
           Wrap(spacing: 6, runSpacing: 6, children: [
             for (final q in [
               ('/today', '🏠 اليوم'),
-              ('/sales/customers', '👥 العملاء'),
+              ('/app/erp/finance/sales-customers', '👥 العملاء'),
               ('/accounting/trial-balance', '📊 ميزان المراجعة'),
               ('/audit', '🔍 المراجعة'),
               ('/reports', '📋 التقارير'),

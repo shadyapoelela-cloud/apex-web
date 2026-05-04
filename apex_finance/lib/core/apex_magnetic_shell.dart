@@ -122,19 +122,19 @@ final List<ApexAppEntry> kApexApps = [
     routePrefix: '/sales',
     categories: [
       ApexCategory('العملاء', Icons.people_rounded, [
-        ApexSubItemRef('قائمة العملاء', '/sales/customers', Icons.people_outline),
+        ApexSubItemRef('قائمة العملاء', '/app/erp/finance/sales-customers', Icons.people_outline),
       ]),
       ApexCategory('الفواتير', Icons.receipt_long_rounded, [
-        ApexSubItemRef('كل الفواتير', '/sales/invoices', Icons.receipt_long_rounded,
+        ApexSubItemRef('كل الفواتير', '/app/erp/sales/invoices', Icons.receipt_long_rounded,
             badge: '47'),
-        ApexSubItemRef('فاتورة جديدة', '/sales/invoices/new', Icons.add_rounded),
-        ApexSubItemRef('فواتير دورية', '/sales/recurring', Icons.repeat_rounded,
+        ApexSubItemRef('فاتورة جديدة', '/app/erp/sales/invoice-create', Icons.add_rounded),
+        ApexSubItemRef('فواتير دورية', '/app/erp/finance/recurring-entries', Icons.repeat_rounded,
             badge: '5'),
-        ApexSubItemRef('عروض الأسعار', '/sales/quotes', Icons.request_quote_rounded),
-        ApexSubItemRef('إشعارات دائنة', '/sales/memos', Icons.note_alt_rounded),
+        ApexSubItemRef('عروض الأسعار', '/app/erp/sales/dashboard', Icons.request_quote_rounded),
+        ApexSubItemRef('إشعارات دائنة', '/app/erp/sales/credit-notes', Icons.note_alt_rounded),
       ]),
       ApexCategory('التحصيل', Icons.account_balance_wallet_rounded, [
-        ApexSubItemRef('أعمار الذمم', '/sales/aging', Icons.bar_chart_rounded,
+        ApexSubItemRef('أعمار الذمم', '/app/erp/sales/ar-aging', Icons.bar_chart_rounded,
             badge: '3 متأخرة', badgeColor: Color(0xFFE05050)),
         ApexSubItemRef('بيع سريع (POS)', '/pos/quick-sale', Icons.shopping_cart_rounded),
       ]),
@@ -345,7 +345,7 @@ final List<ApexSubItemRef> kApexPinned = [
 
 // Quick-create actions for the FAB.
 const List<ApexSubItemRef> _kQuickCreate = [
-  ApexSubItemRef('فاتورة مبيعات', '/sales/invoices/new', Icons.receipt_long_rounded),
+  ApexSubItemRef('فاتورة مبيعات', '/app/erp/sales/invoice-create', Icons.receipt_long_rounded),
   ApexSubItemRef('قيد محاسبي', '/app/erp/finance/je-builder/new', Icons.edit_note_rounded),
   ApexSubItemRef('فاتورة ZATCA', '/compliance/zatca-invoice', Icons.qr_code_2_rounded),
   ApexSubItemRef('شركة جديدة', '/settings/entities?action=new-company',

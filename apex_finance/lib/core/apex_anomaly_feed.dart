@@ -30,7 +30,7 @@ class ApexAnomalyFeedCard extends StatelessWidget {
       'title': 'فاتورة مكررة محتملة',
       'description': 'فاتورة بنفس المبلغ والمورد خلال 48 ساعة',
       'action': 'راجع',
-      'route': '/sales/invoices',
+      'route': '/app/erp/sales/invoices',
     },
     {
       'severity': 'medium',

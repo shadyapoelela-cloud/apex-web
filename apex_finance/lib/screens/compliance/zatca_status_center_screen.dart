@@ -33,7 +33,7 @@ class ZatcaStatusCenterScreen extends StatelessWidget {
           _recentErrorsCard(),
           const ApexOutputChips(items: [
             ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
-            ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
+            ApexChipLink('الفواتير', '/app/erp/sales/invoices', Icons.receipt),
             ApexChipLink('التقويم الضريبي', '/compliance/tax-calendar', Icons.event),
             ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
           ]),

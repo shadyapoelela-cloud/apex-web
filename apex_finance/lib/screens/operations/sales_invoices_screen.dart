@@ -7,8 +7,8 @@
 ///   • Group-by:      none / status / customer / month / quarter / due-week
 ///   • Sort:          date↓↑ · number · total↓↑ · due-date↑
 ///   • View modes:    list, cards
-///   • CTAs:          + جديد → /sales/invoices/new
-///                    ✨ ذكاء → /sales/invoices/new?ai=1
+///   • CTAs:          + جديد → /app/erp/sales/invoice-create
+///                    ✨ ذكاء → /app/erp/sales/invoice-create?ai=1
 library;
 
 import 'package:flutter/material.dart';
@@ -22,7 +22,7 @@ import '../../core/theme.dart';
 import '../../widgets/apex_copilot_drawer.dart';
 import '../../widgets/apex_list_toolbar.dart';
 
-const String _kScreenKey = '/sales/invoices';
+const String _kScreenKey = '/app/erp/sales/invoices';
 
 class SalesInvoicesScreen extends StatefulWidget {
   const SalesInvoicesScreen({super.key});
@@ -526,7 +526,7 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
   // ─────────────────────────────────────────────────────────────────────
   //  CTA actions
   // ─────────────────────────────────────────────────────────────────────
-  void _onCreate() => context.go('/sales/invoices/new');
+  void _onCreate() => context.go('/app/erp/sales/invoice-create');
 
   /// "ذكاء" button — opens an inline AI Copilot drawer grounded in the
   /// current screen state. Replaces the old `?ai=1` create-route fallback;

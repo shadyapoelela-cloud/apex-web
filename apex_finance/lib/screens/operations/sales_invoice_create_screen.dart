@@ -1,5 +1,5 @@
 /// APEX — Dedicated "Create Sales Invoice" form
-/// /sales/invoices/new — focused single-purpose screen.
+/// /app/erp/sales/invoice-create — focused single-purpose screen.
 library;
 
 import 'package:flutter/material.dart';
@@ -320,7 +320,7 @@ class _SalesInvoiceCreateScreenState extends State<SalesInvoiceCreateScreen> {
               child: Text('لا يوجد عملاء — أضف عميلاً أولاً',
                   style: TextStyle(color: AC.warn, fontSize: 12.5))),
           TextButton(
-            onPressed: () => context.go('/sales/customers'),
+            onPressed: () => context.go('/app/erp/finance/sales-customers'),
             child: Text('إدارة العملاء',
                 style: TextStyle(color: AC.gold, fontSize: 11.5)),
           ),

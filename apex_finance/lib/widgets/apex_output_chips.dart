@@ -4,7 +4,7 @@
 ///
 /// Usage:
 ///   ApexOutputChips(items: [
-///     ApexChipLink('أعمار AR', '/sales/aging', Icons.timeline),
+///     ApexChipLink('أعمار AR', '/app/erp/sales/ar-aging', Icons.timeline),
 ///     ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
 ///   ])
 library;

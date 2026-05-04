@@ -44,7 +44,7 @@ const quickCreateActions = <QuickCreateAction>[
     sublabelAr: 'إنشاء فاتورة جديدة لعميل',
     icon: Icons.receipt,
     color: _goldC,
-    route: '/app/erp/sales/invoices',
+    route: '/app/erp/app/erp/sales/invoices',
     shortcut: 'I',
   ),
   QuickCreateAction(

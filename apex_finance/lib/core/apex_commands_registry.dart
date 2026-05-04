@@ -118,7 +118,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'كل العملاء مع فلاتر',
       kind: ApexCommandKind.navigation,
       icon: Icons.people_outline,
-      onRun: (_) => go('/sales/customers'),
+      onRun: (_) => go('/app/erp/finance/sales-customers'),
     ),
     ApexCommand(
       id: 'nav_vendors',
@@ -134,7 +134,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'مسودة / صادرة / متأخرة / مدفوعة',
       kind: ApexCommandKind.navigation,
       icon: Icons.receipt_long_outlined,
-      onRun: (_) => go('/sales/invoices'),
+      onRun: (_) => go('/app/erp/sales/invoices'),
     ),
     ApexCommand(
       id: 'nav_ar_aging',
@@ -142,7 +142,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'AR Aging buckets — current / 30 / 60 / 90+',
       kind: ApexCommandKind.navigation,
       icon: Icons.timeline_outlined,
-      onRun: (_) => go('/sales/aging'),
+      onRun: (_) => go('/app/erp/sales/ar-aging'),
     ),
     ApexCommand(
       id: 'nav_settings',
@@ -289,7 +289,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'Quote pipeline + conversion tracking',
       kind: ApexCommandKind.navigation,
       icon: Icons.description,
-      onRun: (_) => go('/sales/quotes'),
+      onRun: (_) => go('/app/erp/sales/dashboard'),
     ),
     ApexCommand(
       id: 'nav_credit_memos',
@@ -297,7 +297,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'Credit/Debit notes للمرتجعات والرسوم',
       kind: ApexCommandKind.navigation,
       icon: Icons.note,
-      onRun: (_) => go('/sales/memos'),
+      onRun: (_) => go('/app/erp/sales/credit-notes'),
     ),
     ApexCommand(
       id: 'nav_expense_reports',
@@ -313,7 +313,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'اشتراكات + MRR + ARR',
       kind: ApexCommandKind.navigation,
       icon: Icons.repeat,
-      onRun: (_) => go('/sales/recurring'),
+      onRun: (_) => go('/app/erp/finance/recurring-entries'),
     ),
     ApexCommand(
       id: 'nav_knowledge_search',

@@ -1,5 +1,5 @@
 /// APEX — AR Aging (live, computed locally from issued invoices)
-/// /sales/aging — buckets: Current / 1-30 / 31-60 / 61-90 / 90+
+/// /app/erp/sales/ar-aging — buckets: Current / 1-30 / 31-60 / 61-90 / 90+
 library;
 
 import 'package:flutter/material.dart';
@@ -127,8 +127,8 @@ class _ArAgingScreenState extends State<ArAgingScreen> {
                       const ApexOutputChips(
                         title: 'مرتبطة بـ',
                         items: [
-                          ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
-                          ApexChipLink('العملاء', '/sales/customers', Icons.people),
+                          ApexChipLink('الفواتير', '/app/erp/sales/invoices', Icons.receipt),
+                          ApexChipLink('العملاء', '/app/erp/finance/sales-customers', Icons.people),
                           ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),
                         ],
                       ),

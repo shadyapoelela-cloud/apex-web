@@ -91,11 +91,7 @@ import '../screens/audit/audit_engagement_workspace_screen.dart';
 import '../screens/operations/vendor_360_screen.dart';
 import '../screens/operations/receipt_capture_screen.dart';
 import '../screens/settings/unified_settings_screen.dart';
-import '../screens/operations/customers_list_screen.dart';
 import '../screens/operations/vendors_list_screen.dart';
-import '../screens/operations/invoices_list_screen.dart';
-import '../screens/operations/sales_invoice_create_screen.dart';
-import '../screens/operations/ar_aging_screen.dart';
 import '../screens/operations/bills_list_screen.dart';
 import '../screens/operations/ap_aging_screen.dart';
 import '../screens/notifications/notifications_panel_screen.dart';
@@ -117,7 +113,6 @@ import '../screens/compliance/consolidation_v2_screen.dart';
 import '../screens/admin/ai_suggestions_queue_v2_screen.dart';
 import '../screens/analytics/project_profitability_screen.dart';
 import '../screens/settings/bank_feed_setup_screen.dart';
-import '../screens/sales/recurring_invoices_screen.dart';
 import '../screens/knowledge/knowledge_search_v2_screen.dart';
 import '../screens/hr/expense_reports_screen.dart';
 import '../screens/compliance/wht_v2_screen.dart';
@@ -507,7 +502,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/compliance/budget-variance', redirect: (c, s) => '/analytics/budget-variance-v2'),
     GoRoute(path: '/compliance/bank-rec', redirect: (c, s) => '/accounting/bank-rec-v2'),
     GoRoute(path: '/compliance/inventory', redirect: (c, s) => '/operations/inventory-v2'),
-    GoRoute(path: '/compliance/aging', redirect: (c, s) => '/sales/aging'),
+        // Sprint 15 Stage 4c: V4 /compliance/aging archived → V5 /app/erp/sales/ar-aging
     GoRoute(
       path: '/compliance/working-capital',
       pageBuilder: (c, s) => _apexPage(const WorkingCapitalScreen(), s),
@@ -763,10 +758,10 @@ final appRouter = GoRouter(
     ),
     GoRoute(path: '/receipt/capture', pageBuilder: (c, s) => _apexPage(const ReceiptCaptureScreen(), s)),
     GoRoute(path: '/settings/unified', pageBuilder: (c, s) => _apexPage(const UnifiedSettingsScreen(), s)),
-    GoRoute(path: '/sales/customers', pageBuilder: (c, s) => _apexPage(const CustomersListScreen(), s)),
-    GoRoute(path: '/sales/invoices', pageBuilder: (c, s) => _apexPage(const InvoicesListScreen(), s)),
-    GoRoute(path: '/sales/invoices/new', pageBuilder: (c, s) => _apexPage(const SalesInvoiceCreateScreen(), s)),
-    GoRoute(path: '/sales/aging', pageBuilder: (c, s) => _apexPage(const ArAgingScreen(), s)),
+        // Sprint 15 Stage 4c: V4 /sales/customers archived → V5 /app/erp/finance/sales-customers
+        // Sprint 15 Stage 4c: V4 /sales/invoices archived → V5 /app/erp/sales/invoices
+        // Sprint 15 Stage 4c: V4 /sales/invoices/new archived → V5 /app/erp/sales/invoice-create
+        // Sprint 15 Stage 4c: V4 /sales/aging archived → V5 /app/erp/sales/ar-aging
     GoRoute(path: '/purchase/vendors', pageBuilder: (c, s) => _apexPage(const VendorsListScreen(), s)),
     GoRoute(path: '/purchase/bills', pageBuilder: (c, s) => _apexPage(const BillsListScreen(), s)),
     // /purchase/bills/new doesn't exist yet (no PurchaseBillCreateScreen
@@ -823,10 +818,10 @@ final appRouter = GoRouter(
     GoRoute(path: '/analytics/project-profitability', pageBuilder: (c, s) => _apexPage(const ProjectProfitabilityScreen(), s)),
     GoRoute(path: '/settings/bank-feeds', pageBuilder: (c, s) => _apexPage(const BankFeedSetupScreen(), s)),
     GoRoute(path: '/compliance/activity-log-v2', redirect: (c, s) => '/app/erp/finance/activity-log'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
-    GoRoute(path: '/sales/recurring', pageBuilder: (c, s) => _apexPage(const RecurringInvoicesScreen(), s)),
+        // Sprint 15 Stage 4c: V4 /sales/recurring archived → V5 /app/erp/finance/recurring-entries
     GoRoute(path: '/knowledge/search', pageBuilder: (c, s) => _apexPage(const KnowledgeSearchV2Screen(), s)),
-    GoRoute(path: '/sales/quotes', redirect: (c, s) => '/app/erp/sales/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
-    GoRoute(path: '/sales/memos', redirect: (c, s) => '/app/erp/sales/credit-notes'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
+        // Sprint 15 Stage 4c: V4 /sales/quotes archived → V5 /app/erp/sales/dashboard
+        // Sprint 15 Stage 4c: V4 /sales/memos archived → V5 /app/erp/sales/credit-notes
     GoRoute(path: '/hr/expense-reports', pageBuilder: (c, s) => _apexPage(const ExpenseReportsScreen(), s)),
     GoRoute(path: '/analytics/cost-variance-v2', redirect: (c, s) => '/app/erp/finance/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/compliance/wht-v2', pageBuilder: (c, s) => _apexPage(const WhtV2Screen(), s)),

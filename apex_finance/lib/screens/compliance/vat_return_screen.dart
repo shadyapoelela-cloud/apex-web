@@ -104,7 +104,7 @@ class _VatReturnScreenState extends State<VatReturnScreen> {
               const SizedBox(height: 16),
               _results(),
               const ApexOutputChips(items: [
-                ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
+                ApexChipLink('الفواتير', '/app/erp/sales/invoices', Icons.receipt),
                 ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
                 ApexChipLink('ZATCA Status', '/compliance/zatca-status', Icons.verified),
                 ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),

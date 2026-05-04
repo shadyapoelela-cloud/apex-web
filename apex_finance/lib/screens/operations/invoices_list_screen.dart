@@ -1,5 +1,5 @@
 /// APEX — Invoices List (sales invoices)
-/// /sales/invoices — filters: All / Issued / Paid / Overdue / Draft.
+/// /app/erp/sales/invoices — filters: All / Issued / Paid / Overdue / Draft.
 library;
 
 import 'package:flutter/material.dart';
@@ -120,7 +120,7 @@ class _InvoicesListScreenState extends State<InvoicesListScreen> {
       error: _error,
       onRefresh: _load,
       listFooter: const ApexOutputChips(items: [
-        ApexChipLink('أعمار AR', '/sales/aging', Icons.timeline),
+        ApexChipLink('أعمار AR', '/app/erp/sales/ar-aging', Icons.timeline),
         ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
         ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
         ApexChipLink('التقويم الضريبي', '/compliance/tax-calendar', Icons.event),

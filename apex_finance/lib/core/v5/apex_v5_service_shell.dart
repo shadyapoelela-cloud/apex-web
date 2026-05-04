@@ -995,7 +995,7 @@ const _kAllPins = <_Pin>[
       id: 'clients',
       labelAr: 'العملاء',
       icon: Icons.groups,
-      route: '/app/erp/sales/customers'),
+      route: '/app/erp/app/erp/finance/sales-customers'),
   _Pin(
       id: 'vendors',
       labelAr: 'الموردون',

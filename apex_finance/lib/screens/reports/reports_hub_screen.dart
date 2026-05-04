@@ -26,9 +26,9 @@ class ReportsHubScreen extends StatelessWidget {
       title: 'الذمم والأعمار',
       icon: Icons.timeline,
       reports: [
-        _Report('أعمار AR', 'Customer Aging', '/sales/aging', Icons.people),
+        _Report('أعمار AR', 'Customer Aging', '/app/erp/sales/ar-aging', Icons.people),
         _Report('أعمار AP', 'Vendor Aging', '/purchase/aging', Icons.local_shipping),
-        _Report('قائمة الفواتير', 'Sales Invoices', '/sales/invoices', Icons.receipt_long),
+        _Report('قائمة الفواتير', 'Sales Invoices', '/app/erp/sales/invoices', Icons.receipt_long),
         _Report('فواتير الموردين', 'Bills', '/purchase/bills', Icons.receipt),
       ],
     ),

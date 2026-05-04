@@ -505,7 +505,7 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
       GlobalKey<ScaffoldState>();
 
   // No dedicated /purchase/bills/new screen yet (parallel to sales has
-  // SalesInvoiceCreateScreen at /sales/invoices/new). Route to the
+  // SalesInvoiceCreateScreen at /app/erp/sales/invoice-create). Route to the
   // purchase hub for now — the user picks the right action there.
   // TODO(wave-4): build PurchaseInvoiceCreateScreen + register route.
   void _onCreate() => context.go('/purchase');
