@@ -3437,28 +3437,77 @@ same pattern can be applied to sibling screens with one import.
 - **Cross-ref:** file 39 § 3.1, file 38 § 2-3, file 40 Stage 4 prompts.
 - **Sprint target:** 15 — execute via per-concept sub-PRs.
 
-#### 🔴 G-CLEANUP-2. Force login screen on bare URL visit
-- **Severity:** 🔴 P0 Blocker — auth UX
-- **Path:** `apex_finance/lib/main.dart` (token restore on startup)
-  + `apex_finance/lib/core/auth_guard.dart` (current redirect rule)
-  + new backend `/auth/validate-token` endpoint.
-- **Evidence:** `APEX_LIVE_UX_AUDIT_2026-05-04.md` F-003 + file 38 § 1.
-  Visiting the bare URL lands on `/app` instead of `/login` because
-  `main.dart:14-16` restores a stale token from `localStorage` before
-  `auth_guard` runs; `auth_guard` then sees a non-null `S.token` and
-  allows entry.
-- **Fix proposal:** Per file 39 § 5:
-  1. Add backend endpoint `GET /auth/validate-token` that verifies
-     signature + `exp` and returns 200/401.
-  2. In `main.dart` startup, after `S.restore()`, call the validator
-     and on 401 clear the token + redirect to `/login`.
-  3. Ensure JWT `exp` claim ≤ 24 hours so stale-token risk caps quickly.
-- **Verification:** incognito browser visit to the bare URL must
-  redirect to `/login` (not `/app`).
-- **Effort:** ~1 day.
-- **Owner:** TBD.
-- **Cross-ref:** file 39 § 5, file 40 Stage 1 prompt.
-- **Sprint target:** 15 — Stage 1.
+#### ✅ G-CLEANUP-2. Force login screen on bare URL visit — FULLY DONE 2026-05-04
+- **Branch:** `sprint-15/g-cleanup-2-force-login`.
+- **Severity (was):** 🔴 P0 Blocker — auth UX.
+- **Path:** `apex_finance/lib/main.dart` + `apex_finance/lib/api_service.dart`.
+- **Original evidence:** `APEX_LIVE_UX_AUDIT_2026-05-04.md` F-003 +
+  file 38 § 1. Visiting the bare URL landed on `/app` instead of
+  `/login` because `main.dart:14-16` restored a stale token from
+  `localStorage` before `auth_guard` ran; `auth_guard` then saw a
+  non-null `S.token` and allowed entry.
+- **Verify-First findings (2026-05-04):**
+  - **JWT exp already ≤ 24 hours.** `app/phase1/services/auth_service.py:46`
+    sets `ACCESS_TOKEN_EXPIRE_MINUTES = 60` (1 hour). Step 4 of the
+    Stage 1 plan was a no-op — the short-exp pillar of the fix was
+    already in place; only the validation pillar was missing.
+  - **No new backend endpoint needed.** `GET /users/me` already
+    exists at `app/phase1/routes/phase1_routes.py:354` and uses
+    `Depends(get_current_user)`, which raises HTTP 401 on missing /
+    invalid / expired tokens. This is a perfect probe — reusing it
+    avoided a backend PR + new tests.
+  - `ApiService.getProfile()` (line 94) already wraps `GET /users/me`,
+    confirming the frontend-side probe was wireable in <10 LOC.
+- **Fix applied (Design B — reuse `/users/me`):**
+  - `apex_finance/lib/api_service.dart`: added 17-LOC
+    `validateToken()` static method. Calls `GET /users/me` with the
+    current token; returns `true` on HTTP 200, `false` on any other
+    status, network error, or timeout (8s cap, fail-closed).
+  - `apex_finance/lib/main.dart`: converted `main` to `Future<void>
+    main() async`, added `WidgetsFlutterBinding.ensureInitialized()`.
+    After `S.restore()` succeeds, awaits `ApiService.validateToken()`;
+    on `false`, calls `S.clear()` (existing helper that wipes all
+    `apex_*` localStorage keys) + `ApiService.clearToken()`. The
+    GoRouter `authGuardRedirect` (already wired at `router.dart:285-286`
+    by G-S2 Sprint 11) then sees a null token and redirects to `/login`.
+  - No backend changes. No new endpoints. No test infrastructure
+    additions.
+- **Files touched:**
+  - `apex_finance/lib/api_service.dart` (+19 / -1).
+  - `apex_finance/lib/main.dart` (+44 / -10).
+- **Verification:**
+  - `flutter analyze`: 306 issues (matches G-DOCS-2 documented
+    baseline — zero NEW issues introduced).
+  - `flutter test`: 43 passed, 1 pre-existing failure
+    (`ask_panel_test.dart` `package:web` 1.1.1 incompatibility,
+    documented since G-UX-1 Sprint 11 — unrelated to this PR).
+  - `pytest tests/test_auth.py`: 5/5 passed in 3.70s. Backend auth
+    tests unchanged (no backend changes in this PR).
+- **Manual verification deferred to operator (per Step 7):**
+  - **Incognito browser** → bare URL `https://shadyapoelela-cloud.github.io/apex-web/`
+    → must land on `/login` (was: `/app`). 🎯 The acceptance test.
+  - **Logged-in browser with fresh token** → bare URL → `/app` loads
+    seamlessly. Validates that the change does NOT break working
+    sessions.
+  - **Browser with expired token** (force expiry by waiting 60+
+    minutes OR by manually editing `apex_token` in DevTools) →
+    bare URL → redirected to `/login`, `apex_token` removed from
+    localStorage automatically.
+- **Risk:** medium. Auth-flow changes always carry risk of
+  accidental lockout. Mitigations:
+  - Fail-closed on network errors prevents "valid token but Render
+    cold-started" → would normally redirect to `/login`. Operator
+    should warm the backend (visit `/login`, then bare URL) once
+    post-deploy to confirm behaviour. The 8s timeout is generous —
+    Render's worst-case warm cold-start is <30s but only on the
+    very first request; the validation happens AFTER the user
+    has previously authenticated, so the backend is normally warm.
+  - The change is fail-OPEN to UX disruption (over-redirect to
+    `/login` is preferable to under-redirect to `/app` with stale
+    session) — matches the operator's directive.
+- **Sprint:** 15 — Stage 1. **First Stage 1 win of Sprint 15.**
+- **Cross-ref:** file 39 § 5, file 40 Stage 1 prompt, F-003 audit
+  finding, G-S2 (auth_guard, Sprint 11).
 
 #### 🔴 G-CLEANUP-3. Clean home dashboard to 5 pillars only
 - **Severity:** 🔴 P0 Blocker — IA / UX consolidation

@@ -9,13 +9,44 @@ import 'core/session.dart';
 export 'app/apex_app.dart' show ApexApp;
 import 'app/apex_app.dart' show ApexApp;
 
-void main() {
-  // Restore session from localStorage
+Future<void> main() async {
+  // G-CLEANUP-2 (Sprint 15): main is now async because we await a
+  // backend round-trip to validate any restored token before trusting
+  // it. WidgetsFlutterBinding.ensureInitialized() is required when
+  // main is async per Flutter convention.
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Restore session from localStorage.
   if (S.token == null) {
     final restored = S.restore();
     if (restored && S.token != null) {
       ApiService.setToken(S.token!);
+
+      // G-CLEANUP-2 (Sprint 15): a non-null token in localStorage from
+      // a previous session is NOT enough — it might be expired (60-min
+      // access-token lifetime per app/phase1/services/auth_service.py:46)
+      // or signed by a rotated JWT_SECRET. Validate against the backend
+      // before trusting it. On any failure, clear the token so the
+      // GoRouter auth guard (lib/core/auth_guard.dart) redirects the
+      // user to /login.
+      //
+      // The operator's directive (file 39 § 5): bare-URL visitors must
+      // land on /login, not on /app with a stale session. This async
+      // probe is the mechanism that delivers that promise.
+      //
+      // Fail-closed: if validation can't reach the backend (network
+      // error, timeout, etc.), we treat the token as invalid and
+      // redirect to /login. Better to over-redirect than to under-
+      // redirect.
+      //
+      // See APEX_BLUEPRINT/09 § 20.1 G-CLEANUP-2.
+      final isValid = await ApiService.validateToken();
+      if (!isValid) {
+        S.clear();
+        ApiService.clearToken();
+      }
     }
   }
+
   runApp(const ProviderScope(child: ApexApp()));
 }
