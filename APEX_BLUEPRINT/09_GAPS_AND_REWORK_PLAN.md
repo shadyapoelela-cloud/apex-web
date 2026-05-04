@@ -3410,32 +3410,84 @@ same pattern can be applied to sibling screens with one import.
 - **Owner:** TBD.
 - **Sprint target:** 14 — Phase B.
 
-#### 🔴 G-CLEANUP-1. Archive V4 duplicate routes that have V5 equivalents
-- **Severity:** 🔴 P0 Blocker — route duplication / cleanup
-- **Path:** `apex_finance/lib/core/router.dart` + V4 screen files
-  under `apex_finance/lib/screens/v4_*/`.
+#### 🔴 G-CLEANUP-1. Archive V4 duplicate routes that have V5 equivalents — Stage 4a (audit) DONE 2026-05-04
+- **Severity:** 🔴 P0 Blocker — route duplication / cleanup. Cleanup
+  (route deletion + reference updates) deferred to Stages 4b–4f.
+- **Path:** `apex_finance/lib/core/router.dart` + ~720 internal-
+  reference call sites across `apex_finance/lib/`.
 - **Evidence:** Per file 38 § 2-3 (Real Routes Flowchart) + file 39
-  § 3.1 (Canonical Journey & Archive Mandate), ~70 V4 routes are
-  still wired in `router.dart` alongside V5 routes (`/app/erp/*`).
-  Internal links inside V5 code (e.g., `v5_routes.dart:414`) still
-  reference V4 routes, so the V4 surface can't be deleted blindly.
-- **Fix proposal (split into 5-6 sub-PRs per business concept):**
-  1. Pick canonical (recommend V5 in every case).
-  2. Update all internal links in V5 code to point at the V5 equivalent.
-  3. Delete the V4 route from `router.dart`.
-  4. Archive the V4 screen file(s) to
-     `apex_finance/lib/_archive/v4-screens/<concept>/`.
-  Concepts to sweep (per file 39 § 3.1):
-  - Journal Entries (6 V4 routes → 3 V5 routes)
-  - Sales (customers, invoices, aging, recurring, payments)
-  - Purchase (vendors, bills, aging, payments)
-  - Accounting (COA, bank rec)
-  - Compliance (ZATCA, tax, IFRS, ratios, FS)
-  - Audit, Analytics, HR, Marketplace, Operations
-- **Effort:** ~1-2 weeks (split across Stages 4a-4f per file 40).
-- **Owner:** TBD.
-- **Cross-ref:** file 39 § 3.1, file 38 § 2-3, file 40 Stage 4 prompts.
-- **Sprint target:** 15 — execute via per-concept sub-PRs.
+  § 3.1 (Canonical Journey & Archive Mandate). Audit (Stage 4a)
+  catalogued **92 V4 routes** (the original "~70" estimate was low):
+  69 with `pageBuilder` real handlers + 23 redirect-only aliases.
+- **Stage 4a audit findings (2026-05-04):**
+  - **92 V4 routes** in `router.dart` outside the canonical
+    `/app/*` (V5) namespace. Distribution: 32 Compliance, 12
+    Operations, 8 Sales, 6 Purchase, 6 Audit, 8 Analytics, 6 HR,
+    5 Marketplace/Provider, 3 Accounting, plus several
+    `coa-*` / `tb` / `analysis` / root-level legacy paths.
+  - **67 V5 equivalents identified** (existing V5 wired-screen
+    entries already point at the same screen widgets). Many V4
+    screens are **dual-wired** (V4 path + V5 chip → same screen
+    file) — Stage 4 deletes ROUTES not SCREENS; screen archival
+    is a separate Stage 5/6 sweep.
+  - **25 V4 routes have no clear V5 equivalent yet** — need
+    per-route decision (wire to a new V5 path / delete entirely
+    / defer to G-MOD-* track) during the relevant sub-PR.
+  - **~720 total internal references** to V4 paths across
+    `apex_finance/lib/`. The biggest single drivers:
+    1. `apex_commands_registry.dart` (Cmd+K palette)
+    2. `apex_magnetic_shell.dart` (sidebar / navigation)
+    3. `apex_saved_views_v2.dart` (saved views)
+    4. `apex_launchpad_screen.dart` (the `/launchpad/full`
+       verbose launcher — itself a Stage 4f.5 archive candidate)
+    5. `apex_service_hub_screen.dart` (V4 service hubs at
+       `/sales`, `/purchase`, etc. — Stage 4 final-cleanup
+       candidates)
+  - **Top 10 most-referenced V4 paths** (45→15 hits each):
+    `/compliance/financial-statements` (45), `/accounting/je-list`
+    (32), `/sales/invoices` (27), `/compliance/vat-return` (26),
+    `/compliance/activity-log-v2` (20), `/purchase/bills` (20),
+    `/analytics/cash-flow-forecast` (18), `/sales/aging` (16),
+    `/compliance/zakat` (16), `/sales/customers` (15).
+- **Audit doc:** `APEX_BLUEPRINT/V4_ARCHIVE_AUDIT_2026-05-04.md` —
+  full route inventory, V5 mapping, internal-reference counts,
+  edge cases, and per-concept sub-PR scope.
+- **Recommended sub-PR sequence (lowest-risk first):**
+  - **Stage 4b — Journal Entries** (6 routes / ~50 refs / ~1 day).
+    Smallest, well-defined; tests the workflow pattern.
+  - **Stage 4c — Sales** (8 routes / ~110 refs / ~1.5 days).
+    3 NEW V5 wirings needed (aging, quotes, memos).
+  - **Stage 4d — Purchase** (6 routes / ~60 refs / ~1 day).
+    Same shape as Sales; 2 NEW V5 wirings (ap-aging, payment).
+  - **Stage 4e — Compliance** (32 routes / ~320 refs / ~3-4
+    days). Largest concept — recommend splitting into 4e.1
+    (ZATCA/Tax), 4e.2 (IFRS/Statements), 4e.3 (Misc) if a
+    single PR feels too heavy.
+  - **Stage 4f — Remaining** (Audit + Analytics + HR + Operations
+    + Marketplace; ~28 routes / ~190 refs / ~2-3 days). May
+    further split into 4f.1-4f.5 by sub-concept.
+  - **Stage 4g (final) — V4 service hubs + verbose launchpad**
+    (~13 routes; runs after every V4 target route is migrated).
+- **Total cleanup effort estimate:** ~8-11 days across 5 PRs
+  (or 7 if Compliance and Remaining are split into 4e.1-4e.3
+  and 4f.1-4f.5).
+- **Edge cases (full list in audit doc § "Edge cases & flags"):**
+  - Same-screen / dual-wired (V4 path + V5 chip share screen file).
+  - Service Hub screens at `/sales`, `/purchase`, `/accounting`,
+    etc. are V4-era IA — keep until last (Stage 4g).
+  - V5 Workspaces shortcuts inside `v5_data.dart` reference V4
+    paths; each sub-PR must update workspace config too.
+  - Test files referencing V4 paths must be updated per concept.
+  - Documentation (chapters 03, 04, 06) — out of scope for
+    Stage 4; tracked under G-CLEANUP-5 (Sprint 17).
+- **Status post-Stage 4a:** 🔴 audit complete; cleanup pending
+  Stage 4b-4f execution. Each sub-PR's Verify-First step starts
+  with the audit doc's per-concept reference list.
+- **Owner:** TBD per sub-PR.
+- **Cross-ref:** `APEX_BLUEPRINT/V4_ARCHIVE_AUDIT_2026-05-04.md`,
+  file 39 § 3.1, file 38 § 2-3, file 40 Stage 4 prompts.
+- **Sprint target:** 15 — Stages 4a (this audit) + 4b–4g
+  (subsequent execution PRs).
 
 #### ✅ G-CLEANUP-2. Force login screen on bare URL visit — FULLY DONE 2026-05-04
 - **Branch:** `sprint-15/g-cleanup-2-force-login`.
