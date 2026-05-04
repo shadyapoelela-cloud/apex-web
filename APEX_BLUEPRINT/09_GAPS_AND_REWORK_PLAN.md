@@ -3410,6 +3410,150 @@ same pattern can be applied to sibling screens with one import.
 - **Owner:** TBD.
 - **Sprint target:** 14 — Phase B.
 
+#### 🔴 G-CLEANUP-1. Archive V4 duplicate routes that have V5 equivalents
+- **Severity:** 🔴 P0 Blocker — route duplication / cleanup
+- **Path:** `apex_finance/lib/core/router.dart` + V4 screen files
+  under `apex_finance/lib/screens/v4_*/`.
+- **Evidence:** Per file 38 § 2-3 (Real Routes Flowchart) + file 39
+  § 3.1 (Canonical Journey & Archive Mandate), ~70 V4 routes are
+  still wired in `router.dart` alongside V5 routes (`/app/erp/*`).
+  Internal links inside V5 code (e.g., `v5_routes.dart:414`) still
+  reference V4 routes, so the V4 surface can't be deleted blindly.
+- **Fix proposal (split into 5-6 sub-PRs per business concept):**
+  1. Pick canonical (recommend V5 in every case).
+  2. Update all internal links in V5 code to point at the V5 equivalent.
+  3. Delete the V4 route from `router.dart`.
+  4. Archive the V4 screen file(s) to
+     `apex_finance/lib/_archive/v4-screens/<concept>/`.
+  Concepts to sweep (per file 39 § 3.1):
+  - Journal Entries (6 V4 routes → 3 V5 routes)
+  - Sales (customers, invoices, aging, recurring, payments)
+  - Purchase (vendors, bills, aging, payments)
+  - Accounting (COA, bank rec)
+  - Compliance (ZATCA, tax, IFRS, ratios, FS)
+  - Audit, Analytics, HR, Marketplace, Operations
+- **Effort:** ~1-2 weeks (split across Stages 4a-4f per file 40).
+- **Owner:** TBD.
+- **Cross-ref:** file 39 § 3.1, file 38 § 2-3, file 40 Stage 4 prompts.
+- **Sprint target:** 15 — execute via per-concept sub-PRs.
+
+#### 🔴 G-CLEANUP-2. Force login screen on bare URL visit
+- **Severity:** 🔴 P0 Blocker — auth UX
+- **Path:** `apex_finance/lib/main.dart` (token restore on startup)
+  + `apex_finance/lib/core/auth_guard.dart` (current redirect rule)
+  + new backend `/auth/validate-token` endpoint.
+- **Evidence:** `APEX_LIVE_UX_AUDIT_2026-05-04.md` F-003 + file 38 § 1.
+  Visiting the bare URL lands on `/app` instead of `/login` because
+  `main.dart:14-16` restores a stale token from `localStorage` before
+  `auth_guard` runs; `auth_guard` then sees a non-null `S.token` and
+  allows entry.
+- **Fix proposal:** Per file 39 § 5:
+  1. Add backend endpoint `GET /auth/validate-token` that verifies
+     signature + `exp` and returns 200/401.
+  2. In `main.dart` startup, after `S.restore()`, call the validator
+     and on 401 clear the token + redirect to `/login`.
+  3. Ensure JWT `exp` claim ≤ 24 hours so stale-token risk caps quickly.
+- **Verification:** incognito browser visit to the bare URL must
+  redirect to `/login` (not `/app`).
+- **Effort:** ~1 day.
+- **Owner:** TBD.
+- **Cross-ref:** file 39 § 5, file 40 Stage 1 prompt.
+- **Sprint target:** 15 — Stage 1.
+
+#### 🔴 G-CLEANUP-3. Clean home dashboard to 5 pillars only
+- **Severity:** 🔴 P0 Blocker — IA / UX consolidation
+- **Path:** `/app` home (the Launchpad / V5 landing screen).
+- **Evidence:** `APEX_LIVE_UX_AUDIT_2026-05-04.md` F-004 + file 39
+  § 2.2. The home currently shows three competing nav patterns:
+  1. Hero grid (15 large action cards).
+  2. Quick Shortcuts (4 small cards).
+  3. Service Pillars (5 pillars with `Alt+1..5` shortcut).
+  This is the same "three doorbells" problem flagged earlier in
+  G-UX-4 — but at the home-screen level rather than within a single
+  app.
+- **Fix proposal:** Keep ONLY the 5 Service Pillars. Delete Hero grid
+  and Quick Shortcuts entirely. Final home contains: APEX header,
+  Copilot AI banner (top), 5 pillars, news ticker, floating "اسأل
+  أبكس" button — and nothing else.
+- **Effort:** ~2 days.
+- **Owner:** TBD.
+- **Cross-ref:** file 39 § 2.2, file 40 Stage 2 prompt.
+- **Sprint target:** 15 — Stage 2.
+
+#### 🔴 G-CLEANUP-4. Hide non-working apps from launchers
+- **Severity:** 🔴 P0 Blocker — UX honesty
+- **Path:** All Pillar launcher screens (`/app/<pillar>/apps`)
+  + `apex_finance/lib/core/v5/v5_groups.dart` (chip definitions).
+- **Evidence:** `APEX_LIVE_UX_AUDIT_2026-05-04.md` F-002 + file 39
+  § 3.3. 5+ app tiles in the launchers are frontend shells with
+  zero backend wiring (CRM, PM, DMS, Helpdesk, BI — same set tracked
+  under G-MOD-CRM-1..BI-1). Plus broken routes (Hotel PMS 404 from
+  G-UI-7, HR empty launcher from G-UI-6).
+- **Fix proposal:**
+  1. Add `enabled: bool` flag to `V5Chip`. Default `true`; explicitly
+     `false` for known shells / broken routes.
+  2. Filter chips on launcher render so disabled tiles don't show.
+  3. For users who URL-direct to a hidden tile path, render
+     "قيد البناء" (under construction) page instead of allowing the
+     broken screen / 404.
+- **Effort:** ~1 day.
+- **Owner:** TBD.
+- **Cross-ref:** file 39 § 3.3, file 40 Stage 3 prompt.
+- **Sprint target:** 15 — Stage 3.
+
+#### 🟠 G-CLEANUP-5. Archive idealized blueprint docs
+- **Severity:** 🟠 P1 Major — documentation hygiene
+- **Path:** `APEX_BLUEPRINT/` chapters that reflect designed-but-not-
+  built modules or stale claims.
+- **Evidence:** Per file 39 § 3.5 — several blueprint docs are
+  aspirational / superseded and should move to
+  `APEX_BLUEPRINT/_archive/2026-05-04/`. Active blueprint after
+  archive ≈ 10 files.
+- **Archive list (per file 39 § 3.5):**
+  - `04_SCREENS_AND_BUTTONS_CATALOG.md` — idealized; reality has
+    duplicates and shells.
+  - `03_NAVIGATION_MAP.md` — claims 70+ routes; reality is 257
+    (G-DOCS-2 patched the headline; full rewrite still owed).
+  - `05_API_ENDPOINTS_MASTER.md` — claims 240+ endpoints; reality
+    is 770 (same situation as 03; G-DOCS-3 will eventually
+    auto-generate).
+  - `24_CRM_MODULE_DESIGN.md` — module not built (G-MOD-CRM-1).
+  - `25_PROJECT_MANAGEMENT.md` — module not built (G-MOD-PM-1).
+  - `26_DOCUMENT_MANAGEMENT_SYSTEM.md` — module not built (G-MOD-DMS-1).
+  - `37_COMPLETE_FLOWCHART_2026-05-04.md` — idealized; superseded
+    by file 38 (real routes flowchart).
+  - Any Helpdesk / BI deep-dive chapters — modules not built
+    (G-MOD-HELPDESK-1 / G-MOD-BI-1).
+- **Effort:** ~1 day.
+- **Owner:** TBD.
+- **Cross-ref:** file 39 § 3.5, file 40 Stage 6 prompt.
+- **Sprint target:** 17 — runs after Sprints 15-16 close their
+  cleanups so the archive list is final.
+
+#### 🟠 G-CLEANUP-6. CRUD verification per kept app
+- **Severity:** 🟠 P1 Major — quality gate
+- **Path:** Each app remaining on the KEEP-list after G-CLEANUP-1..4.
+- **Evidence:** Per file 39 § 2.3 (KEEP-list) + § 6 (CRUD round-trip
+  requirement). For every app that survives the Sprint 15 cleanup,
+  full CRUD against the live backend must round-trip cleanly:
+  create → list → click row → edit → save → list refreshes.
+- **Fix proposal:** Audit pass per file 40 Stage 5a (per-app CRUD
+  smoke against the deployed backend); per-app fix PRs per Stages
+  5b-5N.
+- **Initial KEEP-list (will grow as more apps are verified working
+  during Stage 4):**
+  - `/app/erp/finance/je-builder` (Journal Entries — already
+    Sprint 13 + 14 verified).
+  - `/app/erp/finance/workflows` (Approval Kanban).
+  - `/app/compliance/zatca/dashboard`.
+  - Plus any further apps Stage 4 confirms genuinely working
+    end-to-end against backend.
+- **Effort:** ~2 weeks (audit + per-app fixes).
+- **Owner:** TBD.
+- **Cross-ref:** file 39 § 2.3 + § 6, file 40 Stage 5 prompts.
+- **Sprint target:** 16 — runs after Sprint 15's structural cleanup
+  so the KEEP-list is stable.
+
 ### 20.2 Major findings (Phase B/C — strategic + UX consolidation)
 
 #### 🟠 G-UI-3. Replace hardcoded mocks with real-or-empty pattern
