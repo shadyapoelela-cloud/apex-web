@@ -554,6 +554,11 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'integrations', labelAr: 'التكاملات API', labelEn: 'Integrations Hub', icon: Icons.hub, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'integrations'),
           const V5Chip(id: 'onboarding', labelAr: 'رحلة الإعداد', labelEn: 'Onboarding', icon: Icons.auto_awesome, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'golive'),
           const V5Chip(id: 'advanced-settings', labelAr: 'إعدادات متقدّمة', labelEn: 'Advanced Settings', icon: Icons.settings_applications, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'golive'),
+          // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 3 new chips reusing V4 finance screens.
+          // /compliance/cashflow + /compliance/cashflow-statement both consolidate to this single chip.
+          const V5Chip(id: 'cashflow', labelAr: 'التدفق النقدي', labelEn: 'Cash Flow', icon: Icons.water_drop, category: 'reports'),
+          const V5Chip(id: 'depreciation', labelAr: 'الإهلاك', labelEn: 'Depreciation', icon: Icons.trending_down, category: 'operations'),
+          const V5Chip(id: 'amortization', labelAr: 'الإطفاء', labelEn: 'Amortization', icon: Icons.access_time, category: 'operations'),
         ],
       ),
 
@@ -603,6 +608,8 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'fx', labelAr: 'صرف العملات', labelEn: 'FX', icon: Icons.currency_exchange),
           const V5Chip(id: 'guarantees', labelAr: 'الضمانات والاعتمادات', labelEn: 'Guarantees & L/Cs', icon: Icons.verified_user),
           const V5Chip(id: 'investments', labelAr: 'محفظة الاستثمار', labelEn: 'Investment Portfolio', icon: Icons.show_chart),
+          // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 1 new chip reusing V4 FxConverterScreen.
+          const V5Chip(id: 'fx-converter', labelAr: 'محوّل العملات', labelEn: 'FX Converter', icon: Icons.swap_horiz),
         ],
       ),
 
@@ -630,6 +637,12 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'contracts', labelAr: 'العقود', labelEn: 'Contracts', icon: Icons.gavel),
           const V5Chip(id: 'subscription-billing', labelAr: 'فوترة الاشتراكات', labelEn: 'Subscription Billing', icon: Icons.autorenew),
           const V5Chip(id: 'credit', labelAr: 'التصنيف الائتماني', labelEn: 'Credit Scoring', icon: Icons.credit_score),
+          // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 5 new chips reusing V4 sales screens.
+          const V5Chip(id: 'invoice-create', labelAr: 'إنشاء فاتورة', labelEn: 'Create Invoice', icon: Icons.add_box),
+          const V5Chip(id: 'ar-aging', labelAr: 'أعمار الذمم AR', labelEn: 'AR Aging', icon: Icons.timeline),
+          const V5Chip(id: 'payment', labelAr: 'تحصيل دفعة عميل', labelEn: 'Customer Payment', icon: Icons.payments),
+          const V5Chip(id: 'customer-360', labelAr: 'العميل 360°', labelEn: 'Customer 360°', icon: Icons.person_pin_circle),
+          const V5Chip(id: 'live-cycle', labelAr: 'دورة المبيعات الحيّة', labelEn: 'Live Sales Cycle', icon: Icons.timeline),
         ],
       ),
 
@@ -654,6 +667,11 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'vendor-onboarding', labelAr: 'إدخال مورد', labelEn: 'Vendor Onboarding', icon: Icons.person_add),
           const V5Chip(id: 'requisitions', labelAr: 'طلبات الشراء', labelEn: 'Purchase Requisitions', icon: Icons.shopping_cart),
           const V5Chip(id: 'procurement-rfq', labelAr: 'عروض الأسعار RFQ', labelEn: 'Procurement RFQ', icon: Icons.request_quote),
+          // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 4 new chips reusing V4 purchase screens.
+          const V5Chip(id: 'ap-aging', labelAr: 'أعمار الذمم AP', labelEn: 'AP Aging', icon: Icons.timeline),
+          const V5Chip(id: 'payment', labelAr: 'دفعة مورد', labelEn: 'Vendor Payment', icon: Icons.payments),
+          const V5Chip(id: 'vendor-360', labelAr: 'المورد 360°', labelEn: 'Vendor 360°', icon: Icons.business),
+          const V5Chip(id: 'cycle', labelAr: 'دورة الشراء', labelEn: 'Purchase Cycle', icon: Icons.sync),
         ],
       ),
 
@@ -698,6 +716,8 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'restaurant-pos', labelAr: 'نقاط بيع المطاعم 🎉', labelEn: 'Restaurant POS', icon: Icons.restaurant),
           const V5Chip(id: 'retail-pos', labelAr: 'نقاط بيع التجزئة', labelEn: 'Retail POS', icon: Icons.storefront),
           const V5Chip(id: 'service-pos', labelAr: 'نقاط بيع الخدمات', labelEn: 'Service POS', icon: Icons.room_service),
+          // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 1 new chip reusing V4 PosSessionScreen.
+          const V5Chip(id: 'sessions', labelAr: 'جلسات نقاط البيع', labelEn: 'POS Sessions', icon: Icons.event_available),
         ],
       ),
 
@@ -1001,6 +1021,8 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'calendar', labelAr: 'الرزنامة الضريبية', labelEn: 'Tax Calendar', icon: Icons.calendar_month),
           const V5Chip(id: 'optimizer', labelAr: 'محاكي تحسين الضرائب', labelEn: 'Tax Optimizer', icon: Icons.savings),
           const V5Chip(id: 'filings', labelAr: 'مركز الإقرارات', labelEn: 'Filing Center', icon: Icons.folder_special),
+          // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 1 new chip — TaxTimelineScreen.
+          const V5Chip(id: 'timeline', labelAr: 'الخط الزمني الضريبي', labelEn: 'Tax Timeline', icon: Icons.timeline),
         ],
       ),
 
@@ -1023,6 +1045,8 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'csid', labelAr: 'شهادات CSID', labelEn: 'CSID', icon: Icons.badge),
           _chipFromV4('compliance', 'zatca-queue', labelOverrideAr: 'قائمة الانتظار والإعادة'),
           const V5Chip(id: 'errors', labelAr: 'سجل الأخطاء', labelEn: 'Error Log', icon: Icons.error),
+          // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 1 new chip — ZatcaInvoiceBuilderScreen.
+          const V5Chip(id: 'invoice', labelAr: 'بنّاء فاتورة ZATCA', labelEn: 'ZATCA Invoice Builder', icon: Icons.receipt_long),
         ],
       ),
 
@@ -1045,6 +1069,11 @@ List<V5Service> v5Services = [
           V5Chip(id: 'revenue-recognition', labelAr: 'الاعتراف بالإيراد IFRS 15', labelEn: 'Revenue Recognition', icon: Icons.receipt_long),
           V5Chip(id: 'leases', labelAr: 'الإيجارات IFRS 16', labelEn: 'Leases (IFRS 16)', icon: Icons.home_work),
           V5Chip(id: 'deferred', labelAr: 'الضريبة المؤجلة IAS 12', labelEn: 'Deferred Tax', icon: Icons.account_balance_wallet),
+          // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 4 new chips — IFRS tools + extras + Islamic finance.
+          V5Chip(id: 'tools', labelAr: 'أدوات IFRS', labelEn: 'IFRS Tools', icon: Icons.build),
+          V5Chip(id: 'deferred-tax', labelAr: 'الضريبة المؤجلة', labelEn: 'Deferred Tax (V4)', icon: Icons.account_balance_wallet),
+          V5Chip(id: 'extras', labelAr: 'أدوات إضافية', labelEn: 'Extras Tools', icon: Icons.extension),
+          V5Chip(id: 'islamic', labelAr: 'التمويل الإسلامي', labelEn: 'Islamic Finance', icon: Icons.mosque),
         ],
       ),
 
@@ -1171,6 +1200,8 @@ List<V5Service> v5Services = [
           V5Chip(id: 'planning', labelAr: 'التخطيط', labelEn: 'Audit Planning', icon: Icons.edit_calendar),
           V5Chip(id: 'kickoff', labelAr: 'البدء', labelEn: 'Kick-off', icon: Icons.rocket_launch),
           V5Chip(id: 'materiality', labelAr: 'الأهمية النسبية', labelEn: 'Materiality', icon: Icons.straighten),
+          // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 1 new chip — AiAuditWorkflowScreen.
+          V5Chip(id: 'ai-workflow', labelAr: 'سير عمل المراجعة بالذكاء', labelEn: 'AI Audit Workflow', icon: Icons.auto_fix_high),
         ],
       ),
 
@@ -1360,6 +1391,8 @@ List<V5Service> v5Services = [
           V5Chip(id: 'dcf', labelAr: 'التدفقات المخصومة DCF', labelEn: 'DCF Model', icon: Icons.show_chart),
           V5Chip(id: 'multiples', labelAr: 'المضاعفات', labelEn: 'Trading Multiples', icon: Icons.compare_arrows),
           V5Chip(id: 'lbo', labelAr: 'نموذج LBO', labelEn: 'LBO Model', icon: Icons.account_balance),
+          // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 1 new chip — InvestmentScreen.
+          V5Chip(id: 'investment', labelAr: 'محفظة الاستثمار', labelEn: 'Investment', icon: Icons.attach_money),
         ],
       ),
 
@@ -1426,6 +1459,11 @@ List<V5Service> v5Services = [
           V5Chip(id: 'ratios', labelAr: 'النسب المالية', labelEn: 'Financial Ratios', icon: Icons.analytics),
           V5Chip(id: 'benchmarking', labelAr: 'المقارنة المرجعية', labelEn: 'Benchmarking', icon: Icons.compare),
           V5Chip(id: 'industry', labelAr: 'أداء الصناعة', labelEn: 'Industry Performance', icon: Icons.factory),
+          // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 3 new chips — DSCR + working-capital + breakeven.
+          // Note: dashboard chip above is reused for /compliance/ratios → /app/advisory/ratios/dashboard.
+          V5Chip(id: 'dscr', labelAr: 'تغطية خدمة الدين DSCR', labelEn: 'DSCR', icon: Icons.account_balance),
+          V5Chip(id: 'working-capital', labelAr: 'رأس المال العامل', labelEn: 'Working Capital', icon: Icons.work),
+          V5Chip(id: 'breakeven', labelAr: 'نقطة التعادل', labelEn: 'Break-Even', icon: Icons.balance),
         ],
       ),
 
@@ -1526,6 +1564,9 @@ List<V5Service> v5Services = [
           V5Chip(id: 'browse', labelAr: 'تصفّح', labelEn: 'Browse', icon: Icons.search),
           V5Chip(id: 'apex-match', labelAr: 'ذكاء الاقتران APEX Match', labelEn: 'APEX Match AI', icon: Icons.auto_awesome),
           V5Chip(id: 'compare', labelAr: 'مقارنة المزوّدين', labelEn: 'Compare Providers', icon: Icons.compare),
+          // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 2 new chips — service catalog + new request.
+          V5Chip(id: 'catalog', labelAr: 'كتالوج الخدمات', labelEn: 'Service Catalog', icon: Icons.menu_book),
+          V5Chip(id: 'new-request', labelAr: 'طلب خدمة جديد', labelEn: 'New Service Request', icon: Icons.add_circle),
         ],
       ),
 

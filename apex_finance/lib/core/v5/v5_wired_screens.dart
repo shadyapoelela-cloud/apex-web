@@ -24,6 +24,39 @@ library;
 
 import 'package:flutter/material.dart';
 
+// G-CLEANUP-1 Stage 4c-prep (Sprint 15, 2026-05-05): added 27 new V5
+// chip imports as part of the V4 → V5 migration. Each V4 screen below
+// becomes the implementation for a new V5 chip; the V4 path is then
+// removed in PR 2 (Stages 4c-4g final). See V4_CLASSIFICATION_2026-05-04.md.
+import '../../screens/operations/sales_invoice_create_screen.dart';
+import '../../screens/operations/ar_aging_screen.dart';
+import '../../screens/operations/customer_payment_screen.dart';
+import '../../screens/operations/customer_360_screen.dart' as ops_customer_360;
+import '../../screens/operations/live_sales_cycle_screen.dart';
+import '../../screens/operations/ap_aging_screen.dart';
+import '../../screens/operations/vendor_payment_screen.dart';
+import '../../screens/operations/vendor_360_screen.dart';
+import '../../screens/operations/purchase_cycle_screen.dart';
+import '../../screens/compliance/cashflow_screen.dart';
+import '../../screens/compliance/amortization_screen.dart';
+import '../../screens/compliance/fx_converter_screen.dart';
+import '../../screens/operations/pos_session_screen.dart';
+import '../../screens/compliance/zatca_invoice_builder_screen.dart';
+import '../../screens/compliance/tax_timeline_screen.dart';
+import '../../screens/compliance/ifrs_tools_screen.dart';
+import '../../screens/compliance/deferred_tax_screen.dart' as cmp_deferred_tax;
+import '../../screens/compliance/extras_tools_screen.dart';
+import '../../screens/compliance/islamic_finance_screen.dart';
+import '../../screens/compliance/financial_ratios_screen.dart';
+import '../../screens/compliance/dscr_screen.dart';
+import '../../screens/compliance/working_capital_screen.dart';
+import '../../screens/compliance/breakeven_screen.dart';
+import '../../screens/compliance/valuation_screen.dart';
+import '../../screens/compliance/investment_screen.dart';
+import '../../screens/compliance/audit_workflow_screen.dart' show AiAuditWorkflowScreen;
+import '../../screens/marketplace/service_catalog_screen.dart';
+import '../../widgets/forms/new_service_request_screen.dart';
+
 // Reuse existing brave-yonath screens (Waves 2-146).
 import '../../screens/v4_ai/ai_agents_gallery_screen.dart';
 import '../../screens/v4_compliance/aml_kyc_screen.dart';
@@ -694,6 +727,70 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // Note: AiGuardrailsScreen is API-backed so it's not wired here.
   // In production it lives under /settings/ai-agents with auth.
+
+  // ════════════════════════════════════════════════════════════════════
+  // G-CLEANUP-1 Stage 4c-prep (Sprint 15, 2026-05-05): 27 new V5 chips
+  // wired as part of the V4 → V5 migration. Each entry below maps a new
+  // V5 chip path to an existing V4 screen widget (the V4 screen is
+  // reused as the V5 chip's implementation). PR 2 (Stages 4c-4g final)
+  // deletes the corresponding V4 routes from router.dart and updates
+  // internal references to point at these V5 paths.
+  // See APEX_BLUEPRINT/V4_CLASSIFICATION_2026-05-04.md for the full
+  // matrix.
+  // ════════════════════════════════════════════════════════════════════
+
+  // Sales (5 new chips)
+  'erp/sales/invoice-create': (ctx) => const SalesInvoiceCreateScreen(),
+  'erp/sales/ar-aging': (ctx) => const ArAgingScreen(),
+  'erp/sales/payment': (ctx) => const CustomerPaymentScreen(invoiceId: ''),  // path-keyed; PR 2 wires :id sub-route in v5_routes.dart
+  'erp/sales/customer-360': (ctx) => const ops_customer_360.Customer360Screen(customerId: ''),  // path-keyed; same
+  'erp/sales/live-cycle': (ctx) => const LiveSalesCycleScreen(),
+
+  // Purchasing (4 new chips)
+  'erp/purchasing/ap-aging': (ctx) => const ApAgingScreen(),
+  'erp/purchasing/payment': (ctx) => const VendorPaymentScreen(billId: ''),  // path-keyed
+  'erp/purchasing/vendor-360': (ctx) => const Vendor360Screen(vendorId: ''),  // path-keyed
+  'erp/purchasing/cycle': (ctx) => const PurchaseCycleScreen(),
+
+  // Finance (3 new chips — cashflow consolidates two V4 routes)
+  'erp/finance/cashflow': (ctx) => const CashFlowScreen(),
+  'erp/finance/depreciation': (ctx) => const DepreciationScreen(),
+  'erp/finance/amortization': (ctx) => const AmortizationScreen(),
+
+  // Treasury (1 new chip)
+  'erp/treasury/fx-converter': (ctx) => const FxConverterScreen(),
+
+  // POS (1 new chip)
+  'erp/pos/sessions': (ctx) => const PosSessionScreen(),
+
+  // ZATCA (1 new chip — base path; :id variant handled via v5_routes.dart in PR 2)
+  'compliance/zatca/invoice': (ctx) => const ZatcaInvoiceBuilderScreen(),
+
+  // Tax (1 new chip — distinct from existing 'compliance/tax/calendar')
+  'compliance/tax/timeline': (ctx) => const TaxTimelineScreen(),
+
+  // IFRS (4 new chips)
+  'compliance/ifrs/tools': (ctx) => const IfrsToolsScreen(),
+  'compliance/ifrs/deferred-tax': (ctx) => const cmp_deferred_tax.DeferredTaxScreen(),
+  'compliance/ifrs/extras': (ctx) => const ExtrasToolsScreen(),
+  'compliance/ifrs/islamic': (ctx) => const IslamicFinanceScreen(),
+
+  // Advisory ratios (4 new chips — operator-directed home for finance ratios)
+  'advisory/ratios/dashboard': (ctx) => const FinancialRatiosScreen(),
+  'advisory/ratios/dscr': (ctx) => const DscrScreen(),
+  'advisory/ratios/working-capital': (ctx) => const WorkingCapitalScreen(),
+  'advisory/ratios/breakeven': (ctx) => const BreakevenScreen(),
+
+  // Advisory valuation (2 new chips)
+  'advisory/valuation/dashboard': (ctx) => const ValuationScreen(),
+  'advisory/valuation/investment': (ctx) => const InvestmentScreen(),
+
+  // Audit (1 new chip)
+  'audit/engagement/ai-workflow': (ctx) => const AiAuditWorkflowScreen(),
+
+  // Marketplace (2 new chips)
+  'marketplace/browse/catalog': (ctx) => const ServiceCatalogScreen(),
+  'marketplace/browse/new-request': (ctx) => const NewServiceRequestScreen(),
 };
 
 /// Returns true if a chip has a wired screen.
