@@ -72,7 +72,7 @@ import '../screens/activity_feed_screen.dart';
 // import '../screens/operations/financial_statements_formatted_screen.dart';
 // import '../screens/operations/financial_analysis_screen.dart';
 import '../screens/home/today_dashboard_screen.dart';
-import '../screens/home/apex_launchpad_screen.dart';
+// Stage 4g: V4 /launchpad/full now redirects to /app — apex_launchpad_screen.dart kept in lib/screens/home/ but unmounted from router.
 import '../screens/home/apex_service_hub_screen.dart';
 import '../screens/home/apex_services_screen.dart';
 // G-CLEANUP-1 Stage 4b (Sprint 15, 2026-05-04): je_builder_live_v52 prefix
@@ -121,7 +121,7 @@ import '../screens/simulation/trial_balance_screen.dart';
 import '../tb_binding_screen.dart';
 import '../financial_statements_screen.dart';
 // import '../screens/compliance/journal_entries_screen.dart'; // deduplicated → /accounting/je-list
-import '../screens/compliance/compliance_hub_screen.dart';
+// Stage 4g: V4 /compliance hub now redirects to /app/compliance/dashboard — ComplianceHubScreen kept on disk for V5 chip wiring elsewhere.
 // Legacy screens deduplicated to canonical paths (Phase 26):
 // import '../screens/compliance/budget_variance_screen.dart'; // → /analytics/budget-variance-v2
 // import '../screens/compliance/bank_rec_screen.dart';        // → /accounting/bank-rec-v2
@@ -218,16 +218,19 @@ final appRouter = GoRouter(
     // tiles + secondary tools, instead of redirecting blindly into one
     // sub-screen. This gives the user the proper hierarchical navigation:
     //   Launchpad → Service Hub → App → Detail screen
-    GoRoute(path: '/sales', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'sales'), s)),
-    GoRoute(path: '/purchase', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'purchase'), s)),
-    GoRoute(path: '/accounting', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'accounting'), s)),
-    GoRoute(path: '/operations', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'operations'), s)),
-    GoRoute(path: '/compliance-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'compliance-hub'), s)),
-    GoRoute(path: '/audit-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'audit-hub'), s)),
-    GoRoute(path: '/audit', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'audit-hub'), s)),
-    GoRoute(path: '/analytics', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'analytics'), s)),
-    GoRoute(path: '/hr', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'hr-hub'), s)),
-    GoRoute(path: '/hr-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'hr-hub'), s)),
+    // Sprint 15 Stage 4g: V4 service hubs redirect to V5 equivalents.
+    // ApexServiceHubScreen kept in lib/screens/home/ for the launchpad fallback —
+    // these specific URL bindings just funnel users into the V5 service tree.
+    GoRoute(path: '/sales', redirect: (c, s) => '/app/erp/sales/dashboard'),
+    GoRoute(path: '/purchase', redirect: (c, s) => '/app/erp/purchasing/dashboard'),
+    GoRoute(path: '/accounting', redirect: (c, s) => '/app/erp/finance/dashboard'),
+    GoRoute(path: '/operations', redirect: (c, s) => '/app/erp/finance/dashboard'),
+    GoRoute(path: '/compliance-hub', redirect: (c, s) => '/app/compliance/dashboard'),
+    GoRoute(path: '/audit-hub', redirect: (c, s) => '/app/audit/dashboard'),
+    GoRoute(path: '/audit', redirect: (c, s) => '/app/audit/dashboard'),
+    GoRoute(path: '/analytics', redirect: (c, s) => '/app/erp/finance/dashboard'),
+    GoRoute(path: '/hr', redirect: (c, s) => '/app/erp/hr/dashboard'),
+    GoRoute(path: '/hr-hub', redirect: (c, s) => '/app/erp/hr/dashboard'),
     GoRoute(path: '/workflow', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'workflow-hub'), s)),
     GoRoute(path: '/workflow-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'workflow-hub'), s)),
     GoRoute(path: '/settings-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'settings-hub'), s)),
@@ -248,7 +251,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/apps', redirect: (c, s) => '/app'),
     GoRoute(path: '/all', redirect: (c, s) => '/app'),
     // Old verbose Launchpad still accessible at /launchpad/full for power users
-    GoRoute(path: '/launchpad/full', pageBuilder: (c, s) => _apexPage(const ApexLaunchpadScreen(), s)),
+    // Sprint 15 Stage 4g: verbose V4 launchpad redirects to V5 launchpad.
+    GoRoute(path: '/launchpad/full', redirect: (c, s) => '/app'),
 
     // ── V5.1 shell (16-app ERP + Cmd+K palette + Entity Scope) ──
     // V4 shell removed in G-A2 (2026-04-30). V5 owns the /app namespace.
@@ -398,11 +402,9 @@ final appRouter = GoRouter(
       redirect: (c, s) => '/app/erp/finance/onboarding',
     ),
 
-    // ── Compliance (ZATCA / IFRS / SOCPA) ──
-    GoRoute(
-      path: '/compliance',
-      pageBuilder: (c, s) => _apexPage(const ComplianceHubScreen(), s),
-    ),
+    // Sprint 15 Stage 4g: V4 /compliance hub redirects to V5 compliance dashboard.
+    // ComplianceHubScreen kept on disk — still imported by V5 chip wiring elsewhere.
+    GoRoute(path: '/compliance', redirect: (c, s) => '/app/compliance/dashboard'),
     // Legacy → canonical (Phase 26 dedup)
     // G-CLEANUP-1 Stage 4b: V4 /compliance/journal-entries redirect deleted.
     // V5: /app/erp/finance/je-builder (LIST).
