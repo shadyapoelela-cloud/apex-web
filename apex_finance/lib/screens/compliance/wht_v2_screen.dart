@@ -1,5 +1,5 @@
 /// APEX — Withholding Tax v2 (Saudi-aware)
-/// /compliance/wht-v2 — WHT calculation + monthly summary
+/// /app/compliance/tax/wht — WHT calculation + monthly summary
 library;
 
 import 'package:flutter/material.dart';

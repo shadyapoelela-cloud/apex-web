@@ -17,9 +17,9 @@ class ReportsHubScreen extends StatelessWidget {
       icon: Icons.assessment,
       reports: [
         _Report('ميزان المراجعة', 'Trial Balance Live', '/accounting/trial-balance', Icons.book),
-        _Report('قائمة الدخل', 'Income Statement', '/compliance/financial-statements', Icons.trending_up),
-        _Report('الميزانية العمومية', 'Balance Sheet', '/compliance/financial-statements', Icons.account_balance),
-        _Report('قائمة التدفقات النقدية', 'Cash Flow Statement', '/compliance/cashflow-statement', Icons.water),
+        _Report('قائمة الدخل', 'Income Statement', '/app/erp/finance/statements', Icons.trending_up),
+        _Report('الميزانية العمومية', 'Balance Sheet', '/app/erp/finance/statements', Icons.account_balance),
+        _Report('قائمة التدفقات النقدية', 'Cash Flow Statement', '/app/erp/finance/cashflow', Icons.water),
       ],
     ),
     _Section(
@@ -37,19 +37,19 @@ class ReportsHubScreen extends StatelessWidget {
       icon: Icons.analytics,
       reports: [
         _Report('توقع التدفق النقدي', '90-day forecast', '/analytics/cash-flow-forecast', Icons.show_chart),
-        _Report('النسب المالية', 'Liquidity / Solvency / Profitability', '/compliance/ratios', Icons.calculate),
-        _Report('Health Score', 'مؤشر صحة الكيان', '/compliance/health-score', Icons.health_and_safety),
-        _Report('رأس المال العامل', 'Working Capital', '/compliance/working-capital', Icons.savings),
+        _Report('النسب المالية', 'Liquidity / Solvency / Profitability', '/app/advisory/ratios/dashboard', Icons.calculate),
+        _Report('Health Score', 'مؤشر صحة الكيان', '/app/erp/finance/health-score', Icons.health_and_safety),
+        _Report('رأس المال العامل', 'Working Capital', '/app/advisory/ratios/working-capital', Icons.savings),
       ],
     ),
     _Section(
       title: 'الامتثال والضرائب',
       icon: Icons.gavel,
       reports: [
-        _Report('التقويم الضريبي', '7 obligations سعودية', '/compliance/tax-calendar', Icons.event),
-        _Report('VAT Return', 'إقرار ضريبة القيمة المضافة', '/compliance/vat-return', Icons.receipt_long),
-        _Report('الزكاة', 'Zakat Calculator', '/compliance/zakat', Icons.account_balance_wallet),
-        _Report('WHT', 'استقطاع المصدر', '/compliance/wht', Icons.percent),
+        _Report('التقويم الضريبي', '7 obligations سعودية', '/app/compliance/tax/calendar', Icons.event),
+        _Report('VAT Return', 'إقرار ضريبة القيمة المضافة', '/app/compliance/tax/vat-return', Icons.receipt_long),
+        _Report('الزكاة', 'Zakat Calculator', '/app/compliance/tax/zakat', Icons.account_balance_wallet),
+        _Report('WHT', 'استقطاع المصدر', '/app/compliance/tax/wht', Icons.percent),
       ],
     ),
     _Section(
@@ -59,7 +59,7 @@ class ReportsHubScreen extends StatelessWidget {
         _Report('Engagement Workspace', '5 tabs مع Evidence Chain', '/audit/engagements', Icons.folder),
         _Report('Benford Analysis', 'تحليل الرقم الأول', '/audit/benford', Icons.bar_chart),
         _Report('JE Sampling', 'عينة قيود deterministic', '/audit/sampling', Icons.shuffle),
-        _Report('Audit Trail', 'سلسلة الأحداث', '/compliance/audit-trail', Icons.history),
+        _Report('Audit Trail', 'سلسلة الأحداث', '/app/audit/trail', Icons.history),
       ],
     ),
     _Section(
@@ -67,22 +67,22 @@ class ReportsHubScreen extends StatelessWidget {
       icon: Icons.people,
       reports: [
         _Report('قائمة الموظفين', 'مع Saudization', '/hr/employees', Icons.badge),
-        _Report('Payroll', 'كشف الرواتب', '/compliance/payroll', Icons.account_balance_wallet),
-        _Report('GOSI', 'تأمينات اجتماعية', '/compliance/payroll', Icons.shield),
+        _Report('Payroll', 'كشف الرواتب', '/app/erp/hr/payroll', Icons.account_balance_wallet),
+        _Report('GOSI', 'تأمينات اجتماعية', '/app/erp/hr/payroll', Icons.shield),
       ],
     ),
     _Section(
       title: 'متقدّمة',
       icon: Icons.auto_awesome,
       reports: [
-        _Report('Consolidation', 'تجميع الكيانات', '/compliance/consolidation', Icons.layers),
-        _Report('Multi-Currency', 'تحليل FX', '/compliance/multi-currency', Icons.currency_exchange),
-        _Report('Fixed Assets', 'الأصول الثابتة', '/compliance/fixed-assets', Icons.business),
-        _Report('Investments', 'المحفظة الاستثمارية', '/compliance/investment', Icons.savings),
-        _Report('Lease Accounting', 'IFRS 16', '/compliance/lease', Icons.apartment),
-        _Report('IFRS Tools', 'IFRS 2 / IAS 40 / IFRS 16', '/compliance/ifrs-tools', Icons.science),
-        _Report('Islamic Finance', 'Murabaha / Ijarah / Zakah', '/compliance/islamic-finance', Icons.mosque),
-        _Report('Transfer Pricing', 'TP documentation', '/compliance/transfer-pricing', Icons.compare_arrows),
+        _Report('Consolidation', 'تجميع الكيانات', '/app/erp/consolidation/dashboard', Icons.layers),
+        _Report('Multi-Currency', 'تحليل FX', '/app/erp/treasury/dashboard', Icons.currency_exchange),
+        _Report('Fixed Assets', 'الأصول الثابتة', '/app/erp/finance/fixed-assets', Icons.business),
+        _Report('Investments', 'المحفظة الاستثمارية', '/app/advisory/valuation/investment', Icons.savings),
+        _Report('Lease Accounting', 'IFRS 16', '/app/compliance/ifrs/dashboard', Icons.apartment),
+        _Report('IFRS Tools', 'IFRS 2 / IAS 40 / IFRS 16', '/app/compliance/ifrs/tools', Icons.science),
+        _Report('Islamic Finance', 'Murabaha / Ijarah / Zakah', '/app/compliance/ifrs/islamic', Icons.mosque),
+        _Report('Transfer Pricing', 'TP documentation', '/app/compliance/tax/tp', Icons.compare_arrows),
       ],
     ),
   ];
@@ -112,7 +112,7 @@ class ReportsHubScreen extends StatelessWidget {
         itemBuilder: (_, i) {
           if (i == _sections.length) {
             return const ApexOutputChips(items: [
-              ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+              ApexChipLink('ميزان المراجعة', '/app/erp/finance/statements', Icons.assessment),
               ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
               ApexChipLink('Health Score', '/analytics/health-score-v2', Icons.health_and_safety),
               ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),

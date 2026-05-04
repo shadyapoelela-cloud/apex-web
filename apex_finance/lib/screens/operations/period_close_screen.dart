@@ -145,7 +145,7 @@ class _PeriodCloseScreenState extends State<PeriodCloseScreen> {
         ),
         const ApexOutputChips(items: [
           ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
-          ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+          ApexChipLink('ميزان المراجعة', '/app/erp/finance/statements', Icons.assessment),
           ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
         ]),
       ],

@@ -182,7 +182,7 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
             ApexChipLink('الفواتير', '/app/erp/sales/invoices', Icons.receipt),
             ApexChipLink('المخزون', '/operations/inventory-v2', Icons.inventory_2),
             ApexChipLink('بطاقة الصنف', '/operations/stock-card', Icons.timeline),
-            ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
+            ApexChipLink('VAT Return', '/app/compliance/tax/vat-return', Icons.receipt_long),
           ]),
         ]),
       ),

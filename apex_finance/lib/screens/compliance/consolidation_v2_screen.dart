@@ -1,5 +1,5 @@
 /// APEX — Consolidation v2 (multi-entity + intercompany matrix)
-/// /compliance/consolidation-v2 — IFRS 10 consolidation
+/// /app/erp/consolidation/dashboard — IFRS 10 consolidation
 library;
 
 import 'package:flutter/material.dart';
@@ -52,7 +52,7 @@ class _ConsolidationV2ScreenState extends State<ConsolidationV2Screen> {
           const SizedBox(height: 12),
           _eliminationCard(),
           const ApexOutputChips(items: [
-            ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+            ApexChipLink('ميزان المراجعة', '/app/erp/finance/statements', Icons.assessment),
             ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
             ApexChipLink('متابعة العملات', '/analytics/multi-currency-v2', Icons.currency_exchange),
           ]),

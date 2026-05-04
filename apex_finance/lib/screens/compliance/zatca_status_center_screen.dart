@@ -1,5 +1,5 @@
 /// APEX — ZATCA Status Center (CSID + Queue + Errors in one)
-/// /compliance/zatca-status — single source for ZATCA Phase 2 ops
+/// /app/erp/finance/zatca-status — single source for ZATCA Phase 2 ops
 library;
 
 import 'package:flutter/material.dart';
@@ -32,9 +32,9 @@ class ZatcaStatusCenterScreen extends StatelessWidget {
           const SizedBox(height: 12),
           _recentErrorsCard(),
           const ApexOutputChips(items: [
-            ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
+            ApexChipLink('VAT Return', '/app/compliance/tax/vat-return', Icons.receipt_long),
             ApexChipLink('الفواتير', '/app/erp/sales/invoices', Icons.receipt),
-            ApexChipLink('التقويم الضريبي', '/compliance/tax-calendar', Icons.event),
+            ApexChipLink('التقويم الضريبي', '/app/compliance/tax/calendar', Icons.event),
             ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
           ]),
         ]),

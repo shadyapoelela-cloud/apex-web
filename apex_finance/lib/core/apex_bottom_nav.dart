@@ -143,11 +143,11 @@ class _NavItem {
 class _MoreSheet extends StatelessWidget {
   static const _entries = [
     ('لوحة التحكم التنفيذية', Icons.dashboard, '/compliance/executive-dashboard'),
-    ('الزكاة', Icons.calculate, '/compliance/zakat'),
-    ('ضريبة القيمة المضافة', Icons.description, '/compliance/vat-return'),
-    ('المطابقة البنكية', Icons.compare_arrows, '/compliance/bank-rec'),
-    ('الرواتب', Icons.badge, '/compliance/payroll'),
-    ('النسب المالية', Icons.bar_chart, '/compliance/ratios'),
+    ('الزكاة', Icons.calculate, '/app/compliance/tax/zakat'),
+    ('ضريبة القيمة المضافة', Icons.description, '/app/compliance/tax/vat-return'),
+    ('المطابقة البنكية', Icons.compare_arrows, '/app/erp/treasury/recon'),
+    ('الرواتب', Icons.badge, '/app/erp/hr/payroll'),
+    ('النسب المالية', Icons.bar_chart, '/app/advisory/ratios/dashboard'),
     ('Copilot', Icons.psychology, '/copilot'),
     ('المعرفة', Icons.menu_book, '/knowledge'),
     ('الإعدادات', Icons.settings, '/settings'),

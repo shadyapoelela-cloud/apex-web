@@ -44,7 +44,7 @@ class ApexAnomalyFeedCard extends StatelessWidget {
       'title': 'حساب البنوك يحتاج تسوية',
       'description': '12 معاملة لم تُسوّى منذ 7 أيام',
       'action': 'سوّ',
-      'route': '/compliance/bank-rec-ai',
+      'route': '/app/erp/treasury/recon',
     },
   ];
 

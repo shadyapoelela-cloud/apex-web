@@ -440,7 +440,7 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
         unit: 'ريال',
         icon: Icons.account_balance,
         color: AC.gold,
-        onTap: () => context.go('/compliance/financial-statements'),
+        onTap: () => context.go('/app/erp/finance/statements'),
       ),
       _KpiCard(
         title: 'صافي الدخل (السنة)',
@@ -448,7 +448,7 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
         unit: 'ريال',
         icon: _netIncome >= 0 ? Icons.trending_up : Icons.trending_down,
         color: _netIncome >= 0 ? AC.ok : AC.err,
-        onTap: () => context.go('/compliance/financial-statements'),
+        onTap: () => context.go('/app/erp/finance/statements'),
       ),
       _KpiCard(
         title: 'الذمم غير المُحصّلة',

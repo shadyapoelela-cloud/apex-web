@@ -281,7 +281,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: '5/15/20% حسب نوع الدفعة + إقرار شهري',
       kind: ApexCommandKind.navigation,
       icon: Icons.percent,
-      onRun: (_) => go('/compliance/wht-v2'),
+      onRun: (_) => go('/app/compliance/tax/wht'),
     ),
     ApexCommand(
       id: 'nav_quotes',
@@ -362,7 +362,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'كيانات + استبعادات + إيرادات موحّدة',
       kind: ApexCommandKind.navigation,
       icon: Icons.layers,
-      onRun: (_) => go('/compliance/consolidation-v2'),
+      onRun: (_) => go('/app/erp/consolidation/dashboard'),
     ),
     ApexCommand(
       id: 'nav_ai_suggestions_v2',
@@ -378,7 +378,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'ROU + التزام + جدول إهلاك',
       kind: ApexCommandKind.navigation,
       icon: Icons.apartment,
-      onRun: (_) => go('/compliance/lease-v2'),
+      onRun: (_) => go('/app/compliance/ifrs/dashboard'),
     ),
     ApexCommand(
       id: 'nav_zatca_status',
@@ -386,7 +386,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'CSID + Queue + Errors',
       kind: ApexCommandKind.navigation,
       icon: Icons.verified_user_outlined,
-      onRun: (_) => go('/compliance/zatca-status'),
+      onRun: (_) => go('/app/erp/finance/zatca-status'),
     ),
     ApexCommand(
       id: 'nav_multi_currency_v2',
@@ -450,7 +450,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'VAT + زكاة + GOSI + ZATCA + سعودة',
       kind: ApexCommandKind.navigation,
       icon: Icons.event_outlined,
-      onRun: (_) => go('/compliance/tax-calendar'),
+      onRun: (_) => go('/app/compliance/tax/calendar'),
     ),
     ApexCommand(
       id: 'nav_cashflow_forecast',
@@ -499,7 +499,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'الاستحقاقات القادمة (VAT / زكاة / ضريبة الشركات / ZATCA)',
       kind: ApexCommandKind.navigation,
       icon: Icons.event_note_outlined,
-      onRun: (_) => go('/compliance/tax-timeline'),
+      onRun: (_) => go('/app/compliance/tax/timeline'),
     ),
     ApexCommand(
       id: 'nav_bank_rec_ai',
@@ -507,7 +507,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'مطابقة حركات البنك بقيود اليومية تلقائياً',
       kind: ApexCommandKind.navigation,
       icon: Icons.compare_arrows,
-      onRun: (_) => go('/compliance/bank-rec-ai'),
+      onRun: (_) => go('/app/erp/treasury/recon'),
     ),
     ApexCommand(
       id: 'nav_audit_workflow',
@@ -515,7 +515,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'أدوات مراجعة SOX / ISA 240 / IFRS 15',
       kind: ApexCommandKind.navigation,
       icon: Icons.fact_check_outlined,
-      onRun: (_) => go('/compliance/audit-workflow-ai'),
+      onRun: (_) => go('/app/audit/engagement/ai-workflow'),
     ),
     ApexCommand(
       id: 'nav_islamic_finance',
@@ -523,7 +523,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'AAOIFI-aligned — FAS 28 / 32',
       kind: ApexCommandKind.navigation,
       icon: Icons.mosque_outlined,
-      onRun: (_) => go('/compliance/islamic-finance'),
+      onRun: (_) => go('/app/compliance/ifrs/islamic'),
     ),
     ApexCommand(
       id: 'nav_depreciation_ai',
@@ -531,7 +531,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'خط مستقيم · رصيد متناقص · Double-Declining',
       kind: ApexCommandKind.navigation,
       icon: Icons.trending_down,
-      onRun: (_) => go('/compliance/depreciation-ai'),
+      onRun: (_) => go('/app/erp/finance/depreciation'),
     ),
     ApexCommand(
       id: 'nav_multi_currency',
@@ -539,7 +539,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'مراكز بالعملة الأصلية + التعرّض للصرف الأجنبي',
       kind: ApexCommandKind.navigation,
       icon: Icons.currency_exchange,
-      onRun: (_) => go('/compliance/multi-currency'),
+      onRun: (_) => go('/app/erp/treasury/dashboard'),
     ),
     ApexCommand(
       id: 'nav_onboarding',
@@ -587,7 +587,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'ميزان · قائمة الدخل · قائمة المركز · قيود الإقفال',
       kind: ApexCommandKind.navigation,
       icon: Icons.assessment_outlined,
-      onRun: (_) => go('/compliance/financial-statements'),
+      onRun: (_) => go('/app/erp/finance/statements'),
     ),
     ApexCommand(
       id: 'nav_ratios',
@@ -595,7 +595,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'السيولة · الرافعة · الربحية · الكفاءة',
       kind: ApexCommandKind.navigation,
       icon: Icons.insights,
-      onRun: (_) => go('/compliance/ratios'),
+      onRun: (_) => go('/app/advisory/ratios/dashboard'),
     ),
     ApexCommand(
       id: 'nav_universal_journal',
@@ -673,63 +673,63 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       subtitle: 'إنشاء فاتورة إلكترونية متوافقة مع هيئة الزكاة',
       kind: ApexCommandKind.navigation,
       icon: Icons.qr_code_2,
-      onRun: (_) => go('/compliance/zatca-invoice'),
+      onRun: (_) => go('/app/compliance/zatca/invoice'),
     ),
     ApexCommand(
       id: 'nav_vat_return',
       label: 'إقرار ضريبة القيمة المضافة',
       kind: ApexCommandKind.navigation,
       icon: Icons.description_outlined,
-      onRun: (_) => go('/compliance/vat-return'),
+      onRun: (_) => go('/app/compliance/tax/vat-return'),
     ),
     ApexCommand(
       id: 'nav_zakat',
       label: 'حاسبة الزكاة',
       kind: ApexCommandKind.navigation,
       icon: Icons.calculate_outlined,
-      onRun: (_) => go('/compliance/zakat'),
+      onRun: (_) => go('/app/compliance/tax/zakat'),
     ),
     ApexCommand(
       id: 'nav_bank_rec',
       label: 'المطابقة البنكية',
       kind: ApexCommandKind.navigation,
       icon: Icons.compare_arrows,
-      onRun: (_) => go('/compliance/bank-rec'),
+      onRun: (_) => go('/app/erp/treasury/recon'),
     ),
     ApexCommand(
       id: 'nav_payroll',
       label: 'الرواتب',
       kind: ApexCommandKind.navigation,
       icon: Icons.badge_outlined,
-      onRun: (_) => go('/compliance/payroll'),
+      onRun: (_) => go('/app/erp/hr/payroll'),
     ),
     ApexCommand(
       id: 'nav_ratios',
       label: 'النسب المالية',
       kind: ApexCommandKind.navigation,
       icon: Icons.bar_chart,
-      onRun: (_) => go('/compliance/ratios'),
+      onRun: (_) => go('/app/advisory/ratios/dashboard'),
     ),
     ApexCommand(
       id: 'nav_fixed_assets',
       label: 'الأصول الثابتة',
       kind: ApexCommandKind.navigation,
       icon: Icons.business_outlined,
-      onRun: (_) => go('/compliance/depreciation'),
+      onRun: (_) => go('/app/erp/finance/depreciation'),
     ),
     ApexCommand(
       id: 'nav_cashflow',
       label: 'التدفق النقدي',
       kind: ApexCommandKind.navigation,
       icon: Icons.waterfall_chart,
-      onRun: (_) => go('/compliance/cashflow'),
+      onRun: (_) => go('/app/erp/finance/cashflow'),
     ),
     ApexCommand(
       id: 'nav_breakeven',
       label: 'نقطة التعادل',
       kind: ApexCommandKind.navigation,
       icon: Icons.trending_up,
-      onRun: (_) => go('/compliance/breakeven'),
+      onRun: (_) => go('/app/advisory/ratios/breakeven'),
     ),
 
     // ── What's New (featured first) ──
@@ -845,7 +845,7 @@ List<ApexCommand> buildAppCommands(BuildContext context) {
       label: 'فاتورة ZATCA جديدة',
       icon: Icons.add_to_photos,
       shortcut: 'N I',
-      onRun: (ctx) => GoRouter.of(ctx).go('/compliance/zatca-invoice'),
+      onRun: (ctx) => GoRouter.of(ctx).go('/app/compliance/zatca/invoice'),
     ),
     ApexCommand.action(
       id: 'action_upload_coa',

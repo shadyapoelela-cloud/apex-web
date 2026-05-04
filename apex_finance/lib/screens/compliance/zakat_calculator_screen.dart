@@ -115,9 +115,9 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
               const SizedBox(height: 16),
               _results(),
               const ApexOutputChips(items: [
-                ApexChipLink('التقويم الضريبي', '/compliance/tax-calendar', Icons.event),
-                ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
-                ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+                ApexChipLink('التقويم الضريبي', '/app/compliance/tax/calendar', Icons.event),
+                ApexChipLink('VAT Return', '/app/compliance/tax/vat-return', Icons.receipt_long),
+                ApexChipLink('ميزان المراجعة', '/app/erp/finance/statements', Icons.assessment),
                 ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
               ]),
             ]),

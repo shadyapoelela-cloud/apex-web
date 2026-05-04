@@ -1,5 +1,5 @@
 /// APEX — ZATCA E-Invoice Viewer (with QR + cleared XML preview)
-/// /compliance/zatca-invoice-viewer/:id — Saudi-specific Phase 2 viewer
+/// /app/compliance/zatca/invoice-viewer/:id — Saudi-specific Phase 2 viewer
 library;
 
 import 'package:flutter/material.dart';

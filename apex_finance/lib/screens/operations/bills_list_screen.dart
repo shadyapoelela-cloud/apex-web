@@ -119,9 +119,9 @@ class _BillsListScreenState extends State<BillsListScreen> {
       onRefresh: _load,
       listFooter: const ApexOutputChips(items: [
         ApexChipLink('أعمار AP', '/app/erp/purchasing/ap-aging', Icons.timeline),
-        ApexChipLink('استقطاع المصدر WHT', '/compliance/wht-v2', Icons.percent),
-        ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
-        ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+        ApexChipLink('استقطاع المصدر WHT', '/app/compliance/tax/wht', Icons.percent),
+        ApexChipLink('VAT Return', '/app/compliance/tax/vat-return', Icons.receipt_long),
+        ApexChipLink('ميزان المراجعة', '/app/erp/finance/statements', Icons.assessment),
       ]),
       emptyState: ApexEmptyState(
         icon: Icons.receipt_outlined,

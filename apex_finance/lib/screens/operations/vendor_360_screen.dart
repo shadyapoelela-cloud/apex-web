@@ -112,7 +112,7 @@ class _Vendor360ScreenState extends State<Vendor360Screen> {
                       const ApexOutputChips(items: [
                         ApexChipLink('فواتير الموردين', '/app/erp/finance/purchase-bills', Icons.receipt_outlined),
                         ApexChipLink('أعمار AP', '/app/erp/purchasing/ap-aging', Icons.timeline),
-                        ApexChipLink('استقطاع المصدر WHT', '/compliance/wht-v2', Icons.percent),
+                        ApexChipLink('استقطاع المصدر WHT', '/app/compliance/tax/wht', Icons.percent),
                         ApexChipLink('قائمة الموردين', '/app/erp/purchasing/suppliers', Icons.business),
                       ]),
                     ]),

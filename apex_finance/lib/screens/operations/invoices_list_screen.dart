@@ -121,9 +121,9 @@ class _InvoicesListScreenState extends State<InvoicesListScreen> {
       onRefresh: _load,
       listFooter: const ApexOutputChips(items: [
         ApexChipLink('أعمار AR', '/app/erp/sales/ar-aging', Icons.timeline),
-        ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
-        ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
-        ApexChipLink('التقويم الضريبي', '/compliance/tax-calendar', Icons.event),
+        ApexChipLink('VAT Return', '/app/compliance/tax/vat-return', Icons.receipt_long),
+        ApexChipLink('ميزان المراجعة', '/app/erp/finance/statements', Icons.assessment),
+        ApexChipLink('التقويم الضريبي', '/app/compliance/tax/calendar', Icons.event),
       ]),
       emptyState: ApexEmptyState(
         icon: Icons.receipt_long_outlined,
