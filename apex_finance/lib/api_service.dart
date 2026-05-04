@@ -53,6 +53,26 @@ class ApiService {
   };
 
   // ── Auth ──
+  /// G-CLEANUP-2 (Sprint 15): probe whether the current token is still
+  /// valid against the backend. Reuses the existing `/users/me`
+  /// endpoint (which goes through `Depends(get_current_user)` and
+  /// returns 401 on missing / invalid / expired token). Fail-closed:
+  /// any non-200 result — including network errors and timeouts —
+  /// is treated as invalid, so we err toward forcing the user to
+  /// re-login rather than silently trusting a stale localStorage
+  /// token. See APEX_BLUEPRINT/09 § 20.1 G-CLEANUP-2.
+  static Future<bool> validateToken() async {
+    if ((_token ?? S.token) == null) return false;
+    try {
+      final res = await _httpClient
+          .get(Uri.parse('$_base/users/me'), headers: _h)
+          .timeout(const Duration(seconds: 8));
+      return res.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<ApiResult> login(String username, String password) => _post('/auth/login', {'username_or_email':username,'password':password});
   static Future<ApiResult> register({required String username, required String email, required String password, String? displayName, String? mobile, String? countryCode}) => _post('/auth/register', {'username':username,'email':email,'password':password,if(displayName!=null)'display_name':displayName,if(mobile!=null)'mobile':mobile,if(countryCode!=null)'mobile_country_code':countryCode});
   static Future<ApiResult> forgotPassword(String email) => _post('/auth/forgot-password', {'email':email});
