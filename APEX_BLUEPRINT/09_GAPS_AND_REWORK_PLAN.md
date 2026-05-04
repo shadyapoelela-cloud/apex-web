@@ -3623,26 +3623,143 @@ same pattern can be applied to sibling screens with one import.
   (execution plan), F-004 audit finding, G-UX-4 (the broader
   "three doorbells" pattern this fix is one instance of).
 
-#### 🔴 G-CLEANUP-4. Hide non-working apps from launchers
-- **Severity:** 🔴 P0 Blocker — UX honesty
-- **Path:** All Pillar launcher screens (`/app/<pillar>/apps`)
-  + `apex_finance/lib/core/v5/v5_groups.dart` (chip definitions).
-- **Evidence:** `APEX_LIVE_UX_AUDIT_2026-05-04.md` F-002 + file 39
-  § 3.3. 5+ app tiles in the launchers are frontend shells with
-  zero backend wiring (CRM, PM, DMS, Helpdesk, BI — same set tracked
-  under G-MOD-CRM-1..BI-1). Plus broken routes (Hotel PMS 404 from
-  G-UI-7, HR empty launcher from G-UI-6).
-- **Fix proposal:**
-  1. Add `enabled: bool` flag to `V5Chip`. Default `true`; explicitly
-     `false` for known shells / broken routes.
-  2. Filter chips on launcher render so disabled tiles don't show.
-  3. For users who URL-direct to a hidden tile path, render
-     "قيد البناء" (under construction) page instead of allowing the
-     broken screen / 404.
-- **Effort:** ~1 day.
-- **Owner:** TBD.
-- **Cross-ref:** file 39 § 3.3, file 40 Stage 3 prompt.
-- **Sprint target:** 15 — Stage 3.
+#### ✅ G-CLEANUP-4. Hide non-working apps from launchers — FULLY DONE 2026-05-04
+- **Branch:** `sprint-15/g-cleanup-4-hide-shells`.
+- **Severity (was):** 🔴 P0 Blocker — UX honesty.
+- **Path:** `apex_finance/lib/core/v5/v5_models.dart` (schema),
+  `apex_finance/lib/core/v5/v5_data.dart` (6 module flags),
+  `apex_finance/lib/core/v5/apps_hub_screen.dart` (filter),
+  `apex_finance/lib/core/v5/v5_routes.dart` (direct-URL fallback),
+  `apex_finance/lib/screens/coming_soon_screen.dart` (NEW widget).
+- **Original evidence:** `APEX_LIVE_UX_AUDIT_2026-05-04.md` F-002,
+  F-015, F-016, F-017 + file 39 § 3.3.
+- **Verify-First findings (2026-05-04):**
+  - **The launcher tiles are `V5MainModule` entries, NOT `V5Chip`s.**
+    The original prompt suggested adding `enabled` to `V5Chip`. Reading
+    `apps_hub_screen.dart:180` (`_filteredApps()`) showed it iterates
+    `widget.service.mainModules` — the 16 ERP "apps" — not chips
+    (which are sub-tabs within a main module). Targeting V5Chip
+    would have left the tile visible while only filtering its
+    sub-tabs. Correct target: `V5MainModule.enabled`.
+  - **A `_ComingSoonBanner` already exists** (private to
+    `apex_v5_service_shell.dart:3280`) for chips with empty content.
+    For full-route fallback on disabled modules, this PR added a
+    parallel public `ComingSoonScreen` widget (~120 LOC, same visual
+    pattern: icon + title + "قيد البناء" badge + "العودة" button)
+    so the look-and-feel stays consistent at both granularities.
+  - **Construction is the F-018 reference, NOT a deletion target.**
+    The Construction module (`id: 'construction'`) renders the
+    existing `_ComingSoonBanner` honestly today and was the audit's
+    POSITIVE finding. Hiding its tile would remove the very pattern
+    G-UI-3 will eventually adopt platform-wide. Kept visible.
+- **6 main modules marked `enabled: false`** (all in ERP service,
+  Pillar 1 — see v5_data.dart line refs):
+  | ID | Line | Audit evidence | Reason |
+  |---|---|---|---|
+  | `hr` | 737 | F-016 | empty launcher, dashboard chip not wired |
+  | `projects` | 773 | F-002 | PM dashboard shell, ZERO API calls |
+  | `crm-marketing` | 804 | F-002 | CRM dashboard shell, ZERO API calls |
+  | `hotel-pms` | 859 | F-017 | 404 + empty `dashboardWidgets: []` |
+  | `industry-packs` | 909 | Status Audit § 11.A | empty `dashboardWidgets: []`, 8 sub-chips never integrated |
+  | `reports-bi` | 946 | F-015 | misroute (renders Workflows page) |
+  Each entry carries an inline comment explaining WHY hidden + what
+  unlocks re-enabling (e.g. G-MOD-CRM-1 / G-MOD-PM-1 / G-MOD-BI-1
+  module decisions).
+- **Fix applied:**
+  - **`v5_models.dart` (+15 LOC):** added `enabled: bool = true`
+    field to `V5MainModule` constructor. Defaults to `true` so
+    existing code is unchanged unless explicitly opting out.
+  - **`v5_data.dart` (+6 enabled flags + 6 comment blocks):** marked
+    the 6 modules listed above with `enabled: false`. Module
+    definitions stay in source as audit trail of intent (per
+    operator's no-deletion rule).
+  - **`apps_hub_screen.dart` (+5 LOC):** added
+    `widget.service.mainModules.where((m) => m.enabled)` filter at
+    the head of `_filteredApps()`. Disabled tiles no longer render
+    in any launcher view (default order, name-sort, chip-count
+    sort, favourites-first sort — all derive from the filtered list).
+  - **`coming_soon_screen.dart` (NEW, +120 LOC):** public widget
+    with icon + title + "قيد البناء" badge + "العودة إلى مركز
+    التطبيقات" FilledButton (`context.go('/app/{serviceId}/apps')`).
+    Designed to live inside `ApexV5ServiceShell.bodyOverride` so the
+    surrounding chrome (top bar, breadcrumb) is provided by the shell.
+  - **`v5_routes.dart` (+22 LOC):** in the `/app/:service/:main/:chip`
+    route handler, short-circuit on `!main.enabled` and render
+    `ApexV5ServiceShell` with `bodyOverride: ComingSoonScreen(...)`.
+    Catches both direct-URL access (e.g. typed
+    `/app/erp/crm-marketing/dashboard`) and the auto-redirect from
+    `/app/erp/crm-marketing` (which lands at the `/dashboard` chip).
+- **What is NOT changed:**
+  - **Individual chip routes still work.** Disabled modules' chips
+    that are wired (e.g. `erp/hr/employees` → `HrEmployeesScreen`,
+    `erp/projects/projects` → `ProjectsV52Screen`) remain accessible
+    by direct URL. Only the parent dashboard route shows ComingSoon.
+  - **Module definitions stay in source.** Per operator's audit-trail
+    rule, no `V5MainModule(...)` invocations were deleted — they're
+    flagged with `enabled: false` + a sourcetracked reason.
+  - **`v5Workspaces`, `V5Service`, `V5Chip` schemas unchanged.**
+    Only `V5MainModule` got the new field.
+- **Verification:**
+  - `flutter analyze` (full): **306 issues** — exact match to G-DOCS-2
+    documented baseline; **zero new warnings** introduced.
+  - `flutter analyze` (5 touched files): **5 pre-existing** issues in
+    `apps_hub_screen.dart` (unrelated: `avoid_web_libraries`,
+    deprecated `window`, unused-element from earlier sprint) +
+    1 pre-existing unused-import in `v5_data.dart`. None are new.
+  - `flutter test`: **43 passed, 1 pre-existing failure**
+    (`ask_panel_test.dart` `package:web` 1.1.1 — documented since
+    G-UX-1 Sprint 11; unchanged from main).
+  - **Bundle sanity (`docs/main.dart.js` post-rebuild):**
+    - `"العودة إلى مركز التطبيقات"` (new ComingSoonScreen button
+      label, Unicode-escaped form): **1 hit** — confirms the new
+      widget IS in the bundle.
+    - `"قيد البناء"` (Unicode-escaped): **4 hits** (3 pre-existing
+      from `_ComingSoonBanner` + 1 new from `ComingSoonScreen`).
+    - Hidden module IDs (`crm-marketing` 10, `hotel-pms` 5,
+      `industry-packs` 31, `reports-bi` 11): **all preserved** —
+      definitions stay in code as audit trail per operator rule.
+    - Stage 1 `/users/me` probe (G-CLEANUP-2): **6 hits, preserved**.
+    - Stage 2 Copilot banner (`Copilot`): **41 hits, preserved**.
+    - Bundle size: 10,290,751 → **10,292,812 bytes** (+2 KB —
+      ComingSoonScreen widget added; minimal impact).
+  - **Hand-written marketing pages preserved:** `contact.html`,
+    `customers.html`, `pricing.html`, `product.html`,
+    `resources.html`, `solutions.html`, nested `docs/app/`
+    Flutter bundle — all untouched.
+- **Single-PR rebuild:** `flutter build web --release
+  --base-href=/apex-web/ --no-tree-shake-icons` succeeded in ~58s.
+  `cp -r build/web/. docs/` overwrote only Flutter-managed files.
+  Same recipe as Stage 1/2 — no Stage 1-style hotfix follow-up needed.
+- **Manual verification deferred to operator (per Step 11):**
+  - **🎯 Acceptance:** logged-in browser → click Pillar 1 (المحاسبة
+    والعمليات / Alt+1) → confirm only **10 tiles** visible (was 16):
+    finance, consolidation, treasury, sales, purchasing, expenses,
+    pos, inventory, manufacturing, construction. The 6 hidden:
+    HR, Projects, CRM, Hotel PMS, Industry Packs, Reports & BI.
+  - **Direct-URL fallback:** type `/app/erp/crm-marketing/dashboard`
+    in the address bar → see "قيد البناء" page (was a confused
+    empty CRM dashboard with mock data) with "العودة إلى مركز
+    التطبيقات" button leading back to the launcher.
+  - **No regressions:** Stage 1 (`/login` for fresh browsers) and
+    Stage 2 (5 Pillars only on `/app`) still work.
+  - **Construction tile** still visible (kept as F-018 reference).
+- **Risk:** medium. Touches launcher behaviour for the most-trafficked
+  pillar. Mitigations:
+  - 6 modules per audit evidence, no speculative hides — no risk
+    of accidentally hiding a working module.
+  - `enabled` defaults to `true` → all unmarked modules continue to
+    render exactly as before.
+  - ComingSoonScreen for direct URLs is honest UX, never a 404.
+  - Bundle sanity confirmed ComingSoonScreen IS in production
+    bundle.
+- **Sprint:** 15 — Stage 3. **Third Stage 3 win after Stages 1+2
+  shipped 2026-05-04.**
+- **Cross-ref:** file 39 § 3.3 (Canonical Journey & Archive Mandate),
+  file 40 Stage 3 prompt (execution plan), F-002, F-015, F-016,
+  F-017 audit findings, G-MOD-CRM-1, G-MOD-PM-1, G-MOD-DMS-1,
+  G-MOD-HELPDESK-1, G-MOD-BI-1 (the build/archive/hybrid module
+  decisions that, when resolved, will re-enable the corresponding
+  hidden tiles).
 
 #### 🟠 G-CLEANUP-5. Archive idealized blueprint docs
 - **Severity:** 🟠 P1 Major — documentation hygiene

@@ -16,6 +16,7 @@ import 'package:go_router/go_router.dart';
 import '../apex_ask_panel.dart';
 import '../apex_news_ticker.dart';
 import '../theme.dart' as core_theme;
+import '../../screens/coming_soon_screen.dart';
 import '../../screens/v5_showcase/v5_showcase_screen.dart';
 import '../../pilot/screens/setup/je_builder_live_v52.dart';
 import 'apex_v5_service_shell.dart';
@@ -93,6 +94,29 @@ List<RouteBase> v5Routes() => [
           if (main == null) return const _V5NotFound();
           final chip = main.chipById(state.pathParameters['chip']!);
           if (chip == null) return const _V5NotFound();
+          // G-CLEANUP-4 (Sprint 15): if the parent main module is
+          // marked `enabled: false`, render `ComingSoonScreen`
+          // ("قيد البناء") inside the normal service shell instead
+          // of the empty/broken default. The shell still provides the
+          // header + breadcrumb so the user knows where they are; the
+          // body becomes an honest placeholder with a button back to
+          // the apps hub. Direct-URL access (bookmark, deep link,
+          // typed URL) hits this branch — the launcher itself already
+          // hides disabled modules per V5MainModule.enabled +
+          // AppsHubScreen._filteredApps. See APEX_BLUEPRINT/09 § 20.1
+          // G-CLEANUP-4.
+          if (!main.enabled) {
+            return ApexV5ServiceShell(
+              service: svc,
+              mainModule: main,
+              activeChip: chip,
+              bodyOverride: ComingSoonScreen(
+                labelAr: main.labelAr,
+                serviceId: svc.id,
+                icon: main.icon,
+              ),
+            );
+          }
           // Only provide builder if a wired screen exists for this chip;
           // otherwise let the shell fall through to dashboard / v4 / coming-soon.
           final wired = getWiredBuilder(svc.id, main.id, chip.id);

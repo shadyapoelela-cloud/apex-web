@@ -726,8 +726,16 @@ List<V5Service> v5Services = [
       ),
 
       // 1.9 HR & Payroll — unchanged
+      // G-CLEANUP-4 (Sprint 15): HIDDEN from launcher.
+      // Reason: F-016 in APEX_LIVE_UX_AUDIT_2026-05-04.md — the HR
+      // dashboard is an empty launcher (no wired builder for
+      // `erp/hr/dashboard`, no backend integration). Re-enable when
+      // the HR backend lands or when a per-chip wired dashboard
+      // replaces the empty default. Individual chips like
+      // `erp/hr/employees` remain wired and reachable by direct URL.
       V5MainModule(
         id: 'hr',
+        enabled: false,
         labelAr: 'الموارد البشرية والرواتب',
         labelEn: 'HR & Payroll',
         icon: Icons.people,
@@ -755,8 +763,15 @@ List<V5Service> v5Services = [
       ),
 
       // 1.10 Projects & Jobs
+      // G-CLEANUP-4 (Sprint 15): HIDDEN from launcher.
+      // Reason: F-002 in APEX_LIVE_UX_AUDIT_2026-05-04.md — Projects
+      // dashboard is a frontend shell with ZERO API calls verified
+      // via Network panel. Re-enable when G-MOD-PM-1 (build / archive
+      // / hybrid Project Management decision) lands. Individual chips
+      // like `erp/projects/projects` remain wired.
       V5MainModule(
         id: 'projects',
+        enabled: false,
         labelAr: 'المشاريع والمهام',
         labelEn: 'Projects & Jobs',
         icon: Icons.work,
@@ -779,8 +794,15 @@ List<V5Service> v5Services = [
       ),
 
       // 1.11 CRM & Marketing
+      // G-CLEANUP-4 (Sprint 15): HIDDEN from launcher.
+      // Reason: F-002 in APEX_LIVE_UX_AUDIT_2026-05-04.md — CRM
+      // dashboard is a frontend shell with ZERO API calls (clicked
+      // 'تحديث' / refresh in the live audit, Network panel showed
+      // no requests). Re-enable when G-MOD-CRM-1 (build / archive /
+      // hybrid CRM module decision) lands.
       V5MainModule(
         id: 'crm-marketing',
+        enabled: false,
         labelAr: 'علاقات العملاء والتسويق',
         labelEn: 'CRM & Marketing',
         icon: Icons.contacts,
@@ -826,8 +848,16 @@ List<V5Service> v5Services = [
       ),
 
       // 1.13 Hotel PMS (first-class)
+      // G-CLEANUP-4 (Sprint 15): HIDDEN from launcher.
+      // Reason: F-017 in APEX_LIVE_UX_AUDIT_2026-05-04.md — direct
+      // navigation to /app/erp/hotel/dashboard returned "المسار غير
+      // موجود" (404). The dashboardWidgets list is also empty.
+      // Re-enable when a hotel-pms backend ships or when the
+      // V5.2 hotel screens (HotelPmsV52Screen) get wired into the
+      // dashboard chip explicitly.
       V5MainModule(
         id: 'hotel-pms',
+        enabled: false,
         labelAr: 'إدارة الفنادق PMS',
         labelEn: 'Hotel PMS',
         icon: Icons.hotel,
@@ -868,8 +898,16 @@ List<V5Service> v5Services = [
       ),
 
       // 1.15 Industry Packs — simple verticals under one umbrella
+      // G-CLEANUP-4 (Sprint 15): HIDDEN from launcher.
+      // Reason: per Status Audit § 11.A, the 8 industry-pack chips
+      // (real-estate, healthcare, education, transport, grants,
+      // franchise, e-commerce, field-service) have never had backend
+      // integrations. The dashboardWidgets list is empty. Re-enable
+      // per-vertical when each industry pack ships its first
+      // working chip wired to a real backend.
       V5MainModule(
         id: 'industry-packs',
+        enabled: false,
         labelAr: 'حزم القطاعات',
         labelEn: 'Industry Packs',
         icon: Icons.apps,
@@ -896,8 +934,17 @@ List<V5Service> v5Services = [
       ),
 
       // 1.16 Reports & BI
+      // G-CLEANUP-4 (Sprint 15): HIDDEN from launcher.
+      // Reason: F-015 in APEX_LIVE_UX_AUDIT_2026-05-04.md — clicking
+      // the "التقارير والذكاء" tile rendered the Workflows page
+      // instead of a Reports dashboard (the route is misregistered
+      // OR the dashboard chip falls through to a default that
+      // happens to be Workflows). Re-enable when G-MOD-BI-1
+      // (build / archive / hybrid BI decision) lands AND the
+      // routing is fixed.
       V5MainModule(
         id: 'reports-bi',
+        enabled: false,
         labelAr: 'التقارير والذكاء',
         labelEn: 'Reports & BI',
         icon: Icons.assessment,
