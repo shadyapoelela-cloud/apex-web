@@ -49,7 +49,7 @@ final List<ApexModuleTile> kApexModules = [
     subtitle: 'GL + Trial Balance',
     icon: Icons.receipt_long_outlined,
     accent: Color(0xFF4A6FA5),
-    route: '/compliance/journal-entries',
+    route: '/app/erp/finance/je-builder',
   ),
   ApexModuleTile(
     label: 'القوائم المالية',

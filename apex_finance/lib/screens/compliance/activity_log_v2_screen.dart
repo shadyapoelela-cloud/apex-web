@@ -85,7 +85,7 @@ class _ActivityLogV2ScreenState extends State<ActivityLogV2Screen> {
       items: _filtered,
       onRefresh: () async {},
       listFooter: const ApexOutputChips(items: [
-        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
         ApexChipLink('صندوق الموافقات', '/workflow/approvals', Icons.inbox),
         ApexChipLink('Engagement Workspace', '/audit/engagements', Icons.folder),
       ]),

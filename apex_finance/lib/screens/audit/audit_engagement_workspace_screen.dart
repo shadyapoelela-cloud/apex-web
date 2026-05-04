@@ -215,7 +215,7 @@ class _AuditEngagementWorkspaceScreenState
               style: TextStyle(color: AC.tp, fontFamily: 'monospace', fontSize: 11.5)),
           onTap: () {
             final id = je['id'] as String?;
-            if (id != null) context.go('/compliance/journal-entry/$id');
+            if (id != null) context.go('/app/erp/finance/je-builder/$id');
           },
         );
       },

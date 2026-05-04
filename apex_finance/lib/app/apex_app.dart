@@ -25,7 +25,7 @@ import '../providers/app_providers.dart';
 final Map<int, String> _altModuleShortcuts = {
   1: '/home',
   2: '/compliance/executive-dashboard',
-  3: '/compliance/journal-entries',
+  3: '/app/erp/finance/je-builder',
   4: '/compliance/zatca-invoice',
   5: '/compliance/vat-return',
   6: '/compliance/bank-rec',

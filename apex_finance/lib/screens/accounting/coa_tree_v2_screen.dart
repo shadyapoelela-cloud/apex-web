@@ -94,7 +94,7 @@ class _CoaTreeV2ScreenState extends State<CoaTreeV2Screen> {
       error: _error,
       onRefresh: _load,
       listFooter: const ApexOutputChips(items: [
-        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
         ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
         ApexChipLink('محرر الحسابات', '/accounting/coa/edit', Icons.edit_note),
       ]),

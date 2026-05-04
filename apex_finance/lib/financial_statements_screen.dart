@@ -147,7 +147,7 @@ class _FinancialStatementsScreenState extends State<FinancialStatementsScreen>
               _buildCashFlow(),
             ])),
         const ApexOutputChips(items: [
-          ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+          ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
           ApexChipLink('شجرة الحسابات', '/accounting/coa-v2', Icons.account_tree),
           ApexChipLink('إقفال الفترة', '/operations/period-close', Icons.lock_clock),
           ApexChipLink('Health Score', '/analytics/health-score-v2', Icons.health_and_safety),

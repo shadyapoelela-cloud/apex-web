@@ -71,7 +71,7 @@ class ApexOmniCreateFab extends StatelessWidget {
                       _tile(ctx, 'فاتورة ضريبية', Icons.receipt_long_outlined,
                           () => GoRouter.of(ctx).go('/compliance/zatca-invoice')),
                       _tile(ctx, 'قيد يومية', Icons.edit_note,
-                          () => GoRouter.of(ctx).go('/compliance/journal-entry-builder')),
+                          () => GoRouter.of(ctx).go('/app/erp/finance/je-builder/new')),
                       _tile(ctx, 'عميل', Icons.person_add_alt_outlined,
                           () => GoRouter.of(ctx).go('/settings/entities?action=new-company')),
                       _tile(ctx, 'تذكير دفع', Icons.campaign_outlined,

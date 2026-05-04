@@ -45,7 +45,7 @@ class _PettyCashScreenState extends State<PettyCashScreen> {
       onRefresh: () async {},
       listHeader: _heroCard(),
       listFooter: const ApexOutputChips(items: [
-        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
         ApexChipLink('تقارير المصاريف', '/hr/expense-reports', Icons.receipt_long),
         ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
       ]),

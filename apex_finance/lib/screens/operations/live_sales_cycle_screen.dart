@@ -487,7 +487,7 @@ class _LiveSalesCycleScreenState extends State<LiveSalesCycleScreen> {
             if (_lastJeId != null)
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () => context.go('/compliance/journal-entry/$_lastJeId'),
+                  onPressed: () => context.go('/app/erp/finance/je-builder/$_lastJeId'),
                   icon: const Icon(Icons.receipt, size: 16),
                   label: const Text('عرض القيد', style: TextStyle(fontSize: 11.5)),
                   style: ElevatedButton.styleFrom(backgroundColor: AC.gold, foregroundColor: AC.navy),

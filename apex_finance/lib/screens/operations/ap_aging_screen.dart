@@ -200,7 +200,7 @@ class _ApAgingScreenState extends State<ApAgingScreen> {
               style: TextStyle(color: AC.gold, fontFamily: 'monospace', fontSize: 12)),
           onTap: () {
             final jeId = b['journal_entry_id'] as String?;
-            if (jeId != null) context.go('/compliance/journal-entry/$jeId');
+            if (jeId != null) context.go('/app/erp/finance/je-builder/$jeId');
           },
         )).toList(),
       ),

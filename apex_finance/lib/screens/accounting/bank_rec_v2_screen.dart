@@ -57,7 +57,7 @@ class _BankRecV2ScreenState extends State<BankRecV2Screen> {
           const SizedBox(height: 12),
           _explanationCard(),
           const ApexOutputChips(items: [
-            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
             ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
             ApexChipLink('ربط البنوك', '/settings/bank-feeds', Icons.account_balance),
             ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),

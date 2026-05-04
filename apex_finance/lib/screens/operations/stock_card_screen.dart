@@ -38,7 +38,7 @@ class StockCardScreen extends StatelessWidget {
           const ApexOutputChips(items: [
             ApexChipLink('المخزون', '/operations/inventory-v2', Icons.inventory_2),
             ApexChipLink('بيع سريع POS', '/pos/quick-sale', Icons.point_of_sale),
-            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
           ]),
         ]),
       ),

@@ -286,7 +286,7 @@ final _complianceTools = [
       Icons.receipt, AC.warn),
   _Tool('الرواتب', 'GOSI ready', '/compliance/payroll',
       Icons.badge, AC.purple),
-  _Tool('أرقام القيود', 'Gap-free JE', '/compliance/journal-entries',
+  _Tool('أرقام القيود', 'Gap-free JE', '/app/erp/finance/je-builder',
       Icons.confirmation_number, AC.info),
   _Tool('سجل التدقيق', 'SHA-256 chain', '/compliance/audit-trail',
       Icons.lock_outline, AC.err),

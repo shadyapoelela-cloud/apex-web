@@ -141,7 +141,7 @@ class _AccountLedgerScreenState extends State<AccountLedgerScreen> {
                   return InkWell(
                     onTap: jeId == null
                         ? null
-                        : () => context.go('/compliance/journal-entry/$jeId'),
+                        : () => context.go('/app/erp/finance/je-builder/$jeId'),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
@@ -184,7 +184,7 @@ class _AccountLedgerScreenState extends State<AccountLedgerScreen> {
       ),
       const ApexOutputChips(items: [
         ApexChipLink('شجرة الحسابات', '/accounting/coa-v2', Icons.account_tree),
-        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
         ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
         ApexChipLink('إقفال الفترة', '/operations/period-close', Icons.lock_clock),
       ]),

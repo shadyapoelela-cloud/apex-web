@@ -92,7 +92,7 @@ class _ExpenseReportsScreenState extends State<ExpenseReportsScreen> {
       items: _filtered,
       onRefresh: () async {},
       listFooter: const ApexOutputChips(items: [
-        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
         ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
         ApexChipLink('صندوق الموافقات', '/workflow/approvals', Icons.inbox),
       ]),

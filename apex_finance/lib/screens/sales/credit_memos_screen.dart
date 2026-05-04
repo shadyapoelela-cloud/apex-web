@@ -67,7 +67,7 @@ class _CreditMemosScreenState extends State<CreditMemosScreen> {
       listFooter: const ApexOutputChips(items: [
         ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
         ApexChipLink('العملاء', '/sales/customers', Icons.people),
-        ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+        ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
       ]),
       emptyState: ApexEmptyState(
         icon: Icons.note,

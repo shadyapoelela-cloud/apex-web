@@ -1062,7 +1062,7 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
   void _openInvoice(Map<String, dynamic> inv) {
     final jeId = inv['journal_entry_id'] as String?;
     if (jeId != null) {
-      context.go('/compliance/journal-entry/$jeId');
+      context.go('/app/erp/finance/je-builder/$jeId');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('الفاتورة ${inv['invoice_number']} لم تُرحَّل بعد'),

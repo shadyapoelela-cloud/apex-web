@@ -214,7 +214,7 @@ class _ArAgingScreenState extends State<ArAgingScreen> {
               onTap: () {
                 final jeId = inv['journal_entry_id'] as String?;
                 if (jeId != null) {
-                  context.go('/compliance/journal-entry/$jeId');
+                  context.go('/app/erp/finance/je-builder/$jeId');
                 }
               },
             )).toList(),

@@ -189,7 +189,7 @@ class _TodayDashboardScreenState extends State<TodayDashboardScreen> {
           : SnackBarAction(
               label: 'عرض',
               textColor: AC.navy,
-              onPressed: () => context.go('/compliance/journal-entry/$jeId'),
+              onPressed: () => context.go('/app/erp/finance/je-builder/$jeId'),
             ),
     ));
     _expressAmountCtrl.clear();

@@ -53,7 +53,7 @@ class _ConsolidationV2ScreenState extends State<ConsolidationV2Screen> {
           _eliminationCard(),
           const ApexOutputChips(items: [
             ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
-            ApexChipLink('قائمة القيود', '/accounting/je-list', Icons.book),
+            ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
             ApexChipLink('متابعة العملات', '/analytics/multi-currency-v2', Icons.currency_exchange),
           ]),
         ]),
