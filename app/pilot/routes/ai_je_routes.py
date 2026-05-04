@@ -22,9 +22,17 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from app.phase1.models.platform_models import get_db
+from app.phase1.routes.phase1_routes import get_current_user
 from app.pilot.models import Entity, GLAccount
 
-router = APIRouter(prefix="/pilot", tags=["AI / Journal Entries"])
+# G-S9 (Sprint 14): router-level auth dependency. Every endpoint on this
+# router now requires a valid JWT (Bearer header or apex_token cookie).
+# Was previously anonymously reachable — see 09 § 20.1 G-S9 closure.
+router = APIRouter(
+    prefix="/pilot",
+    tags=["AI / Journal Entries"],
+    dependencies=[Depends(get_current_user)],
+)
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 _CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-sonnet-4-5-20250929")

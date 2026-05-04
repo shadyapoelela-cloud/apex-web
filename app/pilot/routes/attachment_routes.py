@@ -7,10 +7,16 @@ from pydantic import BaseModel, Field
 from datetime import datetime, timezone
 
 from app.phase1.models.platform_models import get_db
+from app.phase1.routes.phase1_routes import get_current_user
 from app.pilot.models import Attachment, AttachmentKind, Tenant
 
 
-router = APIRouter(prefix="/pilot", tags=["pilot-attachments"])
+# G-S9 (Sprint 14): router-level auth dependency. See 09 § 20.1 G-S9.
+router = APIRouter(
+    prefix="/pilot",
+    tags=["pilot-attachments"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 # ──────────────────────────────────────────────────────────────────────────

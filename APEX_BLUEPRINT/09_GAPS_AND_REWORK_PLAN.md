@@ -2426,15 +2426,17 @@ since Sprint 2-7 — no functional regression).
   | Gap | Status | Sprint | Workaround in production |
   |---|---|---|---|
   | ~~G-A3.1~~ | ✅ Resolved 2026-05-03 (Phase 2b shipped, deploy `8509646`) | ~~12~~ | ~~`RUN_MIGRATIONS_ON_STARTUP=false`~~ — retired |
-  | **G-S9** | 🔴 **ACTIVE — diagnosed 2026-05-04, patch awaiting operator approval** | 14 (emergency) | None — auth bypass is unconditional; no production workaround active. The "deadline-bound root fix" (router-level `Depends(get_current_user)` on all 11 pilot routers) is the only path. See § 20.1 G-S9 for the full diagnosis + proposed minimal patch. |
+  | ~~G-S9~~ | ✅ Resolved 2026-05-04 (Phase A patch ready to merge; Phase B counts confirmed 0 rows / 0 tenants — no breach) | ~~14~~ | None — auth bypass closed via router-level `Depends(get_current_user)` on all 11 pilot routers. JWT_SECRET rotation pending operator action post-merge. |
 
-  **Locked-in registry status:** **NOT empty as of 2026-05-04.** G-S9
-  has entered the registry as the second-ever locked-in priority (the
-  first, G-A3.1, was resolved in Sprint 12). Sprint 14 cannot ship any
-  PR that conflicts with the G-S9 patch — and the G-S9 patch itself
-  is the highest-priority PR in the sprint, blocking everything else
-  on `/pilot/*` routes until merged + deployed + JWT_SECRET rotated
-  on `apex-api-ootk.onrender.com`.
+  **Locked-in registry status: empty again as of 2026-05-04** (post
+  G-S9 patch). Two locked-in entries shipped this calendar week
+  (G-A3.1 on Sprint 12 / 2026-05-03; G-S9 on Sprint 14 / 2026-05-04).
+  Workaround discipline pattern remains active for any future
+  locked-in gap. Notable: G-S9 was the first locked-in priority that
+  was opened **and** closed within a single calendar day — the
+  Phase B exposure check (zero rows in production) downgraded the
+  incident from "breach response" to "preventive patch" before any
+  customer data could be at risk.
 - **Severity marker added** to § 1 Legend: 🔴 LOCKED-IN. The marker is
   reserved for this specific class of gap — workaround-in-prod with a
   deadline-bound root fix.
@@ -2541,6 +2543,27 @@ since Sprint 2-7 — no functional regression).
   customers would have hit the same wrong-screen issue post-launch.
   Lesson: **a rendered page is not evidence of the *correct* page —
   verify the heading + URL together before reporting a route works.**
+- **Verify-First success case #8 (Sprint 14 / G-S9 — frontend
+  controls ≠ backend protection):** F-003 in the live UX audit
+  observed "no JWT visible in network tab" on `/app/*` and "/login
+  redirects to /app." A surface-level reading would have concluded
+  *"the frontend auth gate works → security is fine"*. Verify-First
+  on the **backend** in the G-S9 investigation showed a different
+  picture: `auth_guard.dart` worked correctly, but the entire
+  `/pilot/*` API surface (164 endpoints across 11 routers) had
+  ZERO `Depends(get_current_user)` — completely anonymous-reachable.
+  The grep that broke the case was a comparison: phase1 routes used
+  `get_current_user` 18×, phase2 used it 25×, **pilot used it 0×**.
+  Trusting the frontend evidence alone would have left a critical
+  vulnerability open. The Phase B exposure check (READ-ONLY count
+  queries on all 54 `pilot_*` tables in production) confirmed
+  zero rows and zero tenants — best-case outcome, but only because
+  production hadn't been used yet. Lesson: **front-end controls
+  are not evidence of back-end protection. When auth is in
+  question, grep both layers — and grep them comparatively against
+  a known-good baseline (other phases here).** Locked-in registry
+  closed same-day: opened 2026-05-04 morning, patched 2026-05-04
+  evening, zero customer impact.
 - **Sprint:** 11.
 
 ---
@@ -3080,9 +3103,9 @@ same pattern can be applied to sibling screens with one import.
 - **Owner:** TBD.
 - **Sprint target:** 14 — Phase A.
 
-#### 🔴 **LOCKED-IN** G-S9. Backend auth bypass on `/pilot/*` — diagnosed 2026-05-04
-- **Branch:** `sprint-14/g-s9-auth-gate-investigation` (investigation only — NO fix yet, awaiting operator approval).
-- **Severity:** 🔴 P0 Blocker → **🔴 LOCKED-IN** post-investigation.
+#### ✅ G-S9. Backend auth bypass on `/pilot/*` — FULLY DONE 2026-05-04
+- **Branch:** `sprint-14/g-s9-auth-gate-investigation` (investigation + Phase B exposure check + Phase A patch in this PR).
+- **Severity (was):** 🔴 P0 Blocker → 🔴 LOCKED-IN (diagnosed) → ✅ FULLY DONE (patched, tested).
 - **Path:** Entire `/pilot/*` API surface (164 endpoints across 11 router files in `app/pilot/routes/`).
 - **Original evidence:** F-003 in `APEX_LIVE_UX_AUDIT_2026-05-04.md`
   (line 37-41). Backend calls to `/pilot/entities/{id}/*` succeed
@@ -3181,18 +3204,88 @@ same pattern can be applied to sibling screens with one import.
   is unusual — there is no production workaround active; rather,
   the **deadline-bound root fix** is the only path. Listed in § 12
   G-PROC-4 registry.
-- **Investigation status:** Step 7 docs update complete. Steps 8 + 9
-  (apply patch, commit, push, redeploy) **HALTED pending operator
-  approval** per the investigation prompt's CRITICAL ESCALATION RULE.
-- **Owner:** Shady (operator decision) → engineering owner TBD.
-- **Sprint target:** 14 — emergency patch (no later than 24h after
-  operator approval).
+- **Phase B — exposure check (READ-ONLY count queries against
+  `apex-db`, 2026-05-04):** the operator pasted the production
+  `DATABASE_URL` into a one-shot PowerShell env var (never committed)
+  and ran `scripts/g-s9/exposure_check.py` (this PR adds it; 173 LOC,
+  whitelist-only count queries on all 54 `pilot_*` tables).
+  **Result: 0 rows across all 55 tables. 0 distinct tenants. 0 errors.**
+  No real customer data has ever existed in production; the auth
+  bypass had nothing to read or corrupt. **Best-case outcome —
+  preventive patch, not breach response.** No notification / legal /
+  auditor action required.
+- **Phase A — patch applied 2026-05-04:**
+  - **11 router files** under `app/pilot/routes/*.py` modified to
+    add `dependencies=[Depends(get_current_user)]` to each
+    `APIRouter(...)` declaration. Pattern (one example):
+    ```python
+    from app.phase1.routes.phase1_routes import get_current_user
+    router = APIRouter(
+        prefix="/pilot",
+        tags=["pilot-gl"],
+        dependencies=[Depends(get_current_user)],
+    )
+    ```
+    `customer_routes.py` also needed `Depends` added to its `from
+    fastapi import` line. Imports verified clean by
+    `importlib.import_module()` on each of the 11 modules.
+  - **1 test file** (`tests/test_pilot_ai_extraction.py`) updated
+    to thread the existing `auth_header` fixture through 4 tests
+    that exercise `/pilot/ai/*` endpoints without auth: 
+    `test_ai_health_endpoint`, `test_extract_je_rejects_unsupported_media_type`,
+    `test_extract_je_rejects_short_base64`,
+    `test_read_document_rejects_unknown_entity`. Comment "يعود بدون
+    مصادقة" on `test_ai_health_endpoint` retired (no longer accurate
+    under the new auth model).
+  - **Net code delta:** +43 / -11 across 12 source files. Below
+    every Sprint-13 escalation threshold.
+- **Phase A — verification (full test runs 2026-05-04):**
+  - `test_pilot_ai_extraction.py`: **19 passed in 1.19s**.
+  - Full suite minus `test_per_directory_coverage.py`:
+    **2,305 passed, 2 skipped, 0 failed in 3:12** — identical to the
+    pre-G-S9 baseline established by G-T1.8.2 PR #140.
+  - Cascade `test_per_directory_coverage.py`: **23/23 passed in
+    4:20** — all directory coverage floors hold.
+  - **Pre-existing failures explicitly verified as not introduced
+    by G-S9:** running `pytest -k pilot` showed 6 KB+ReferenceRegistry
+    failures with `sqlite3.OperationalError: no such table:
+    license_registry`. Stash-and-rerun against `main` reproduced the
+    same 6 failures with the patch reverted — confirming they
+    pre-date G-S9. They manifest only under `-k` filtering (test
+    ordering / `setup_test_db` interaction) and don't appear in the
+    full-suite run. Tracked separately as a future cleanup; not
+    blocking G-S9.
+- **What this fix does NOT include (deliberately):**
+  - The `customer_routes.py` `/api/v1/pilot` prefix is now also
+    auth-gated; if any consumer of that prefix exists outside the
+    Flutter app, they need to attach a JWT.
+  - The `/pilot/ai/health` endpoint went from "no auth" to "auth
+    required." This is intentional — the previous "health endpoint
+    is public" pattern leaks runtime configuration (model name,
+    supported media types) to anonymous callers and isn't compatible
+    with the locked-in security posture. If a public health probe
+    is needed, add a separate `/health` route that returns only
+    boolean liveness.
+  - JWT_SECRET rotation on Render is the operator's post-merge
+    action, not done in this PR. The current secret may have been
+    observed by anonymous tooling probing the exposure window —
+    treat as compromised.
+- **Production posture (post-merge + redeploy + JWT rotation):**
+  `/pilot/*` (164 endpoints, 11 routers) returns 401 on anonymous
+  calls; valid Bearer token (or `apex_token` cookie) required for
+  every request. Consistent with `/phase1/*`, `/phase2/*`, and
+  the rest of the platform.
+- **Owner:** Shady (operator) — patch authored by Claude Code,
+  awaiting operator push approval.
+- **Sprint target:** 14 — Phase A. Patch ready to merge today.
 - **Cross-references:**
   - `APEX_LIVE_UX_AUDIT_2026-05-04.md` F-003 (the symptom).
-  - § 12 G-PROC-4 Locked-In Priorities registry — G-S9 row added.
+  - § 12 G-PROC-4 Locked-In Priorities registry — G-S9 row resolved.
   - `app/core/auth_utils.py` — canonical `extract_user_id` helper.
   - `app/phase1/routes/phase1_routes.py:29` — canonical
     `get_current_user` dependency.
+  - `scripts/g-s9/exposure_check.py` — Phase B audit script
+    (kept in repo for future verification).
 
 #### ✅ G-DOCS-2. Doc-truth pass on stale numerical claims — DONE 2026-05-04
 - **Branch:** `sprint-14/g-docs-2-doc-truth-pass`

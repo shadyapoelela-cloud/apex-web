@@ -156,9 +156,9 @@ def test_account_matcher_returns_none_below_threshold():
     assert conf == 0.0
 
 
-def test_ai_health_endpoint(client):
-    """/pilot/ai/health يعود بدون مصادقة."""
-    r = client.get("/pilot/ai/health")
+def test_ai_health_endpoint(client, auth_header):
+    """/pilot/ai/health — auth required (G-S9 Sprint 14)."""
+    r = client.get("/pilot/ai/health", headers=auth_header)
     assert r.status_code == 200
     body = r.json()
     assert "ai_enabled" in body
@@ -168,11 +168,12 @@ def test_ai_health_endpoint(client):
     assert "application/pdf" in body["supported_media_types"]
 
 
-def test_extract_je_rejects_unsupported_media_type(client):
+def test_extract_je_rejects_unsupported_media_type(client, auth_header):
     """أنواع الملفات غير المدعومة تُرفض بـ 400 أو 404 للـ entity."""
     # بدون entity حقيقي، قد يعود 404 قبل الوصول لفحص media_type
     r = client.post(
         "/pilot/entities/non-existent-entity/ai/extract-je",
+        headers=auth_header,
         json={
             "file_base64": "x" * 200,
             "media_type": "text/plain",
@@ -182,10 +183,11 @@ def test_extract_je_rejects_unsupported_media_type(client):
     assert r.status_code in (400, 404)
 
 
-def test_extract_je_rejects_short_base64(client):
+def test_extract_je_rejects_short_base64(client, auth_header):
     """file_base64 أقصر من 100 حرف يُرفض بواسطة Pydantic."""
     r = client.post(
         "/pilot/entities/any-entity/ai/extract-je",
+        headers=auth_header,
         json={
             "file_base64": "short",
             "media_type": "image/jpeg",
@@ -194,12 +196,13 @@ def test_extract_je_rejects_short_base64(client):
     assert r.status_code == 422  # Pydantic validation
 
 
-def test_read_document_rejects_unknown_entity(client):
+def test_read_document_rejects_unknown_entity(client, auth_header):
     """/read-document يُرفض بسبب entity غير موجود قبل استدعاء Claude."""
     import io
 
     r = client.post(
         "/pilot/entities/does-not-exist/ai/read-document",
+        headers=auth_header,
         files={
             "file": (
                 "receipt.jpg",

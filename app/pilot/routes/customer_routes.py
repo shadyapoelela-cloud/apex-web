@@ -20,11 +20,12 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 from typing import Any, Optional
 
-from fastapi import APIRouter, Body, HTTPException, Path, Query
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.phase1.models.platform_models import SessionLocal, gen_uuid
+from app.phase1.routes.phase1_routes import get_current_user
 from app.pilot.models import (
     Customer,
     CustomerKind,
@@ -42,7 +43,14 @@ from app.pilot.models import (
     PeriodStatus,
 )
 
-router = APIRouter(prefix="/api/v1/pilot", tags=["Pilot — Customers & Sales"])
+# G-S9 (Sprint 14): router-level auth dependency. See 09 § 20.1 G-S9.
+# Note: this router uses /api/v1/pilot prefix (not /pilot) — both prefixes
+# are now equally protected.
+router = APIRouter(
+    prefix="/api/v1/pilot",
+    tags=["Pilot — Customers & Sales"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 def _db() -> Session:
