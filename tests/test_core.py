@@ -126,6 +126,11 @@ def test_flutter_files():
     History:
     - 2026-04-30 (G-T1.2): removed `screens/clients/client_onboarding_wizard.dart`
       which was deleted in commit a5cac24 (Phase 1 frontend cleanup).
+    - 2026-05-05 (G-CLEANUP-1 Stage 4c-prep): removed
+      `screens/tasks/audit_service_screen.dart` which was archived to
+      `apex_finance/_archive/2026-05-04/v4-routes/audit/audit_service_screen.dart`
+      as part of the V4 SHELL screen archive (V4 /audit/service route now
+      redirects to /app/marketplace/dashboard).
     """
     print("Test 8: Flutter files exist...")
     files = [
@@ -135,7 +140,6 @@ def test_flutter_files():
         "apex_finance/lib/widgets/auth_widgets.dart",
         "apex_finance/lib/screens/marketplace/service_catalog_screen.dart",
         "apex_finance/lib/screens/account/archive_screen.dart",
-        "apex_finance/lib/screens/tasks/audit_service_screen.dart",
     ]
     for f in files:
         assert os.path.exists(f), f"Missing: {f}"
