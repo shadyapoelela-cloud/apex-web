@@ -1,5 +1,5 @@
 /// APEX — Withholding Tax v2 (Saudi-aware)
-/// /compliance/wht-v2 — WHT calculation + monthly summary
+/// /app/compliance/tax/wht — WHT calculation + monthly summary
 library;
 
 import 'package:flutter/material.dart';
@@ -64,7 +64,7 @@ class _WhtV2ScreenState extends State<WhtV2Screen> {
           const SizedBox(height: 12),
           _filingCard(),
           const ApexOutputChips(items: [
-            ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
+            ApexChipLink('فواتير الموردين', '/app/erp/finance/purchase-bills', Icons.receipt_outlined),
             ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
             ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
           ]),

@@ -142,7 +142,7 @@ final demoInboxItems = <InboxItem>[
     titleAr: 'أحمد محمد أشار إليك في تعليق',
     subtitleAr: '"@أنت هل يمكنك التحقق من الفاتورة INV-2026-142؟"',
     fromAppAr: 'Sales › Invoices',
-    route: '/app/erp/sales/invoices',
+    route: '/app/erp/app/erp/sales/invoices',
   ),
   InboxItem(
     id: 'i7',

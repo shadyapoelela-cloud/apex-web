@@ -1,5 +1,5 @@
 /// APEX — Customer Payment recording
-/// /sales/payment/:invoiceId — record a payment against an invoice.
+/// /app/erp/sales/payment/:invoiceId — record a payment against an invoice.
 library;
 
 import 'package:flutter/material.dart';
@@ -61,7 +61,7 @@ class _CustomerPaymentScreenState extends State<CustomerPaymentScreen> {
         backgroundColor: AC.ok,
         content: Text('تم تسجيل دفعة بقيمة ${amount.toStringAsFixed(2)} ريال'),
       ));
-      context.go('/sales/invoices');
+      context.go('/app/erp/sales/invoices');
     }
   }
 

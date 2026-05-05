@@ -218,7 +218,7 @@ class _ApprovalsInboxScreenState extends State<ApprovalsInboxScreen> {
       onRefresh: _load,
       listFooter: const ApexOutputChips(items: [
         ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
-        ApexChipLink('فواتير الموردين', '/purchase/bills', Icons.receipt_outlined),
+        ApexChipLink('فواتير الموردين', '/app/erp/finance/purchase-bills', Icons.receipt_outlined),
         ApexChipLink('تقارير المصاريف', '/hr/expense-reports', Icons.receipt_long),
         ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
       ]),

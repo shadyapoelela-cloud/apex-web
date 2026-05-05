@@ -995,12 +995,12 @@ const _kAllPins = <_Pin>[
       id: 'clients',
       labelAr: 'العملاء',
       icon: Icons.groups,
-      route: '/app/erp/sales/customers'),
+      route: '/app/erp/app/erp/finance/sales-customers'),
   _Pin(
       id: 'vendors',
       labelAr: 'الموردون',
       icon: Icons.local_shipping,
-      route: '/app/erp/purchase/vendors'),
+      route: '/app/erp/app/erp/purchasing/suppliers'),
 ];
 
 class _QuickAccessRail extends StatefulWidget {

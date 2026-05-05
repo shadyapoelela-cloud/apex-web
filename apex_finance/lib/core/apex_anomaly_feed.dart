@@ -30,7 +30,7 @@ class ApexAnomalyFeedCard extends StatelessWidget {
       'title': 'فاتورة مكررة محتملة',
       'description': 'فاتورة بنفس المبلغ والمورد خلال 48 ساعة',
       'action': 'راجع',
-      'route': '/sales/invoices',
+      'route': '/app/erp/sales/invoices',
     },
     {
       'severity': 'medium',
@@ -44,7 +44,7 @@ class ApexAnomalyFeedCard extends StatelessWidget {
       'title': 'حساب البنوك يحتاج تسوية',
       'description': '12 معاملة لم تُسوّى منذ 7 أيام',
       'action': 'سوّ',
-      'route': '/compliance/bank-rec-ai',
+      'route': '/app/erp/treasury/recon',
     },
   ];
 

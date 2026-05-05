@@ -53,7 +53,7 @@ class ProjectProfitabilityScreen extends StatelessWidget {
           const ApexOutputChips(items: [
             ApexChipLink('انحراف التكاليف', '/analytics/cost-variance-v2', Icons.precision_manufacturing),
             ApexChipLink('بناء الموازنة', '/analytics/budget-builder', Icons.calculate),
-            ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+            ApexChipLink('ميزان المراجعة', '/app/erp/finance/statements', Icons.assessment),
           ]),
         ]),
       ),

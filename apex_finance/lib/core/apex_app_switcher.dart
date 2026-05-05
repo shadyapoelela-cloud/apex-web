@@ -56,21 +56,21 @@ final List<ApexModuleTile> kApexModules = [
     subtitle: 'P&L · ميزانية · تدفق',
     icon: Icons.insert_chart_outlined,
     accent: Color(0xFF5A8F3D),
-    route: '/compliance/financial-statements',
+    route: '/app/erp/finance/statements',
   ),
   ApexModuleTile(
     label: 'الرواتب',
     subtitle: 'GOSI · WPS · EOSB',
     icon: Icons.badge_outlined,
     accent: Color(0xFFB97A3E),
-    route: '/compliance/payroll',
+    route: '/app/erp/hr/payroll',
   ),
   ApexModuleTile(
     label: 'المطابقة البنكية',
     subtitle: 'OCR + Matching',
     icon: Icons.compare_arrows_outlined,
     accent: Color(0xFF6C63FF),
-    route: '/compliance/bank-rec',
+    route: '/app/erp/treasury/recon',
   ),
   // AI
   ApexModuleTile(

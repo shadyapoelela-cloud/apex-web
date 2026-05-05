@@ -17,7 +17,7 @@ import '../../core/theme.dart';
 import '../../widgets/apex_copilot_drawer.dart';
 import '../../widgets/apex_list_toolbar.dart';
 
-const String _kScreenKey = '/purchase/vendors';
+const String _kScreenKey = '/app/erp/purchasing/suppliers';
 
 class VendorsListScreen extends StatefulWidget {
   const VendorsListScreen({super.key});

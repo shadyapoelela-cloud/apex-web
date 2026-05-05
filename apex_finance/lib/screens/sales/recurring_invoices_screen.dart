@@ -1,5 +1,5 @@
 /// APEX — Recurring Invoices (subscription billing)
-/// /sales/recurring — auto-bill on schedule
+/// /app/erp/finance/recurring-entries — auto-bill on schedule
 library;
 
 import 'package:flutter/material.dart';
@@ -116,8 +116,8 @@ class _RecurringInvoicesScreenState extends State<RecurringInvoicesScreen> {
       onRefresh: () async {},
       listHeader: _mrrCard(),
       listFooter: const ApexOutputChips(items: [
-        ApexChipLink('الفواتير', '/sales/invoices', Icons.receipt),
-        ApexChipLink('أعمار AR', '/sales/aging', Icons.timeline),
+        ApexChipLink('الفواتير', '/app/erp/sales/invoices', Icons.receipt),
+        ApexChipLink('أعمار AR', '/app/erp/sales/ar-aging', Icons.timeline),
         ApexChipLink('توقع التدفق', '/analytics/cash-flow-forecast', Icons.show_chart),
       ]),
       emptyState: ApexEmptyState(

@@ -1,4 +1,4 @@
-/// APEX — Customers List (V5 chip body for /app/erp/sales/customers)
+/// APEX — Customers List (V5 chip body for /app/erp/app/erp/finance/sales-customers)
 ///
 /// Wave 2 of APEX_IMPROVEMENT_PLAN.md — migrated from `ApexListShell`
 /// to the unified `ApexListToolbar` pattern (Odoo-style ribbon, chip
@@ -16,7 +16,7 @@ import '../../core/theme.dart';
 import '../../widgets/apex_copilot_drawer.dart';
 import '../../widgets/apex_list_toolbar.dart';
 
-const String _kScreenKey = '/sales/customers';
+const String _kScreenKey = '/app/erp/finance/sales-customers';
 
 class CustomersListScreen extends StatefulWidget {
   const CustomersListScreen({super.key});

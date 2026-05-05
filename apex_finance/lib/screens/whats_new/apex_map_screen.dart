@@ -227,15 +227,15 @@ class ApexMapScreen extends StatelessWidget {
       items: const [
         _Item(
             title: 'ZATCA e-Invoice',
-            route: '/compliance/zatca-invoice',
+            route: '/app/compliance/zatca/invoice',
             icon: Icons.qr_code_2),
         _Item(
             title: 'VAT Return',
-            route: '/compliance/vat-return',
+            route: '/app/compliance/tax/vat-return',
             icon: Icons.description_outlined),
         _Item(
             title: 'Zakat',
-            route: '/compliance/zakat',
+            route: '/app/compliance/tax/zakat',
             icon: Icons.calculate_outlined),
         _Item(
             title: 'قيود اليومية',
@@ -243,11 +243,11 @@ class ApexMapScreen extends StatelessWidget {
             icon: Icons.receipt_long_outlined),
         _Item(
             title: 'Audit Trail',
-            route: '/compliance/audit-trail',
+            route: '/app/audit/trail',
             icon: Icons.fact_check_outlined),
         _Item(
             title: 'الرواتب',
-            route: '/compliance/payroll',
+            route: '/app/erp/hr/payroll',
             icon: Icons.badge_outlined),
         _Item(
             title: 'ضريبة الشركات UAE',
@@ -267,35 +267,35 @@ class ApexMapScreen extends StatelessWidget {
       items: const [
         _Item(
             title: 'القوائم المالية',
-            route: '/compliance/financial-statements',
+            route: '/app/erp/finance/statements',
             icon: Icons.insert_chart),
         _Item(
             title: 'النسب المالية',
-            route: '/compliance/ratios',
+            route: '/app/advisory/ratios/dashboard',
             icon: Icons.bar_chart),
         _Item(
             title: 'Cashflow',
-            route: '/compliance/cashflow-statement',
+            route: '/app/erp/finance/cashflow',
             icon: Icons.waves),
         _Item(
             title: 'الأصول الثابتة',
-            route: '/compliance/fixed-assets',
+            route: '/app/erp/finance/fixed-assets',
             icon: Icons.business),
         _Item(
             title: 'الإهلاك',
-            route: '/compliance/depreciation',
+            route: '/app/erp/finance/depreciation',
             icon: Icons.trending_down),
         _Item(
             title: 'Lease IFRS 16',
-            route: '/compliance/lease',
+            route: '/app/compliance/ifrs/dashboard',
             icon: Icons.warehouse),
         _Item(
             title: 'التقييم',
-            route: '/compliance/valuation',
+            route: '/app/advisory/valuation/dashboard',
             icon: Icons.price_change),
         _Item(
             title: 'التوحيد',
-            route: '/compliance/consolidation',
+            route: '/app/erp/consolidation/dashboard',
             icon: Icons.hub_outlined),
       ],
     ),

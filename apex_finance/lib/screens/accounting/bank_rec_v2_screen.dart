@@ -1,5 +1,5 @@
 /// APEX — Bank Reconciliation AI v2 (Xero JAX pattern)
-/// /accounting/bank-rec-v2 — auto-match >95% + suggestions for the rest
+/// /app/erp/treasury/recon — auto-match >95% + suggestions for the rest
 library;
 
 import 'package:flutter/material.dart';
@@ -58,7 +58,7 @@ class _BankRecV2ScreenState extends State<BankRecV2Screen> {
           _explanationCard(),
           const ApexOutputChips(items: [
             ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
-            ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+            ApexChipLink('ميزان المراجعة', '/app/erp/finance/statements', Icons.assessment),
             ApexChipLink('ربط البنوك', '/settings/bank-feeds', Icons.account_balance),
             ApexChipLink('سجل النشاط', '/compliance/activity-log-v2', Icons.history),
           ]),
@@ -172,7 +172,7 @@ class _BankRecV2ScreenState extends State<BankRecV2Screen> {
         _bullet('5', 'الثقة <30% → معاملات تحتاج إنشاء قيد جديد'),
         const SizedBox(height: 12),
         OutlinedButton.icon(
-          onPressed: () => context.go('/compliance/bank-rec-ai'),
+          onPressed: () => context.go('/app/erp/treasury/recon'),
           icon: Icon(Icons.list, color: AC.gold, size: 16),
           label: Text('عرض القائمة الكاملة (legacy)', style: TextStyle(color: AC.gold)),
           style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold)),

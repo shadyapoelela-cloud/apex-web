@@ -1,5 +1,5 @@
 /// APEX — Tax Calendar (Saudi-aware: VAT + Zakat + Corp Tax + ZATCA)
-/// /compliance/tax-calendar — upcoming obligations with Hijri context
+/// /app/compliance/tax/calendar — upcoming obligations with Hijri context
 library;
 
 import 'package:flutter/material.dart';
@@ -22,7 +22,7 @@ class TaxCalendarScreen extends StatelessWidget {
         regulator: 'ZATCA',
         amount: '~ 1,725 ريال',
         action: 'قدّم الآن',
-        actionRoute: '/compliance/vat-return',
+        actionRoute: '/app/compliance/tax/vat-return',
       ),
       _TaxObligation(
         title: 'تجديد CSID — ZATCA',
@@ -40,7 +40,7 @@ class TaxCalendarScreen extends StatelessWidget {
         regulator: 'ZATCA',
         amount: '2.5% من الوعاء',
         action: 'احسب',
-        actionRoute: '/compliance/zakat',
+        actionRoute: '/app/compliance/tax/zakat',
       ),
       _TaxObligation(
         title: 'الإقرار الضريبي السنوي للشركات',
@@ -49,7 +49,7 @@ class TaxCalendarScreen extends StatelessWidget {
         regulator: 'ZATCA',
         amount: '20% من صافي الدخل',
         action: 'قدّم',
-        actionRoute: '/compliance/wht',
+        actionRoute: '/app/compliance/tax/wht',
       ),
       _TaxObligation(
         title: 'WHT للموردين الأجانب',
@@ -58,7 +58,7 @@ class TaxCalendarScreen extends StatelessWidget {
         regulator: 'ZATCA',
         amount: 'حسب العقود',
         action: 'احسب',
-        actionRoute: '/compliance/wht',
+        actionRoute: '/app/compliance/tax/wht',
       ),
       _TaxObligation(
         title: 'إيداع GOSI الشهري',
@@ -67,7 +67,7 @@ class TaxCalendarScreen extends StatelessWidget {
         regulator: 'GOSI',
         amount: '~ 22% من الرواتب',
         action: 'حضّر',
-        actionRoute: '/compliance/payroll',
+        actionRoute: '/app/erp/hr/payroll',
       ),
       _TaxObligation(
         title: 'تقرير Saudization (نطاقات)',
@@ -76,7 +76,7 @@ class TaxCalendarScreen extends StatelessWidget {
         regulator: 'وزارة الموارد',
         amount: 'تقرير امتثال',
         action: 'راجع',
-        actionRoute: '/compliance/payroll',
+        actionRoute: '/app/erp/hr/payroll',
       ),
     ]..sort((a, b) => a.dueDate.compareTo(b.dueDate));
   }
@@ -97,10 +97,10 @@ class TaxCalendarScreen extends StatelessWidget {
         itemBuilder: (_, i) {
           if (i == items.length) {
             return const ApexOutputChips(items: [
-              ApexChipLink('ZATCA Status', '/compliance/zatca-status', Icons.verified),
-              ApexChipLink('VAT Return', '/compliance/vat-return', Icons.receipt_long),
-              ApexChipLink('الزكاة', '/compliance/zakat', Icons.account_balance_wallet),
-              ApexChipLink('استقطاع المصدر WHT', '/compliance/wht-v2', Icons.percent),
+              ApexChipLink('ZATCA Status', '/app/erp/finance/zatca-status', Icons.verified),
+              ApexChipLink('VAT Return', '/app/compliance/tax/vat-return', Icons.receipt_long),
+              ApexChipLink('الزكاة', '/app/compliance/tax/zakat', Icons.account_balance_wallet),
+              ApexChipLink('استقطاع المصدر WHT', '/app/compliance/tax/wht', Icons.percent),
             ]);
           }
           final item = items[i];

@@ -218,7 +218,7 @@ class _Sprint37ExperienceScreenState extends State<Sprint37ExperienceScreen> {
                 icon: const Icon(Icons.open_in_new, size: 16),
                 label: const Text('فتح كاملاً'),
                 onPressed: () =>
-                    _toast('سينتقل إلى /compliance/zatca-invoice/${r.id}'),
+                    _toast('سينتقل إلى /app/compliance/zatca/invoice/${r.id}'),
               ),
             ],
           ),

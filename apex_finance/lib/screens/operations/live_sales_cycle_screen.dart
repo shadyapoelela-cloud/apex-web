@@ -225,7 +225,7 @@ class _LiveSalesCycleScreenState extends State<LiveSalesCycleScreen> {
           IconButton(
             icon: Icon(Icons.assessment, color: AC.gold),
             tooltip: 'الذهاب لميزان المراجعة',
-            onPressed: () => context.go('/compliance/financial-statements'),
+            onPressed: () => context.go('/app/erp/finance/statements'),
           ),
         ],
       ),
@@ -476,7 +476,7 @@ class _LiveSalesCycleScreenState extends State<LiveSalesCycleScreen> {
           Row(children: [
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () => context.go('/compliance/financial-statements'),
+                onPressed: () => context.go('/app/erp/finance/statements'),
                 icon: Icon(Icons.assessment, color: AC.gold, size: 16),
                 label: Text('ميزان المراجعة',
                     style: TextStyle(color: AC.gold, fontSize: 11.5)),

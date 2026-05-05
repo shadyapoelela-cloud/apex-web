@@ -282,7 +282,7 @@ class _MainNavS extends ConsumerState<MainNav> {
           _drawerItem(Icons.auto_awesome, 'اسأل أبكس', () { openApexAskPanel(context); setState(() => _dr = false); }, isGold: true),
           _drawerItem(Icons.hub_outlined, 'مركز الذكاء الاصطناعي', () { context.push('/admin/ai-console'); setState(() => _dr = false); }),
           _drawerItem(Icons.inbox_outlined, 'صندوق الاقتراحات', () { context.push('/admin/ai-suggestions'); setState(() => _dr = false); }),
-          _drawerItem(Icons.event_note_outlined, 'التقويم الضريبي', () { context.push('/compliance/tax-timeline'); setState(() => _dr = false); }),
+          _drawerItem(Icons.event_note_outlined, 'التقويم الضريبي', () { context.push('/app/compliance/tax/timeline'); setState(() => _dr = false); }),
           ],
         ),
         ExpansionTile(

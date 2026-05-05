@@ -174,7 +174,7 @@ const _salesDashboardWidgets = <V5DashboardWidget>[
     labelEn: 'Invoices issued today',
     icon: Icons.receipt,
     kind: V5WidgetKind.kpi,
-    actionRoute: '/app/erp/sales/invoices',
+    actionRoute: '/app/erp/app/erp/sales/invoices',
     severity: V5WidgetSeverity.success,
   ),
   V5DashboardWidget(
@@ -555,7 +555,7 @@ List<V5Service> v5Services = [
           const V5Chip(id: 'onboarding', labelAr: 'رحلة الإعداد', labelEn: 'Onboarding', icon: Icons.auto_awesome, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'golive'),
           const V5Chip(id: 'advanced-settings', labelAr: 'إعدادات متقدّمة', labelEn: 'Advanced Settings', icon: Icons.settings_applications, phase: ChipPhase.setup, category: 'foundation', setupGroup: 'golive'),
           // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 3 new chips reusing V4 finance screens.
-          // /compliance/cashflow + /compliance/cashflow-statement both consolidate to this single chip.
+          // /app/erp/finance/cashflow + /app/erp/finance/cashflow both consolidate to this single chip.
           const V5Chip(id: 'cashflow', labelAr: 'التدفق النقدي', labelEn: 'Cash Flow', icon: Icons.water_drop, category: 'reports'),
           const V5Chip(id: 'depreciation', labelAr: 'الإهلاك', labelEn: 'Depreciation', icon: Icons.trending_down, category: 'operations'),
           const V5Chip(id: 'amortization', labelAr: 'الإطفاء', labelEn: 'Amortization', icon: Icons.access_time, category: 'operations'),
@@ -1460,7 +1460,7 @@ List<V5Service> v5Services = [
           V5Chip(id: 'benchmarking', labelAr: 'المقارنة المرجعية', labelEn: 'Benchmarking', icon: Icons.compare),
           V5Chip(id: 'industry', labelAr: 'أداء الصناعة', labelEn: 'Industry Performance', icon: Icons.factory),
           // G-CLEANUP-1 Stage 4c-prep (2026-05-05): 3 new chips — DSCR + working-capital + breakeven.
-          // Note: dashboard chip above is reused for /compliance/ratios → /app/advisory/ratios/dashboard.
+          // Note: dashboard chip above is reused for /app/advisory/ratios/dashboard → /app/advisory/ratios/dashboard.
           V5Chip(id: 'dscr', labelAr: 'تغطية خدمة الدين DSCR', labelEn: 'DSCR', icon: Icons.account_balance),
           V5Chip(id: 'working-capital', labelAr: 'رأس المال العامل', labelEn: 'Working Capital', icon: Icons.work),
           V5Chip(id: 'breakeven', labelAr: 'نقطة التعادل', labelEn: 'Break-Even', icon: Icons.balance),

@@ -183,9 +183,9 @@ class _AccountLedgerScreenState extends State<AccountLedgerScreen> {
               ),
       ),
       const ApexOutputChips(items: [
-        ApexChipLink('شجرة الحسابات', '/accounting/coa-v2', Icons.account_tree),
+        ApexChipLink('شجرة الحسابات', '/app/erp/finance/coa-editor', Icons.account_tree),
         ApexChipLink('قائمة القيود', '/app/erp/finance/je-builder', Icons.book),
-        ApexChipLink('ميزان المراجعة', '/compliance/financial-statements', Icons.assessment),
+        ApexChipLink('ميزان المراجعة', '/app/erp/finance/statements', Icons.assessment),
         ApexChipLink('إقفال الفترة', '/operations/period-close', Icons.lock_clock),
       ]),
     ]);

@@ -122,19 +122,19 @@ final List<ApexAppEntry> kApexApps = [
     routePrefix: '/sales',
     categories: [
       ApexCategory('العملاء', Icons.people_rounded, [
-        ApexSubItemRef('قائمة العملاء', '/sales/customers', Icons.people_outline),
+        ApexSubItemRef('قائمة العملاء', '/app/erp/finance/sales-customers', Icons.people_outline),
       ]),
       ApexCategory('الفواتير', Icons.receipt_long_rounded, [
-        ApexSubItemRef('كل الفواتير', '/sales/invoices', Icons.receipt_long_rounded,
+        ApexSubItemRef('كل الفواتير', '/app/erp/sales/invoices', Icons.receipt_long_rounded,
             badge: '47'),
-        ApexSubItemRef('فاتورة جديدة', '/sales/invoices/new', Icons.add_rounded),
-        ApexSubItemRef('فواتير دورية', '/sales/recurring', Icons.repeat_rounded,
+        ApexSubItemRef('فاتورة جديدة', '/app/erp/sales/invoice-create', Icons.add_rounded),
+        ApexSubItemRef('فواتير دورية', '/app/erp/finance/recurring-entries', Icons.repeat_rounded,
             badge: '5'),
-        ApexSubItemRef('عروض الأسعار', '/sales/quotes', Icons.request_quote_rounded),
-        ApexSubItemRef('إشعارات دائنة', '/sales/memos', Icons.note_alt_rounded),
+        ApexSubItemRef('عروض الأسعار', '/app/erp/sales/dashboard', Icons.request_quote_rounded),
+        ApexSubItemRef('إشعارات دائنة', '/app/erp/sales/credit-notes', Icons.note_alt_rounded),
       ]),
       ApexCategory('التحصيل', Icons.account_balance_wallet_rounded, [
-        ApexSubItemRef('أعمار الذمم', '/sales/aging', Icons.bar_chart_rounded,
+        ApexSubItemRef('أعمار الذمم', '/app/erp/sales/ar-aging', Icons.bar_chart_rounded,
             badge: '3 متأخرة', badgeColor: Color(0xFFE05050)),
         ApexSubItemRef('بيع سريع (POS)', '/pos/quick-sale', Icons.shopping_cart_rounded),
       ]),
@@ -149,11 +149,11 @@ final List<ApexAppEntry> kApexApps = [
     routePrefix: '/purchase',
     categories: [
       ApexCategory('الموردون', Icons.local_shipping_rounded, [
-        ApexSubItemRef('قائمة الموردين', '/purchase/vendors', Icons.local_shipping_outlined),
+        ApexSubItemRef('قائمة الموردين', '/app/erp/purchasing/suppliers', Icons.local_shipping_outlined),
       ]),
       ApexCategory('الفواتير الواردة', Icons.description_rounded, [
-        ApexSubItemRef('كل الفواتير', '/purchase/bills', Icons.description_rounded),
-        ApexSubItemRef('أعمار المستحقات', '/purchase/aging', Icons.bar_chart_outlined),
+        ApexSubItemRef('كل الفواتير', '/app/erp/finance/purchase-bills', Icons.description_rounded),
+        ApexSubItemRef('أعمار المستحقات', '/app/erp/purchasing/ap-aging', Icons.bar_chart_outlined),
       ]),
       ApexCategory('دورة الشراء', Icons.sync_alt_rounded, [
         ApexSubItemRef('دورة الشراء الكاملة', '/operations/purchase-cycle',
@@ -170,19 +170,19 @@ final List<ApexAppEntry> kApexApps = [
     routePrefix: '/accounting',
     categories: [
       ApexCategory('شجرة الحسابات', Icons.account_tree_rounded, [
-        ApexSubItemRef('شجرة الحسابات', '/accounting/coa-v2', Icons.account_tree_rounded),
+        ApexSubItemRef('شجرة الحسابات', '/app/erp/finance/coa-editor', Icons.account_tree_rounded),
         ApexSubItemRef('عرض شجري', '/coa-tree', Icons.account_tree_outlined),
-        ApexSubItemRef('محرر COA', '/accounting/coa/edit', Icons.edit_rounded),
+        ApexSubItemRef('محرر COA', '/app/erp/finance/coa-editor', Icons.edit_rounded),
       ]),
       ApexCategory('قيود اليومية', Icons.edit_note_rounded, [
         ApexSubItemRef('سجل القيود', '/app/erp/finance/je-builder', Icons.list_alt_rounded,
             badge: '128'),
         ApexSubItemRef('بنّاء القيود', '/app/erp/finance/je-builder/new',
             Icons.edit_note_rounded),
-        ApexSubItemRef('سجل التدقيق', '/compliance/audit-trail', Icons.lock_outline_rounded),
+        ApexSubItemRef('سجل التدقيق', '/app/audit/trail', Icons.lock_outline_rounded),
       ]),
       ApexCategory('التسوية البنكية', Icons.account_balance_rounded, [
-        ApexSubItemRef('المطابقة الذكية', '/accounting/bank-rec-v2',
+        ApexSubItemRef('المطابقة الذكية', '/app/erp/treasury/recon',
             Icons.compare_arrows_rounded),
         ApexSubItemRef('تغذية البنوك', '/settings/bank-feeds', Icons.cloud_sync_rounded),
       ]),
@@ -231,7 +231,7 @@ final List<ApexAppEntry> kApexApps = [
       ]),
       ApexCategory('الرواتب', Icons.payments_rounded, [
         ApexSubItemRef('تشغيل الرواتب', '/hr/payroll-run', Icons.payments_rounded),
-        ApexSubItemRef('الرواتب + GOSI', '/compliance/payroll', Icons.badge_rounded),
+        ApexSubItemRef('الرواتب + GOSI', '/app/erp/hr/payroll', Icons.badge_rounded),
         ApexSubItemRef('تقارير المصاريف', '/hr/expense-reports', Icons.receipt_rounded),
       ]),
     ],
@@ -245,22 +245,22 @@ final List<ApexAppEntry> kApexApps = [
     routePrefix: '/compliance',
     categories: [
       ApexCategory('ضرائب وZATCA', Icons.receipt_long_rounded, [
-        ApexSubItemRef('فاتورة ZATCA', '/compliance/zatca-invoice', Icons.receipt_long_rounded),
-        ApexSubItemRef('مركز حالة ZATCA', '/compliance/zatca-status', Icons.verified_rounded),
-        ApexSubItemRef('إقرار VAT', '/compliance/vat-return', Icons.receipt_rounded),
-        ApexSubItemRef('الزكاة', '/compliance/zakat', Icons.savings_rounded),
-        ApexSubItemRef('ضريبة الاستقطاع', '/compliance/wht-v2', Icons.gavel_rounded),
-        ApexSubItemRef('التقويم الضريبي', '/compliance/tax-calendar',
+        ApexSubItemRef('فاتورة ZATCA', '/app/compliance/zatca/invoice', Icons.receipt_long_rounded),
+        ApexSubItemRef('مركز حالة ZATCA', '/app/erp/finance/zatca-status', Icons.verified_rounded),
+        ApexSubItemRef('إقرار VAT', '/app/compliance/tax/vat-return', Icons.receipt_rounded),
+        ApexSubItemRef('الزكاة', '/app/compliance/tax/zakat', Icons.savings_rounded),
+        ApexSubItemRef('ضريبة الاستقطاع', '/app/compliance/tax/wht', Icons.gavel_rounded),
+        ApexSubItemRef('التقويم الضريبي', '/app/compliance/tax/calendar',
             Icons.calendar_month_rounded),
-        ApexSubItemRef('الجدول الزمني', '/compliance/tax-timeline', Icons.timeline_rounded),
+        ApexSubItemRef('الجدول الزمني', '/app/compliance/tax/timeline', Icons.timeline_rounded),
       ]),
       ApexCategory('القوائم والتوحيد', Icons.auto_graph_rounded, [
-        ApexSubItemRef('القوائم (TB/IS/BS)', '/compliance/financial-statements',
+        ApexSubItemRef('القوائم (TB/IS/BS)', '/app/erp/finance/statements',
             Icons.auto_graph_rounded),
-        ApexSubItemRef('قائمة التدفقات', '/compliance/cashflow-statement',
+        ApexSubItemRef('قائمة التدفقات', '/app/erp/finance/cashflow',
             Icons.water_drop_rounded),
-        ApexSubItemRef('التوحيد', '/compliance/consolidation-v2', Icons.merge_type_rounded),
-        ApexSubItemRef('المؤشرات المالية', '/compliance/ratios', Icons.analytics_rounded),
+        ApexSubItemRef('التوحيد', '/app/erp/consolidation/dashboard', Icons.merge_type_rounded),
+        ApexSubItemRef('المؤشرات المالية', '/app/advisory/ratios/dashboard', Icons.analytics_rounded),
       ]),
       ApexCategory('المخاطر والامتثال', Icons.shield_outlined, [
         ApexSubItemRef('سجل المخاطر', '/compliance/risk-register', Icons.warning_amber_rounded),
@@ -268,13 +268,13 @@ final List<ApexAppEntry> kApexApps = [
         ApexSubItemRef('سجل النشاط', '/compliance/activity-log-v2', Icons.history_rounded),
       ]),
       ApexCategory('أصول وIFRS', Icons.style_rounded, [
-        ApexSubItemRef('IFRS (5-in-1)', '/compliance/ifrs-tools', Icons.style_rounded),
-        ApexSubItemRef('الإيجار (IFRS 16)', '/compliance/lease-v2', Icons.timeline_rounded),
-        ApexSubItemRef('الضرائب المؤجّلة', '/compliance/deferred-tax',
+        ApexSubItemRef('IFRS (5-in-1)', '/app/compliance/ifrs/tools', Icons.style_rounded),
+        ApexSubItemRef('الإيجار (IFRS 16)', '/app/compliance/ifrs/dashboard', Icons.timeline_rounded),
+        ApexSubItemRef('الضرائب المؤجّلة', '/app/compliance/ifrs/deferred-tax',
             Icons.schedule_send_rounded),
-        ApexSubItemRef('تسعير التحويل', '/compliance/transfer-pricing',
+        ApexSubItemRef('تسعير التحويل', '/app/compliance/tax/tp',
             Icons.compare_rounded),
-        ApexSubItemRef('تمويل إسلامي', '/compliance/islamic-finance', Icons.mosque_rounded),
+        ApexSubItemRef('تمويل إسلامي', '/app/compliance/ifrs/islamic', Icons.mosque_rounded),
       ]),
     ],
   ),
@@ -345,9 +345,9 @@ final List<ApexSubItemRef> kApexPinned = [
 
 // Quick-create actions for the FAB.
 const List<ApexSubItemRef> _kQuickCreate = [
-  ApexSubItemRef('فاتورة مبيعات', '/sales/invoices/new', Icons.receipt_long_rounded),
+  ApexSubItemRef('فاتورة مبيعات', '/app/erp/sales/invoice-create', Icons.receipt_long_rounded),
   ApexSubItemRef('قيد محاسبي', '/app/erp/finance/je-builder/new', Icons.edit_note_rounded),
-  ApexSubItemRef('فاتورة ZATCA', '/compliance/zatca-invoice', Icons.qr_code_2_rounded),
+  ApexSubItemRef('فاتورة ZATCA', '/app/compliance/zatca/invoice', Icons.qr_code_2_rounded),
   ApexSubItemRef('شركة جديدة', '/settings/entities?action=new-company',
       Icons.domain_add_rounded),
   ApexSubItemRef('بيع سريع POS', '/pos/quick-sale', Icons.shopping_cart_rounded),

@@ -36,16 +36,13 @@ import '../screens/notifications/notification_detail_screen.dart';
 import '../screens/auth/register_screen.dart' show RegScreen;
 import '../screens/upgrade_plan_screen.dart' show UpgradePlanScreen;
 import '../widgets/forms/knowledge_feedback_screen.dart' show KnowledgeFeedbackScreen;
-import '../widgets/forms/new_service_request_screen.dart' show NewServiceRequestScreen;
+// Stage 4f: V4 /marketplace/new-request archived → V5 /app/marketplace/browse/new-request — NewServiceRequestScreen import removed.
 import '../widgets/main_nav.dart' show MainNav;
 import '../screens/account/account_sub_screens.dart' show EditProfileScreen, ChangePasswordScreen, CloseAccountScreen, SessionsScreen;
 import '../screens/admin/admin_sub_screens.dart' show ReviewerConsoleScreen, ProviderVerificationScreen, ProviderDocumentUploadScreen, ProviderComplianceScreen, PolicyManagementScreen, ActivityHistoryScreen, AuditLogScreen, KnowledgeDeveloperConsole, TaskTypesBrowserScreen;
 import '../screens/admin/ai_suggestions_inbox_screen.dart';
 import '../screens/admin/ai_console_screen.dart';
-import '../screens/compliance/tax_timeline_screen.dart';
 // import '../screens/compliance/bank_rec_ai_screen.dart'; // deduplicated → /accounting/bank-rec-v2
-import '../screens/compliance/audit_workflow_screen.dart' show AiAuditWorkflowScreen;
-import '../screens/compliance/islamic_finance_screen.dart';
 // import '../screens/compliance/depreciation_ai_screen.dart';  // redirects to existing /compliance/depreciation
 // import '../screens/compliance/multi_currency_screen.dart'; // deduplicated → /analytics/multi-currency-v2
 // onboarding_wizard_screen.dart archived to _archive/2026-04-29/ (Stage 5a).
@@ -74,55 +71,27 @@ import '../screens/activity_feed_screen.dart';
 // import '../screens/operations/je_creator_screen.dart';
 // import '../screens/operations/financial_statements_formatted_screen.dart';
 // import '../screens/operations/financial_analysis_screen.dart';
-import '../screens/operations/period_close_screen.dart';
-import '../screens/operations/pos_session_screen.dart';
-import '../screens/operations/purchase_cycle_screen.dart';
-import '../screens/operations/live_sales_cycle_screen.dart';
 import '../screens/home/today_dashboard_screen.dart';
-import '../screens/home/apex_launchpad_screen.dart';
+// Stage 4g: V4 /launchpad/full now redirects to /app — apex_launchpad_screen.dart kept in lib/screens/home/ but unmounted from router.
 import '../screens/home/apex_service_hub_screen.dart';
 import '../screens/home/apex_services_screen.dart';
-import '../screens/operations/customer_360_screen.dart';
 // G-CLEANUP-1 Stage 4b (Sprint 15, 2026-05-04): je_builder_live_v52 prefix
 // import deleted alongside the V4 /compliance/journal-entry/:id route.
 // V5 routes for the JE Builder (under /app/erp/finance/je-builder/...)
 // are wired in lib/core/v5/v5_routes.dart, not here.
-import '../screens/audit/audit_engagement_workspace_screen.dart';
-import '../screens/operations/vendor_360_screen.dart';
 import '../screens/operations/receipt_capture_screen.dart';
 import '../screens/settings/unified_settings_screen.dart';
-import '../screens/operations/customers_list_screen.dart';
-import '../screens/operations/vendors_list_screen.dart';
-import '../screens/operations/invoices_list_screen.dart';
-import '../screens/operations/sales_invoice_create_screen.dart';
-import '../screens/operations/ar_aging_screen.dart';
-import '../screens/operations/bills_list_screen.dart';
-import '../screens/operations/ap_aging_screen.dart';
 import '../screens/notifications/notifications_panel_screen.dart';
 import '../screens/operations/pos_quick_sale_screen.dart';
 import '../screens/operations/customer_payment_screen.dart';
-import '../screens/analytics/cash_flow_forecast_screen.dart';
 import '../screens/operations/vendor_payment_screen.dart';
-import '../screens/compliance/tax_calendar_screen.dart';
 // G-CLEANUP-1 Stage 4b: JeListScreen archived to _archive/2026-05-04/v4-routes/.
 // Replaced by V5 list at /app/erp/finance/je-builder.
-import '../screens/accounting/coa_tree_v2_screen.dart';
-import '../screens/hr/employees_list_screen.dart';
-import '../screens/accounting/bank_rec_v2_screen.dart';
 import '../screens/reports/reports_hub_screen.dart';
-import '../screens/compliance/zatca_invoice_viewer_screen.dart';
-import '../screens/hr/payroll_run_screen.dart';
-import '../screens/compliance/zatca_status_center_screen.dart';
-import '../screens/compliance/consolidation_v2_screen.dart';
 import '../screens/admin/ai_suggestions_queue_v2_screen.dart';
-import '../screens/analytics/project_profitability_screen.dart';
 import '../screens/settings/bank_feed_setup_screen.dart';
-import '../screens/sales/recurring_invoices_screen.dart';
 import '../screens/knowledge/knowledge_search_v2_screen.dart';
-import '../screens/hr/expense_reports_screen.dart';
-import '../screens/compliance/wht_v2_screen.dart';
 import '../screens/workflow/approvals_inbox_screen.dart';
-import '../screens/accounting/coa_editor_screen.dart';
 import '../screens/compliance/risk_register_screen.dart';
 import '../screens/extracted/subscription_screens.dart';
 import '../screens/extracted/notification_screens_v2.dart';
@@ -132,7 +101,6 @@ import '../screens/coa_v2/coa_journey_screen.dart';
 import '../screens/auth/forgot_password_flow.dart';
 import '../screens/auth/slide_auth_screen.dart';
 // client_onboarding_wizard removed — redirected to unified /settings/entities
-import '../screens/marketplace/service_catalog_screen.dart' as catalog;
 import '../screens/account/archive_screen.dart' as archive;
 // G-CLEANUP-1 Stage 4c-prep: AuditServiceScreen archived to _archive/2026-05-04/v4-routes/audit/.
 // V4 /audit/service redirects to /app/marketplace/dashboard.
@@ -153,43 +121,21 @@ import '../screens/simulation/trial_balance_screen.dart';
 import '../tb_binding_screen.dart';
 import '../financial_statements_screen.dart';
 // import '../screens/compliance/journal_entries_screen.dart'; // deduplicated → /accounting/je-list
-import '../screens/compliance/audit_trail_screen.dart';
-import '../screens/compliance/zatca_invoice_builder_screen.dart';
-import '../screens/compliance/compliance_hub_screen.dart';
-import '../screens/compliance/zakat_calculator_screen.dart';
-import '../screens/compliance/vat_return_screen.dart';
-import '../screens/compliance/financial_ratios_screen.dart';
-import '../screens/compliance/depreciation_screen.dart';
-import '../screens/compliance/cashflow_screen.dart';
-import '../screens/compliance/amortization_screen.dart';
-import '../screens/compliance/payroll_screen.dart';
-import '../screens/compliance/breakeven_screen.dart';
-import '../screens/compliance/investment_screen.dart';
+// Stage 4g: V4 /compliance hub now redirects to /app/compliance/dashboard — ComplianceHubScreen kept on disk for V5 chip wiring elsewhere.
 // Legacy screens deduplicated to canonical paths (Phase 26):
 // import '../screens/compliance/budget_variance_screen.dart'; // → /analytics/budget-variance-v2
 // import '../screens/compliance/bank_rec_screen.dart';        // → /accounting/bank-rec-v2
 // import '../screens/compliance/inventory_screen.dart';       // → /operations/inventory-v2
 // import '../screens/compliance/aging_screen.dart';           // → /sales/aging
-import '../screens/compliance/working_capital_screen.dart';
 // import '../screens/compliance/health_score_screen.dart'; // deduplicated → /analytics/health-score-v2
-import '../screens/compliance/ocr_screen.dart';
-import '../screens/compliance/dscr_screen.dart';
-import '../screens/compliance/valuation_screen.dart';
 // G-CLEANUP-1 Stage 4b: JournalEntryBuilderScreen archived to
 // _archive/2026-05-04/v4-routes/. Replaced by V5.2 builder at
 // /app/erp/finance/je-builder/new (lib/core/v5/v5_routes.dart).
-import '../screens/compliance/fx_converter_screen.dart';
 // import '../screens/compliance/cost_variance_screen.dart'; // deduplicated → /analytics/cost-variance-v2
-import '../screens/compliance/fin_statements_screen.dart';
-import '../screens/compliance/cashflow_statement_screen.dart';
 // import '../screens/compliance/wht_screen.dart';         // deduplicated → /compliance/wht-v2
 // import '../screens/compliance/consolidation_screen.dart'; // deduplicated → /compliance/consolidation-v2
-import '../screens/compliance/deferred_tax_screen.dart';
 // import '../screens/compliance/lease_screen.dart'; // deduplicated → /compliance/lease-v2
-import '../screens/compliance/ifrs_tools_screen.dart';
 // import '../screens/compliance/fixed_assets_screen.dart'; // deduplicated → /operations/fixed-assets-v2
-import '../screens/compliance/transfer_pricing_screen.dart';
-import '../screens/compliance/extras_tools_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'v5/v5_routes.dart';
 import 'apex_bottom_nav.dart';
@@ -272,16 +218,19 @@ final appRouter = GoRouter(
     // tiles + secondary tools, instead of redirecting blindly into one
     // sub-screen. This gives the user the proper hierarchical navigation:
     //   Launchpad → Service Hub → App → Detail screen
-    GoRoute(path: '/sales', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'sales'), s)),
-    GoRoute(path: '/purchase', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'purchase'), s)),
-    GoRoute(path: '/accounting', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'accounting'), s)),
-    GoRoute(path: '/operations', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'operations'), s)),
-    GoRoute(path: '/compliance-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'compliance-hub'), s)),
-    GoRoute(path: '/audit-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'audit-hub'), s)),
-    GoRoute(path: '/audit', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'audit-hub'), s)),
-    GoRoute(path: '/analytics', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'analytics'), s)),
-    GoRoute(path: '/hr', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'hr-hub'), s)),
-    GoRoute(path: '/hr-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'hr-hub'), s)),
+    // Sprint 15 Stage 4g: V4 service hubs redirect to V5 equivalents.
+    // ApexServiceHubScreen kept in lib/screens/home/ for the launchpad fallback —
+    // these specific URL bindings just funnel users into the V5 service tree.
+    GoRoute(path: '/sales', redirect: (c, s) => '/app/erp/sales/dashboard'),
+    GoRoute(path: '/purchase', redirect: (c, s) => '/app/erp/purchasing/dashboard'),
+    GoRoute(path: '/accounting', redirect: (c, s) => '/app/erp/finance/dashboard'),
+    GoRoute(path: '/operations', redirect: (c, s) => '/app/erp/finance/dashboard'),
+    GoRoute(path: '/compliance-hub', redirect: (c, s) => '/app/compliance/dashboard'),
+    GoRoute(path: '/audit-hub', redirect: (c, s) => '/app/audit/dashboard'),
+    GoRoute(path: '/audit', redirect: (c, s) => '/app/audit/dashboard'),
+    GoRoute(path: '/analytics', redirect: (c, s) => '/app/erp/finance/dashboard'),
+    GoRoute(path: '/hr', redirect: (c, s) => '/app/erp/hr/dashboard'),
+    GoRoute(path: '/hr-hub', redirect: (c, s) => '/app/erp/hr/dashboard'),
     GoRoute(path: '/workflow', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'workflow-hub'), s)),
     GoRoute(path: '/workflow-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'workflow-hub'), s)),
     GoRoute(path: '/settings-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'settings-hub'), s)),
@@ -302,7 +251,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/apps', redirect: (c, s) => '/app'),
     GoRoute(path: '/all', redirect: (c, s) => '/app'),
     // Old verbose Launchpad still accessible at /launchpad/full for power users
-    GoRoute(path: '/launchpad/full', pageBuilder: (c, s) => _apexPage(const ApexLaunchpadScreen(), s)),
+    // Sprint 15 Stage 4g: verbose V4 launchpad redirects to V5 launchpad.
+    GoRoute(path: '/launchpad/full', redirect: (c, s) => '/app'),
 
     // ── V5.1 shell (16-app ERP + Cmd+K palette + Entity Scope) ──
     // V4 shell removed in G-A2 (2026-04-30). V5 owns the /app namespace.
@@ -452,118 +402,49 @@ final appRouter = GoRouter(
       redirect: (c, s) => '/app/erp/finance/onboarding',
     ),
 
-    // ── Compliance (ZATCA / IFRS / SOCPA) ──
-    GoRoute(
-      path: '/compliance',
-      pageBuilder: (c, s) => _apexPage(const ComplianceHubScreen(), s),
-    ),
+    // Sprint 15 Stage 4g: V4 /compliance hub redirects to V5 compliance dashboard.
+    // ComplianceHubScreen kept on disk — still imported by V5 chip wiring elsewhere.
+    GoRoute(path: '/compliance', redirect: (c, s) => '/app/compliance/dashboard'),
     // Legacy → canonical (Phase 26 dedup)
     // G-CLEANUP-1 Stage 4b: V4 /compliance/journal-entries redirect deleted.
     // V5: /app/erp/finance/je-builder (LIST).
-    GoRoute(
-      path: '/compliance/audit-trail',
-      pageBuilder: (c, s) => _apexPage(const AuditTrailScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/zatca-invoice',
-      pageBuilder: (c, s) => _apexPage(const ZatcaInvoiceBuilderScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/zakat',
-      pageBuilder: (c, s) => _apexPage(const ZakatCalculatorScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/vat-return',
-      pageBuilder: (c, s) => _apexPage(const VatReturnScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/ratios',
-      pageBuilder: (c, s) => _apexPage(const FinancialRatiosScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/depreciation',
-      pageBuilder: (c, s) => _apexPage(const DepreciationScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/cashflow',
-      pageBuilder: (c, s) => _apexPage(const CashFlowScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/amortization',
-      pageBuilder: (c, s) => _apexPage(const AmortizationScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/payroll',
-      pageBuilder: (c, s) => _apexPage(const PayrollScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/breakeven',
-      pageBuilder: (c, s) => _apexPage(const BreakevenScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/investment',
-      pageBuilder: (c, s) => _apexPage(const InvestmentScreen(), s),
-    ),
-    GoRoute(path: '/compliance/budget-variance', redirect: (c, s) => '/analytics/budget-variance-v2'),
-    GoRoute(path: '/compliance/bank-rec', redirect: (c, s) => '/accounting/bank-rec-v2'),
-    GoRoute(path: '/compliance/inventory', redirect: (c, s) => '/operations/inventory-v2'),
-    GoRoute(path: '/compliance/aging', redirect: (c, s) => '/sales/aging'),
-    GoRoute(
-      path: '/compliance/working-capital',
-      pageBuilder: (c, s) => _apexPage(const WorkingCapitalScreen(), s),
-    ),
-    GoRoute(path: '/compliance/health-score', redirect: (c, s) => '/analytics/health-score-v2'),
+        // Sprint 15 Stage 4e: V4 /compliance/audit-trail archived → V5 /app/audit/trail
+        // Sprint 15 Stage 4e: V4 /compliance/zatca-invoice archived → V5 /app/compliance/zatca/invoice
+        // Sprint 15 Stage 4e: V4 /compliance/zakat archived → V5 /app/compliance/tax/zakat
+        // Sprint 15 Stage 4e: V4 /compliance/vat-return archived → V5 /app/compliance/tax/vat-return
+        // Sprint 15 Stage 4e: V4 /compliance/ratios archived → V5 /app/advisory/ratios/dashboard
+        // Sprint 15 Stage 4e: V4 /compliance/depreciation archived → V5 /app/erp/finance/depreciation
+        // Sprint 15 Stage 4e: V4 /compliance/cashflow archived → V5 /app/erp/finance/cashflow
+        // Sprint 15 Stage 4e: V4 /compliance/amortization archived → V5 /app/erp/finance/amortization
+        // Sprint 15 Stage 4e: V4 /compliance/payroll archived → V5 /app/erp/hr/payroll
+        // Sprint 15 Stage 4e: V4 /compliance/breakeven archived → V5 /app/advisory/ratios/breakeven
+        // Sprint 15 Stage 4e: V4 /compliance/investment archived → V5 /app/advisory/valuation/investment
+        // Sprint 15 Stage 4e: V4 /compliance/budget-variance archived → V5 /app/erp/finance/budget-actual
+        // Sprint 15 Stage 4e: V4 /compliance/bank-rec archived → V5 /app/erp/treasury/recon
+        // Sprint 15 Stage 4e: V4 /compliance/inventory archived → V5 /app/erp/inventory/inventory
+        // Sprint 15 Stage 4c: V4 /compliance/aging archived → V5 /app/erp/sales/ar-aging
+        // Sprint 15 Stage 4e: V4 /compliance/working-capital archived → V5 /app/advisory/ratios/working-capital
+        // Sprint 15 Stage 4e: V4 /compliance/health-score archived → V5 /app/erp/finance/health-score
     GoRoute(path: '/compliance/executive', redirect: (c, s) => '/app/erp/finance/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived (V4 screen has zero backend; redirected to V5 home)
-    GoRoute(
-      path: '/compliance/ocr',
-      pageBuilder: (c, s) => _apexPage(const OcrScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/dscr',
-      pageBuilder: (c, s) => _apexPage(const DscrScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/valuation',
-      pageBuilder: (c, s) => _apexPage(const ValuationScreen(), s),
-    ),
+        // Sprint 15 Stage 4e: V4 /compliance/ocr archived → V5 /app/erp/finance/receipt-capture
+        // Sprint 15 Stage 4e: V4 /compliance/dscr archived → V5 /app/advisory/ratios/dscr
+        // Sprint 15 Stage 4e: V4 /compliance/valuation archived → V5 /app/advisory/valuation/dashboard
     // G-CLEANUP-1 Stage 4b: V4 /compliance/journal-entry-builder pageBuilder
     // deleted. JournalEntryBuilderScreen archived to
     // _archive/2026-05-04/v4-routes/. V5: /app/erp/finance/je-builder/new
     // (JeBuilderLiveV52Screen, wired in lib/core/v5/v5_routes.dart).
-    GoRoute(
-      path: '/compliance/fx-converter',
-      pageBuilder: (c, s) => _apexPage(const FxConverterScreen(), s),
-    ),
-    GoRoute(path: '/compliance/cost-variance', redirect: (c, s) => '/analytics/cost-variance-v2'),
-    GoRoute(
-      path: '/compliance/financial-statements',
-      pageBuilder: (c, s) => _apexPage(const FinStatementsScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/cashflow-statement',
-      pageBuilder: (c, s) => _apexPage(const CashflowStatementScreen(), s),
-    ),
-    GoRoute(path: '/compliance/wht', redirect: (c, s) => '/compliance/wht-v2'),
-    GoRoute(path: '/compliance/consolidation', redirect: (c, s) => '/compliance/consolidation-v2'),
-    GoRoute(
-      path: '/compliance/deferred-tax',
-      pageBuilder: (c, s) => _apexPage(const DeferredTaxScreen(), s),
-    ),
-    GoRoute(path: '/compliance/lease', redirect: (c, s) => '/compliance/lease-v2'),
-    GoRoute(
-      path: '/compliance/ifrs-tools',
-      pageBuilder: (c, s) => _apexPage(const IfrsToolsScreen(), s),
-    ),
-    GoRoute(path: '/compliance/fixed-assets', redirect: (c, s) => '/operations/fixed-assets-v2'),
-    GoRoute(
-      path: '/compliance/transfer-pricing',
-      pageBuilder: (c, s) => _apexPage(const TransferPricingScreen(), s),
-    ),
-    GoRoute(
-      path: '/compliance/extras-tools',
-      pageBuilder: (c, s) => _apexPage(const ExtrasToolsScreen(), s),
-    ),
-
+        // Sprint 15 Stage 4e: V4 /compliance/fx-converter archived → V5 /app/erp/treasury/fx-converter
+        // Sprint 15 Stage 4e: V4 /compliance/cost-variance archived → V5 /app/erp/finance/dashboard
+        // Sprint 15 Stage 4e: V4 /compliance/financial-statements archived → V5 /app/erp/finance/statements
+        // Sprint 15 Stage 4e: V4 /compliance/cashflow-statement archived → V5 /app/erp/finance/cashflow
+        // Sprint 15 Stage 4e: V4 /compliance/wht archived → V5 /app/compliance/tax/wht
+        // Sprint 15 Stage 4e: V4 /compliance/consolidation archived → V5 /app/erp/consolidation/dashboard
+        // Sprint 15 Stage 4e: V4 /compliance/deferred-tax archived → V5 /app/compliance/ifrs/deferred-tax
+        // Sprint 15 Stage 4e: V4 /compliance/lease archived → V5 /app/compliance/ifrs/dashboard
+        // Sprint 15 Stage 4e: V4 /compliance/ifrs-tools archived → V5 /app/compliance/ifrs/tools
+        // Sprint 15 Stage 4e: V4 /compliance/fixed-assets archived → V5 /app/erp/finance/fixed-assets
+        // Sprint 15 Stage 4e: V4 /compliance/transfer-pricing archived → V5 /app/compliance/tax/tp
+        // Sprint 15 Stage 4e: V4 /compliance/extras-tools archived → V5 /app/compliance/ifrs/extras
     // Account
     GoRoute(path: '/profile/edit', pageBuilder: (c, s) => _apexPage(EditProfileScreen(profile: s.extra as Map<String, dynamic>? ?? {}), s)),
     GoRoute(path: '/password/change', pageBuilder: (c, s) => _apexPage(const ChangePasswordScreen(), s)),
@@ -619,14 +500,14 @@ final appRouter = GoRouter(
     GoRoute(path: '/admin/audit', pageBuilder: (c, s) => _apexPage(const AuditLogScreen(), s)),
     GoRoute(path: '/admin/ai-suggestions', pageBuilder: (c, s) => _apexPage(const AiSuggestionsInboxScreen(), s)),
     GoRoute(path: '/admin/ai-console', pageBuilder: (c, s) => _apexPage(const AiConsoleScreen(), s)),
-    GoRoute(path: '/compliance/tax-timeline', pageBuilder: (c, s) => _apexPage(const TaxTimelineScreen(), s)),
-    GoRoute(path: '/compliance/bank-rec-ai', redirect: (c, s) => '/accounting/bank-rec-v2'),
-    GoRoute(path: '/compliance/audit-workflow-ai', pageBuilder: (c, s) => _apexPage(const AiAuditWorkflowScreen(), s)),
-    GoRoute(path: '/compliance/islamic-finance', pageBuilder: (c, s) => _apexPage(const IslamicFinanceScreen(), s)),
+        // Sprint 15 Stage 4e: V4 /compliance/tax-timeline archived → V5 /app/compliance/tax/timeline
+        // Sprint 15 Stage 4e: V4 /compliance/bank-rec-ai archived → V5 /app/erp/treasury/recon
+        // Sprint 15 Stage 4e: V4 /compliance/audit-workflow-ai archived → V5 /app/audit/engagement/ai-workflow
+        // Sprint 15 Stage 4e: V4 /compliance/islamic-finance archived → V5 /app/compliance/ifrs/islamic
     // ── My new "AI-assisted" depreciation was a duplicate — redirect to the
     //    pre-existing /compliance/depreciation + /compliance/fixed-assets screens.
-    GoRoute(path: '/compliance/depreciation-ai', redirect: (c, s) => '/compliance/depreciation'),
-    GoRoute(path: '/compliance/multi-currency', redirect: (c, s) => '/analytics/multi-currency-v2'),
+        // Sprint 15 Stage 4e: V4 /compliance/depreciation-ai archived → V5 /app/erp/finance/depreciation
+        // Sprint 15 Stage 4e: V4 /compliance/multi-currency archived → V5 /app/erp/treasury/dashboard
     GoRoute(path: '/onboarding/wizard', redirect: (c, s) => '/app/erp/finance/onboarding'),
     GoRoute(path: '/admin/audit-chain', pageBuilder: (c, s) => _apexPage(const AuditChainViewerScreen(), s)),
     // Workflow Engine admin UI (Wave 1A Phase G + Wave 1C Phase M).
@@ -728,53 +609,41 @@ final appRouter = GoRouter(
     GoRoute(path: '/operations/financial-statements', redirect: (c, s) => '/compliance/financial-statements'),
     GoRoute(path: '/operations/financial-analysis', redirect: (c, s) => '/compliance/ratios'),
     GoRoute(path: '/operations/universal-journal', redirect: (c, s) => '/app/erp/finance/je-builder'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
-    GoRoute(path: '/operations/period-close', pageBuilder: (c, s) => _apexPage(const PeriodCloseScreen(), s)),
-    GoRoute(path: '/operations/pos-sessions', pageBuilder: (c, s) => _apexPage(const PosSessionScreen(), s)),
-    GoRoute(path: '/operations/purchase-cycle', pageBuilder: (c, s) => _apexPage(const PurchaseCycleScreen(), s)),
+    // Sprint 15 Stage 4f: V4 /operations/period-close archived (HAS_V5) -> V5 /app/erp/finance/period-close
+    // Sprint 15 Stage 4f: V4 /operations/pos-sessions archived (REAL_NEW_V5) -> V5 /app/erp/pos/sessions
+    // Sprint 15 Stage 4f: V4 /operations/purchase-cycle archived (REAL_NEW_V5) -> V5 /app/erp/purchasing/cycle
     GoRoute(path: '/operations/consolidation-ui', redirect: (c, s) => '/app/erp/consolidation/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
-    GoRoute(path: '/operations/live-sales-cycle', pageBuilder: (c, s) => _apexPage(const LiveSalesCycleScreen(), s)),
+    // Sprint 15 Stage 4f: V4 /operations/live-sales-cycle archived (REAL_NEW_V5) -> V5 /app/erp/sales/live-cycle
     // /today and /sales etc. moved to top of routes list — see above
-    GoRoute(path: '/accounting/coa', redirect: (c, s) => '/coa-tree'),
+        // Sprint 15 Stage 4d: V4 /accounting/coa archived → V5 /app/erp/finance/coa-editor
     // G-CLEANUP-1 Stage 4b: V4 /accounting/journal-entries redirect deleted.
     // V5: /app/erp/finance/je-builder.
-    GoRoute(path: '/accounting/trial-balance', redirect: (c, s) => '/compliance/financial-statements'),
-    GoRoute(path: '/accounting/period-close', redirect: (c, s) => '/operations/period-close'),
+        // Sprint 15 Stage 4d: V4 /accounting/trial-balance archived → V5 /app/erp/finance/statements
+        // Sprint 15 Stage 4d: V4 /accounting/period-close archived → V5 /app/erp/finance/period-close
     // /financial-statements canonical (with optional apiData/pickedFile) defined below at line ~805 — duplicate redirect removed (Stage 1 bugfix 2026-04-29).
-    GoRoute(path: '/audit/engagements', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
-    GoRoute(path: '/audit/engagement-workspace', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
-    GoRoute(path: '/audit/benford', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
-    GoRoute(path: '/audit/sampling', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
-    GoRoute(path: '/audit/workpapers', pageBuilder: (c, s) => _apexPage(const AuditEngagementWorkspaceScreen(), s)),
+    // Sprint 15 Stage 4f: V4 /audit/engagements archived (HAS_V5) -> V5 /app/audit/engagement/dashboard
+    // Sprint 15 Stage 4f: V4 /audit/engagement-workspace archived (alias) -> V5 /app/audit/engagement/dashboard
+    // Sprint 15 Stage 4f: V4 /audit/benford archived (alias) -> V5 /app/audit/engagement/dashboard
+    // Sprint 15 Stage 4f: V4 /audit/sampling archived (alias) -> V5 /app/audit/engagement/dashboard
+    // Sprint 15 Stage 4f: V4 /audit/workpapers archived (alias) -> V5 /app/audit/engagement/dashboard
     GoRoute(path: '/setup', redirect: (c, s) => '/settings/entities'),
     GoRoute(path: '/setup/entity', redirect: (c, s) => '/settings/entities'),
-    GoRoute(
-      path: '/operations/customer-360/:id',
-      pageBuilder: (c, s) => _apexPage(
-        Customer360Screen(customerId: s.pathParameters['id']!),
-        s,
-      ),
-    ),
-    GoRoute(
-      path: '/operations/vendor-360/:id',
-      pageBuilder: (c, s) => _apexPage(
-        Vendor360Screen(vendorId: s.pathParameters['id']!),
-        s,
-      ),
-    ),
+    // Sprint 15 Stage 4f: V4 /operations/customer-360/:id archived (REAL_NEW_V5) -> V5 /app/erp/sales/customer-360/:id
+    // Sprint 15 Stage 4f: V4 /operations/vendor-360/:id archived (REAL_NEW_V5) -> V5 /app/erp/purchasing/vendor-360/:id
     GoRoute(path: '/receipt/capture', pageBuilder: (c, s) => _apexPage(const ReceiptCaptureScreen(), s)),
     GoRoute(path: '/settings/unified', pageBuilder: (c, s) => _apexPage(const UnifiedSettingsScreen(), s)),
-    GoRoute(path: '/sales/customers', pageBuilder: (c, s) => _apexPage(const CustomersListScreen(), s)),
-    GoRoute(path: '/sales/invoices', pageBuilder: (c, s) => _apexPage(const InvoicesListScreen(), s)),
-    GoRoute(path: '/sales/invoices/new', pageBuilder: (c, s) => _apexPage(const SalesInvoiceCreateScreen(), s)),
-    GoRoute(path: '/sales/aging', pageBuilder: (c, s) => _apexPage(const ArAgingScreen(), s)),
-    GoRoute(path: '/purchase/vendors', pageBuilder: (c, s) => _apexPage(const VendorsListScreen(), s)),
-    GoRoute(path: '/purchase/bills', pageBuilder: (c, s) => _apexPage(const BillsListScreen(), s)),
+        // Sprint 15 Stage 4c: V4 /sales/customers archived → V5 /app/erp/finance/sales-customers
+        // Sprint 15 Stage 4c: V4 /sales/invoices archived → V5 /app/erp/sales/invoices
+        // Sprint 15 Stage 4c: V4 /sales/invoices/new archived → V5 /app/erp/sales/invoice-create
+        // Sprint 15 Stage 4c: V4 /sales/aging archived → V5 /app/erp/sales/ar-aging
+        // Sprint 15 Stage 4d: V4 /purchase/vendors archived → V5 /app/erp/purchasing/suppliers
+        // Sprint 15 Stage 4d: V4 /purchase/bills archived → V5 /app/erp/finance/purchase-bills
     // /purchase/bills/new doesn't exist yet (no PurchaseBillCreateScreen
     // sibling to SalesInvoiceCreateScreen). Redirect to the purchase hub
     // so any old links the user (or another screen) navigates to don't
     // crash with GoException.
-    GoRoute(path: '/purchase/bills/new', redirect: (_, __) => '/purchase'),
-    GoRoute(path: '/purchase/aging', pageBuilder: (c, s) => _apexPage(const ApAgingScreen(), s)),
+        // Sprint 15 Stage 4d: V4 /purchase/bills/new archived → V5 /app/erp/finance/purchase-bills
+        // Sprint 15 Stage 4d: V4 /purchase/aging archived → V5 /app/erp/purchasing/ap-aging
     GoRoute(path: '/notifications/panel', pageBuilder: (c, s) => _apexPage(const NotificationsPanelScreen(), s)),
     GoRoute(path: '/pos/quick-sale', pageBuilder: (c, s) => _apexPage(const PosQuickSaleScreen(), s)),
     GoRoute(
@@ -784,7 +653,7 @@ final appRouter = GoRouter(
         s,
       ),
     ),
-    GoRoute(path: '/analytics/cash-flow-forecast', pageBuilder: (c, s) => _apexPage(const CashFlowForecastScreen(), s)),
+    // Sprint 15 Stage 4f: V4 /analytics/cash-flow-forecast archived (HAS_V5) -> V5 /app/erp/finance/cash-flow-forecast
     GoRoute(
       path: '/purchase/payment/:billId',
       pageBuilder: (c, s) => _apexPage(
@@ -792,52 +661,46 @@ final appRouter = GoRouter(
         s,
       ),
     ),
-    GoRoute(path: '/compliance/tax-calendar', pageBuilder: (c, s) => _apexPage(const TaxCalendarScreen(), s)),
+        // Sprint 15 Stage 4e: V4 /compliance/tax-calendar archived → V5 /app/compliance/tax/calendar
     // G-CLEANUP-1 Stage 4b: V4 /accounting/je-list pageBuilder deleted.
     // JeListScreen archived to _archive/2026-05-04/v4-routes/.
     // V5: /app/erp/finance/je-builder (JeBuilderScreen via v5_wired_screens).
-    GoRoute(path: '/accounting/coa-v2', pageBuilder: (c, s) => _apexPage(const CoaTreeV2Screen(), s)),
-    GoRoute(path: '/hr/employees', pageBuilder: (c, s) => _apexPage(const EmployeesListScreen(), s)),
+        // Sprint 15 Stage 4d: V4 /accounting/coa-v2 archived → V5 /app/erp/finance/coa-editor
+    // Sprint 15 Stage 4f: V4 /hr/employees archived (HAS_V5) -> V5 /app/erp/hr/employees
     // /hr now serves the HR Hub (registered earlier at top of routes)
-    GoRoute(path: '/accounting/bank-rec-v2', pageBuilder: (c, s) => _apexPage(const BankRecV2Screen(), s)),
+        // Sprint 15 Stage 4d: V4 /accounting/bank-rec-v2 archived → V5 /app/erp/treasury/recon
     // /reports moved to top of routes list — see above
     GoRoute(path: '/reports/hub', redirect: (c, s) => '/reports'),
-    GoRoute(
-      path: '/compliance/zatca-invoice/:id',
-      pageBuilder: (c, s) => _apexPage(
-        ZatcaInvoiceViewerScreen(invoiceId: s.pathParameters['id']!),
-        s,
-      ),
-    ),
-    GoRoute(path: '/hr/payroll-run', pageBuilder: (c, s) => _apexPage(const PayrollRunScreen(), s)),
+        // Sprint 15 Stage 4e: V4 /compliance/zatca-invoice/:id archived → V5 /app/compliance/zatca/invoice/:id
+    // Sprint 15 Stage 4f: V4 /hr/payroll-run archived (HAS_V5) -> V5 /app/erp/hr/payroll
     GoRoute(path: '/operations/inventory-v2', redirect: (c, s) => '/app/erp/inventory/inventory'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/operations/fixed-assets-v2', redirect: (c, s) => '/app/erp/finance/fixed-assets'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/analytics/budget-variance-v2', redirect: (c, s) => '/app/erp/finance/budget-actual'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/analytics/multi-currency-v2', redirect: (c, s) => '/app/erp/treasury/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/analytics/health-score-v2', redirect: (c, s) => '/app/erp/finance/health-score'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
-    GoRoute(path: '/compliance/lease-v2', redirect: (c, s) => '/app/compliance/ifrs/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
-    GoRoute(path: '/compliance/zatca-status', pageBuilder: (c, s) => _apexPage(const ZatcaStatusCenterScreen(), s)),
-    GoRoute(path: '/compliance/consolidation-v2', pageBuilder: (c, s) => _apexPage(const ConsolidationV2Screen(), s)),
+        // Sprint 15 Stage 4e: V4 /compliance/lease-v2 archived → V5 /app/compliance/ifrs/dashboard
+        // Sprint 15 Stage 4e: V4 /compliance/zatca-status archived → V5 /app/erp/finance/zatca-status
+        // Sprint 15 Stage 4e: V4 /compliance/consolidation-v2 archived → V5 /app/erp/consolidation/dashboard
     GoRoute(path: '/admin/ai-suggestions-v2', pageBuilder: (c, s) => _apexPage(const AiSuggestionsQueueV2Screen(), s)),
     GoRoute(path: '/analytics/investment-portfolio-v2', redirect: (c, s) => '/app/advisory/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
-    GoRoute(path: '/analytics/project-profitability', pageBuilder: (c, s) => _apexPage(const ProjectProfitabilityScreen(), s)),
+    // Sprint 15 Stage 4f: V4 /analytics/project-profitability archived (SHELL) -> V5 /app/erp/projects/dashboard
     GoRoute(path: '/settings/bank-feeds', pageBuilder: (c, s) => _apexPage(const BankFeedSetupScreen(), s)),
     GoRoute(path: '/compliance/activity-log-v2', redirect: (c, s) => '/app/erp/finance/activity-log'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
-    GoRoute(path: '/sales/recurring', pageBuilder: (c, s) => _apexPage(const RecurringInvoicesScreen(), s)),
+        // Sprint 15 Stage 4c: V4 /sales/recurring archived → V5 /app/erp/finance/recurring-entries
     GoRoute(path: '/knowledge/search', pageBuilder: (c, s) => _apexPage(const KnowledgeSearchV2Screen(), s)),
-    GoRoute(path: '/sales/quotes', redirect: (c, s) => '/app/erp/sales/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
-    GoRoute(path: '/sales/memos', redirect: (c, s) => '/app/erp/sales/credit-notes'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
-    GoRoute(path: '/hr/expense-reports', pageBuilder: (c, s) => _apexPage(const ExpenseReportsScreen(), s)),
+        // Sprint 15 Stage 4c: V4 /sales/quotes archived → V5 /app/erp/sales/dashboard
+        // Sprint 15 Stage 4c: V4 /sales/memos archived → V5 /app/erp/sales/credit-notes
+    // Sprint 15 Stage 4f: V4 /hr/expense-reports archived (HAS_V5) -> V5 /app/erp/expenses/expenses
     GoRoute(path: '/analytics/cost-variance-v2', redirect: (c, s) => '/app/erp/finance/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
-    GoRoute(path: '/compliance/wht-v2', pageBuilder: (c, s) => _apexPage(const WhtV2Screen(), s)),
+        // Sprint 15 Stage 4e: V4 /compliance/wht-v2 archived → V5 /app/compliance/tax/wht
     GoRoute(path: '/hr/timesheet', redirect: (c, s) => '/app/erp/hr/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/operations/petty-cash', redirect: (c, s) => '/app/erp/finance/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/operations/stock-card', redirect: (c, s) => '/app/erp/inventory/stock-movements'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     // G-CLEANUP-1 Stage 4c-prep: V4 /operations/stock-card/:sku SHELL archived alongside its non-keyed variant.
-    GoRoute(path: '/operations/stock-card/:sku', redirect: (c, s) => '/app/erp/inventory/stock-movements'),
+    // Sprint 15 Stage 4f: V4 /operations/stock-card/:sku archived (SHELL-variant) -> V5 /app/erp/inventory/stock-movements
     GoRoute(path: '/audit/anomaly/:id', redirect: (c, s) => '/app/erp/finance/anomalies'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived (V4 screen has zero backend; redirected to V5 home)
     GoRoute(path: '/workflow/approvals', pageBuilder: (c, s) => _apexPage(const ApprovalsInboxScreen(), s)),
-    GoRoute(path: '/accounting/coa/edit', pageBuilder: (c, s) => _apexPage(const CoaEditorScreen(), s)),
+        // Sprint 15 Stage 4d: V4 /accounting/coa/edit archived → V5 /app/erp/finance/coa-editor
     GoRoute(path: '/compliance/risk-register', pageBuilder: (c, s) => _apexPage(const RiskRegisterScreen(), s)),
     GoRoute(path: '/analytics/budget-builder', redirect: (c, s) => '/app/erp/finance/budget-planning'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/compliance/kyc-aml', redirect: (c, s) => '/app/compliance/aml-ethics/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
@@ -931,12 +794,12 @@ final appRouter = GoRouter(
 
     // ─── Detail Screens ───
     // G-CLEANUP-1 Stage 4c-prep: V4 /service-request/detail SHELL archived (zero backend).
-    GoRoute(path: '/service-request/detail', redirect: (c, s) => '/app/marketplace/dashboard'),
+    // Sprint 15 Stage 4f: V4 /service-request/detail archived (SHELL) -> V5 /app/marketplace/dashboard
     GoRoute(path: '/notification/detail', pageBuilder: (c, s) {
       return _apexPage(NotificationDetailScreen(notification: s.extra as Map<String, dynamic>? ?? {}), s);
     }),
     // G-CLEANUP-1 Stage 4c-prep: V4 /provider/profile SHELL archived (zero backend).
-    GoRoute(path: '/provider/profile', redirect: (c, s) => '/app/marketplace/provider/dashboard'),
+    // Sprint 15 Stage 4f: V4 /provider/profile archived (SHELL) -> V5 /app/marketplace/provider/dashboard
     // Unified entity/company/branch setup (single source of truth).
     // Old onboarding paths below all redirect here to eliminate the
     // duplicate setup journeys the user reported.
@@ -963,10 +826,7 @@ final appRouter = GoRouter(
       final args = s.extra as Map<String, dynamic>? ?? {};
       return _apexPage(CoaJourneyV2Screen(clientId: args['clientId'] ?? '', clientName: args['clientName'] ?? ''), s);
     }),
-    GoRoute(path: '/service-catalog', pageBuilder: (c, s) {
-      final args = s.extra as Map<String, dynamic>?;
-      return _apexPage(catalog.ServiceCatalogScreen(clientId: args?['clientId'] as String?, token: args?['token'] as String?), s);
-    }),
+    // Sprint 15 Stage 4f: V4 /service-catalog archived (REAL_NEW_V5) -> V5 /app/marketplace/browse/catalog
     GoRoute(path: '/upgrade-plan', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
       return _apexPage(UpgradePlanScreen(plans: args['plans'] as List? ?? [], currentPlan: args['currentPlan'] as String?), s);
@@ -975,14 +835,14 @@ final appRouter = GoRouter(
       final args = s.extra as Map<String, dynamic>?;
       return _apexPage(KnowledgeFeedbackScreen(resultId: args?['resultId'] as String?), s);
     }),
-    GoRoute(path: '/marketplace/new-request', pageBuilder: (c, s) => _apexPage(const NewServiceRequestScreen(), s)),
+    // Sprint 15 Stage 4f: V4 /marketplace/new-request archived (REAL_NEW_V5) -> V5 /app/marketplace/browse/new-request
     // /clients/create — legacy path; redirect to the unified setup.
     GoRoute(
       path: '/clients/create',
       redirect: (c, s) => '/settings/entities?action=new-company',
     ),
     // G-CLEANUP-1 Stage 4c-prep: V4 /audit/service SHELL archived (marketplace audit-tier wrapper, no ownership).
-    GoRoute(path: '/audit/service', redirect: (c, s) => '/app/marketplace/dashboard'),
+    // Sprint 15 Stage 4f: V4 /audit/service archived (SHELL) -> V5 /app/marketplace/dashboard
   ],
 );
 

@@ -20,7 +20,7 @@ import 'theme.dart';
 class ApexSavedView {
   final String id;
   final String name;
-  final String screen; // e.g., '/sales/invoices'
+  final String screen; // e.g., '/app/erp/sales/invoices'
   final Map<String, dynamic> filters;
   final DateTime createdAt;
   final bool pinned;
@@ -106,7 +106,7 @@ class ApexSavedViewsRepo {
     ApexSavedView(
       id: 'default_invoices_overdue',
       name: 'فواتير متأخرة',
-      screen: '/sales/invoices',
+      screen: '/app/erp/sales/invoices',
       filters: {'filter': 'overdue'},
       createdAt: DateTime.now(),
       pinned: true,
@@ -115,7 +115,7 @@ class ApexSavedViewsRepo {
     ApexSavedView(
       id: 'default_ar_high',
       name: 'AR > 90 يوماً',
-      screen: '/sales/aging',
+      screen: '/app/erp/sales/ar-aging',
       filters: {},
       createdAt: DateTime.now(),
       pinned: true,
@@ -124,7 +124,7 @@ class ApexSavedViewsRepo {
     ApexSavedView(
       id: 'default_customers_active',
       name: 'العملاء النشطون',
-      screen: '/sales/customers',
+      screen: '/app/erp/finance/sales-customers',
       filters: {'filter': 'active'},
       createdAt: DateTime.now(),
       pinned: false,
