@@ -14,7 +14,7 @@ import '../screens/tabs/account_tab.dart' show AccountTab;
 import '../screens/tabs/admin_tab.dart' show AdminTab;
 import '../screens/tabs/clients_tab.dart' show ClientsTab;
 import '../screens/tabs/analysis_tab.dart' show AnalysisTab;
-import '../screens/dashboard/enhanced_dashboard.dart';
+import '../screens/dashboard/customizable_dashboard.dart';
 import 'apex_search.dart';
 
 Widget quickServiceBtn(BuildContext c, String label, IconData icon, int tabIdx) => Padding(
@@ -62,14 +62,12 @@ class _MainNavS extends ConsumerState<MainNav> {
 
   @override Widget build(BuildContext c) {
     _drawerItemCounter = 0;
-    final tabs = [EnhancedDashboard(
-          onSwitchToClients: () => setState(() => _i = 1),
-          onCreateClient: () {
-            setState(() => _i = 1);
-            // Trigger create wizard after tab switch
-          },
-          onNavigateToCoa: _goToCoa,
-        ), ClientsTab(), AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()];
+    // DASH-1.1 (2026-05-06): replaced EnhancedDashboard with the new
+    // CustomizableDashboard. The legacy onSwitchToClients/onCreateClient/
+    // onNavigateToCoa callbacks are now reachable via the customizable
+    // layout's "Express Invoice" / "Top Customers" widgets and direct
+    // navigation — the embedded callback contract was a v1 artefact.
+    final tabs = [const CustomizableDashboard(), ClientsTab(), AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()];
     return Scaffold(
       backgroundColor: AC.navy,
       body: Column(children: [

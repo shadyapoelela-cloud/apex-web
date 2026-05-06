@@ -1,17 +1,28 @@
-/// APEX — Today Dashboard
-/// ═══════════════════════════════════════════════════════════════════════
-/// First screen the user sees after onboarding. Five KPI cards (Stripe-
-/// pattern + Linear-pattern):
+/// ⚠️ DEPRECATED — مؤرشف 2026-05-06 لصالح CustomizableDashboard
+/// (راجع DASH-1.1). يبقى للمراجع التاريخية لـ widgets منطق KPI.
+/// لا تستورده في كود إنتاجي.
 ///
+/// `analysis_options.yaml` excludes `_archive/**` so the analyzer skips
+/// this file. Imports below remain at their original `../../...` paths
+/// which no longer resolve from inside `_archive/` — that's intentional;
+/// fixing them would suggest the file is still maintained.
+///
+/// Live `/today` is now serviced by
+/// `lib/screens/dashboard/customizable_dashboard.dart`.
+///
+/// === Original header ===
+///
+/// APEX — Today Dashboard
+/// First screen the user sees after onboarding. Five KPI cards:
 ///   1. النقد المتاح        ← BS.assets[1110+1120]
 ///   2. صافي الدخل اليوم    ← IS revenue − expense (today)
 ///   3. AR (الذمم المدينة)  ← BS or TB account 1130
 ///   4. الفواتير غير المُحصّلة ← invoices.status='issued' SUM(total)
 ///   5. عدد الفواتير اليوم   ← invoices count where issue_date == today
-///
 /// Plus an "AI Pulse" line of running commentary in Arabic.
 library;
 
+// ignore_for_file: unused_import, uri_does_not_exist
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

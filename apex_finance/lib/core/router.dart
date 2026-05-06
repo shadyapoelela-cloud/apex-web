@@ -26,7 +26,10 @@ import '../screens/whats_new/white_label_settings_screen.dart';
 import '../screens/whats_new/syncfusion_grid_demo_screen.dart';
 import '../screens/financial/financial_ops_screen.dart';
 import '../screens/knowledge/knowledge_brain_screen.dart';
-import '../screens/dashboard/enhanced_dashboard.dart';
+// DASH-1.1: enhanced_dashboard.dart archived to lib/_archive/dashboards_v1/.
+// /dashboard now resolves to CustomizableDashboard.
+import '../screens/dashboard/customizable_dashboard.dart';
+import '../screens/dashboard/role_layouts_admin.dart';
 import '../screens/settings/enhanced_settings_screen.dart';
 import '../screens/coa/coa_tree_screen.dart';
 import '../screens/legal/legal_acceptance_screen.dart';
@@ -71,7 +74,8 @@ import '../screens/activity_feed_screen.dart';
 // import '../screens/operations/je_creator_screen.dart';
 // import '../screens/operations/financial_statements_formatted_screen.dart';
 // import '../screens/operations/financial_analysis_screen.dart';
-import '../screens/home/today_dashboard_screen.dart';
+// DASH-1.1: today_dashboard_screen.dart archived to lib/_archive/dashboards_v1/.
+// /today now resolves to CustomizableDashboard (same screen as /dashboard).
 // Stage 4g: V4 /launchpad/full now redirects to /app — apex_launchpad_screen.dart kept in lib/screens/home/ but unmounted from router.
 import '../screens/home/apex_service_hub_screen.dart';
 import '../screens/home/apex_services_screen.dart';
@@ -238,7 +242,8 @@ final appRouter = GoRouter(
     // Setup alias — keep simple redirect.
     GoRoute(path: '/setup', redirect: (c, s) => '/settings/entities'),
     GoRoute(path: '/reports', pageBuilder: (c, s) => _apexPage(const ReportsHubScreen(), s)),
-    GoRoute(path: '/today', pageBuilder: (c, s) => _apexPage(const TodayDashboardScreen(), s)),
+    // DASH-1.1: /today now mounts CustomizableDashboard. The legacy TodayDashboardScreen is archived.
+    GoRoute(path: '/today', pageBuilder: (c, s) => _apexPage(const CustomizableDashboard(title: 'اليوم'), s)),
     GoRoute(path: '/lab', pageBuilder: (c, s) => _apexPage(const InnovationLabScreen(), s)),
 
     // ── Services Page (Level 0) — clean entry point ──
@@ -492,7 +497,15 @@ final appRouter = GoRouter(
     GoRoute(path: '/compliance-detail', pageBuilder: (c, s) => _apexPage(const ProviderComplianceDetailScreen(), s)),
     GoRoute(path: '/coa-tree', pageBuilder: (c, s) => _apexPage(const CoaTreeScreen(), s)),
     GoRoute(path: '/settings', pageBuilder: (c, s) => _apexPage(const EnhancedSettingsScreen(), s)),
-    GoRoute(path: '/dashboard', pageBuilder: (c, s) => _apexPage(const EnhancedDashboard(), s)),
+    // DASH-1.1 (2026-05-06): /dashboard now mounts CustomizableDashboard.
+    // The v1 EnhancedDashboard is archived under lib/_archive/dashboards_v1/.
+    GoRoute(path: '/dashboard', pageBuilder: (c, s) => _apexPage(const CustomizableDashboard(), s)),
+    // DASH-1.1: admin-only — manage role-default layouts.
+    // Permission gate (manage:dashboard_role) is enforced inside the screen.
+    GoRoute(
+      path: '/dashboard/admin/role-layouts',
+      pageBuilder: (c, s) => _apexPage(const RoleLayoutsAdminScreen(), s),
+    ),
     GoRoute(path: '/audit-workflow', redirect: (c, s) => '/app/audit/engagement/dashboard'),  // G-CLEANUP-1 Stage 4c-prep: SHELL archived; V4 screen had zero backend
     GoRoute(path: '/knowledge-brain', pageBuilder: (c, s) => _apexPage(const KnowledgeBrainScreen(), s)),
     GoRoute(path: '/financial-ops', pageBuilder: (c, s) => _apexPage(const FinancialOpsScreen(), s)),
