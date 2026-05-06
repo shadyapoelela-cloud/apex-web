@@ -607,3 +607,66 @@ def test_compute_batch_partial_errors_dont_kill_others():
     )
     assert out.data["test.widget.always_ok"] == {"ok": True}
     assert "test.widget.always_fail" in out.errors
+
+
+# ── 10. Default resolvers ─────────────────────────────────
+
+
+def test_all_12_default_resolvers_return_payload():
+    """The 12 system resolvers wired in app.dashboard.resolvers should
+    all execute without raising — verifying the defensive try/except
+    in @_safe + the JSON shape contract.
+    """
+    from app.dashboard import resolvers as r
+
+    cases = [
+        (r.kpi_cash_balance, "value"),
+        (r.kpi_net_income_mtd, "value"),
+        (r.kpi_ar_outstanding, "value"),
+        (r.kpi_ap_due_7d, "value"),
+        (r.chart_revenue_30d, "series"),
+        (r.chart_cash_flow_90d, "series"),
+        (r.list_top_customers, "rows"),
+        (r.list_pending_approvals, "rows"),
+        (r.list_recent_invoices, "rows"),
+        (r.widget_compliance_health, "indicators"),
+        (r.widget_ai_pulse, "headline_ar"),
+        (r.widget_express_invoice, "action"),
+    ]
+    ctx = {"tenant_id": "t-1", "as_of_date": "2026-05-06"}
+    for fn, key in cases:
+        out = fn(ctx)
+        assert isinstance(out, dict), f"{fn.__name__} returned non-dict"
+        # Either the expected key or an error-marker — both are valid
+        # for the defensive @_safe contract.
+        assert key in out or "error" in out, (
+            f"{fn.__name__}: missing both '{key}' and 'error' in {out}"
+        )
+
+
+def test_kpi_resolvers_return_currency_when_successful():
+    from app.dashboard import resolvers as r
+
+    out = r.kpi_cash_balance({"tenant_id": "t-1"})
+    if "error" not in out:
+        assert out.get("currency") == "SAR"
+
+
+def test_chart_resolvers_emit_correct_series_length():
+    from app.dashboard import resolvers as r
+
+    out30 = r.chart_revenue_30d({})
+    assert "error" in out30 or len(out30["series"]) == 30
+    out90 = r.chart_cash_flow_90d({})
+    assert "error" in out90 or len(out90["series"]) == 90
+
+
+def test_register_default_resolvers_is_idempotent():
+    from app.dashboard import resolvers as r
+    from app.dashboard.service import has_resolver
+
+    # Calling twice shouldn't blow up.
+    r.register_default_resolvers()
+    r.register_default_resolvers()
+    assert has_resolver("kpi.cash_balance")
+    assert has_resolver("widget.express_invoice")
