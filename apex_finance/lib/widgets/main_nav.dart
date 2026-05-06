@@ -15,6 +15,7 @@ import '../screens/tabs/admin_tab.dart' show AdminTab;
 import '../screens/tabs/clients_tab.dart' show ClientsTab;
 import '../screens/tabs/analysis_tab.dart' show AnalysisTab;
 import '../screens/dashboard/customizable_dashboard.dart';
+import '../screens/dashboard/dashboard_hooks_default.dart';
 import 'apex_search.dart';
 
 Widget quickServiceBtn(BuildContext c, String label, IconData icon, int tabIdx) => Padding(
@@ -67,7 +68,7 @@ class _MainNavS extends ConsumerState<MainNav> {
     // onNavigateToCoa callbacks are now reachable via the customizable
     // layout's "Express Invoice" / "Top Customers" widgets and direct
     // navigation — the embedded callback contract was a v1 artefact.
-    final tabs = [const CustomizableDashboard(), ClientsTab(), AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()];
+    final tabs = [CustomizableDashboard(hooks: defaultDashboardHooks(target: DashboardEditTarget.user)), ClientsTab(), AnalysisTab(), const MarketTab(), const ProviderTab(), const AccountTab(), const AdminTab()];
     return Scaffold(
       backgroundColor: AC.navy,
       body: Column(children: [

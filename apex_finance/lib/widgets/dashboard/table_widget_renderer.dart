@@ -134,6 +134,7 @@ class _PaginatedTableState extends State<_PaginatedTable> {
     final pageRows = widget.rows.sublist(start, end);
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -141,7 +142,8 @@ class _PaginatedTableState extends State<_PaginatedTable> {
           style: TextStyle(color: AC.tp, fontSize: 14, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
-        Expanded(
+        SizedBox(
+          height: 320,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: DataTable(

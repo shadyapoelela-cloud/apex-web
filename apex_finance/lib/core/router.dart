@@ -29,6 +29,7 @@ import '../screens/knowledge/knowledge_brain_screen.dart';
 // DASH-1.1: enhanced_dashboard.dart archived to lib/_archive/dashboards_v1/.
 // /dashboard now resolves to CustomizableDashboard.
 import '../screens/dashboard/customizable_dashboard.dart';
+import '../screens/dashboard/dashboard_hooks_default.dart';
 import '../screens/dashboard/role_layouts_admin.dart';
 import '../screens/settings/enhanced_settings_screen.dart';
 import '../screens/coa/coa_tree_screen.dart';
@@ -243,7 +244,13 @@ final appRouter = GoRouter(
     GoRoute(path: '/setup', redirect: (c, s) => '/settings/entities'),
     GoRoute(path: '/reports', pageBuilder: (c, s) => _apexPage(const ReportsHubScreen(), s)),
     // DASH-1.1: /today now mounts CustomizableDashboard. The legacy TodayDashboardScreen is archived.
-    GoRoute(path: '/today', pageBuilder: (c, s) => _apexPage(const CustomizableDashboard(title: 'اليوم'), s)),
+    GoRoute(path: '/today', pageBuilder: (c, s) => _apexPage(
+      CustomizableDashboard(
+        title: 'اليوم',
+        hooks: defaultDashboardHooks(target: DashboardEditTarget.user),
+      ),
+      s,
+    )),
     GoRoute(path: '/lab', pageBuilder: (c, s) => _apexPage(const InnovationLabScreen(), s)),
 
     // ── Services Page (Level 0) — clean entry point ──
@@ -498,8 +505,13 @@ final appRouter = GoRouter(
     GoRoute(path: '/coa-tree', pageBuilder: (c, s) => _apexPage(const CoaTreeScreen(), s)),
     GoRoute(path: '/settings', pageBuilder: (c, s) => _apexPage(const EnhancedSettingsScreen(), s)),
     // DASH-1.1 (2026-05-06): /dashboard now mounts CustomizableDashboard.
-    // The v1 EnhancedDashboard is archived under lib/_archive/dashboards_v1/.
-    GoRoute(path: '/dashboard', pageBuilder: (c, s) => _apexPage(const CustomizableDashboard(), s)),
+    // The v1 EnhancedDashboard is archived under apex_finance/_archive/2026-05-06/dashboards_v1/.
+    GoRoute(path: '/dashboard', pageBuilder: (c, s) => _apexPage(
+      CustomizableDashboard(
+        hooks: defaultDashboardHooks(target: DashboardEditTarget.user),
+      ),
+      s,
+    )),
     // DASH-1.1: admin-only — manage role-default layouts.
     // Permission gate (manage:dashboard_role) is enforced inside the screen.
     GoRoute(

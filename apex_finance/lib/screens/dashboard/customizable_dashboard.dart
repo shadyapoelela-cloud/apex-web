@@ -13,16 +13,11 @@
 library;
 
 import 'dart:async';
-import 'dart:convert';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../api_service.dart';
 import '../../core/apex_dashboard_builder.dart' as adb;
-import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../widgets/dashboard/_base.dart';
 import '../../widgets/dashboard/action_widget_renderer.dart';
@@ -71,7 +66,10 @@ class DashboardLayoutFetchResult {
 }
 
 /// Override hooks the test suite uses to pin network + SSE without
-/// pulling in mockito. Defaults call the real ApiService / EventSource.
+/// mockito. Production callers get the live network adapter from
+/// [defaultDashboardHooks] in `dashboard_hooks_default.dart` — kept
+/// in a sibling file so this widget compiles in `flutter test`
+/// (which can't resolve `package:http/browser_client.dart`).
 class DashboardApiHooks {
   final Future<List<DashboardCatalogEntry>> Function() fetchWidgets;
   final Future<DashboardLayoutFetchResult?> Function() fetchLayout;
@@ -80,6 +78,18 @@ class DashboardApiHooks {
   final Future<void> Function() resetLayout;
   final Stream<Map<String, dynamic>> Function()? openStream;
 
+  /// Per-widget refresh — used by the AI renderer's "تحديث" button.
+  /// Kept on the hooks struct so the AI widget itself stays free of
+  /// any HTTP imports.
+  final Future<Map<String, dynamic>?> Function(String code)? refreshWidget;
+
+  /// Permission check. Defaults to a closure that asks `S.hasPerm`,
+  /// supplied by the live adapter in `dashboard_hooks_default.dart`.
+  /// Tests inject a stub so this widget never needs to import
+  /// `core/session.dart` (which transitively pulls `dart:html` and
+  /// would break `flutter test`'s Dart-VM compile).
+  final bool Function(String perm)? hasPerm;
+
   const DashboardApiHooks({
     required this.fetchWidgets,
     required this.fetchLayout,
@@ -87,89 +97,18 @@ class DashboardApiHooks {
     required this.saveLayout,
     required this.resetLayout,
     this.openStream,
+    this.refreshWidget,
+    this.hasPerm,
   });
-
-  static DashboardApiHooks defaults({
-    required String roleId,
-    required DashboardEditTarget target,
-  }) {
-    return DashboardApiHooks(
-      fetchWidgets: () async {
-        final res = await ApiService.dashboardWidgets();
-        if (!res.success || res.data is! List) return const [];
-        return (res.data as List)
-            .whereType<Map>()
-            .map((m) => DashboardCatalogEntry.fromJson(m.cast<String, dynamic>()))
-            .toList();
-      },
-      fetchLayout: () async {
-        final res = await ApiService.dashboardLayout();
-        if (!res.success || res.data == null) return null;
-        return DashboardLayoutFetchResult.fromJson(
-            (res.data as Map).cast<String, dynamic>());
-      },
-      fetchBatch: (codes) async {
-        final res = await ApiService.dashboardBatch(widgetCodes: codes);
-        if (!res.success || res.data is! Map) return const {};
-        return (res.data as Map).cast<String, dynamic>();
-      },
-      saveLayout: (blocks, {String name = 'default'}) async {
-        final payload = blocks.map((b) => b.toJson()).toList();
-        if (target == DashboardEditTarget.role) {
-          final res = await ApiService.dashboardSaveRoleLayout(
-              roleId, payload, name: name);
-          return res.success;
-        }
-        final res = await ApiService.saveDashboardLayout(payload, name: name);
-        return res.success;
-      },
-      resetLayout: () async {
-        await ApiService.resetDashboardLayout();
-      },
-      openStream: () => _defaultStream(),
-    );
-  }
-}
-
-/// Default SSE adapter — uses the browser's EventSource so the
-/// connection survives tab visibility changes the way Dart's http
-/// stream wouldn't.
-Stream<Map<String, dynamic>> _defaultStream() {
-  final url = ApiService.dashboardStreamUrl();
-  // Cookie auth — the apex_token HttpOnly cookie carries the token
-  // the same way the rest of the app authenticates.
-  final src = html.EventSource(url, withCredentials: true);
-  final controller = StreamController<Map<String, dynamic>>.broadcast();
-
-  void emit(html.MessageEvent ev, String type) {
-    try {
-      final raw = ev.data;
-      if (raw is String && raw.isNotEmpty) {
-        final m = jsonDecode(raw);
-        if (m is Map) {
-          final out = m.cast<String, dynamic>();
-          out['_event_type'] = type;
-          controller.add(out);
-        }
-      }
-    } catch (_) {/* ignore malformed frames */}
-  }
-
-  src.addEventListener('hello', (e) => emit(e as html.MessageEvent, 'hello'));
-  src.addEventListener('ping', (e) => emit(e as html.MessageEvent, 'ping'));
-  src.addEventListener(
-      'invalidate', (e) => emit(e as html.MessageEvent, 'invalidate'));
-  src.addEventListener(
-      'update', (e) => emit(e as html.MessageEvent, 'update'));
-
-  controller.onCancel = () {
-    src.close();
-  };
-  return controller.stream;
 }
 
 /// Public widget. The constructor accepts `target` + `roleId` so the
 /// admin route can mount the same screen pointed at PUT /role-layouts/.
+///
+/// `hooks` is null for callers using the live adapter — see
+/// `dashboard_hooks_default.dart::defaultDashboardHooks`. Tests pass
+/// a fake `DashboardApiHooks`. Both router.dart and the test suite
+/// use this seam to avoid coupling this widget to `api_service.dart`.
 class CustomizableDashboard extends StatefulWidget {
   final DashboardEditTarget target;
   final String? roleId;
@@ -202,23 +141,35 @@ class _CustomizableDashboardState extends State<CustomizableDashboard> {
 
   StreamSubscription<Map<String, dynamic>>? _sseSub;
 
-  bool get _canCustomize {
-    if (widget.target == DashboardEditTarget.role) {
-      return S.hasPerm('manage:dashboard_role');
-    }
-    return S.hasPerm('customize:dashboard');
+  bool _hasPerm(String perm) {
+    final fn = _hooks.hasPerm;
+    if (fn != null) return fn(perm);
+    // Default-deny when no impl is supplied — keeps the screen safe
+    // even if a caller forgot to wire the adapter.
+    return false;
   }
 
-  bool get _canManageRoles => S.hasPerm('manage:dashboard_role');
+  bool get _canCustomize {
+    if (widget.target == DashboardEditTarget.role) {
+      return _hasPerm('manage:dashboard_role');
+    }
+    return _hasPerm('customize:dashboard');
+  }
+
+  bool get _canManageRoles => _hasPerm('manage:dashboard_role');
 
   @override
   void initState() {
     super.initState();
-    _hooks = widget.hooks ??
-        DashboardApiHooks.defaults(
-          roleId: widget.roleId ?? '',
-          target: widget.target,
-        );
+    final h = widget.hooks;
+    if (h == null) {
+      throw StateError(
+        'CustomizableDashboard requires hooks. Production callers must '
+        'pass `defaultDashboardHooks(...)` from '
+        '`screens/dashboard/dashboard_hooks_default.dart`.',
+      );
+    }
+    _hooks = h;
     _bootstrap();
   }
 
@@ -450,6 +401,7 @@ class _CustomizableDashboardState extends State<CustomizableDashboard> {
         return const ListWidgetRenderer().render(ctx, w, payload, onRetry: retry);
       case 'ai':
         return AiWidgetRenderer(
+          refresher: _hooks.refreshWidget,
           onRefreshed: (code, fresh) {
             if (!mounted) return;
             setState(() {
@@ -586,11 +538,17 @@ class _CustomizableDashboardState extends State<CustomizableDashboard> {
       textDirection: TextDirection.rtl,
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: adb.ApexDashboardBuilder(
-          blocks: _toBuilderBlocks(),
-          widgetRegistry: _buildRegistry(),
-          editable: _editMode,
-          onLayoutChanged: _onLayoutChanged,
+        // ApexDashboardBuilder uses Expanded inside its block frame —
+        // wrapping in IntrinsicHeight tells the parent ScrollView to size
+        // the builder's children intrinsically rather than asking them to
+        // expand into infinite vertical space.
+        child: IntrinsicHeight(
+          child: adb.ApexDashboardBuilder(
+            blocks: _toBuilderBlocks(),
+            widgetRegistry: _buildRegistry(),
+            editable: _editMode,
+            onLayoutChanged: _onLayoutChanged,
+          ),
         ),
       ),
     );

@@ -14,7 +14,6 @@ library;
 
 import 'package:flutter/material.dart';
 
-import '../../api_service.dart';
 import '../../core/theme.dart';
 import '_base.dart';
 
@@ -178,17 +177,19 @@ class _RefreshActionState extends State<_RefreshAction> {
 
   Future<void> _refresh() async {
     if (_busy) return;
+    if (widget.refresher == null) {
+      // No injected refresher → host didn't wire one. Surface a snack
+      // and bail rather than reach into ApiService directly here
+      // (keeping this widget independent of the HTTP layer also
+      // means flutter test can compile it without pulling browser_client).
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('غير مفعّل في هذا السياق')),
+      );
+      return;
+    }
     setState(() => _busy = true);
     try {
-      Map<String, dynamic>? payload;
-      if (widget.refresher != null) {
-        payload = await widget.refresher!(widget.code);
-      } else {
-        final res = await ApiService.dashboardWidgetData(widget.code);
-        if (res.success && res.data is Map) {
-          payload = (res.data as Map).cast<String, dynamic>();
-        }
-      }
+      final payload = await widget.refresher!(widget.code);
       if (payload != null && widget.onRefreshed != null) {
         widget.onRefreshed!(widget.code, payload);
       }

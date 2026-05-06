@@ -78,6 +78,7 @@ class ChartWidgetRenderer implements DashboardWidgetRenderer {
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -91,7 +92,12 @@ class ChartWidgetRenderer implements DashboardWidgetRenderer {
           const SizedBox(height: 8),
           if (series.length > 1) _legend(series, colors),
           const SizedBox(height: 4),
-          Expanded(
+          // Fixed-height chart area so the renderer composes inside both
+          // Expanded and shrink-wrapping parents. Tweakable via
+          // def.config_schema['chart_height'] if a caller wants taller.
+          SizedBox(
+            height:
+                ((def.configSchema?['chart_height'] as num?) ?? 200).toDouble(),
             child: chartType == 'bar'
                 ? _buildBar(series, colors)
                 : _buildLine(series, colors, area: chartType == 'area'),

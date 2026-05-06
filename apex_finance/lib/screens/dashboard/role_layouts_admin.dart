@@ -14,6 +14,7 @@ import '../../api_service.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import 'customizable_dashboard.dart';
+import 'dashboard_hooks_default.dart';
 
 class RoleLayoutsAdminScreen extends StatefulWidget {
   const RoleLayoutsAdminScreen({super.key});
@@ -104,6 +105,10 @@ class _RoleLayoutsAdminScreenState extends State<RoleLayoutsAdminScreen> {
           target: DashboardEditTarget.role,
           roleId: row.ownerId,
           title: 'تخطيط دور ${_roleLabel(row.ownerId)}',
+          hooks: defaultDashboardHooks(
+            target: DashboardEditTarget.role,
+            roleId: row.ownerId,
+          ),
         ),
       ),
     ).then((_) => _load());

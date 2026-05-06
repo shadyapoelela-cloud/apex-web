@@ -66,6 +66,7 @@ class ListWidgetRenderer implements DashboardWidgetRenderer {
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -77,7 +78,8 @@ class ListWidgetRenderer implements DashboardWidgetRenderer {
               ),
             ),
             const SizedBox(height: 6),
-            Expanded(
+            SizedBox(
+              height: 240,
               child: ListView.separated(
                 itemCount: items.length,
                 separatorBuilder: (_, __) =>
