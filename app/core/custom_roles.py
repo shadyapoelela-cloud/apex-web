@@ -127,6 +127,19 @@ _PERMISSIONS: list[Permission] = [
     Permission("export:chart_of_accounts", "تصدير شجرة الحسابات", "Export CoA", "finance"),
     Permission("manage:coa_templates", "إدارة القوالب", "Manage templates", "admin"),
     Permission("approve:coa_changes", "اعتماد تعديلات الشجرة", "Approve CoA edits", "finance"),
+    # ─ Invoicing (INV-1, Sprint 18) ─
+    Permission("read:credit_notes", "عرض إشعارات الدائن/المدين", "Read credit notes", "finance"),
+    Permission("write:credit_notes", "إنشاء إشعارات", "Write credit notes", "finance"),
+    Permission("issue:credit_notes", "إصدار إشعارات", "Issue credit notes", "finance"),
+    Permission("apply:credit_notes", "تطبيق إشعار على فاتورة", "Apply credit notes", "finance"),
+    Permission("read:recurring_invoices", "عرض الفواتير المتكررة", "Read recurring", "finance"),
+    Permission("write:recurring_invoices", "إعداد فواتير متكررة", "Write recurring", "finance"),
+    Permission("run:recurring_invoices", "تشغيل فاتورة متكررة يدويًا", "Run recurring", "finance"),
+    Permission("export:invoice_pdf", "تصدير فاتورة PDF", "Export invoice PDF", "finance"),
+    Permission("bulk:invoice_actions", "عمليات مجمّعة للفواتير", "Bulk invoice actions", "finance"),
+    Permission("upload:invoice_attachments", "رفع مرفقات للفواتير", "Upload attachments", "finance"),
+    Permission("read:aged_ar_ap", "عرض تقارير العمر", "Read aged reports", "finance"),
+    Permission("write_off:invoices", "شطب فواتير معدومة", "Write off invoices", "finance"),
 ]
 
 _PERM_BY_ID = {p.id: p for p in _PERMISSIONS}

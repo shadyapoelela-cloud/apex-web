@@ -110,6 +110,7 @@ _MODEL_MODULES = (
     "app.core.webhooks",                    # 4 classes
     "app.dashboard.models",                 # 3 classes (DASH-1, Sprint 16)
     "app.coa.models",                       # 3 classes (CoA-1, Sprint 17)
+    "app.invoicing.models",                 # 4 classes (INV-1, Sprint 18)
 
     # ── Feature modules ─────────────────────────────────────────
     "app.features.ap_agent.models",         # 2 classes (NEW P2a)
