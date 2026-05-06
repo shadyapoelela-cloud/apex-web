@@ -1513,6 +1513,51 @@ class ApiService {
       return ApiResult.error(_parseErr(body, res.statusCode));
     } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
+
+  // ── DASH-1: Customizable Dashboard ──
+  // All endpoints under /api/v1/dashboard/. The backend wraps responses
+  // in {success, data} so .data on the ApiResult matches the rest of
+  // the codebase.
+  static Future<ApiResult> dashboardWidgets() => _get('/api/v1/dashboard/widgets');
+  static Future<ApiResult> dashboardLayout() => _get('/api/v1/dashboard/layout');
+  static Future<ApiResult> saveDashboardLayout(List<Map<String, dynamic>> blocks, {String name = 'default'}) =>
+      _put('/api/v1/dashboard/layout', {'name': name, 'blocks': blocks});
+  static Future<ApiResult> resetDashboardLayout() =>
+      _post('/api/v1/dashboard/layout/reset', const {});
+  static Future<ApiResult> dashboardBatch({
+    String? entityId,
+    String? asOfDate,
+    required List<String> widgetCodes,
+  }) => _post('/api/v1/dashboard/data/batch', {
+        if (entityId != null) 'entity_id': entityId,
+        if (asOfDate != null) 'as_of_date': asOfDate,
+        'widgets': widgetCodes,
+      });
+  static Future<ApiResult> dashboardWidgetData(String widgetCode, {String? entityId, String? asOfDate}) {
+    final qp = <String, String>{};
+    if (entityId != null) qp['entity_id'] = entityId;
+    if (asOfDate != null) qp['as_of_date'] = asOfDate;
+    final qs = qp.isEmpty
+        ? ''
+        : '?${qp.entries.map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}').join('&')}';
+    return _get('/api/v1/dashboard/data/$widgetCode$qs');
+  }
+
+  /// Returns the URL clients should hit with EventSource. The actual
+  /// SSE listener lives in `lib/widgets/dashboard/dashboard_stream.dart`
+  /// because Dart's http package is one-shot — long-lived streams need
+  /// the `package:web` EventSource (web build) or a custom http client
+  /// (native).
+  static String dashboardStreamUrl() => '$_base/api/v1/dashboard/stream';
+
+  // Admin-only role-layout endpoints. Frontend gates UI on
+  // `manage:dashboard_role` / `lock:dashboard` from token claims;
+  // backend re-checks regardless.
+  static Future<ApiResult> dashboardRoleLayouts() => _get('/api/v1/dashboard/role-layouts');
+  static Future<ApiResult> dashboardSaveRoleLayout(String roleId, List<Map<String, dynamic>> blocks, {String name = 'default'}) =>
+      _put('/api/v1/dashboard/role-layouts/$roleId', {'name': name, 'blocks': blocks});
+  static Future<ApiResult> dashboardLockRoleLayout(String roleId, bool isLocked) =>
+      _post('/api/v1/dashboard/role-layouts/$roleId/lock', {'is_locked': isLocked});
 }
 
 
