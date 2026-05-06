@@ -113,6 +113,11 @@ _PERMISSIONS: list[Permission] = [
     Permission("admin:modules", "إدارة الوحدات", "Manage modules", "admin"),
     Permission("admin:tenant_settings", "إعدادات المستأجر", "Manage tenant settings", "admin"),
     Permission("admin:billing", "الفواتير والاشتراكات", "Billing & subscriptions", "admin"),
+    # ─ Dashboard (DASH-1, Sprint 16) ─
+    Permission("read:dashboard", "عرض الداشبورد", "View dashboard", "platform"),
+    Permission("customize:dashboard", "تخصيص داشبوردي", "Customize own dashboard", "platform"),
+    Permission("manage:dashboard_role", "إدارة داشبورد الأدوار", "Manage role dashboards", "admin"),
+    Permission("lock:dashboard", "قفل تخطيط الداشبورد", "Lock dashboard layout", "admin"),
 ]
 
 _PERM_BY_ID = {p.id: p for p in _PERMISSIONS}

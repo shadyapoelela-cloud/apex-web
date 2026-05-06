@@ -127,6 +127,7 @@ for _mod in [
     "app.core.governed_ai",
     "app.core.webhooks",
     "app.core.saved_views",
+    "app.dashboard.models",
     "app.services.copilot_memory",
     "app.core.dimensional_accounting",
     "app.core.consolidation_intercompany",
@@ -752,6 +753,16 @@ try:
     logging.info("Activity log router mounted at /api/v1/activity")
 except Exception as _e:
     logging.warning(f"Activity log router not mounted: {_e}")
+
+# Customizable Dashboard (mounted at /api/v1/dashboard/*).
+HAS_DASHBOARD = False
+try:
+    from app.dashboard.router import router as dashboard_router
+    app.include_router(dashboard_router)
+    HAS_DASHBOARD = True
+    logging.info("Dashboard router mounted at /api/v1/dashboard/*")
+except Exception as _e:
+    logging.warning(f"Dashboard router not mounted: {_e}")
 
 # Notifications list API — bootstraps the bell with history on mount.
 try:

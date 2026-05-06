@@ -108,6 +108,7 @@ _MODEL_MODULES = (
     "app.core.saved_views",                 # 3 classes
     "app.core.tenant_branding",             # 2 classes (also alembic-tracked)
     "app.core.webhooks",                    # 4 classes
+    "app.dashboard.models",                 # 3 classes (DASH-1, Sprint 16)
 
     # ── Feature modules ─────────────────────────────────────────
     "app.features.ap_agent.models",         # 2 classes (NEW P2a)
