@@ -287,6 +287,52 @@ def widget_express_invoice(ctx: dict) -> dict:
     }
 
 
+@_safe
+def list_recent_account_changes(ctx: dict) -> dict:
+    """Most-recent CoA changes across the tenant.
+
+    Wired into dashboard widget `list.recent_account_changes` (CoA-1
+    Phase 5). Tenant-scoped via `TenantMixin` filter — the dashboard
+    sets the tenant context from the JWT before calling resolvers.
+
+    Output shape matches `list_widget_renderer.dart` expectations:
+        {"items": [{"title": ..., "subtitle": ..., "trailing": ..., "id": ..}]}
+    """
+    try:
+        from app.coa import service as coa_service  # noqa: F401
+        from app.phase1.models.platform_models import SessionLocal
+    except Exception:
+        return {"items": []}
+
+    db = SessionLocal()
+    try:
+        rows = coa_service.get_recent_changes(db, limit=5)
+        items = []
+        for r in rows:
+            ts = r.timestamp.isoformat() if r.timestamp else None
+            action_label = {
+                "create": "أضيف",
+                "update": "عُدِّل",
+                "deactivate": "أُلغي تفعيل",
+                "reactivate": "أُعيد تفعيل",
+                "delete": "حُذف",
+                "merge": "دُمج",
+                "import_template": "استيراد قالب",
+            }.get(r.action, r.action)
+            account_id = r.account_id or "—"
+            short = (account_id[:8] + "…") if len(account_id) > 8 else account_id
+            items.append({
+                "id": r.id,
+                "title": f"{action_label} — {short}",
+                "subtitle": ts or "",
+                "icon": "approval" if r.action in ("update", "deactivate") else "invoice",
+                "route": f"/finance/coa?focus={account_id}" if r.account_id else "/finance/coa",
+            })
+        return {"items": items}
+    finally:
+        db.close()
+
+
 # ── Registration ──────────────────────────────────────────
 
 
@@ -310,6 +356,8 @@ def register_default_resolvers() -> None:
     register_resolver("widget.compliance_health", widget_compliance_health)
     register_resolver("widget.ai_pulse",       widget_ai_pulse)
     register_resolver("widget.express_invoice", widget_express_invoice)
+    # CoA-1 Phase 5
+    register_resolver("list.recent_account_changes", list_recent_account_changes)
     _REGISTERED = True
 
 
