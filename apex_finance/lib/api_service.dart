@@ -1647,6 +1647,151 @@ class ApiService {
       return null;
     }
   }
+
+  // ── INV-1: Invoicing ──
+  // 21 endpoints under /api/v1/invoicing.
+
+  // Credit notes
+  static Future<ApiResult> createCreditNote(Map<String, dynamic> data) =>
+      _post('/api/v1/invoicing/credit-notes', data);
+  static Future<ApiResult> listCreditNotes({
+    String? entityId,
+    String? customerId,
+    String? vendorId,
+    String? status,
+    String? cnType,
+    String? fromDate,
+    String? toDate,
+    int limit = 100,
+    int offset = 0,
+  }) {
+    final params = <String, String>{'limit': '$limit', 'offset': '$offset'};
+    if (entityId != null) params['entity_id'] = entityId;
+    if (customerId != null) params['customer_id'] = customerId;
+    if (vendorId != null) params['vendor_id'] = vendorId;
+    if (status != null) params['status'] = status;
+    if (cnType != null) params['cn_type'] = cnType;
+    if (fromDate != null) params['from_date'] = fromDate;
+    if (toDate != null) params['to_date'] = toDate;
+    final qs = params.entries
+        .map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}')
+        .join('&');
+    return _get('/api/v1/invoicing/credit-notes?$qs');
+  }
+  static Future<ApiResult> getCreditNote(String id) =>
+      _get('/api/v1/invoicing/credit-notes/$id');
+  static Future<ApiResult> issueCreditNote(String id) =>
+      _post('/api/v1/invoicing/credit-notes/$id/issue', const {});
+  static Future<ApiResult> applyCreditNote(
+    String id, {
+    required String targetInvoiceId,
+    double? amount,
+    String? reason,
+  }) =>
+      _post('/api/v1/invoicing/credit-notes/$id/apply', {
+        'target_invoice_id': targetInvoiceId,
+        if (amount != null) 'amount': amount,
+        if (reason != null) 'reason': reason,
+      });
+  static Future<ApiResult> cancelCreditNote(String id, {String? reason}) =>
+      _post('/api/v1/invoicing/credit-notes/$id/cancel',
+          {if (reason != null) 'reason': reason});
+
+  // Recurring templates
+  static Future<ApiResult> createRecurring(Map<String, dynamic> data) =>
+      _post('/api/v1/invoicing/recurring', data);
+  static Future<ApiResult> listRecurring({
+    String? entityId,
+    bool? isActive,
+    String? invoiceType,
+    int limit = 100,
+    int offset = 0,
+  }) {
+    final params = <String, String>{'limit': '$limit', 'offset': '$offset'};
+    if (entityId != null) params['entity_id'] = entityId;
+    if (isActive != null) params['is_active'] = '$isActive';
+    if (invoiceType != null) params['invoice_type'] = invoiceType;
+    final qs = params.entries
+        .map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}')
+        .join('&');
+    return _get('/api/v1/invoicing/recurring?$qs');
+  }
+  static Future<ApiResult> updateRecurring(String id, Map<String, dynamic> data) =>
+      _patch('/api/v1/invoicing/recurring/$id', data);
+  static Future<ApiResult> runRecurringNow(String id) =>
+      _post('/api/v1/invoicing/recurring/$id/run-now', const {});
+  static Future<ApiResult> pauseRecurring(String id) =>
+      _post('/api/v1/invoicing/recurring/$id/pause', const {});
+
+  // Aged AR / AP
+  static Future<ApiResult> agedAr(String entityId, {String? asOfDate}) {
+    final qs = StringBuffer('entity_id=${Uri.encodeQueryComponent(entityId)}');
+    if (asOfDate != null) qs.write('&as_of_date=$asOfDate');
+    return _get('/api/v1/invoicing/aged-ar?$qs');
+  }
+  static Future<ApiResult> agedAp(String entityId, {String? asOfDate}) {
+    final qs = StringBuffer('entity_id=${Uri.encodeQueryComponent(entityId)}');
+    if (asOfDate != null) qs.write('&as_of_date=$asOfDate');
+    return _get('/api/v1/invoicing/aged-ap?$qs');
+  }
+
+  // Bulk
+  static Future<ApiResult> bulkIssueInvoices(List<String> invoiceIds) =>
+      _post('/api/v1/invoicing/sales-invoices/bulk/issue',
+          {'invoice_ids': invoiceIds});
+  static Future<ApiResult> bulkEmailInvoices(List<String> invoiceIds) =>
+      _post('/api/v1/invoicing/sales-invoices/bulk/email',
+          {'invoice_ids': invoiceIds});
+
+  // Attachments
+  static Future<ApiResult> uploadInvoiceAttachment(
+    String invoiceId, {
+    required String filename,
+    required String mimeType,
+    required List<int> bytes,
+    String invoiceType = 'sales',
+  }) {
+    final b64 = base64.encode(bytes);
+    return _post('/api/v1/invoicing/invoices/$invoiceId/attachments', {
+      'invoice_type': invoiceType,
+      'filename': filename,
+      'mime_type': mimeType,
+      'content_b64': b64,
+    });
+  }
+  static Future<ApiResult> listInvoiceAttachments(String invoiceId) =>
+      _get('/api/v1/invoicing/invoices/$invoiceId/attachments');
+  static Future<ApiResult> deleteInvoiceAttachment(String attachmentId) =>
+      _delete('/api/v1/invoicing/attachments/$attachmentId');
+
+  // Write-off
+  static Future<ApiResult> writeOffInvoice(
+    String invoiceId, {
+    required String reason,
+    String? writeOffAccountId,
+  }) =>
+      _post('/api/v1/invoicing/invoices/$invoiceId/write-off', {
+        'reason': reason,
+        if (writeOffAccountId != null) 'write_off_account_id': writeOffAccountId,
+      });
+
+  // PDF — returns raw bytes; callers stream to download.
+  static Future<List<int>?> downloadInvoicePdf(
+    String invoiceId, {
+    bool isPurchase = false,
+  }) async {
+    try {
+      final path = isPurchase
+          ? '/api/v1/invoicing/purchase-invoices/$invoiceId/pdf'
+          : '/api/v1/invoicing/sales-invoices/$invoiceId/pdf';
+      final url = Uri.parse('$_base$path');
+      final res = await _httpClient.post(url, headers: _h);
+      if (res.statusCode == 200) return res.bodyBytes;
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
 }
 
 
