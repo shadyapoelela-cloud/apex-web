@@ -1,5 +1,32 @@
 # APEX Sprint Progress
 
+## Sprint 16 — Customizable Dashboard (Q2 2026, week 5) — IN PROGRESS
+
+### 2026-05-06
+
+- [x] **DASH-1.1** — Customizable Dashboard Frontend (Flutter UI)
+  - Branch: `feat/dashboard-customizable-ui` (this PR)
+  - 6 widget renderers: KPI / Chart (fl_chart) / Table (paginated) /
+    List / AI Pulse / Action (CTA + mini-form)
+  - `CustomizableDashboard` host screen — bootstrap (catalog +
+    layout + batch data) in parallel, Edit Mode toggle gated on
+    `customize:dashboard`, granular SSE updates via injectable
+    hooks struct
+  - `RoleLayoutsAdminScreen` — admin shell at
+    `/dashboard/admin/role-layouts`, gated on `manage:dashboard_role`
+  - SSE listener via `dart:html` EventSource (cookie auth),
+    `update` events mutate one widget's payload only — no full
+    rebuild
+  - Decoupled the screen + renderers from `api_service.dart` /
+    `core/session.dart` so `flutter test` compiles (the live network
+    adapter lives in a sibling `dashboard_hooks_default.dart`
+    — production callers pass `defaultDashboardHooks(...)`)
+  - Archived `enhanced_dashboard.dart` and `today_dashboard_screen.dart`
+    to `apex_finance/_archive/2026-05-06/dashboards_v1/`. Routes
+    `/dashboard` and `/today` rewired to `CustomizableDashboard`
+  - 22 widget tests — `flutter test test/dashboard/`: all green.
+    `flutter analyze`: 277 issues, 0 errors (-11 vs baseline)
+
 ## Sprint 11 — Coverage Closure + UX Track (Q2 2026, week 4) — IN PROGRESS
 
 - [x] **G-PROC-4** Workaround discipline + Locked-In Priorities registry — **DONE** 2026-05-02
