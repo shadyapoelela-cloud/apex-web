@@ -1,6 +1,62 @@
 # APEX Sprint Progress
 
-## Sprint 17 — Chart of Accounts (Q2 2026, week 6) — IN PROGRESS
+## Sprint 18 — Invoicing (Q2 2026, week 7) — IN PROGRESS
+
+### 2026-05-06
+
+- [x] **INV-1** (Phases 0-6 backend) — Invoicing orchestration layer
+  - Branch: `feat/invoicing-module`
+  - 4 SQLAlchemy tables: `credit_notes`, `credit_note_lines`,
+    `recurring_invoice_templates`, `invoice_attachments`
+  - Idempotent migration `j7e2c8d4f9b1` (DASH-1 hotfix pattern)
+  - 12 new permissions on `app.core.custom_roles`:
+    `read|write|issue|apply:credit_notes`,
+    `read|write|run:recurring_invoices`,
+    `export:invoice_pdf`, `bulk:invoice_actions`,
+    `upload:invoice_attachments`, `read:aged_ar_ap`,
+    `write_off:invoices`
+  - 21 API endpoints under `/api/v1/invoicing/*` with `{success, data}`
+    envelope + JWT-based perm gates (incl. `POST /admin/run-due-now`)
+  - Service layer: full credit-note lifecycle (draft→issued→applied→
+    cancelled), recurring template engine (5 frequencies + month-end
+    clamping), aged AR/AP with 5 buckets, bulk operations (100-id
+    cap), attachments, write-off path, PDF endpoint via existing
+    `app/integrations/zatca/invoice_pdf.py`
+  - **45 API tests** covering credit-note state machine, recurring
+    scheduling (max_runs / end_date / not-due-yet branches),
+    aged-bucket boundaries, bulk error surfacing, attachments,
+    permission gates
+  - Coverage on `app/invoicing/`: **75.47%** — gap is pilot-model
+    integration paths inside `apply_credit_note` / `bulk_issue` /
+    `write_off_invoice` / `_aged_report` / `run_recurring_template`
+    that require seeded pilot rows (tracked as INV-1 follow-up)
+  - 4 dashboard widgets wired into `app/dashboard/`:
+    `kpi.aged_ar_summary`, `kpi.aged_ap_summary`,
+    `list.overdue_invoices`, `kpi.recurring_due_today`
+  - CFO + Accountant default layouts updated to include the new
+    widgets
+  - Recurring scheduler shipped as a cron-driven stub
+    (`POST /admin/run-due-now`); apscheduler in-process scheduler
+    deferred to INV-1.3
+  - Flutter `api_service.dart`: 21 stub methods (createCreditNote,
+    listCreditNotes, issueCreditNote, applyCreditNote,
+    cancelCreditNote, createRecurring, listRecurring,
+    updateRecurring, runRecurringNow, pauseRecurring,
+    agedAr/agedAp, bulkIssueInvoices, bulkEmailInvoices,
+    uploadInvoiceAttachment, listInvoiceAttachments,
+    deleteInvoiceAttachment, writeOffInvoice, downloadInvoicePdf)
+
+  **Deferred to follow-ups:**
+  - **INV-1.1** — branded multi-page PDF (headers, watermarks)
+  - **INV-1.2** — HTML branded email template
+  - **INV-1.3** — apscheduler in-process scheduler
+  - **INV-1.4** — pilot-model-seeded service tests to push coverage
+    above 85%
+  - **Storage backend** — S3 binding for `invoice_attachments.storage_key`
+  - **JE wiring** — downstream subscribers to
+    `invoice.credit_note.issued` create the offsetting journal entry
+
+## Sprint 17 — Chart of Accounts (Q2 2026, week 6) — DONE 2026-05-06
 
 ### 2026-05-06
 

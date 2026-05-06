@@ -288,6 +288,112 @@ def widget_express_invoice(ctx: dict) -> dict:
 
 
 @_safe
+def kpi_aged_ar_summary(ctx: dict) -> dict:
+    """Aged AR rollup widget — sums outstanding from aged AR report.
+
+    Output:
+      {value: 12345.67, currency: "SAR", overdue_count: 8,
+       buckets: [{bucket: "0-30", count: ..., total: ...}, ...]}
+    """
+    try:
+        from app.invoicing import service as inv_service
+        from app.phase1.models.platform_models import SessionLocal
+    except Exception:
+        return {"value": 0.0, "currency": "SAR", "overdue_count": 0, "buckets": []}
+
+    entity_id = ctx.get("entity_id") or ""
+    if not entity_id:
+        return {"value": 0.0, "currency": "SAR", "overdue_count": 0, "buckets": []}
+
+    db = SessionLocal()
+    try:
+        report = inv_service.compute_aged_ar(db, entity_id)
+        return {
+            "value": report["grand_total"],
+            "currency": report["currency_code"],
+            "overdue_count": report["overdue_count"],
+            "buckets": report["buckets"],
+            "as_of": report["as_of_date"].isoformat() if hasattr(report["as_of_date"], "isoformat") else str(report["as_of_date"]),
+        }
+    finally:
+        db.close()
+
+
+@_safe
+def kpi_aged_ap_summary(ctx: dict) -> dict:
+    try:
+        from app.invoicing import service as inv_service
+        from app.phase1.models.platform_models import SessionLocal
+    except Exception:
+        return {"value": 0.0, "currency": "SAR", "overdue_count": 0, "buckets": []}
+
+    entity_id = ctx.get("entity_id") or ""
+    if not entity_id:
+        return {"value": 0.0, "currency": "SAR", "overdue_count": 0, "buckets": []}
+
+    db = SessionLocal()
+    try:
+        report = inv_service.compute_aged_ap(db, entity_id)
+        return {
+            "value": report["grand_total"],
+            "currency": report["currency_code"],
+            "overdue_count": report["overdue_count"],
+            "buckets": report["buckets"],
+            "as_of": report["as_of_date"].isoformat() if hasattr(report["as_of_date"], "isoformat") else str(report["as_of_date"]),
+        }
+    finally:
+        db.close()
+
+
+@_safe
+def list_overdue_invoices(ctx: dict) -> dict:
+    try:
+        from app.invoicing import service as inv_service
+        from app.phase1.models.platform_models import SessionLocal
+    except Exception:
+        return {"items": []}
+
+    db = SessionLocal()
+    try:
+        rows = inv_service.list_overdue_invoices(
+            db, entity_id=ctx.get("entity_id"), limit=10
+        )
+        items = []
+        for r in rows:
+            items.append({
+                "id": r["id"],
+                "title": r["number"],
+                "subtitle": f"{r['days_overdue']} يوم متأخر",
+                "trailing": r["outstanding"],
+                "icon": "invoice",
+                "route": f"/finance/invoices?focus={r['id']}",
+            })
+        return {"items": items}
+    finally:
+        db.close()
+
+
+@_safe
+def kpi_recurring_due_today(ctx: dict) -> dict:
+    try:
+        from app.invoicing import service as inv_service
+        from app.phase1.models.platform_models import SessionLocal
+    except Exception:
+        return {"value": 0, "label_ar": "قوالب مستحقة اليوم"}
+
+    db = SessionLocal()
+    try:
+        rows = inv_service.list_due_recurring(db)
+        return {
+            "value": len(rows),
+            "label_ar": "قوالب مستحقة اليوم",
+            "label_en": "Templates Due Today",
+        }
+    finally:
+        db.close()
+
+
+@_safe
 def list_recent_account_changes(ctx: dict) -> dict:
     """Most-recent CoA changes across the tenant.
 
@@ -358,6 +464,11 @@ def register_default_resolvers() -> None:
     register_resolver("widget.express_invoice", widget_express_invoice)
     # CoA-1 Phase 5
     register_resolver("list.recent_account_changes", list_recent_account_changes)
+    # INV-1 Phase 4
+    register_resolver("kpi.aged_ar_summary", kpi_aged_ar_summary)
+    register_resolver("kpi.aged_ap_summary", kpi_aged_ap_summary)
+    register_resolver("list.overdue_invoices", list_overdue_invoices)
+    register_resolver("kpi.recurring_due_today", kpi_recurring_due_today)
     _REGISTERED = True
 
 

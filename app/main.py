@@ -129,6 +129,7 @@ for _mod in [
     "app.core.saved_views",
     "app.dashboard.models",
     "app.coa.models",
+    "app.invoicing.models",
     "app.services.copilot_memory",
     "app.core.dimensional_accounting",
     "app.core.consolidation_intercompany",
@@ -774,6 +775,16 @@ try:
     logging.info("CoA router mounted at /api/v1/coa/*")
 except Exception as _e:
     logging.warning(f"CoA router not mounted: {_e}")
+
+# Invoicing (mounted at /api/v1/invoicing/*).
+HAS_INVOICING = False
+try:
+    from app.invoicing.router import router as invoicing_router
+    app.include_router(invoicing_router)
+    HAS_INVOICING = True
+    logging.info("Invoicing router mounted at /api/v1/invoicing/*")
+except Exception as _e:
+    logging.warning(f"Invoicing router not mounted: {_e}")
 
 # Notifications list API — bootstraps the bell with history on mount.
 try:
