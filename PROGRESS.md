@@ -1,6 +1,50 @@
 # APEX Sprint Progress
 
-## Sprint 16 — Customizable Dashboard (Q2 2026, week 5) — IN PROGRESS
+## Sprint 17 — Chart of Accounts (Q2 2026, week 6) — IN PROGRESS
+
+### 2026-05-06
+
+- [x] **CoA-1** (Phases 0-3 + 5) — Chart of Accounts backend foundation
+  - Branch: `feat/chart-of-accounts-screen`
+  - 3 SQLAlchemy tables: `chart_of_accounts`, `coa_templates`, `coa_change_log`
+  - Idempotent migration `i3d9f6c2e8a5` (DASH-1 hotfix pattern —
+    `inspect().has_table()` guards on every `op.create_table` /
+    `op.create_index`)
+  - 8 new permissions on `app.core.custom_roles`:
+    `read|write|delete|merge|export:chart_of_accounts`,
+    `import:coa_template`, `manage:coa_templates`,
+    `approve:coa_changes`
+  - 3 official templates seeded:
+    `socpa-retail-2024` (104 accounts, ZATCA-aware),
+    `ifrs-services-2024` (41 accounts, IFRS 15),
+    `ifrs-manufacturing-2024` (50 accounts, IAS 2 RM/WIP/FG split)
+  - 14 API endpoints under `/api/v1/coa/*` with `{success, data}`
+    envelope + JWT-based perm gates
+  - Service layer: full_path denormalised tree, cycle detection on
+    parent moves, breadth-first descendant path refresh, in-place
+    audit log writer, csv/json export
+  - **34 API tests** covering CRUD + hierarchy + merge + import
+    round-trip + permission gates + change_log accuracy
+  - Coverage on `app/coa/`: **87.30%** (target 85%)
+  - Dashboard widget `list.recent_account_changes` wired into
+    `app/dashboard/resolvers.py` + `seeds.py` so the audit log
+    surfaces in the customizable dashboard
+  - Flutter `api_service.dart`: 14 stub methods (`coaTree`,
+    `coaList`, `coaGet`, `coaCreate`, `coaUpdate`, `coaDelete`,
+    `coaDeactivate`, `coaReactivate`, `coaMerge`, `coaTemplates`,
+    `coaImportTemplate`, `coaChangelog`, `coaUsage`, `coaExport`)
+    so the follow-up Flutter screen can build on hook-injection
+    pattern from DASH-1.1
+
+  **Deferred to follow-up PRs:**
+  - **CoA-1.1** — backfill `pilot_gl_accounts` → `chart_of_accounts`
+  - **CoA-1.2** — full Flutter Three-Pane screen + 7 dialogs +
+    drag-drop reparent + 26+ widget tests (api_service stubs in
+    place)
+  - Approval workflow body
+  - GL posting validator consulting `requires_*` gates
+
+## Sprint 16 — Customizable Dashboard (Q2 2026, week 5) — DONE 2026-05-06
 
 ### 2026-05-06
 

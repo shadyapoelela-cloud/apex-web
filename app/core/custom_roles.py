@@ -118,6 +118,15 @@ _PERMISSIONS: list[Permission] = [
     Permission("customize:dashboard", "تخصيص داشبوردي", "Customize own dashboard", "platform"),
     Permission("manage:dashboard_role", "إدارة داشبورد الأدوار", "Manage role dashboards", "admin"),
     Permission("lock:dashboard", "قفل تخطيط الداشبورد", "Lock dashboard layout", "admin"),
+    # ─ Chart of Accounts (CoA-1, Sprint 17) ─
+    Permission("read:chart_of_accounts", "عرض شجرة الحسابات", "Read CoA", "finance"),
+    Permission("write:chart_of_accounts", "إنشاء/تعديل حسابات", "Write accounts", "finance"),
+    Permission("delete:chart_of_accounts", "حذف حسابات (غير مستخدمة)", "Delete accounts", "finance"),
+    Permission("merge:chart_of_accounts", "دمج حسابين", "Merge accounts", "finance"),
+    Permission("import:coa_template", "استيراد قالب جاهز", "Import template", "finance"),
+    Permission("export:chart_of_accounts", "تصدير شجرة الحسابات", "Export CoA", "finance"),
+    Permission("manage:coa_templates", "إدارة القوالب", "Manage templates", "admin"),
+    Permission("approve:coa_changes", "اعتماد تعديلات الشجرة", "Approve CoA edits", "finance"),
 ]
 
 _PERM_BY_ID = {p.id: p for p in _PERMISSIONS}

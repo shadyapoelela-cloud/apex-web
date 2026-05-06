@@ -166,6 +166,18 @@ SYSTEM_WIDGETS: list[dict[str, Any]] = [
         "required_perms": ["write:invoices"],
         "refresh_secs": 0,
     },
+    # CoA-1 Phase 5: dashboard window into the new audit log.
+    {
+        "code": "list.recent_account_changes",
+        "title_ar": "آخر تعديلات شجرة الحسابات",
+        "title_en": "Recent CoA Changes",
+        "category": "finance",
+        "widget_type": WidgetType.LIST,
+        "data_source": "coa.changelog.recent?limit=5",
+        "default_span": 4, "min_span": 3, "max_span": 6,
+        "required_perms": ["read:chart_of_accounts"],
+        "refresh_secs": 300,
+    },
 ]
 
 

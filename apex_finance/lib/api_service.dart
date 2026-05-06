@@ -1558,6 +1558,95 @@ class ApiService {
       _put('/api/v1/dashboard/role-layouts/$roleId', {'name': name, 'blocks': blocks});
   static Future<ApiResult> dashboardLockRoleLayout(String roleId, bool isLocked) =>
       _post('/api/v1/dashboard/role-layouts/$roleId/lock', {'is_locked': isLocked});
+
+  // ── CoA-1: Chart of Accounts ──
+  // 14 endpoints under /api/v1/coa. Same {success, data} envelope as
+  // every other ApiResult-returning method here — UI layer unwraps
+  // .data the same way it does for the dashboard.
+
+  static Future<ApiResult> coaTree(String entityId, {bool includeInactive = false}) {
+    final qp = 'entity_id=${Uri.encodeQueryComponent(entityId)}'
+        '${includeInactive ? '&include_inactive=true' : ''}';
+    return _get('/api/v1/coa/tree?$qp');
+  }
+
+  static Future<ApiResult> coaList(
+    String entityId, {
+    bool? isActive,
+    String? accountClass,
+    bool? isPostable,
+    bool? isReconcilable,
+    String? search,
+    int limit = 1000,
+    int offset = 0,
+  }) {
+    final params = <String, String>{
+      'entity_id': entityId,
+      'limit': '$limit',
+      'offset': '$offset',
+    };
+    if (isActive != null) params['is_active'] = '$isActive';
+    if (accountClass != null) params['account_class'] = accountClass;
+    if (isPostable != null) params['is_postable'] = '$isPostable';
+    if (isReconcilable != null) params['is_reconcilable'] = '$isReconcilable';
+    if (search != null && search.isNotEmpty) params['search'] = search;
+    final qs = params.entries
+        .map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}')
+        .join('&');
+    return _get('/api/v1/coa/list?$qs');
+  }
+
+  static Future<ApiResult> coaGet(String id) =>
+      _get('/api/v1/coa/$id');
+  static Future<ApiResult> coaCreate(Map<String, dynamic> data) =>
+      _post('/api/v1/coa/', data);
+  static Future<ApiResult> coaUpdate(String id, Map<String, dynamic> data) =>
+      _patch('/api/v1/coa/$id', data);
+  static Future<ApiResult> coaDelete(String id) =>
+      _delete('/api/v1/coa/$id');
+  static Future<ApiResult> coaDeactivate(String id, {String? reason}) =>
+      _post('/api/v1/coa/$id/deactivate', {if (reason != null) 'reason': reason});
+  static Future<ApiResult> coaReactivate(String id) =>
+      _post('/api/v1/coa/$id/reactivate', const {});
+  static Future<ApiResult> coaMerge({
+    required String sourceId,
+    required String targetId,
+    String? reason,
+  }) =>
+      _post('/api/v1/coa/merge', {
+        'source_id': sourceId,
+        'target_id': targetId,
+        if (reason != null) 'reason': reason,
+      });
+  static Future<ApiResult> coaTemplates() =>
+      _get('/api/v1/coa/templates');
+  static Future<ApiResult> coaImportTemplate(
+    String code,
+    String entityId, {
+    bool overwrite = false,
+  }) =>
+      _post('/api/v1/coa/templates/$code/import', {
+        'entity_id': entityId,
+        'overwrite': overwrite,
+      });
+  static Future<ApiResult> coaChangelog(String id, {int limit = 50}) =>
+      _get('/api/v1/coa/$id/changelog?limit=$limit');
+  static Future<ApiResult> coaUsage(String id) =>
+      _get('/api/v1/coa/$id/usage');
+
+  /// CSV / JSON exports return raw text rather than the JSON envelope —
+  /// callers should treat .data as a pre-formatted string.
+  static Future<String?> coaExport(String entityId, {String fmt = 'json'}) async {
+    try {
+      final url = Uri.parse(
+          '$_base/api/v1/coa/export?entity_id=${Uri.encodeQueryComponent(entityId)}&fmt=$fmt');
+      final res = await _httpClient.get(url, headers: _h);
+      if (res.statusCode == 200) return res.body;
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
 }
 
 
