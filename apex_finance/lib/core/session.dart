@@ -6,6 +6,35 @@ class S {
   static String? tenantId, entityId;
   static String? get savedTenantId => tenantId ?? html.window.localStorage['apex_tenant_id'];
   static String? get savedEntityId => entityId ?? html.window.localStorage['apex_entity_id'];
+
+  /// DASH-1.1: cached effective permission set for the active user.
+  /// Populated from JWT claims after login, plus refreshed whenever the
+  /// dashboard fetches /widgets (the catalog response is permission-scoped
+  /// so the resulting code-set lower-bounds what we know the user can do).
+  /// Reads fall back to localStorage so a refresh doesn't clobber the
+  /// permission gate before the next API call.
+  static List<String> userPerms = const [];
+  static List<String> get savedUserPerms {
+    if (userPerms.isNotEmpty) return userPerms;
+    final raw = html.window.localStorage['apex_user_perms'];
+    if (raw == null || raw.isEmpty) return const [];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) {
+        userPerms = decoded.cast<String>();
+        return userPerms;
+      }
+    } catch (_) {/* fall through */}
+    return raw.split(',').where((p) => p.isNotEmpty).toList();
+  }
+  static set savedUserPerms(List<String> v) {
+    userPerms = List.unmodifiable(v);
+    html.window.localStorage['apex_user_perms'] = jsonEncode(userPerms);
+  }
+  static bool hasPerm(String perm) {
+    if (perm == 'read:dashboard' && (token ?? '').isNotEmpty) return true;
+    return savedUserPerms.contains(perm);
+  }
   static void setActiveScope({required String tenant, required String entity}) {
     tenantId = tenant;
     entityId = entity;
@@ -35,10 +64,12 @@ class S {
   static void clear() {
     token=null; uid=null; uname=null; dname=null; plan=null; email=null; roles=[];
     tenantId=null; entityId=null;
+    userPerms = const [];
     final st = html.window.localStorage;
     st.remove('apex_token'); st.remove('apex_uid'); st.remove('apex_uname');
     st.remove('apex_dname'); st.remove('apex_plan'); st.remove('apex_email');
     st.remove('apex_roles'); st.remove('apex_tenant_id'); st.remove('apex_entity_id');
+    st.remove('apex_user_perms');
   }
   static String planAr() {
     const m = {'free':'مجاني','pro':'احترافي','business':'أعمال','expert':'خبير','enterprise':'مؤسسي'};

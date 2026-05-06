@@ -1,3 +1,17 @@
+/// ⚠️ DEPRECATED — مؤرشف 2026-05-06 لصالح CustomizableDashboard
+/// (راجع DASH-1.1). يبقى للمراجع التاريخية لـ widgets منطق KPI.
+/// لا تستورده في كود إنتاجي.
+///
+/// `analysis_options.yaml` excludes `_archive/**` so the analyzer skips
+/// this file. Imports below remain at their original `../../...` paths
+/// which no longer resolve from inside `_archive/` — that's intentional;
+/// fixing them would suggest the file is still maintained.
+///
+/// Live `/dashboard` and `/today` are now serviced by
+/// `lib/screens/dashboard/customizable_dashboard.dart`.
+library;
+
+// ignore_for_file: unused_import, uri_does_not_exist
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';

@@ -143,6 +143,54 @@ data: {"widget_code": "kpi.cash_balance", "payload": {...}}
 The frontend `dashboardStream()` listener routes by `widget_code` and
 re-renders only that widget — no full-dashboard re-render.
 
+## Frontend integration (DASH-1.1)
+
+Flutter UI lives at `apex_finance/lib/`:
+
+| file                                                   | role |
+| ------------------------------------------------------ | ---- |
+| `lib/screens/dashboard/customizable_dashboard.dart`    | Host screen — bootstraps catalog + layout + batch data, opens SSE, manages Edit Mode. Constructor takes a `DashboardApiHooks` so tests can pin the network without mockito. |
+| `lib/screens/dashboard/dashboard_hooks_default.dart`   | Live network adapter — production callers use `defaultDashboardHooks(...)`. Lives in its own file so the screen compiles in `flutter test` without dragging `package:http/browser_client.dart`. |
+| `lib/screens/dashboard/role_layouts_admin.dart`        | Admin shell at `/dashboard/admin/role-layouts`. Lock toggle + edit each role's default layout. |
+| `lib/widgets/dashboard/_base.dart`                     | `DashboardCatalogEntry`, `DashboardBlockSpec`, abstract `DashboardWidgetRenderer`, shared `renderErrorState` helper. |
+| `lib/widgets/dashboard/kpi_widget_renderer.dart`       | KPI tile with sparkline + trend chip. |
+| `lib/widgets/dashboard/chart_widget_renderer.dart`     | fl_chart line / area / bar; normalises 3 wire shapes. |
+| `lib/widgets/dashboard/table_widget_renderer.dart`     | DataTable with 10-row pagination + Arabic numerals. |
+| `lib/widgets/dashboard/list_widget_renderer.dart`      | ListTile collection with optional `route` taps. |
+| `lib/widgets/dashboard/ai_widget_renderer.dart`        | AI Pulse with confidence dot + per-widget refresh. |
+| `lib/widgets/dashboard/action_widget_renderer.dart`    | CTA button OR mini-form (driven by `configSchema['fields']`). |
+
+### Reuses, does NOT replace
+
+- `lib/core/apex_dashboard_builder.dart` (353 lines, drag/drop) — the
+  host translates between its own `DashboardBlockSpec` and the builder's
+  `DashboardBlock` and lets the builder own reorder/resize UX entirely.
+- `lib/widgets/main_nav.dart` tab 0 was previously `EnhancedDashboard`
+  with three legacy callbacks; now mounts `CustomizableDashboard`.
+
+### Routes
+
+| path | screen |
+| ---- | ------ |
+| `/dashboard` | `CustomizableDashboard()` |
+| `/today`     | `CustomizableDashboard(title: 'اليوم')` |
+| `/dashboard/admin/role-layouts` | `RoleLayoutsAdminScreen()` (manage:dashboard_role gated) |
+
+The 6 specialised V5 dashboards (executive_v5, esg, cybersecurity,
+admin_health, action) ship as preset views toggleable from settings —
+they aren't part of this rewire.
+
+### Archived
+
+`apex_finance/_archive/2026-05-06/dashboards_v1/` holds the v1
+`enhanced_dashboard.dart` and `today_dashboard_screen.dart` for git
+history. `analysis_options.yaml` excludes the archive from analysis.
+
+### Tests
+
+`apex_finance/test/dashboard/` — 22 widget tests (13 renderer + 9 host).
+Hooks-based test doubles avoid mockito/mocktail.
+
 ## Cross-references
 
 - `app/core/saved_views.py` — same persistence shape (UNIQUE on tenant +
@@ -160,6 +208,6 @@ re-renders only that widget — no full-dashboard re-render.
 | 1     | Models + permissions + alembic migration  | ✅   |
 | 2     | Seeds + service layer + resolvers         | ✅   |
 | 3     | API endpoints + SSE + tests               | ✅   |
-| 4     | Frontend (api_service + customizable screen + renderers) | partial |
+| 4     | Frontend (api_service + customizable screen + renderers) | ✅ DASH-1.1 |
 | 5     | Permission hardening + 15 tests           | ✅   |
-| 6     | Coverage 85% + perf + docs + PR           | partial |
+| 6     | Coverage 85% + perf + docs + PR           | ✅   |
