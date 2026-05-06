@@ -12,6 +12,17 @@ funding_*, etc.) that polluted the autogen output. The hand-written
 revision contains only the dashboard tables — diff-clean against any
 fresh `create_all`-built DB.
 
+Idempotent (DASH-1 hotfix 2026-05-06): production was bootstrapped via
+SQLAlchemy's `create_all()` which races with alembic when both run on
+startup. `_run_startup` calls `create_all()` early, then alembic tries
+`op.create_table("dashboard_widgets", ...)` and trips DuplicateTable.
+
+Each `create_table` is now wrapped in an `inspect().has_table(...)`
+guard so the migration succeeds whether the table was pre-created
+by `create_all()` or not. The same guard wraps `drop_table` in
+`downgrade()` so a partial rollback doesn't crash on already-dropped
+tables.
+
 Revision ID: h2c5e8f1a4b7
 Revises: g1e2b4c9f3d8
 Create Date: 2026-05-06
@@ -23,6 +34,7 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy import inspect
 
 
 # ── Identifiers ────────────────────────────────────────────
@@ -34,118 +46,167 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+# ── Idempotency helpers ───────────────────────────────────
+
+
+def _table_exists(table_name: str) -> bool:
+    """True when the live DB already has `table_name`.
+
+    Used to skip `op.create_table` when `create_all()` got there first
+    (the create_all → alembic-stamp transition leaves prod in a state
+    where the table is real but alembic_version doesn't know about it).
+    """
+    bind = op.get_bind()
+    return inspect(bind).has_table(table_name)
+
+
+def _index_exists(table_name: str, index_name: str) -> bool:
+    """True when `index_name` already exists on `table_name`. Belt-and-
+    braces — `create_all()` mirrors model-side indexes too, so each
+    `create_index` could collide on the second run."""
+    bind = op.get_bind()
+    try:
+        existing = {ix["name"] for ix in inspect(bind).get_indexes(table_name)}
+    except Exception:  # noqa: BLE001 — table may not exist yet
+        return False
+    return index_name in existing
+
+
 # ── Upgrade / Downgrade ───────────────────────────────────
 
 
 def upgrade() -> None:
     # Widget catalog
-    op.create_table(
-        "dashboard_widgets",
-        sa.Column("id", sa.String(length=36), nullable=False),
-        sa.Column("tenant_id", sa.String(length=36), nullable=True),
-        sa.Column("code", sa.String(length=120), nullable=False),
-        sa.Column("title_ar", sa.String(length=160), nullable=False),
-        sa.Column("title_en", sa.String(length=160), nullable=False),
-        sa.Column("description_ar", sa.String(length=400), nullable=True),
-        sa.Column("description_en", sa.String(length=400), nullable=True),
-        sa.Column("category", sa.String(length=64), nullable=False),
-        sa.Column("widget_type", sa.String(length=16), nullable=False),
-        sa.Column("data_source", sa.String(length=200), nullable=True),
-        sa.Column("default_span", sa.Integer(), nullable=False),
-        sa.Column("min_span", sa.Integer(), nullable=False),
-        sa.Column("max_span", sa.Integer(), nullable=False),
-        sa.Column("required_perms", sa.JSON(), nullable=False),
-        sa.Column("config_schema", sa.JSON(), nullable=True),
-        sa.Column("refresh_secs", sa.Integer(), nullable=False),
-        sa.Column("is_system", sa.Boolean(), nullable=False),
-        sa.Column("is_enabled", sa.Boolean(), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("tenant_id", "code", name="uq_dashboard_widget_code"),
-    )
-    op.create_index(
-        op.f("ix_dashboard_widgets_code"),
-        "dashboard_widgets",
-        ["code"],
-        unique=False,
-    )
-    op.create_index(
-        op.f("ix_dashboard_widgets_tenant_id"),
-        "dashboard_widgets",
-        ["tenant_id"],
-        unique=False,
-    )
+    if not _table_exists("dashboard_widgets"):
+        op.create_table(
+            "dashboard_widgets",
+            sa.Column("id", sa.String(length=36), nullable=False),
+            sa.Column("tenant_id", sa.String(length=36), nullable=True),
+            sa.Column("code", sa.String(length=120), nullable=False),
+            sa.Column("title_ar", sa.String(length=160), nullable=False),
+            sa.Column("title_en", sa.String(length=160), nullable=False),
+            sa.Column("description_ar", sa.String(length=400), nullable=True),
+            sa.Column("description_en", sa.String(length=400), nullable=True),
+            sa.Column("category", sa.String(length=64), nullable=False),
+            sa.Column("widget_type", sa.String(length=16), nullable=False),
+            sa.Column("data_source", sa.String(length=200), nullable=True),
+            sa.Column("default_span", sa.Integer(), nullable=False),
+            sa.Column("min_span", sa.Integer(), nullable=False),
+            sa.Column("max_span", sa.Integer(), nullable=False),
+            sa.Column("required_perms", sa.JSON(), nullable=False),
+            sa.Column("config_schema", sa.JSON(), nullable=True),
+            sa.Column("refresh_secs", sa.Integer(), nullable=False),
+            sa.Column("is_system", sa.Boolean(), nullable=False),
+            sa.Column("is_enabled", sa.Boolean(), nullable=False),
+            sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+            sa.PrimaryKeyConstraint("id"),
+            sa.UniqueConstraint("tenant_id", "code", name="uq_dashboard_widget_code"),
+        )
+    if not _index_exists("dashboard_widgets", "ix_dashboard_widgets_code"):
+        op.create_index(
+            op.f("ix_dashboard_widgets_code"),
+            "dashboard_widgets",
+            ["code"],
+            unique=False,
+        )
+    if not _index_exists("dashboard_widgets", "ix_dashboard_widgets_tenant_id"):
+        op.create_index(
+            op.f("ix_dashboard_widgets_tenant_id"),
+            "dashboard_widgets",
+            ["tenant_id"],
+            unique=False,
+        )
 
     # Layout
-    op.create_table(
-        "dashboard_layouts",
-        sa.Column("id", sa.String(length=36), nullable=False),
-        sa.Column("tenant_id", sa.String(length=36), nullable=True),
-        sa.Column("scope", sa.String(length=16), nullable=False),
-        sa.Column("owner_id", sa.String(length=120), nullable=True),
-        sa.Column("name", sa.String(length=120), nullable=False),
-        sa.Column("blocks", sa.JSON(), nullable=False),
-        sa.Column("is_default", sa.Boolean(), nullable=False),
-        sa.Column("is_locked", sa.Boolean(), nullable=False),
-        sa.Column("version", sa.Integer(), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint(
-            "tenant_id",
-            "scope",
-            "owner_id",
-            "name",
-            name="uq_dashboard_layout_scope",
-        ),
-    )
-    op.create_index(
-        "ix_dashboard_layouts_owner",
-        "dashboard_layouts",
-        ["scope", "owner_id"],
-        unique=False,
-    )
-    op.create_index(
-        op.f("ix_dashboard_layouts_owner_id"),
-        "dashboard_layouts",
-        ["owner_id"],
-        unique=False,
-    )
-    op.create_index(
-        op.f("ix_dashboard_layouts_tenant_id"),
-        "dashboard_layouts",
-        ["tenant_id"],
-        unique=False,
-    )
+    if not _table_exists("dashboard_layouts"):
+        op.create_table(
+            "dashboard_layouts",
+            sa.Column("id", sa.String(length=36), nullable=False),
+            sa.Column("tenant_id", sa.String(length=36), nullable=True),
+            sa.Column("scope", sa.String(length=16), nullable=False),
+            sa.Column("owner_id", sa.String(length=120), nullable=True),
+            sa.Column("name", sa.String(length=120), nullable=False),
+            sa.Column("blocks", sa.JSON(), nullable=False),
+            sa.Column("is_default", sa.Boolean(), nullable=False),
+            sa.Column("is_locked", sa.Boolean(), nullable=False),
+            sa.Column("version", sa.Integer(), nullable=False),
+            sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+            sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
+            sa.PrimaryKeyConstraint("id"),
+            sa.UniqueConstraint(
+                "tenant_id",
+                "scope",
+                "owner_id",
+                "name",
+                name="uq_dashboard_layout_scope",
+            ),
+        )
+    if not _index_exists("dashboard_layouts", "ix_dashboard_layouts_owner"):
+        op.create_index(
+            "ix_dashboard_layouts_owner",
+            "dashboard_layouts",
+            ["scope", "owner_id"],
+            unique=False,
+        )
+    if not _index_exists("dashboard_layouts", "ix_dashboard_layouts_owner_id"):
+        op.create_index(
+            op.f("ix_dashboard_layouts_owner_id"),
+            "dashboard_layouts",
+            ["owner_id"],
+            unique=False,
+        )
+    if not _index_exists("dashboard_layouts", "ix_dashboard_layouts_tenant_id"):
+        op.create_index(
+            op.f("ix_dashboard_layouts_tenant_id"),
+            "dashboard_layouts",
+            ["tenant_id"],
+            unique=False,
+        )
 
     # Snapshot cache
-    op.create_table(
-        "dashboard_data_cache",
-        sa.Column("cache_key", sa.String(length=256), nullable=False),
-        sa.Column("payload", sa.JSON(), nullable=False),
-        sa.Column("computed_at", sa.DateTime(timezone=True), nullable=False),
-        sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
-        sa.PrimaryKeyConstraint("cache_key"),
-    )
-    op.create_index(
-        "ix_dashboard_cache_expiry",
-        "dashboard_data_cache",
-        ["expires_at"],
-        unique=False,
-    )
+    if not _table_exists("dashboard_data_cache"):
+        op.create_table(
+            "dashboard_data_cache",
+            sa.Column("cache_key", sa.String(length=256), nullable=False),
+            sa.Column("payload", sa.JSON(), nullable=False),
+            sa.Column("computed_at", sa.DateTime(timezone=True), nullable=False),
+            sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
+            sa.PrimaryKeyConstraint("cache_key"),
+        )
+    if not _index_exists("dashboard_data_cache", "ix_dashboard_cache_expiry"):
+        op.create_index(
+            "ix_dashboard_cache_expiry",
+            "dashboard_data_cache",
+            ["expires_at"],
+            unique=False,
+        )
 
 
 def downgrade() -> None:
-    op.drop_index("ix_dashboard_cache_expiry", table_name="dashboard_data_cache")
-    op.drop_table("dashboard_data_cache")
+    # Drop in reverse order, each guarded so a partially-rolled-back
+    # state doesn't trip on an already-dropped table.
+    if _table_exists("dashboard_data_cache"):
+        if _index_exists("dashboard_data_cache", "ix_dashboard_cache_expiry"):
+            op.drop_index(
+                "ix_dashboard_cache_expiry", table_name="dashboard_data_cache"
+            )
+        op.drop_table("dashboard_data_cache")
 
-    op.drop_index(
-        op.f("ix_dashboard_layouts_tenant_id"), table_name="dashboard_layouts"
-    )
-    op.drop_index(op.f("ix_dashboard_layouts_owner_id"), table_name="dashboard_layouts")
-    op.drop_index("ix_dashboard_layouts_owner", table_name="dashboard_layouts")
-    op.drop_table("dashboard_layouts")
+    if _table_exists("dashboard_layouts"):
+        for ix in (
+            "ix_dashboard_layouts_tenant_id",
+            "ix_dashboard_layouts_owner_id",
+            "ix_dashboard_layouts_owner",
+        ):
+            if _index_exists("dashboard_layouts", ix):
+                op.drop_index(ix, table_name="dashboard_layouts")
+        op.drop_table("dashboard_layouts")
 
-    op.drop_index(op.f("ix_dashboard_widgets_tenant_id"), table_name="dashboard_widgets")
-    op.drop_index(op.f("ix_dashboard_widgets_code"), table_name="dashboard_widgets")
-    op.drop_table("dashboard_widgets")
+    if _table_exists("dashboard_widgets"):
+        for ix in (
+            "ix_dashboard_widgets_tenant_id",
+            "ix_dashboard_widgets_code",
+        ):
+            if _index_exists("dashboard_widgets", ix):
+                op.drop_index(ix, table_name="dashboard_widgets")
+        op.drop_table("dashboard_widgets")
