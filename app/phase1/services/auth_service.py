@@ -132,7 +132,29 @@ def validate_password_strength(password: str):
 # â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
 
 
-def create_access_token(user_id: str, username: str, roles: list) -> str:
+def create_access_token(
+    user_id: str,
+    username: str,
+    roles: list,
+    *,
+    tenant_id: Optional[str] = None,
+) -> str:
+    """Issue a short-lived access token.
+
+    ERR-2 (2026-05-07): `tenant_id` keyword embeds the user's primary
+    tenant id into the JWT claim. `TenantContextMiddleware` reads it
+    via `_extract_jwt_tenant()` and binds it to a per-request
+    ContextVar; the `attach_tenant_guard()` SQLAlchemy listener then
+    auto-filters every query on a `TenantMixin` model by that tenant.
+
+    Without this claim the middleware sees `tenant_id == None` and
+    falls back to the permissive "show NULL-tenant rows" path — which
+    is how the cross-tenant data leak in UAT Issue #3 was happening.
+    Legacy callers passing only `(user_id, username, roles)` keep
+    working: the keyword defaults to `None`, the claim is omitted,
+    and the existing fallback applies. New registrations + logins
+    pass the claim explicitly so isolation kicks in.
+    """
     payload = {
         "sub": user_id,
         "username": username,
@@ -141,6 +163,8 @@ def create_access_token(user_id: str, username: str, roles: list) -> str:
         "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
         "iat": datetime.now(timezone.utc),
     }
+    if tenant_id is not None:
+        payload["tenant_id"] = tenant_id
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
