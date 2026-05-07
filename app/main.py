@@ -2340,6 +2340,56 @@ def promote_user(
         db.close()
 
 
+@app.post(
+    "/admin/migrate-legacy-tenants",
+    tags=["Admin"],
+    summary="Backfill PilotTenant for users created before ERR-2 Phase 3 (PR #169)",
+)
+async def admin_migrate_legacy_tenants(
+    secret: str = Query(None),
+    x_admin_secret: str = Header(None, alias="X-Admin-Secret"),
+):
+    """G-LEGACY-TENANT-MIGRATION trigger.
+
+    One-off (idempotent) admin action that walks the users table and
+    creates a fresh `pilot_tenants` row for every user that doesn't
+    already own one. Same field shape as ERR-2 Phase 3's
+    `auth_service.register()` so legacy and new tenants render
+    identically in the dashboard.
+
+    Auth: `X-Admin-Secret` header required (or `?secret=` query in
+    dev only — production rejects the query form per `_verify_admin`).
+
+    Re-running is safe: users that already own a tenant are skipped,
+    so the second invocation reports `migrated == 0`.
+
+    Response:
+        {
+          "success": true,
+          "data": {
+            "total_legacy": <int>,    # users found needing migration
+            "migrated": <int>,        # rows actually inserted
+            "failed": <int>,          # per-row failures
+            "details": [{user_id, username, tenant_id}, ...],
+            "failures": [{user_id, username, error}, ...]
+          }
+        }
+    """
+    _verify_admin(secret, x_admin_secret)
+
+    from app.phase1.models.platform_models import SessionLocal
+    from app.phase1.services.legacy_tenant_migration import (
+        migrate_all_legacy_users,
+    )
+
+    db = SessionLocal()
+    try:
+        result = migrate_all_legacy_users(db)
+        return {"success": True, "data": result}
+    finally:
+        db.close()
+
+
 @app.post("/admin/promote/{username}", tags=["Admin"])
 async def promote_to_admin(
     username: str, secret: str = Query(None), x_admin_secret: str = Header(None, alias="X-Admin-Secret")
