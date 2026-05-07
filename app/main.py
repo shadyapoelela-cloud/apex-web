@@ -18,7 +18,9 @@ All 11 Phases + 6 Sprints:
 """
 
 from contextlib import asynccontextmanager
+from typing import Optional
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Header
+from app.core.auth_utils import extract_user_id
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import os
@@ -2336,6 +2338,98 @@ def promote_user(
             )
             db.commit()
         return {"success": True, "username": username, "role": role}
+    finally:
+        db.close()
+
+
+@app.post(
+    "/admin/seed-demo-data",
+    tags=["Admin"],
+    summary="Seed realistic master data into a target tenant (G-DEMO-DATA-SEEDER v1)",
+)
+async def admin_seed_demo_data(
+    tenant_id: str = Query(..., description="Target tenant UUID"),
+    force: bool = Query(False, description="Append another batch even if data exists"),
+    secret: str = Query(None),
+    x_admin_secret: str = Header(None, alias="X-Admin-Secret"),
+):
+    """Admin trigger for the demo-data seeder.
+
+    Used during customer onboarding when ops want to populate a
+    tenant before handing it over. Idempotent — re-running on a
+    seeded tenant returns `{"skipped": true}` unless `force=true`.
+
+    Auth: `X-Admin-Secret` header required.
+    """
+    _verify_admin(secret, x_admin_secret)
+
+    from app.phase1.models.platform_models import SessionLocal
+    from app.phase1.services.demo_data_seeder import seed_demo_data
+
+    db = SessionLocal()
+    try:
+        result = seed_demo_data(db, tenant_id, force=force)
+        return {"success": True, "data": result}
+    except ValueError as exc:
+        # Tenant not found — surface as 404 rather than 500.
+        raise HTTPException(404, str(exc))
+    finally:
+        db.close()
+
+
+@app.post(
+    "/api/v1/account/seed-demo-data",
+    tags=["Account"],
+    summary="Seed realistic master data into the caller's own tenant",
+)
+async def user_seed_demo_data(
+    force: bool = Query(False, description="Append another batch even if data exists"),
+    authorization: Optional[str] = Header(None),
+):
+    """User-facing trigger for the demo-data seeder.
+
+    Every authenticated user can populate their own tenant — ideal
+    for the "Try it with demo data" button on a fresh account. The
+    tenant id comes from the JWT's `tenant_id` claim (added by
+    ERR-2 Phase 3 / PR #169); admin secret is NOT required because
+    the seeder writes only into the caller's own tenant.
+
+    Returns the same shape as the admin endpoint. Legacy users
+    whose JWT predates ERR-2 (no `tenant_id` claim) get 400 with a
+    pointer to the legacy-migration endpoint.
+    """
+    user_id = extract_user_id(authorization)
+
+    from app.core.tenant_context import current_tenant
+    from app.phase1.models.platform_models import SessionLocal
+    from app.phase1.services.demo_data_seeder import seed_demo_data
+
+    # The TenantContextMiddleware already extracted the claim into
+    # the ContextVar; we just read it here. If it's None, the JWT
+    # was issued before ERR-2 Phase 3 lands for that user.
+    tenant_id = current_tenant()
+    if not tenant_id:
+        raise HTTPException(
+            400,
+            "Your account has no tenant_id in the session token. "
+            "An admin can run /admin/migrate-legacy-tenants to "
+            "create one for you.",
+        )
+
+    db = SessionLocal()
+    try:
+        result = seed_demo_data(db, tenant_id, force=force)
+        # Surface user_id in the log line so an ops chase against
+        # the admin run is easier to correlate.
+        logging.info(
+            "G-DEMO-DATA-SEEDER: user=%s tenant=%s result=%s",
+            user_id,
+            tenant_id,
+            "skipped" if result.get("skipped") else "seeded",
+        )
+        return {"success": True, "data": result}
+    except ValueError as exc:
+        raise HTTPException(404, str(exc))
     finally:
         db.close()
 
