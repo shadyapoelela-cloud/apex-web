@@ -18,18 +18,15 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('V5 Quick Access pin validation', () {
     test('broken pins count stays within baseline', () {
-      // The HOTFIX repaired BUG-1..4 from UAT_FORENSIC_FULL_2026-05-06.md.
-      // The runtime validator (which knows about main-module scope —
-      // unlike the regex-only `scripts/dev/repro_routing_bugs.py`) also
-      // surfaces a pre-existing 5th bug: pin `vat` points to
-      // `/app/erp/finance/vat`, but the chip with id `vat` lives in
-      // `compliance/tax`, not in `erp/finance`. Out of scope for this
-      // PR — tracked separately. See the "Out of scope" section in the
-      // PR description.
+      // HOTFIX-Routing repaired BUG-1..4 from UAT_FORENSIC_FULL_2026-05-06.md
+      // and surfaced a 5th pre-existing bug (pin `vat` → wrong main
+      // module). G-CHIPS-WIRE-FIN-1 (this PR) fixed pin `vat` by
+      // routing it at the canonical `vat-return` chip in finance —
+      // dropping the broken-pin baseline from 1 to 0.
       //
       // This number must only DECREASE over time. Lower the baseline
       // when fixing a pin to ratchet the gate tighter.
-      const allowedBrokenPins = 1;
+      const allowedBrokenPins = 0;
       final errors = validatePins();
       expect(errors.length, lessThanOrEqualTo(allowedBrokenPins),
           reason:
@@ -48,21 +45,33 @@ void main() {
   });
 
   group('V5 chip reachability inventory', () {
+    test('chip vat-return is wired (G-CHIPS-WIRE-FIN-1 ratchet)', () {
+      // Pin `vat` depends on this chip remaining wired. If the pin
+      // route changes, OR the chip wiring is removed, this test catches
+      // it before the validator's broader chip-count test does.
+      final all = validateAllChips();
+      final vat =
+          all.firstWhere((s) => s.key == 'erp/finance/vat-return');
+      expect(vat.isReachable, isTrue,
+          reason:
+              'vat-return must remain wired — pin vat depends on it');
+    });
+
     test('reports broken chips count within baseline', () {
       final all = validateAllChips();
       final unreachable = all.where((s) => !s.isReachable).toList();
 
-      // Per UAT_FORENSIC_FULL_2026-05-06.md, the audit estimated 39
-      // unreachable chips. The actual count from the runtime validator
-      // is 56 — the audit was a manual sample; the validator is
-      // exhaustive. Most are unwired service-/module-level dashboards
-      // (`*/dashboard` chips) waiting for their dashboards to be wired
-      // in `v5_wired_screens.dart`.
+      // HOTFIX-Routing established the baseline at 56. G-CHIPS-WIRE-FIN-1
+      // (this PR) wired 12 finance chips — 10 of them previously
+      // unreachable, 2 already-reachable via the shell switch fallback —
+      // dropping the baseline to 46. Most of what remains are unwired
+      // service-/module-level dashboards (`*/dashboard` chips) waiting
+      // for their dashboards to be wired in `v5_wired_screens.dart`.
       //
       // This number must only DECREASE over time as chips get wired up.
       // If it grows, a regression has been introduced. Tighten the
       // baseline when wiring a chip to ratchet the gate.
-      const allowedUnreachable = 56;
+      const allowedUnreachable = 46;
       expect(unreachable.length, lessThanOrEqualTo(allowedUnreachable),
           reason:
               'Unreachable chips count grew above baseline ($allowedUnreachable). '
