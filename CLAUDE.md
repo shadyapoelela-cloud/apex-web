@@ -25,6 +25,8 @@
 - Don't leak tracebacks to clients -- log with `logging.error()`, return generic HTTPException
 - Startup uses `lifespan` context manager (NOT deprecated `on_event`)
 - Environment validation: fail-fast in production if critical vars are missing
+- **Tenant assignment (ERR-2 Phase 3, 2026-05-08):** every new user gets their own `pilot_tenants` row at registration (`auth_service.register()`), owned via `Tenant.created_by_user_id`. The JWT carries the id in a `tenant_id` claim added by `create_access_token(..., tenant_id=…)`; `TenantContextMiddleware` (already wired in `app/main.py:675`) binds it to a per-request ContextVar and `attach_tenant_guard(engine)` (`:686`) auto-filters every query on a `TenantMixin` model by that tenant. Login looks the tenant up via `Tenant.created_by_user_id`. Legacy users without a tenant row get tokens with no claim — guard falls back to permissive mode (do not break this for backward-compat). Admin paths bypassing the filter use `with_system_context()`.
+- **DB-layer RLS is NOT yet enabled** on the 97 tenant-scoped tables (see `docs/TENANT_TABLES_AUDIT_2026-05-07.md`). The app-layer guard above is the only enforcement today. RLS rollout is tracked as `G-RLS-MIGRATION` and must follow the table-by-table staging pattern in CLAUDE.md G-A3.1 — never enable in bulk on production startup.
 
 ## Frontend Conventions
 

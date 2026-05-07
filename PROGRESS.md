@@ -2,6 +2,52 @@
 
 ## Sprint 18 — Invoicing (Q2 2026, week 7) — IN PROGRESS
 
+### 2026-05-08
+
+- [x] **ERR-2 Phase 3** — Tenant per User on Registration (UAT Issue #3 closed)
+  - Branch: `feat/err-2-tenant-per-user`
+  - **User-visible bug:** new user registered via `/auth/register` was
+    immediately seeing 7 unrelated companies — a CRITICAL cross-tenant
+    leak. Reconnaissance proved the actual gap was much narrower than
+    the original spec implied: the app-layer tenant guard
+    (`TenantContextMiddleware` + `attach_tenant_guard()`) is already
+    wired in `app/main.py:675` / `:686` and works correctly when given
+    a tenant context. The bug was that `auth_service.register()` never
+    inserted a `Tenant` row and `create_access_token()` never embedded
+    `tenant_id` in the JWT — so the middleware saw no tenant and the
+    guard fell back to the permissive "show NULL-tenant rows" path
+    that surfaced the leftover shared-tenant data.
+  - **Fix:** three small code changes:
+    1. `create_access_token(..., tenant_id=None)` — optional keyword
+       embeds the claim; legacy positional callers unchanged.
+    2. `auth_service.register()` — inserts a fresh `Tenant` row owned
+       by the new user (`created_by_user_id = user.id`) and passes
+       its id into the access-token issuance.
+    3. `auth_service.login()` — looks the user's tenant up via
+       `Tenant.created_by_user_id` (oldest first) and embeds it.
+       Legacy users without a tenant row get tokens with no claim →
+       permissive fallback unchanged.
+  - **Tests:** 15 in `tests/test_tenant_per_user_registration.py`
+    across pure-unit (`create_access_token`), service-level
+    (`AuthService.register/login`), and end-to-end FastAPI client
+    layers. All pass.
+  - **Audit deliverable:** `docs/TENANT_TABLES_AUDIT_2026-05-07.md`
+    lists 97 tenant-scoped tables (TenantMixin or raw `tenant_id`).
+    Generator script at `scripts/dev/audit_tenant_tables.py` —
+    idempotent, no DB needed.
+  - **Deferred** to separate future tickets (out of scope here):
+    - `G-RLS-MIGRATION` — PostgreSQL RLS as defense-in-depth on top
+      of the app-layer guard. Per CLAUDE.md G-A3.1, must roll out
+      table-by-table with staging verification, not bulk.
+    - `G-LEGACY-TENANT-MIGRATION` — backfill script for users that
+      registered before this PR landed and still ride the shared
+      `06892550-…` tenant.
+    - `G-CI-DOCKER-POSTGRES` — testcontainers-postgres in CI for
+      RLS-level testing (prerequisite for G-RLS-MIGRATION).
+  - **Pre-existing test failure unaffected by this PR:**
+    `tests/test_invoicing_api.py::test_admin_run_due_now_runs_all_eligible`
+    fails identically on a stashed clean main. Not in scope.
+
 ### 2026-05-07
 
 - [x] **ERR-1** — Session redirect HOTFIX (Issues #1 + #2 from UAT)
