@@ -253,6 +253,14 @@ import '../../pilot/screens/setup/je_builder_screen.dart' as pilot_je;
 import '../../pilot/screens/setup/financial_reports_screen.dart' as pilot_reports;
 import '../../pilot/screens/setup/members_screen.dart' as pilot_members;
 
+// G-CHIPS-WIRE-FIN-1 (Sprint 16, 2026-05-06): wire 12 finance chips to
+// existing screen widgets. No new screens — pure mapping. See
+// scripts/dev/chip_wiring_audit.md for the full ground-truth audit.
+import '../../screens/operations/sales_invoices_screen.dart';
+import '../../screens/operations/receipt_capture_screen.dart';
+import '../../screens/settings/entity_setup_screen.dart';
+import '../../screens/compliance/zatca_status_center_screen.dart';
+
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
 ///
@@ -310,6 +318,25 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/ai-reconciliation': (ctx) => const AiReconciliationV52Screen(),
   'erp/finance/advanced-settings': (ctx) => const CompanySettingsScreen(),  // LIVE — Tenant+Entities+Branches+Settings CRUD
   'erp/finance/company-settings': (ctx) => const CompanySettingsScreen(),  // LIVE alias
+
+  // ── G-CHIPS-WIRE-FIN-1 (2026-05-06) — wire 12 chips reachable today ──
+  // Reduces unreachable-chip baseline from 56 → ~44. Pure mapping; the
+  // widgets all already exist. See scripts/dev/chip_wiring_audit.md.
+  // The first two entries (sales-invoices, entity-setup) replace the
+  // shell switch fallback at apex_v5_service_shell.dart:227 — direct
+  // wiring makes them visible to the routing validator.
+  'erp/finance/sales-invoices': (ctx) => const SalesInvoicesScreen(),
+  'erp/finance/entity-setup': (ctx) => const EntitySetupScreen(),
+  'erp/finance/ar-aging': (ctx) => const ArAgingScreen(),
+  'erp/finance/ap-aging': (ctx) => const ApAgingScreen(),
+  'erp/finance/vat-return': (ctx) => const VatReturnV52Screen(),
+  'erp/finance/cash-flow-forecast': (ctx) => const CashFlowForecastScreen(),
+  'erp/finance/tax-calendar': (ctx) => const TaxTimelineScreen(),
+  'erp/finance/wht': (ctx) => const WhtCalculatorV5Screen(),
+  'erp/finance/zakat': (ctx) => const ZakatCalculatorV5Screen(),
+  'erp/finance/zatca-status': (ctx) => const ZatcaStatusCenterScreen(),
+  'erp/finance/activity-log': (ctx) => const ActivityLogScreen(),
+  'erp/finance/receipt-capture': (ctx) => const ReceiptCaptureScreen(),
 
   // ── 1.2 Consolidation ────────────────────────────────────────────
   'erp/consolidation/consolidation': (ctx) => const ConsolidationV2Screen(),

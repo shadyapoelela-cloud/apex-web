@@ -4,6 +4,61 @@
 
 ### 2026-05-06
 
+- [x] **G-CHIPS-WIRE-FIN-1** — Wire 12 finance chips + fix pin `vat`
+  - Branch: `feat/g-chips-wire-fin-1`
+  - 12 finance chips wired to existing screens (no new screens):
+    `ar-aging`, `ap-aging`, `vat-return`, `cash-flow-forecast`,
+    `tax-calendar`, `wht`, `zakat`, `zatca-status`, `activity-log`,
+    `receipt-capture` (+ `sales-invoices` and `entity-setup` moved
+    from shell switch fallback to direct wiring so the validator
+    can see them).
+  - Fixed 5th pre-existing pin bug discovered during HOTFIX-Routing:
+    pin `vat` was pointing at `/app/erp/finance/vat`, but chip `vat`
+    lives in `compliance/tax`. New route: `/app/erp/finance/vat-return`
+    (canonical finance VAT screen, wired in this PR).
+  - Validator baselines tightened (ratchet ↓):
+    - `allowedBrokenPins`: 1 → **0**
+    - `allowedUnreachable`: 56 → **46**
+  - New artifact: `scripts/dev/regenerate_wired_keys.py` makes
+    `v5_wired_keys.dart` reproducible after any wiring edit.
+  - Out of scope (separate tickets):
+    - 2 chips with no existing screen: `health-score`, `inventory`
+    - 127 orphan wired entries cleanup
+    - Forensic audit of `hybrid_sidebar.dart` and Command Palette
+    - Finance-module-level `dashboard` chips (still in the 46
+      unreachable count, waiting on their own dashboard widgets)
+
+- [x] **HOTFIX-Routing** — 4 broken Quick Access pins + V5 routing validator
+  - Branch: `hotfix/v5-routing-pins`
+  - Bug summary (see `UAT_FORENSIC_FULL_2026-05-06.md`):
+    - BUG-1..4 fixed in `apex_v5_service_shell.dart` (4 lines)
+    - BUG-1: pin `tb` → chip `trial-balance` not declared in finance → 404
+    - BUG-2: pin `journal` → chip `gl` not declared in finance → 404
+    - BUG-3: pin `clients` → `/app/erp/app/erp/...` double prefix → 404
+    - BUG-4: pin `vendors` → `/app/erp/app/erp/...` double prefix → 404
+  - New artifacts:
+    - `apex_finance/lib/core/v5/v5_routing_validator.dart` (validator)
+    - `apex_finance/lib/core/v5/v5_pin_routes.dart` (public pin list,
+      decoupled from the shell to keep `flutter test` away from the
+      `dart:html` graph)
+    - `apex_finance/lib/core/v5/v5_wired_keys.dart` (352 wired chip
+      paths, decoupled from the 200+ screen-widget imports for the
+      same reason)
+    - `apex_finance/test/v5_routing_test.dart` (3 guard tests)
+    - `scripts/dev/repro_routing_bugs.py` (regex-only repro)
+    - CI gates added to `.github/workflows/ci.yml`: Python script
+      runs in `lint`, Flutter test runs in new `flutter-routing` job
+  - Baselines (ratchet only down): broken pins ≤ 1 (vat — pre-existing,
+    out of scope); unreachable chips ≤ 56 (manual audit guessed 39;
+    runtime walk is the actual exhaustive count).
+  - Out of scope (separate tickets):
+    - Pin `vat` → chip `vat` lives in `compliance/tax`, not `erp/finance`
+    - Wiring the 12 finance chips with broken wiring (ar-aging,
+      vat-return, etc.)
+    - Cleanup of orphan wired entries (V4 aliases)
+    - Forensic audit of `hybrid_sidebar.dart` routes
+    - Forensic audit of Command Palette commands
+
 - [x] **INV-1** (Phases 0-6 backend) — Invoicing orchestration layer
   - Branch: `feat/invoicing-module`
   - 4 SQLAlchemy tables: `credit_notes`, `credit_note_lines`,
