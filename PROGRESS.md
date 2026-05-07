@@ -4,6 +4,45 @@
 
 ### 2026-05-08
 
+- [x] **G-DEMO-DATA-SEEDER (master-data tier)** — fill empty tenants with demo data
+  - Branch: `feat/g-demo-data-seeder`
+  - **Bug:** after ERR-2 (PR #169) + Legacy Migration (PR #170), every
+    tenant starts empty. The 12 wired finance + customer + vendor
+    chips render blank screens, breaking stakeholder demos and UAT.
+  - **Fix (v1, this PR):** master-data tier of the seeder. New
+    service `app/phase1/services/demo_data_seeder.py` populates
+    `pilot_customers` (5), `pilot_vendors` (5), `pilot_products`
+    (15) — 25 records per call, Arabic names + Saudi-style codes.
+    Two endpoints in `app/main.py`:
+    - `POST /admin/seed-demo-data?tenant_id=…` (X-Admin-Secret;
+      404 for invalid tenant)
+    - `POST /api/v1/account/seed-demo-data` (JWT; reads tenant_id
+      from claim added by ERR-2 Phase 3; 400 for legacy tokens
+      without claim)
+    Idempotent via "any `pilot_customers` row owned by this
+    tenant" sentinel — second call without `force=true` returns
+    `{"skipped": true}`. `force=true` appends with 6-hex-char code
+    suffix to avoid the `uq_pilot_*_tenant_code` constraints.
+  - **Tests:** 18 in `tests/test_demo_data_seeder.py` across
+    idempotency, master-data counts, Arabic names + code
+    uniqueness, cross-tenant isolation, admin endpoint auth, user
+    endpoint auth + claim-driven dispatch. 69/69 across the wider
+    auth + tenant + seeder sweep.
+  - **Audit doc:** `docs/DEMO_DATA_GUIDE_2026-05-08.md` covers the
+    contract, risk profile, idempotency semantics, and what's
+    explicitly NOT touched.
+  - **Deferred (G-DEMO-DATA-SEEDER-V2, separate ticket):**
+    journal entries, sales invoices, purchase invoices, payments.
+    Each needs a curated FK chain (Entity, FiscalPeriod, ~8
+    `pilot_gl_accounts` rows, AR/AP control accounts, running
+    invoice numbers) that the codebase doesn't yet have a packaged
+    seeder for. Bundling all of that into one PR creates a
+    high-regression-risk migration; better to ship the
+    blank-screens fix today and queue the GL+invoice extension
+    with a focused FK design.
+  - **Refs:** UAT need from stakeholder demos; builds on PRs #169
+    + #170.
+
 - [x] **G-LEGACY-TENANT-MIGRATION** — backfill tenants for users created before ERR-2 Phase 3
   - Branch: `feat/g-legacy-tenant-migration`
   - **Bug:** ERR-2 Phase 3 (PR #169) fixed new registrations — every
