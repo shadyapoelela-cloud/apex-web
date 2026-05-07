@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api_service.dart';
 import 'core/session.dart';
+import 'core/v5/v5_routing_validator.dart';
 
 // Sprint-1 refactor: the root widget now lives in app/apex_app.dart.
 // Re-exported so existing imports of `package:apex_finance/main.dart`
@@ -47,6 +49,8 @@ Future<void> main() async {
       }
     }
   }
+
+  if (kDebugMode) validatePins();
 
   runApp(const ProviderScope(child: ApexApp()));
 }
