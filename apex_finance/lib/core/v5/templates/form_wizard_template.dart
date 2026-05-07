@@ -276,7 +276,27 @@ class _FormWizardTemplateState extends State<FormWizardTemplate> {
                 style: TextStyle(fontSize: 13, color: core_theme.AC.ts)),
           ],
           const SizedBox(height: 20),
-          Expanded(child: widget.steps[_currentStep].builder(context)),
+          // G-VAT-WIZARD-FIX-2 (2026-05-07): wrap the step body in a
+          // SingleChildScrollView at the template level. The step
+          // body lives inside Expanded, which gives it bounded
+          // height — but a tall step (e.g. VAT step 2 with 5 source
+          // rows + a confirm checkbox) overflows that height, and
+          // without an explicit scroll viewport the overflow is
+          // silently clipped (verified in production: the
+          // _confirmedSources checkbox sat below a viewport with
+          // body scrollHeight === innerHeight === 588 and zero
+          // scrollable elements detected). Wrapping here makes
+          // every wizard step scroll-safe regardless of what its
+          // own builder returns. PR #166 added per-step
+          // SingleChildScrollView wraps in vat_return_v52_screen.dart;
+          // those become redundant but harmless when this outer
+          // scroll view is in place — the inner SCV just inherits
+          // unbounded vertical space and passes through.
+          Expanded(
+            child: SingleChildScrollView(
+              child: widget.steps[_currentStep].builder(context),
+            ),
+          ),
         ],
       ),
     );
