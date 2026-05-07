@@ -24,7 +24,7 @@ const List<V5PinRoute> kAllPinsForValidation = <V5PinRoute>[
   V5PinRoute(id: 'tb', route: '/app/erp/finance/statements'),
   V5PinRoute(id: 'financial_reports', route: '/app/erp/finance/statements'),
   V5PinRoute(id: 'journal', route: '/app/erp/finance/statements'),
-  V5PinRoute(id: 'vat', route: '/app/erp/finance/vat'),
+  V5PinRoute(id: 'vat', route: '/app/erp/finance/vat-return'),
   V5PinRoute(id: 'fixed_assets', route: '/app/erp/finance/fixed-assets'),
   V5PinRoute(id: 'budgets', route: '/app/erp/finance/budgets'),
   V5PinRoute(id: 'clients', route: '/app/erp/finance/sales-customers'),

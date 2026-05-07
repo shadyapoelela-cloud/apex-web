@@ -980,7 +980,7 @@ const _kAllPins = <_Pin>[
       id: 'vat',
       labelAr: 'ضريبة القيمة المضافة',
       icon: Icons.receipt_long,
-      route: '/app/erp/finance/vat'),
+      route: '/app/erp/finance/vat-return'),
   _Pin(
       id: 'fixed_assets',
       labelAr: 'الأصول الثابتة',
