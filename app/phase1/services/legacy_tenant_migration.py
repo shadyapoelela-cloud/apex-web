@@ -94,10 +94,15 @@ def find_legacy_users(db: Session) -> list[User]:
     """
     Tenant = _import_tenant_model()
 
+    # Pass an explicit select() to `IN(...)` rather than a Subquery —
+    # the latter triggers a SAWarning under SQLAlchemy 2.x ("Coercing
+    # Subquery object into a select()"). Functionally identical, just
+    # the canonical form.
+    from sqlalchemy import select as _select
+
     owned_user_ids = (
-        db.query(Tenant.created_by_user_id)
-        .filter(Tenant.created_by_user_id.isnot(None))
-        .subquery()
+        _select(Tenant.created_by_user_id)
+        .where(Tenant.created_by_user_id.isnot(None))
     )
     return (
         db.query(User)
