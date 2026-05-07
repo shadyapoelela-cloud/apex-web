@@ -150,7 +150,12 @@ import '../screens/lab/innovation_lab_screen.dart';
 import '../screens/settings/entity_setup_screen.dart';
 import '../screens/account/mfa_screen.dart';
 
-final authRefresh = ValueNotifier<int>(0);
+// ERR-1 (2026-05-07): the cross-cutting auth-refresh notifier moved
+// to `auth_guard.dart` so the 401 interceptor in api_service.dart can
+// bump it without importing this file (which would cycle through 200+
+// screen widgets). Re-export the canonical reference under the
+// historical name for source-compat.
+final authRefresh = apexAuthRefresh;
 
 /// Redirect guard for demo / dev-tool / showcase routes.
 /// Returns null (allow) when the current session has platform_admin or

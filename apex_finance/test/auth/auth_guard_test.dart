@@ -19,11 +19,17 @@ import 'package:apex_finance/core/auth_guard.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('authGuardRedirect (G-S2)', () {
-    test('protected path with no token → /login', () {
+  group('authGuardRedirect (G-S2 + ERR-1)', () {
+    test('protected path with no token → /login with return_to', () {
+      // ERR-1 (2026-05-07): redirect now carries the original path as
+      // `?return_to=…` so the login screen can send the user back.
+      // The test for the bare `/login` target was retired with that
+      // change. See `err_1_session_redirect_test.dart` for the
+      // exhaustive return_to round-trip checks.
       final r = authGuardRedirect(path: '/app', token: null);
-      expect(r, '/login',
-          reason: 'an anonymous visit to /app must be forced to login');
+      expect(r, '/login?return_to=%2Fapp',
+          reason: 'an anonymous visit to /app must be forced to login '
+              'with return_to preserving the destination');
     });
 
     test('/login with no token → no redirect (no loop)', () {
@@ -59,13 +65,15 @@ void main() {
       // session.dart's `S.token` getter returns null when the localStorage
       // value is an empty string, but defending here too prevents future
       // refactors from silently breaking the guard.
-      expect(authGuardRedirect(path: '/app', token: ''), '/login');
+      expect(authGuardRedirect(path: '/app', token: ''),
+          '/login?return_to=%2Fapp');
     });
 
-    test('nested protected paths also redirect', () {
-      expect(authGuardRedirect(path: '/app/dashboard', token: null), '/login');
-      expect(
-          authGuardRedirect(path: '/settings/entities', token: null), '/login');
+    test('nested protected paths also redirect with encoded return_to', () {
+      expect(authGuardRedirect(path: '/app/dashboard', token: null),
+          '/login?return_to=%2Fapp%2Fdashboard');
+      expect(authGuardRedirect(path: '/settings/entities', token: null),
+          '/login?return_to=%2Fsettings%2Fentities');
     });
   });
 }

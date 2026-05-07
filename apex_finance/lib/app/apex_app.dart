@@ -16,6 +16,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../core/apex_ask_panel.dart';
 import '../core/apex_command_palette.dart';
 import '../core/apex_commands_registry.dart';
+import '../core/auth_guard.dart' show apexScaffoldMessengerKey;
 import '../core/router.dart';
 import '../core/theme.dart';
 import '../providers/app_providers.dart';
@@ -63,6 +64,10 @@ class ApexApp extends ConsumerWidget {
       child: MaterialApp.router(
         title: 'APEX',
         debugShowCheckedModeBanner: false,
+        // ERR-1 (2026-05-07): attach the global ScaffoldMessenger key
+        // so the 401 interceptor in `api_service.dart` can show the
+        // "session expired" SnackBar without holding a BuildContext.
+        scaffoldMessengerKey: apexScaffoldMessengerKey,
         routerConfig: appRouter,
         theme: theme,
         locale: isAr ? const Locale('ar') : const Locale('en'),
