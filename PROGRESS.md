@@ -4,6 +4,30 @@
 
 ### 2026-05-06
 
+- [x] **G-CHIPS-WIRE-FIN-1** — Wire 12 finance chips + fix pin `vat`
+  - Branch: `feat/g-chips-wire-fin-1`
+  - 12 finance chips wired to existing screens (no new screens):
+    `ar-aging`, `ap-aging`, `vat-return`, `cash-flow-forecast`,
+    `tax-calendar`, `wht`, `zakat`, `zatca-status`, `activity-log`,
+    `receipt-capture` (+ `sales-invoices` and `entity-setup` moved
+    from shell switch fallback to direct wiring so the validator
+    can see them).
+  - Fixed 5th pre-existing pin bug discovered during HOTFIX-Routing:
+    pin `vat` was pointing at `/app/erp/finance/vat`, but chip `vat`
+    lives in `compliance/tax`. New route: `/app/erp/finance/vat-return`
+    (canonical finance VAT screen, wired in this PR).
+  - Validator baselines tightened (ratchet ↓):
+    - `allowedBrokenPins`: 1 → **0**
+    - `allowedUnreachable`: 56 → **46**
+  - New artifact: `scripts/dev/regenerate_wired_keys.py` makes
+    `v5_wired_keys.dart` reproducible after any wiring edit.
+  - Out of scope (separate tickets):
+    - 2 chips with no existing screen: `health-score`, `inventory`
+    - 127 orphan wired entries cleanup
+    - Forensic audit of `hybrid_sidebar.dart` and Command Palette
+    - Finance-module-level `dashboard` chips (still in the 46
+      unreachable count, waiting on their own dashboard widgets)
+
 - [x] **HOTFIX-Routing** — 4 broken Quick Access pins + V5 routing validator
   - Branch: `hotfix/v5-routing-pins`
   - Bug summary (see `UAT_FORENSIC_FULL_2026-05-06.md`):
