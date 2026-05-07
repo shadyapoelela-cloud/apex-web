@@ -4,6 +4,58 @@
 
 ### 2026-05-08
 
+- [x] **G-LEGACY-TENANT-MIGRATION** — backfill tenants for users created before ERR-2 Phase 3
+  - Branch: `feat/g-legacy-tenant-migration`
+  - **Bug:** ERR-2 Phase 3 (PR #169) fixed new registrations — every
+    new user gets their own `pilot_tenants` row and a JWT carrying
+    `tenant_id`. But users that registered BEFORE #169 still have no
+    Tenant row, their tokens lack the claim, and
+    `TenantContextMiddleware` falls back to its permissive path —
+    they keep seeing the legacy shared `06892550-…` tenant data.
+    This is the residual leg of UAT Issue #3 that #169 deliberately
+    deferred.
+  - **Fix:** new service module
+    `app/phase1/services/legacy_tenant_migration.py` exposes
+    `find_legacy_users`, `migrate_user`, and
+    `migrate_all_legacy_users`. Backed by a one-off admin endpoint
+    `POST /admin/migrate-legacy-tenants` (gated on
+    `X-Admin-Secret`). Idempotent — running twice returns
+    `migrated == 0` for any user already migrated; no double Tenant
+    rows.
+  - **Field shape matches ERR-2 Phase 3 exactly** so legacy and
+    fresh tenants render identically in the dashboard:
+    `slug = "u-<uid-prefix>-<fresh-uuid-suffix>"`,
+    `legal_name_ar = "<display> - الحساب الشخصي"`,
+    `primary_email = user.email`, `primary_country = "SA"`,
+    `created_by_user_id = user.id`. Display falls back through
+    `display_name → username → user.id` so a degenerate row still
+    gets a non-empty name.
+  - **Tests:** 15 in `tests/test_legacy_tenant_migration.py`
+    covering the SQL anti-join (including the NULL-owner /
+    three-valued-logic pitfall on PostgreSQL), single-row migration
+    + idempotency, batch path, and the HTTP surface (403 without
+    secret, 403 with wrong secret, 200 + migrated rows in details
+    with correct secret, second run reports zero for the same user).
+    51/51 pass across the wider auth + tenant test sweep.
+  - **Operator action after deploy:** hit the endpoint once.
+    ```
+    curl -X POST $API/admin/migrate-legacy-tenants \
+      -H "X-Admin-Secret: $ADMIN_SECRET"
+    ```
+    Re-running is safe; migrated users pick up their `tenant_id`
+    claim on their next login automatically (handled by ERR-2 Phase 3's
+    existing `auth_service.login()` lookup — no extra step).
+  - **Out of scope (separate cleanup tickets):**
+    - Reassigning data already in the legacy `06892550-…` tenant
+      to its rightful user. Deciding which row goes to which user
+      requires customer-support context.
+    - Reissuing JWTs to migrated users mid-session — covered
+      automatically on next login.
+    - `G-RLS-MIGRATION` — still deferred (see ERR-2 Phase 3 entry
+      below).
+  - **Refs:** UAT_REPORT_2026-05-06.md Issue #3 (residual leg);
+    builds on ERR-2 Phase 3 (PR #169).
+
 - [x] **ERR-2 Phase 3** — Tenant per User on Registration (UAT Issue #3 closed)
   - Branch: `feat/err-2-tenant-per-user`
   - **User-visible bug:** new user registered via `/auth/register` was
