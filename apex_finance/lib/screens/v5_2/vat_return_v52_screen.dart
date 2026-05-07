@@ -76,16 +76,18 @@ class _VatReturnV52ScreenState extends State<VatReturnV52Screen> {
   }
 
   Widget _step1() {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('اختر الفترة الضريبية:', style: TextStyle(fontSize: 13, color: core_theme.AC.ts)),
-      const SizedBox(height: 16),
-      Wrap(spacing: 10, runSpacing: 10, children: [
-        _periodCard('Q1 2026', 'يناير - مارس', '23 أبريل 2026', true),
-        _periodCard('Q4 2025', 'أكتوبر - ديسمبر', '23 يناير 2026', false),
-        _periodCard('Q3 2025', 'يوليو - سبتمبر', '23 أكتوبر 2025', false),
-        _periodCard('Q2 2025', 'أبريل - يونيو', '23 يوليو 2025', false),
+    return SingleChildScrollView(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('اختر الفترة الضريبية:', style: TextStyle(fontSize: 13, color: core_theme.AC.ts)),
+        const SizedBox(height: 16),
+        Wrap(spacing: 10, runSpacing: 10, children: [
+          _periodCard('Q1 2026', 'يناير - مارس', '23 أبريل 2026', true),
+          _periodCard('Q4 2025', 'أكتوبر - ديسمبر', '23 يناير 2026', false),
+          _periodCard('Q3 2025', 'يوليو - سبتمبر', '23 أكتوبر 2025', false),
+          _periodCard('Q2 2025', 'أبريل - يونيو', '23 يوليو 2025', false),
+        ]),
       ]),
-    ]);
+    );
   }
 
   Widget _periodCard(String period, String dates, String due, bool current) {
@@ -128,42 +130,44 @@ class _VatReturnV52ScreenState extends State<VatReturnV52Screen> {
       ('إشعارات دائنة', 'Credit Notes', '24 إشعار', true),
       ('نقاط البيع', 'POS (Retail + Restaurant)', '15,240 عملية', true),
     ];
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.ok.withValues(alpha: 0.3))),
-        child: Row(children: [
-          Icon(Icons.check_circle, color: core_theme.AC.ok, size: 20),
-          SizedBox(width: 10),
-          Expanded(child: Text('تم جلب البيانات من كل المصادر بنجاح', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
-        ]),
-      ),
-      const SizedBox(height: 16),
-      Text('المصادر المُدرجة في الإقرار:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-      const SizedBox(height: 8),
-      ...sources.map((s) => Container(
-            margin: const EdgeInsets.only(bottom: 6),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
-            child: Row(children: [
-              Icon(s.$4 ? Icons.check_circle : Icons.radio_button_unchecked, color: s.$4 ? core_theme.AC.ok : core_theme.AC.td),
-              const SizedBox(width: 10),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(s.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                Text('${s.$2} · ${s.$3}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
-              ])),
-            ]),
-          )),
-      const SizedBox(height: 12),
-      CheckboxListTile(
-        value: _confirmedSources,
-        onChanged: (v) => setState(() => _confirmedSources = v ?? false),
-        title: Text('أؤكّد صحة المصادر أعلاه', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-        subtitle: Text('سيتم استخدامها لحساب VAT Output / Input', style: TextStyle(fontSize: 10)),
-        activeColor: _gold,
-        dense: true,
-      ),
-    ]);
+    return SingleChildScrollView(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.ok.withValues(alpha: 0.3))),
+          child: Row(children: [
+            Icon(Icons.check_circle, color: core_theme.AC.ok, size: 20),
+            SizedBox(width: 10),
+            Expanded(child: Text('تم جلب البيانات من كل المصادر بنجاح', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700))),
+          ]),
+        ),
+        const SizedBox(height: 16),
+        Text('المصادر المُدرجة في الإقرار:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 8),
+        ...sources.map((s) => Container(
+              margin: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
+              child: Row(children: [
+                Icon(s.$4 ? Icons.check_circle : Icons.radio_button_unchecked, color: s.$4 ? core_theme.AC.ok : core_theme.AC.td),
+                const SizedBox(width: 10),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(s.$1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                  Text('${s.$2} · ${s.$3}', style: TextStyle(fontSize: 11, color: core_theme.AC.ts)),
+                ])),
+              ]),
+            )),
+        const SizedBox(height: 12),
+        CheckboxListTile(
+          value: _confirmedSources,
+          onChanged: (v) => setState(() => _confirmedSources = v ?? false),
+          title: Text('أؤكّد صحة المصادر أعلاه', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+          subtitle: Text('سيتم استخدامها لحساب VAT Output / Input', style: TextStyle(fontSize: 10)),
+          activeColor: _gold,
+          dense: true,
+        ),
+      ]),
+    );
   }
 
   Widget _step3() {
@@ -175,23 +179,25 @@ class _VatReturnV52ScreenState extends State<VatReturnV52Screen> {
     ];
     final totalSales = lines.fold<double>(0, (s, l) => s + l.$3);
     final totalVAT = lines.fold<double>(0, (s, l) => s + l.$4);
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: _gold.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: _gold)),
-        child: Row(children: [
-          Icon(Icons.arrow_circle_up, color: _gold, size: 28),
-          const SizedBox(width: 12),
-          Expanded(child: Text('ضريبة المخرجات (Output VAT)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy))),
-          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Text('${totalVAT.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _gold)),
-            Text('من مبيعات ${(totalSales / 1e6).toStringAsFixed(2)} مليون', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+    return SingleChildScrollView(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(color: _gold.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: _gold)),
+          child: Row(children: [
+            Icon(Icons.arrow_circle_up, color: _gold, size: 28),
+            const SizedBox(width: 12),
+            Expanded(child: Text('ضريبة المخرجات (Output VAT)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy))),
+            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Text('${totalVAT.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _gold)),
+              Text('من مبيعات ${(totalSales / 1e6).toStringAsFixed(2)} مليون', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+            ]),
           ]),
-        ]),
-      ),
-      const SizedBox(height: 16),
-      _vatTable(lines),
-    ]);
+        ),
+        const SizedBox(height: 16),
+        _vatTable(lines),
+      ]),
+    );
   }
 
   Widget _step4() {
@@ -203,23 +209,25 @@ class _VatReturnV52ScreenState extends State<VatReturnV52Screen> {
     ];
     final totalPurch = lines.fold<double>(0, (s, l) => s + l.$3);
     final totalVAT = lines.fold<double>(0, (s, l) => s + l.$4);
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok)),
-        child: Row(children: [
-          Icon(Icons.arrow_circle_down, color: core_theme.AC.ok, size: 28),
-          const SizedBox(width: 12),
-          Expanded(child: Text('ضريبة المدخلات (Input VAT)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy))),
-          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Text('${totalVAT.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: core_theme.AC.ok)),
-            Text('من مشتريات ${(totalPurch / 1e6).toStringAsFixed(2)} مليون', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+    return SingleChildScrollView(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(color: core_theme.AC.ok.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(10), border: Border.all(color: core_theme.AC.ok)),
+          child: Row(children: [
+            Icon(Icons.arrow_circle_down, color: core_theme.AC.ok, size: 28),
+            const SizedBox(width: 12),
+            Expanded(child: Text('ضريبة المدخلات (Input VAT)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _navy))),
+            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Text('${totalVAT.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: core_theme.AC.ok)),
+              Text('من مشتريات ${(totalPurch / 1e6).toStringAsFixed(2)} مليون', style: TextStyle(fontSize: 10, color: core_theme.AC.ts)),
+            ]),
           ]),
-        ]),
-      ),
-      const SizedBox(height: 16),
-      _vatTable(lines),
-    ]);
+        ),
+        const SizedBox(height: 16),
+        _vatTable(lines),
+      ]),
+    );
   }
 
   Widget _step5() {
@@ -228,29 +236,31 @@ class _VatReturnV52ScreenState extends State<VatReturnV52Screen> {
       ('تعديل فواتير ملغاة (Q4)', -12800.0, true),
       ('إعادة احتساب الأصول الثابتة', 3200.0, false),
     ];
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('التسويات المقترحة لنهاية الفترة:', style: TextStyle(fontSize: 13, color: core_theme.AC.ts)),
-      const SizedBox(height: 12),
-      ...adjustments.map((a) => Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
-            child: Row(children: [
-              Icon(a.$3 ? Icons.check_circle : Icons.radio_button_unchecked, color: a.$3 ? core_theme.AC.ok : core_theme.AC.td),
-              const SizedBox(width: 10),
-              Expanded(child: Text(a.$1, style: const TextStyle(fontSize: 13))),
-              Text('${a.$2 >= 0 ? '+' : ''}${a.$2.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: a.$2 >= 0 ? core_theme.AC.ok : core_theme.AC.err)),
-            ]),
-          )),
-      const SizedBox(height: 12),
-      CheckboxListTile(
-        value: _reviewedAdjustments,
-        onChanged: (v) => setState(() => _reviewedAdjustments = v ?? false),
-        title: Text('راجعت التسويات وقمت بتطبيق ما يلزم', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-        activeColor: _gold,
-        dense: true,
-      ),
-    ]);
+    return SingleChildScrollView(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('التسويات المقترحة لنهاية الفترة:', style: TextStyle(fontSize: 13, color: core_theme.AC.ts)),
+        const SizedBox(height: 12),
+        ...adjustments.map((a) => Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: core_theme.AC.bdr)),
+              child: Row(children: [
+                Icon(a.$3 ? Icons.check_circle : Icons.radio_button_unchecked, color: a.$3 ? core_theme.AC.ok : core_theme.AC.td),
+                const SizedBox(width: 10),
+                Expanded(child: Text(a.$1, style: const TextStyle(fontSize: 13))),
+                Text('${a.$2 >= 0 ? '+' : ''}${a.$2.toStringAsFixed(0)} ر.س', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: a.$2 >= 0 ? core_theme.AC.ok : core_theme.AC.err)),
+              ]),
+            )),
+        const SizedBox(height: 12),
+        CheckboxListTile(
+          value: _reviewedAdjustments,
+          onChanged: (v) => setState(() => _reviewedAdjustments = v ?? false),
+          title: Text('راجعت التسويات وقمت بتطبيق ما يلزم', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+          activeColor: _gold,
+          dense: true,
+        ),
+      ]),
+    );
   }
 
   Widget _step6() {
