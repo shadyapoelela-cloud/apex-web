@@ -965,7 +965,7 @@ const _kAllPins = <_Pin>[
       id: 'tb',
       labelAr: 'ميزان المراجعة',
       icon: Icons.table_chart,
-      route: '/app/erp/finance/trial-balance'),
+      route: '/app/erp/finance/statements'),
   _Pin(
       id: 'financial_reports',
       labelAr: 'القوائم المالية',
@@ -975,7 +975,7 @@ const _kAllPins = <_Pin>[
       id: 'journal',
       labelAr: 'دفتر الأستاذ',
       icon: Icons.menu_book,
-      route: '/app/erp/finance/gl'),
+      route: '/app/erp/finance/statements'),
   _Pin(
       id: 'vat',
       labelAr: 'ضريبة القيمة المضافة',
@@ -995,12 +995,12 @@ const _kAllPins = <_Pin>[
       id: 'clients',
       labelAr: 'العملاء',
       icon: Icons.groups,
-      route: '/app/erp/app/erp/finance/sales-customers'),
+      route: '/app/erp/finance/sales-customers'),
   _Pin(
       id: 'vendors',
       labelAr: 'الموردون',
       icon: Icons.local_shipping,
-      route: '/app/erp/app/erp/purchasing/suppliers'),
+      route: '/app/erp/purchasing/suppliers'),
 ];
 
 class _QuickAccessRail extends StatefulWidget {
