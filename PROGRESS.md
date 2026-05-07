@@ -4,6 +4,41 @@
 
 ### 2026-05-07
 
+- [x] **ERR-1** — Session redirect HOTFIX (Issues #1 + #2 from UAT)
+  - Branch: `feat/err-1-session-redirect`
+  - **User-visible bug:** opening `/app/erp/finance/ar-aging` with an
+    expired session showed "الجلسة منتهية" but trapped the user — no
+    redirect to `/login`. The G-S2 auth guard already protects route
+    *navigation* but only fires on page load; in-flight API calls
+    that 401 weren't clearing the session, so the user kept the
+    stale token in localStorage.
+  - **Three layers of fix:**
+    1. `api_service.dart` — every helper goes through `_handleResponse`,
+       which detects 401 and triggers `_SessionExpiryHandler.handle()`:
+       clears `S`, shows a SnackBar via the global messenger key,
+       bumps `apexAuthRefresh` so `appRouter` re-evaluates the guard
+       and bounces the user to `/login`.
+    2. `auth_guard.dart` — `authGuardRedirect` now appends
+       `?return_to=<encoded original path>` to the `/login` redirect
+       so the destination survives the round trip. `apexAuthRefresh`
+       and `apexScaffoldMessengerKey` are declared here too (single
+       file with no `dart:html` so unit tests still load).
+    3. `slide_auth_screen.dart` — after a successful login,
+       `resolvePostLoginDestination(returnTo)` validates the query
+       param and navigates to the original path (or `/home`).
+       Defends against open-redirect attacks via crafted
+       `return_to=https://evil.example` (rejected; falls back to
+       `/home`).
+  - **Tests:** 18 new tests in `test/err_1_session_redirect_test.dart`
+    covering auth-flow paths, protected paths, encoded-paths
+    round-trip, and the post-login destination resolver including
+    open-redirect rejection. 3 existing G-S2 tests in
+    `test/auth/auth_guard_test.dart` updated to reflect the new
+    `?return_to=…` contract.
+  - **Refs:** `UAT_REPORT_2026-05-06.md` Issue #1 + #2;
+    `ERROR_HANDLING_STANDARD_2026.md` (Authentication & Session
+    Errors).
+
 - [x] **G-WEB-BUILD-1** — Catch-up bundle rebuild + gh-pages deploy automation
   - Branch: `chore/web-bundle-rebuild`
   - **Discovered:** 5 merged PRs (#157-#161 — DASH-1.1, CoA-1, INV-1,

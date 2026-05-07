@@ -33,6 +33,8 @@
 - **API base URL**: Centralized in `core/api_config.dart` -- ALL files import from there (never hardcode URLs)
 - Arabic RTL is the primary UI language
 - All API calls should go through `ApiService` which handles token injection and retry logic
+- **Session-expiry handling (ERR-1, 2026-05-07):** every `ApiResult`-producing helper in `api_service.dart` routes through `_handleResponse`, which detects HTTP 401 and triggers `_SessionExpiryHandler` exactly once: clears `S`, shows a SnackBar via the global `apexScaffoldMessengerKey`, and bumps `apexAuthRefresh` so `appRouter` re-evaluates the auth guard. Direct `_httpClient.{get,post,…}` calls that build their own `ApiResult` must call `_handleResponse(res)` to preserve this contract — do not parse 401s inline.
+- **Auth-protected routes:** anything not under `/login`, `/register`, or `/forgot-password*` is gated by `authGuardRedirect` in `core/auth_guard.dart`. The redirect emits `/login?return_to=<encoded path>`; `slide_auth_screen.dart` validates and decodes the param via `resolvePostLoginDestination` (which rejects open-redirect attempts).
 - All TextEditingControllers must have `dispose()` in the State class
 
 ## Environment Variables

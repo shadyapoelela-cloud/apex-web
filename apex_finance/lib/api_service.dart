@@ -1,9 +1,11 @@
 ﻿import 'dart:convert';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/browser_client.dart' show BrowserClient;
 import 'core/api_config.dart';
+import 'core/auth_guard.dart' show apexAuthRefresh, apexScaffoldMessengerKey;
 import 'core/session.dart';
 import 'core/company_store.dart';
 import 'core/entity_store.dart';
@@ -21,6 +23,48 @@ final http.Client _httpClient = (() {
   c.withCredentials = true;
   return c;
 })();
+
+/// ERR-1 (2026-05-07): centralized handler for 401 responses.
+///
+/// Triggered from every ApiResult-producing helper when the backend
+/// returns 401 (token missing / invalid / expired). Effects, in
+/// order:
+///   1. Clear local session state (`S.clear()` — token + uid + roles
+///      + tenant + entity + permissions, in-memory and localStorage).
+///   2. Show a SnackBar via the global `apexScaffoldMessengerKey`:
+///      "انتهت جلستك. يرجى تسجيل الدخول مجددًا."
+///   3. Bump `apexAuthRefresh`. `appRouter` listens via
+///      `refreshListenable`, so GoRouter re-evaluates the auth guard
+///      and bounces the user to `/login?return_to=<original path>`.
+///
+/// Idempotent: once `S.token` is null the handler short-circuits, so
+/// concurrent in-flight requests that all hit 401 only run the
+/// teardown once.
+class _SessionExpiryHandler {
+  static bool _handling = false;
+
+  static void handle() {
+    if (_handling) return;
+    if (S.token == null || S.token!.isEmpty) return;
+    _handling = true;
+    try {
+      S.clear();
+      ApiService.clearToken();
+      apexScaffoldMessengerKey.currentState?.showSnackBar(
+        const SnackBar(
+          content: Text('انتهت جلستك. يرجى تسجيل الدخول مجددًا.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      // Bumping the notifier triggers GoRouter's redirect re-evaluation,
+      // which now sees `S.token == null` and emits the
+      // `/login?return_to=<encoded path>` redirect.
+      apexAuthRefresh.value++;
+    } finally {
+      _handling = false;
+    }
+  }
+}
 
 class ApiService {
   static const _base = apiBase;
@@ -747,20 +791,33 @@ class ApiService {
   }
 
     // ── Helpers (use _httpClient so HttpOnly cookies ride along) ──
+  // ERR-1 (2026-05-07): every response goes through `_handleResponse`
+  // so a 401 anywhere triggers `_SessionExpiryHandler` exactly once.
+  static ApiResult _handleResponse(http.Response res) {
+    if (res.statusCode == 401) {
+      _SessionExpiryHandler.handle();
+      return ApiResult.error('انتهت جلستك');
+    }
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      return ApiResult.ok(jsonDecode(res.body));
+    }
+    return ApiResult.error(_parseErr(res.body, res.statusCode));
+  }
+
   static Future<ApiResult> _get(String path) async {
-    try { final res=await _httpClient.get(Uri.parse('$_base$path'),headers:_h); if(res.statusCode==200)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
+    try { final res = await _httpClient.get(Uri.parse('$_base$path'), headers: _h); return _handleResponse(res); } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
   static Future<ApiResult> _post(String path, Map body) async {
-    try { final res=await _httpClient.post(Uri.parse('$_base$path'),headers:_h,body:jsonEncode(body)); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
+    try { final res = await _httpClient.post(Uri.parse('$_base$path'), headers: _h, body: jsonEncode(body)); return _handleResponse(res); } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
   static Future<ApiResult> _put(String path, Map body) async {
-    try { final res=await _httpClient.put(Uri.parse('$_base$path'),headers:_h,body:jsonEncode(body)); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
+    try { final res = await _httpClient.put(Uri.parse('$_base$path'), headers: _h, body: jsonEncode(body)); return _handleResponse(res); } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
   static Future<ApiResult> _delete(String path) async {
-    try { final res=await _httpClient.delete(Uri.parse('$_base$path'),headers:_h); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
+    try { final res = await _httpClient.delete(Uri.parse('$_base$path'), headers: _h); return _handleResponse(res); } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
   static Future<ApiResult> _patch(String path, Map body) async {
-    try { final res=await _httpClient.patch(Uri.parse('$_base$path'),headers:_h,body:jsonEncode(body)); if(res.statusCode>=200&&res.statusCode<300)return ApiResult.ok(jsonDecode(res.body)); return ApiResult.error(_parseErr(res.body,res.statusCode)); } catch(e){return ApiResult.error('خطأ: $e');}
+    try { final res = await _httpClient.patch(Uri.parse('$_base$path'), headers: _h, body: jsonEncode(body)); return _handleResponse(res); } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
   static String _parseErr(String body, int code) { try { final d=jsonDecode(body); return d['detail']??d['message']??'خطأ $code'; } catch(_){return 'خطأ $code';} }
 
@@ -779,11 +836,12 @@ class ApiService {
   }
 
   // ── Admin-secret-gated helpers (used by Wave 1A/1B/1C admin routes) ──
+  // ERR-1 (2026-05-07): use the same `_handleResponse` so admin 401s
+  // also trigger the session-expiry handler.
   static Future<ApiResult> _adminGet(String path) async {
     try {
       final res = await _httpClient.get(Uri.parse('$_base$path'), headers: _ha);
-      if (res.statusCode == 200) return ApiResult.ok(jsonDecode(res.body));
-      return ApiResult.error(_parseErr(res.body, res.statusCode));
+      return _handleResponse(res);
     } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
   static Future<ApiResult> _adminPost(String path, [Map? body]) async {
@@ -793,22 +851,19 @@ class ApiService {
         headers: _ha,
         body: jsonEncode(body ?? const {}),
       );
-      if (res.statusCode >= 200 && res.statusCode < 300) return ApiResult.ok(jsonDecode(res.body));
-      return ApiResult.error(_parseErr(res.body, res.statusCode));
+      return _handleResponse(res);
     } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
   static Future<ApiResult> _adminPatch(String path, Map body) async {
     try {
       final res = await _httpClient.patch(Uri.parse('$_base$path'), headers: _ha, body: jsonEncode(body));
-      if (res.statusCode >= 200 && res.statusCode < 300) return ApiResult.ok(jsonDecode(res.body));
-      return ApiResult.error(_parseErr(res.body, res.statusCode));
+      return _handleResponse(res);
     } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
   static Future<ApiResult> _adminDelete(String path) async {
     try {
       final res = await _httpClient.delete(Uri.parse('$_base$path'), headers: _ha);
-      if (res.statusCode >= 200 && res.statusCode < 300) return ApiResult.ok(jsonDecode(res.body));
-      return ApiResult.error(_parseErr(res.body, res.statusCode));
+      return _handleResponse(res);
     } catch (e) { return ApiResult.error('خطأ: $e'); }
   }
 

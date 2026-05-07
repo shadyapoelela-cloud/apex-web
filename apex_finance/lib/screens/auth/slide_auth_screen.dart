@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api_service.dart';
 import '../../core/apex_trust_signals.dart';
+import '../../core/auth_guard.dart' show resolvePostLoginDestination;
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/theme.dart' as core_theme;
@@ -46,7 +47,16 @@ class _SAS extends State<SlideAuthScreen> {
       S.plan = d['user']['plan'];
       S.email = d['user']['email'];
       S.roles = List<String>.from(d['user']['roles'] ?? []);
-      if (mounted) context.go('/home');
+      // ERR-1 (2026-05-07): if we got bounced here by the 401
+      // interceptor, the original path is in `?return_to=…`. Honor it
+      // (after sanity-checking it's a safe in-app path) so the user
+      // lands back where they were before the session expired.
+      if (mounted) {
+        final returnTo = GoRouterState.of(context)
+            .uri
+            .queryParameters['return_to'];
+        context.go(resolvePostLoginDestination(returnTo));
+      }
     } else {
       setState(() { _le = res.error ?? 'خطأ في الدخول'; _ll = false; });
     }
