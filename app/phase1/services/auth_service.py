@@ -252,6 +252,49 @@ class AuthService:
                         )
                     )
 
+            # ERR-2 (2026-05-07): every new user gets their own tenant.
+            # Before this, all signups silently shared the legacy tenant
+            # `06892550-…` and the new user instantly saw 7 unrelated
+            # companies (UAT Issue #3). The dedicated tenant created here
+            # is the row that `Tenant.created_by_user_id` will join back
+            # on at login (see `login()` below) so the JWT carries a
+            # real `tenant_id` claim.
+            #
+            # Best-effort: if the `pilot_tenants` table isn't reachable
+            # in the current environment (older schema, separate DB,
+            # ImportError on the pilot package), log and continue with
+            # `new_tenant_id = None`. The legacy `create_access_token`
+            # path then omits the claim — same behavior as before this
+            # PR — so registration never fails because of the isolation
+            # layer.
+            new_tenant_id: Optional[str] = None
+            try:
+                from app.pilot.models.tenant import Tenant as PilotTenant
+
+                new_tenant_id = gen_uuid()
+                db.add(
+                    PilotTenant(
+                        id=new_tenant_id,
+                        # Slug must be globally unique. Mix in the user
+                        # id prefix + a fresh uuid suffix; collisions are
+                        # astronomically unlikely.
+                        slug=f"u-{user.id[:8]}-{gen_uuid()[:8]}",
+                        legal_name_ar=f"{user.display_name} - الحساب الشخصي",
+                        primary_email=user.email,
+                        primary_country="SA",
+                        created_by_user_id=user.id,
+                    )
+                )
+            except Exception as tenant_exc:
+                logging.warning(
+                    "ERR-2: tenant creation skipped during registration "
+                    "(user=%s, reason=%s); token will issue without "
+                    "tenant_id claim",
+                    user.id,
+                    tenant_exc,
+                )
+                new_tenant_id = None
+
             # Security event — best-effort; tolerate older schema missing
             # columns or column types by trying with `details` first and
             # falling back to the minimal field set.
@@ -316,9 +359,15 @@ class AuthService:
                     "status": user.status,
                     "plan": free_plan.code if free_plan else "free",
                     "roles": roles,
+                    # ERR-2 (2026-05-07): expose tenant_id so the
+                    # frontend can store it; the JWT also carries it
+                    # in the `tenant_id` claim (below).
+                    "tenant_id": new_tenant_id,
                 },
                 "tokens": {
-                    "access_token": create_access_token(user.id, user.username, roles),
+                    "access_token": create_access_token(
+                        user.id, user.username, roles, tenant_id=new_tenant_id
+                    ),
                     "refresh_token": create_refresh_token(user.id),
                 },
             }
@@ -415,7 +464,39 @@ class AuthService:
                 .all()
             ]
 
-            access_tok = create_access_token(user.id, user.username, user_roles)
+            # ERR-2 (2026-05-07): look up the tenant created for this
+            # user at registration time and embed its id in the JWT.
+            # `Tenant.created_by_user_id` is the only link today (no
+            # explicit junction table); future workspaces / multi-org
+            # support would replace this with a richer lookup. Legacy
+            # users that pre-date ERR-2 won't have a tenant row → the
+            # claim is omitted and the existing TenantContextMiddleware
+            # falls back to its permissive path. Best-effort wrap so a
+            # missing pilot table or import error never blocks login.
+            login_tenant_id: Optional[str] = None
+            try:
+                from app.pilot.models.tenant import Tenant as PilotTenant
+
+                t = (
+                    db.query(PilotTenant)
+                    .filter(PilotTenant.created_by_user_id == user.id)
+                    .order_by(PilotTenant.created_at.asc())
+                    .first()
+                )
+                if t is not None:
+                    login_tenant_id = t.id
+            except Exception as tenant_exc:
+                logging.warning(
+                    "ERR-2: tenant lookup skipped during login "
+                    "(user=%s, reason=%s); token will issue without "
+                    "tenant_id claim",
+                    user.id,
+                    tenant_exc,
+                )
+
+            access_tok = create_access_token(
+                user.id, user.username, user_roles, tenant_id=login_tenant_id
+            )
             refresh_tok = create_refresh_token(user.id)
 
             # Update session with token hashes
@@ -434,6 +515,10 @@ class AuthService:
                     "status": user.status,
                     "plan": self._get_user_plan(db, user.id),
                     "roles": user_roles,
+                    # ERR-2 (2026-05-07): mirror the JWT claim into the
+                    # user payload so the frontend can store it
+                    # alongside the token.
+                    "tenant_id": login_tenant_id,
                 },
                 "tokens": {
                     "access_token": access_tok,
