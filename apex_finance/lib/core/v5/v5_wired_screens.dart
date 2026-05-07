@@ -831,3 +831,66 @@ V5ChipBuilder? getWiredBuilder(String serviceId, String mainId, String chipId) {
   final key = '$serviceId/$mainId/$chipId';
   return v5WiredScreens[key];
 }
+
+// ────────────────────────────────────────────────────────────────────
+// G-TREESHAKE-FIX (2026-05-07) — keep widget classes that are reachable
+// only through the v5WiredScreens Map alive in release builds.
+// ────────────────────────────────────────────────────────────────────
+//
+// Verified bug: after PR #163 + Pages source flip to gh-pages, the
+// live bundle contained the chip key strings (`indexOf` returned valid
+// offsets) but the UI rendered the "قيد البناء" / Coming Soon banner
+// for receipt-capture, ar-aging, vat-return, and 8 others. Diagnosis:
+// dart2js elided the widget closures inside the Map<String,
+// V5ChipBuilder> because the widget classes weren't reachable from any
+// direct call graph — only via the Map's runtime indexing, which
+// doesn't count as reachability for tree-shaking.
+//
+// Fix: a switch with 12 independent cases — each constructs ONE widget
+// non-const at runtime — invoked from `main.dart` with a runtime-valued
+// index that dart2js cannot fold statically.
+//
+// Earlier attempts that were defeated by dart2js (verified by content
+// grep on built bundle):
+//   1. `const _v5KeepAlive = <Type>[ArAgingScreen, ...]` then
+//      `contains(SizedBox)` check — folded to false at compile time.
+//   2. `final _v5KeepAlive = <Widget>[const ArAgingScreen(), ...]`
+//      with `print(...length)` — `.length` folded to 12 at compile
+//      time; class bodies still elided.
+//   3. Same pattern with non-const constructors — same result; the
+//      compiler proved the constructor calls had no observable effect
+//      beyond an unused-instance result.
+//
+// Why a switch works where a list didn't: each `case N: return FooScreen()`
+// is an independent reachable code path. dart2js cannot prove which arm
+// the runtime index will hit, so every widget class must remain in the
+// bundle. The caller (in main.dart) uses the return value
+// (`runtimeType`) so the call itself can't be eliminated as pure.
+//
+// Maintenance: whenever you wire a chip whose widget class is not
+// referenced anywhere else, add a `case N: return FooScreen();` line
+// here AND bump the modulus in main.dart. Order doesn't matter.
+@pragma('vm:entry-point')
+Widget v5WiredKeepAliveTouch(int idx) {
+  // ignore: prefer_const_constructors
+  switch (idx) {
+    case 0:  return ArAgingScreen();
+    case 1:  return ApAgingScreen();
+    case 2:  return VatReturnV52Screen();
+    case 3:  return CashFlowForecastScreen();
+    case 4:  return TaxTimelineScreen();
+    case 5:  return WhtCalculatorV5Screen();
+    case 6:  return ZakatCalculatorV5Screen();
+    case 7:  return ZatcaStatusCenterScreen();
+    case 8:  return ActivityLogScreen();
+    case 9:  return ReceiptCaptureScreen();
+    case 10: return EntitySetupScreen();
+    case 11: return SalesInvoicesScreen();
+    default: return const SizedBox.shrink();
+  }
+}
+
+/// Number of widgets touched by [v5WiredKeepAliveTouch]. The startup
+/// touch in main.dart cycles through the indices [0, v5WiredKeepAliveBaseline)
+/// at runtime so every case is reachable at least once.
+const int v5WiredKeepAliveBaseline = 12;
