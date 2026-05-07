@@ -175,7 +175,13 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
+          # G-WEB-BUILD-4 (2026-05-07): pinned to 3.27.4 (= local dev SDK)
+          # because newer Flutter ships Dart 3.7+ which fails const
+          # evaluation on google_fonts 6.3.0 (FontWeight as Map key
+          # without primitive `==`). Bump this in lockstep with a
+          # google_fonts upgrade — neither alone.
           channel: stable
+          flutter-version: '3.27.4'
           cache: true
 
       - name: Install Flutter dependencies
@@ -215,7 +221,13 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
+          # G-WEB-BUILD-4 (2026-05-07): pinned to 3.27.4 (= local dev SDK)
+          # because newer Flutter ships Dart 3.7+ which fails const
+          # evaluation on google_fonts 6.3.0 (FontWeight as Map key
+          # without primitive `==`). Bump this in lockstep with a
+          # google_fonts upgrade — neither alone.
           channel: stable
+          flutter-version: '3.27.4'
           cache: true
 
       - name: Build web bundle
