@@ -191,6 +191,80 @@ jobs:
         working-directory: apex_finance
         run: flutter test test/v5_routing_test.dart --reporter expanded
 
+  pages-deploy:
+    # G-WEB-BUILD-1 (Sprint 16, 2026-05-07): build the Flutter web bundle
+    # on every main push and force-push the result to the `gh-pages`
+    # branch. main history stays clean — bundle commits never land
+    # there. Replaces the previous workflow of ad-hoc manual rebuilds
+    # which left apex-web/main.dart.js stale by 5 PRs (b127858 →
+    # 03cca47). See PROGRESS.md G-WEB-BUILD-1 entry.
+    name: Build and deploy Flutter web to gh-pages
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      # Only used by peaceiris/actions-gh-pages to push to the
+      # gh-pages branch. main is never written to by this job.
+      contents: write
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Build web bundle
+        working-directory: apex_finance
+        run: |
+          flutter pub get
+          flutter build web \
+            --release \
+            --no-tree-shake-icons \
+            --base-href "/apex-web/" \
+            --dart-define=API_BASE=https://apex-api-ootk.onrender.com
+
+      - name: Smoke test bundle
+        # Refuse to publish broken builds. Catches:
+        # - missing main.dart.js
+        # - absurdly small bundle (compile silently produced empty output)
+        # - chip-class regression (recently-wired chip keys missing —
+        #   means the wiring was tree-shaken or v5_wired_screens.dart
+        #   broke during the build)
+        run: |
+          set -euo pipefail
+          test -f apex_finance/build/web/main.dart.js
+          SIZE=$(stat -c%s apex_finance/build/web/main.dart.js)
+          if [ "$SIZE" -lt 1000000 ]; then
+            echo "::error::main.dart.js too small ($SIZE bytes) — likely broken build"
+            exit 1
+          fi
+          for chip in receipt-capture ar-aging ap-aging vat-return tax-calendar; do
+            if ! grep -q "erp/finance/$chip" apex_finance/build/web/main.dart.js; then
+              echo "::error::Recently-wired chip '$chip' not found in bundle — wiring regression"
+              exit 1
+            fi
+          done
+          echo "Bundle smoke test passed: ${SIZE} bytes, all checked chips present"
+
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: apex_finance/build/web
+          publish_branch: gh-pages
+          force_orphan: true
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          commit_message: |
+            deploy: ${{ github.event.head_commit.message }}
+
+            Built from ${{ github.sha }}
+
   deploy:
     name: Deploy to Render
     needs: [lint, test]
