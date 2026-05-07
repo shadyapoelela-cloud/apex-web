@@ -105,6 +105,39 @@ Validator: `apex_finance/lib/core/v5/v5_routing_validator.dart`
 - One-shot start: `scripts/dev/run-backend.ps1` then `scripts/dev/run-frontend.ps1` (Windows) or the `.sh` equivalents (Mac/Linux). Both wrappers print the underlying `uvicorn` / `flutter run` command before executing — read once, learn the shape, drop the wrapper if you prefer.
 - **Do not edit `apex_finance/lib/core/api_config.dart` to "fix" local dev** — production CI bakes the default at build time. Use `--dart-define` instead.
 
+## Deployment
+
+### Backend → Render
+The `deploy` job in `.github/workflows/ci.yml` triggers a Render deploy
+hook on every push to `main` (after `lint` and `test` pass). No manual
+step.
+
+### Frontend → GitHub Pages auto-deploy (G-WEB-BUILD-1, Sprint 16)
+Every push to `main` runs the `pages-deploy` CI job, which:
+1. Builds Flutter web with `API_BASE=https://apex-api-ootk.onrender.com`
+2. Smoke-tests the bundle (`main.dart.js` ≥ 1 MB, recently-wired chip
+   keys present in the JS — guards against tree-shake regressions)
+3. Force-pushes the build output to the **`gh-pages`** branch via
+   `peaceiris/actions-gh-pages@v4`. main is never written to.
+
+`apex-web/` in `main` is now a frozen catch-up snapshot only; normal
+deploys live in `gh-pages` and are reproducible from CI. To see the
+bundle history use `git log gh-pages` (force-orphan keeps it 1-commit).
+
+Manual rebuild (emergency only — e.g. CI is down and a fix must ship):
+```bash
+cd apex_finance
+flutter build web --release --no-tree-shake-icons \
+  --base-href "/apex-web/" \
+  --dart-define=API_BASE=https://apex-api-ootk.onrender.com
+# Then push the output to gh-pages directly:
+cd ..
+git push origin --force build/web:gh-pages   # one-off override
+```
+
+`--no-tree-shake-icons` is required until a separate cleanup ticket
+fixes the source's non-const `IconData` usage. CI mirrors this flag.
+
 ## Common Pitfalls
 
 - Phase routers may shadow each other if paths overlap (e.g., `/users/me/security`)

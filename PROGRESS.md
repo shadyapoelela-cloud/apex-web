@@ -2,6 +2,40 @@
 
 ## Sprint 18 — Invoicing (Q2 2026, week 7) — IN PROGRESS
 
+### 2026-05-07
+
+- [x] **G-WEB-BUILD-1** — Catch-up bundle rebuild + gh-pages deploy automation
+  - Branch: `chore/web-bundle-rebuild`
+  - **Discovered:** 5 merged PRs (#157-#161 — DASH-1.1, CoA-1, INV-1,
+    HOTFIX-Routing, G-CHIPS-WIRE-FIN-1) updated `apex_finance/lib/`,
+    but `apex-web/main.dart.js` was last rebuilt at b127858 (161
+    source commits ago). Users on
+    `shadyapoelela-cloud.github.io/apex-web/` were running stale UI.
+  - **Root cause:** `ci.yml` had Render deploy (backend) but no
+    Flutter web deploy. apex-web/ was rebuilt manually + ad-hoc.
+  - **Fix Phase 1:** one-time manual rebuild — bundle now contains
+    all 12 newly wired finance chips (`vat-return`, `ar-aging`,
+    `ap-aging`, `tax-calendar`, `wht`, `zakat`, `zatca-status`,
+    `activity-log`, `receipt-capture`, `cash-flow-forecast`,
+    `sales-invoices`, `entity-setup`).
+  - **Fix Phase 2:** new `pages-deploy` CI job. Pattern chosen after
+    rejecting auto-push-to-main (anti-pattern). Builds web on every
+    main push, smoke-tests the bundle (≥1 MB + chip keys present),
+    force-pushes to **`gh-pages`** branch via
+    `peaceiris/actions-gh-pages@v4`. main history stays clean.
+  - **Build flag added:** `--no-tree-shake-icons`. The icon shaker
+    rejected at least one non-const `IconData` invocation in source.
+    Per scope this PR can't modify source; the flag is the
+    minimum-impact unblock. Cleanup is a separate ticket.
+  - **Required action by repo owner after merge:**
+    Settings → Pages → Source: `gh-pages` branch (currently
+    `main / apex-web/`). Non-breaking until flipped — current
+    deployment keeps serving from `apex-web/` until the toggle.
+  - **Verification after merge + flip:** open
+    `/app/erp/finance/receipt-capture` → loads `ReceiptCaptureScreen`
+    (was "قيد البناء" placeholder). Same for `ar-aging`, `ap-aging`,
+    `vat-return`, `tax-calendar`.
+
 ### 2026-05-06
 
 - [x] **G-CHIPS-WIRE-FIN-1** — Wire 12 finance chips + fix pin `vat`
