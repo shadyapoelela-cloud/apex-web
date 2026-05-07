@@ -7,8 +7,7 @@
 /// of which transitively pull in package:web, breaking flutter test).
 ///
 /// **Discipline:** any add/remove in [v5WiredScreens] must be mirrored
-/// here. The startup assertion in [v5_wired_screens.dart] catches drift
-/// in debug mode by comparing this set to the live map keys.
+/// here. Regenerate via `python scripts/dev/regenerate_wired_keys.py`.
 library;
 
 const Set<String> v5WiredKeys = <String>{
@@ -45,6 +44,18 @@ const Set<String> v5WiredKeys = <String>{
   'erp/finance/ai-reconciliation',
   'erp/finance/advanced-settings',
   'erp/finance/company-settings',
+  'erp/finance/sales-invoices',
+  'erp/finance/entity-setup',
+  'erp/finance/ar-aging',
+  'erp/finance/ap-aging',
+  'erp/finance/vat-return',
+  'erp/finance/cash-flow-forecast',
+  'erp/finance/tax-calendar',
+  'erp/finance/wht',
+  'erp/finance/zakat',
+  'erp/finance/zatca-status',
+  'erp/finance/activity-log',
+  'erp/finance/receipt-capture',
   'erp/consolidation/consolidation',
   'erp/consolidation/intercompany',
   'erp/consolidation/cap-table',
