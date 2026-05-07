@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'api_service.dart';
 import 'core/session.dart';
 import 'core/v5/v5_routing_validator.dart';
+import 'core/v5/v5_wired_screens.dart'
+    show v5WiredKeepAliveBaseline, v5WiredKeepAliveTouch;
 
 // Sprint-1 refactor: the root widget now lives in app/apex_app.dart.
 // Re-exported so existing imports of `package:apex_finance/main.dart`
@@ -51,6 +53,19 @@ Future<void> main() async {
   }
 
   if (kDebugMode) validatePins();
+
+  // G-TREESHAKE-FIX (2026-05-07): touch every widget class that's
+  // reachable only through the v5WiredScreens Map. The runtime index
+  // (`DateTime.now().microsecond % baseline`) ensures dart2js cannot
+  // prove which switch arm in `v5WiredKeepAliveTouch` is taken, so it
+  // must keep all 12 widget classes. The print of `runtimeType`
+  // consumes the return value so the call itself is not elidable.
+  // See v5_wired_screens.dart for the full bug history.
+  final keepAliveIdx =
+      DateTime.now().microsecond % v5WiredKeepAliveBaseline;
+  final keepAlive = v5WiredKeepAliveTouch(keepAliveIdx);
+  // ignore: avoid_print
+  print('apex: V5 keep-alive ${keepAlive.runtimeType}');
 
   runApp(const ProviderScope(child: ApexApp()));
 }
