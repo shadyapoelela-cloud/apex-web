@@ -46,7 +46,17 @@ dependencies:
   google_fonts: ^6.1.0
   go_router: ^14.8.1
   shared_preferences: ^2.3.4
-  intl: ^0.19.0
+  # intl is transitively pinned by `flutter_localizations` from the
+  # Flutter SDK: 0.19.0 in Flutter 3.27 (local dev SDK), 0.20.2 in
+  # Flutter 3.29+ (the channel:stable that CI's subosito/flutter-action
+  # currently pulls). A specific `^0.19.0` constraint breaks `pub get`
+  # on newer SDKs (the bug that blocked the pages-deploy job on CI run
+  # #696, commit 26ca44f); `^0.20.2` would symmetrically break older
+  # local SDKs. The bounded `>=0.19.0 <0.21.0` range satisfies both
+  # SDK pins without forcing a lockfile-wide refresh — the existing
+  # pubspec.lock entry (0.19.0) stays valid locally, and CI's pub get
+  # picks 0.20.2 freely. See G-WEB-BUILD-3.
+  intl: ">=0.19.0 <0.21.0"
   qr_flutter: ^4.1.0
   # V2 Blueprint § 2.0.1 — Syncfusion DataGrid for screens that need
   # freeze columns + virtual scroll for >1000 rows. Community license
