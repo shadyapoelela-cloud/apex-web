@@ -54,6 +54,15 @@ jobs:
           find app/ -name "*.py" -print0 | xargs -0 -n1 python -m py_compile
           echo "All files compiled successfully."
 
+      - name: V5 Routing — pin shape/chip-id check (regex)
+        # Fast pure-Python guard against the 4 routing bugs found in
+        # UAT_FORENSIC_FULL_2026-05-06.md: pins pointing at non-existent
+        # chips, and `/app/erp/app/erp/...` double-prefix typos. Runs
+        # without a Flutter toolchain so it gates every PR. The deeper
+        # runtime check (chip-in-correct-main-module + reachability
+        # ratchet) lives in `apex_finance/test/v5_routing_test.dart`.
+        run: python scripts/dev/repro_routing_bugs.py
+
   test:
     name: Tests & Coverage
     runs-on: ubuntu-latest
@@ -157,6 +166,30 @@ jobs:
           else:
               print('\nAll imports passed.')
           "
+
+  flutter-routing:
+    name: V5 Routing Validation (Flutter)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install Flutter dependencies
+        working-directory: apex_finance
+        run: flutter pub get
+
+      - name: Run V5 routing tests
+        # Guards against:
+        # - Quick Access pins resolving to a non-existent chip
+        # - /app/erp/app/erp/... double-prefix bugs
+        # - Unreachable chip count growing above the documented baseline
+        # See UAT_FORENSIC_FULL_2026-05-06.md.
+        working-directory: apex_finance
+        run: flutter test test/v5_routing_test.dart --reporter expanded
 
   deploy:
     name: Deploy to Render

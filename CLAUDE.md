@@ -75,6 +75,30 @@
 - CI/CD: GitHub Actions (`.github/workflows/ci.yml`) — lint (Black, Ruff, Bandit) + tests + coverage + deploy
 - Config: `pyproject.toml` for Black (120 chars), Ruff, pytest, coverage settings
 
+### V5 Routing Validation (HOTFIX-Routing, Sprint 16)
+
+Every PR runs two layers of routing checks:
+
+1. **CI lint job** runs `python scripts/dev/repro_routing_bugs.py` —
+   regex-only guard for `/app/erp/app/erp/...` double-prefix bugs and
+   pins pointing at chip ids that aren't declared as
+   `V5Chip(id: 'foo')` literals in `v5_data.dart`. Fast, no Flutter
+   needed.
+2. **CI flutter-routing job** runs
+   `flutter test apex_finance/test/v5_routing_test.dart` —
+   stricter runtime check (knows main-module scope, so a chip that
+   exists in the wrong main module is flagged). Also enforces a
+   ratchet on the count of unreachable chips: the number is allowed
+   to decrease as chips get wired but never grow.
+
+When wiring a previously-broken chip, the test will pass and the
+baseline implicitly decreases. To formally tighten the baseline, lower
+the `allowedUnreachable` (or `allowedBrokenPins`) constant in
+`test/v5_routing_test.dart` (acts as a ratchet).
+
+Audit history: `UAT_FORENSIC_FULL_2026-05-06.md`
+Validator: `apex_finance/lib/core/v5/v5_routing_validator.dart`
+
 ## Local Development
 
 - Full runbook: **`LOCAL_DEV_RUNBOOK.md`** (G-DEV-1, Sprint 8). Covers the `--dart-define=API_BASE` flag (REQUIRED — `api_config.dart` defaults to the Render production URL), test-user creation, the 127.0.0.1-vs-localhost / IPv6-fallback trap, port conflicts, and the Python 3.14 pandas caveat.
