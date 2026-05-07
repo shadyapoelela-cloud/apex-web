@@ -10,9 +10,9 @@ library;
 
 import 'package:flutter/foundation.dart';
 
-import 'apex_v5_service_shell.dart' show kAllPinsForValidation;
 import 'v5_data.dart';
-import 'v5_wired_screens.dart' show v5WiredScreens;
+import 'v5_pin_routes.dart' show kAllPinsForValidation;
+import 'v5_wired_keys.dart' show v5WiredKeys;
 
 class PinValidationError {
   final String pinId;
@@ -110,7 +110,7 @@ List<ChipValidationStatus> validateAllChips() {
     for (final m in svc.mainModules) {
       for (final c in m.chips) {
         final key = '${svc.id}/${m.id}/${c.id}';
-        final wired = v5WiredScreens.containsKey(key);
+        final wired = v5WiredKeys.contains(key);
         final hasSwitch = _switchFallbackChips.contains(c.id);
         final hasSub = c.subModule != null;
         results.add(ChipValidationStatus(key, wired, hasSwitch, hasSub));

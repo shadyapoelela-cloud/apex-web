@@ -1003,36 +1003,6 @@ const _kAllPins = <_Pin>[
       route: '/app/erp/purchasing/suppliers'),
 ];
 
-/// Lightweight public view of a Quick Access pin (id + route only).
-///
-/// Exposed so [v5_routing_validator.dart] and unit tests can verify
-/// every pin resolves to a real chip without depending on the private
-/// `_Pin` type. Not part of the public API — for validation use only.
-@immutable
-class V5PinRoute {
-  final String id;
-  final String route;
-  const V5PinRoute({required this.id, required this.route});
-}
-
-/// Read-only projection of [_kAllPins] for the routing validator.
-///
-/// Mirrors the pin list above. Whenever a pin is added/removed/edited,
-/// keep this list in sync. The unit test in `test/v5_routing_test.dart`
-/// will catch any mismatch by validating routes against `v5_data`.
-const List<V5PinRoute> kAllPinsForValidation = <V5PinRoute>[
-  V5PinRoute(id: 'coa', route: '/app/erp/finance/coa-editor'),
-  V5PinRoute(id: 'je', route: '/app/erp/finance/je-builder'),
-  V5PinRoute(id: 'tb', route: '/app/erp/finance/statements'),
-  V5PinRoute(id: 'financial_reports', route: '/app/erp/finance/statements'),
-  V5PinRoute(id: 'journal', route: '/app/erp/finance/statements'),
-  V5PinRoute(id: 'vat', route: '/app/erp/finance/vat'),
-  V5PinRoute(id: 'fixed_assets', route: '/app/erp/finance/fixed-assets'),
-  V5PinRoute(id: 'budgets', route: '/app/erp/finance/budgets'),
-  V5PinRoute(id: 'clients', route: '/app/erp/finance/sales-customers'),
-  V5PinRoute(id: 'vendors', route: '/app/erp/purchasing/suppliers'),
-];
-
 class _QuickAccessRail extends StatefulWidget {
   const _QuickAccessRail();
   @override
