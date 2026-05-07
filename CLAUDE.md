@@ -109,6 +109,7 @@ Validator: `apex_finance/lib/core/v5/v5_routing_validator.dart`
 - Full runbook: **`LOCAL_DEV_RUNBOOK.md`** (G-DEV-1, Sprint 8). Covers the `--dart-define=API_BASE` flag (REQUIRED — `api_config.dart` defaults to the Render production URL), test-user creation, the 127.0.0.1-vs-localhost / IPv6-fallback trap, port conflicts, and the Python 3.14 pandas caveat.
 - One-shot start: `scripts/dev/run-backend.ps1` then `scripts/dev/run-frontend.ps1` (Windows) or the `.sh` equivalents (Mac/Linux). Both wrappers print the underlying `uvicorn` / `flutter run` command before executing — read once, learn the shape, drop the wrapper if you prefer.
 - **Do not edit `apex_finance/lib/core/api_config.dart` to "fix" local dev** — production CI bakes the default at build time. Use `--dart-define` instead.
+- **Post-deploy ops (G-OPS-RUNBOOK, 2026-05-08):** after each merge to main, run `python3 scripts/dev/post_deploy_runbook.py --all` to verify the gh-pages bundle is fresh, migrate legacy tenants (PR #170), seed demo data on the caller's tenant (PR #171), and smoke-test key endpoints. Stdlib-only (no `requests` dep). Reads `ADMIN_SECRET` / `APEX_USERNAME` / `APEX_PASSWORD` / `APEX_API_URL` from the env. See `scripts/dev/README.md`.
 
 ## Deployment
 

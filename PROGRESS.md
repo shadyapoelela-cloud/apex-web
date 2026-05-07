@@ -4,6 +4,40 @@
 
 ### 2026-05-08
 
+- [x] **G-OPS-RUNBOOK** — single-script orchestrator for post-deploy ops
+  - Branch: `feat/g-ops-runbook`
+  - **Why:** the four post-merge actions (verify gh-pages bundle,
+    migrate legacy tenants, seed demo data, smoke-test) had been
+    accumulating as ad-hoc `curl` recipes scattered across PR
+    descriptions for #170 and #171. Each invocation needed JWT
+    extraction + manual response inspection. This consolidates them
+    into one Python entry point with structured output.
+  - **What:** `scripts/dev/post_deploy_runbook.py` — stdlib only
+    (urllib + getpass + argparse), no `requests` dep. Flags:
+    `--verify-deploy`, `--migrate-legacy`, `--seed-demo`,
+    `--smoke-test`, `--all` (default). Reads
+    `ADMIN_SECRET` / `APEX_USERNAME` / `APEX_PASSWORD` /
+    `APEX_API_URL` from the env, prompts for whatever's missing.
+    ANSI colors when stdout is a TTY (`NO_COLOR` respected). Exit
+    `0` on success, `1` on any step failure.
+  - **Verify-deploy sentinels:** the bundle check looks for four
+    substrings dropped by recent PRs — `erp/finance/receipt-capture`,
+    `erp/finance/vat-return`, `apexAuthRefresh`, `seed-demo-data`.
+    Missing sentinels warn but don't fail the step (a runbook
+    against staging shouldn't error just because the latest PR
+    isn't deployed there yet).
+  - **Tests:** 26 in `tests/test_post_deploy_runbook.py`. Stubs
+    `http_request` so nothing hits the network. Covers each step's
+    pass / skip / fail paths plus the overall `main()` orchestration
+    (default → all, single-flag → others skipped, login failure →
+    abort with exit 1).
+  - **Verified live:** `--verify-deploy` against the production API
+    correctly reports the live gh-pages bundle as stale (missing
+    ERR-1 + G-DEMO-DATA-SEEDER sentinels) — the exact case the
+    runbook is designed to catch.
+  - **Docs:** `scripts/dev/README.md` documents this script + the
+    other dev scripts that previously had no README.
+
 - [x] **G-DEMO-DATA-SEEDER (master-data tier)** — fill empty tenants with demo data
   - Branch: `feat/g-demo-data-seeder`
   - **Bug:** after ERR-2 (PR #169) + Legacy Migration (PR #170), every
