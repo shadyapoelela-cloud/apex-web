@@ -26,6 +26,7 @@ from sqlalchemy.orm import Session
 
 from app.phase1.models.platform_models import SessionLocal, gen_uuid
 from app.phase1.routes.phase1_routes import get_current_user
+from app.pilot.security import assert_entity_in_tenant
 from app.pilot.models import (
     Customer,
     CustomerKind,
@@ -550,9 +551,11 @@ def list_sales_invoices(
     status: Optional[str] = Query(None),
     customer_id: Optional[str] = Query(None),
     limit: int = Query(100, ge=1, le=500),
+    current_user: dict = Depends(get_current_user),
 ):
     db = _db()
     try:
+        assert_entity_in_tenant(db, entity_id, current_user)
         q = db.query(SalesInvoice).filter(SalesInvoice.entity_id == entity_id)
         if status:
             q = q.filter(SalesInvoice.status == status)

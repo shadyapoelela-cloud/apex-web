@@ -24,6 +24,7 @@ from sqlalchemy.orm import Session
 from app.phase1.models.platform_models import get_db
 from app.phase1.routes.phase1_routes import get_current_user
 from app.pilot.models import Entity, GLAccount
+from app.pilot.security import assert_entity_in_tenant
 
 # G-S9 (Sprint 14): router-level auth dependency. Every endpoint on this
 # router now requires a valid JWT (Bearer header or apex_token cookie).
@@ -51,13 +52,12 @@ async def ai_read_document(
     entity_id: str,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ) -> Dict[str, Any]:
     """Extract a proposed journal entry from an uploaded document."""
 
-    # ── Validate entity ────────────────────────────────────────────
-    entity = db.query(Entity).filter(Entity.id == entity_id).first()
-    if entity is None:
-        raise HTTPException(status_code=404, detail="Entity not found")
+    # ── Validate entity (with cross-tenant guard) ─────────────────
+    entity = assert_entity_in_tenant(db, entity_id, current_user)
 
     # ── Validate file ──────────────────────────────────────────────
     content_type = (file.content_type or "").lower()

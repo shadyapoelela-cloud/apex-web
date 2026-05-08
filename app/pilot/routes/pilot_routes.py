@@ -46,6 +46,7 @@ from sqlalchemy import select, and_
 
 from app.phase1.models.platform_models import get_db, User, UserStatus
 from app.phase1.routes.phase1_routes import get_current_user
+from app.pilot.security import assert_entity_in_tenant
 from app.pilot.models import (
     Tenant, CompanySettings, TenantStatus, TenantTier,
     Entity, EntityType, EntityStatus,
@@ -294,13 +295,22 @@ def create_entity(tenant_id: str, payload: EntityCreate, db: Session = Depends(g
 
 
 @router.get("/entities/{entity_id}", response_model=EntityRead)
-def get_entity(entity_id: str, db: Session = Depends(get_db)):
-    return _get_entity_or_404(db, entity_id)
+def get_entity(
+    entity_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    return assert_entity_in_tenant(db, entity_id, current_user)
 
 
 @router.patch("/entities/{entity_id}", response_model=EntityRead)
-def update_entity(entity_id: str, payload: EntityUpdate, db: Session = Depends(get_db)):
-    entity = _get_entity_or_404(db, entity_id)
+def update_entity(
+    entity_id: str,
+    payload: EntityUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    entity = assert_entity_in_tenant(db, entity_id, current_user)
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(entity, field, value)
     db.commit()
@@ -309,8 +319,12 @@ def update_entity(entity_id: str, payload: EntityUpdate, db: Session = Depends(g
 
 
 @router.delete("/entities/{entity_id}", status_code=204)
-def delete_entity(entity_id: str, db: Session = Depends(get_db)):
-    entity = _get_entity_or_404(db, entity_id)
+def delete_entity(
+    entity_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    entity = assert_entity_in_tenant(db, entity_id, current_user)
     entity.is_deleted = True
     entity.deleted_at = datetime.now(timezone.utc)
     db.commit()
@@ -321,16 +335,25 @@ def delete_entity(entity_id: str, db: Session = Depends(get_db)):
 # ═══════════════════════════════════════════════════════════════
 
 @router.get("/entities/{entity_id}/branches", response_model=list[BranchRead])
-def list_branches(entity_id: str, db: Session = Depends(get_db)):
-    _get_entity_or_404(db, entity_id)
+def list_branches(
+    entity_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_entity_in_tenant(db, entity_id, current_user)
     return db.query(Branch).filter(
         Branch.entity_id == entity_id, Branch.is_deleted == False  # noqa: E712
     ).order_by(Branch.sort_order, Branch.code).all()
 
 
 @router.post("/entities/{entity_id}/branches", response_model=BranchRead, status_code=201)
-def create_branch(entity_id: str, payload: BranchCreate, db: Session = Depends(get_db)):
-    entity = _get_entity_or_404(db, entity_id)
+def create_branch(
+    entity_id: str,
+    payload: BranchCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    entity = assert_entity_in_tenant(db, entity_id, current_user)
 
     existing = db.query(Branch).filter(
         Branch.tenant_id == entity.tenant_id, Branch.code == payload.code, Branch.is_deleted == False  # noqa: E712

@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.phase1.models.platform_models import get_db
 from app.phase1.routes.phase1_routes import get_current_user
+from app.pilot.security import assert_entity_in_tenant
 from app.pilot.models import (
     Entity, PosTransaction,
     ZatcaOnboarding, ZatcaInvoiceSubmission,
@@ -45,11 +46,16 @@ router = APIRouter(
 )
 
 
-def _entity_or_404(db: Session, eid: str) -> Entity:
-    e = db.query(Entity).filter(Entity.id == eid, Entity.is_deleted == False).first()  # noqa: E712
-    if not e:
-        raise HTTPException(404, f"Entity {eid} not found")
-    return e
+def _entity_or_404(db: Session, eid: str, current_user: Optional[dict] = None) -> Entity:
+    """Backward-compatible shim — delegates to ``assert_entity_in_tenant``.
+
+    Pre-G-PILOT-REPORTS-TENANT-AUDIT this helper had **no** tenant
+    check, leaving every route below it cross-tenant readable /
+    writable. The helper now requires a ``current_user`` context for
+    enforcement; callers pass the ``Depends(get_current_user)`` value
+    through.
+    """
+    return assert_entity_in_tenant(db, eid, current_user)
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -62,8 +68,9 @@ def zatca_onboard(
     environment: str = Query("developer_portal", pattern="^(developer_portal|simulation|production)$"),
     simulate: bool = Query(True, description="إذا true، يُحاكي إصدار CSID"),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    e = _entity_or_404(db, entity_id)
+    e = assert_entity_in_tenant(db, entity_id, current_user)
     if e.country != "SA":
         raise HTTPException(400, "ZATCA خاص بالسعودية")
     onb = create_or_get_onboarding(db, entity=e, environment=environment)
@@ -75,8 +82,12 @@ def zatca_onboard(
 
 
 @router.get("/entities/{entity_id}/zatca/onboarding", response_model=list[ZatcaOnboardingRead])
-def list_onboardings(entity_id: str, db: Session = Depends(get_db)):
-    _entity_or_404(db, entity_id)
+def list_onboardings(
+    entity_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_entity_in_tenant(db, entity_id, current_user)
     return db.query(ZatcaOnboarding).filter(
         ZatcaOnboarding.entity_id == entity_id
     ).order_by(ZatcaOnboarding.created_at.desc()).all()
@@ -105,8 +116,9 @@ def list_zatca_submissions(
     status: Optional[str] = Query(None),
     limit: int = Query(100, le=500),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _entity_or_404(db, entity_id)
+    assert_entity_in_tenant(db, entity_id, current_user)
     q = db.query(ZatcaInvoiceSubmission).filter(
         ZatcaInvoiceSubmission.entity_id == entity_id
     )
@@ -153,8 +165,12 @@ def gosi_calculate(
 
 
 @router.post("/gosi/registrations", response_model=GosiRegistrationRead, status_code=201)
-def create_gosi_registration(payload: GosiRegistrationCreate, db: Session = Depends(get_db)):
-    e = _entity_or_404(db, payload.entity_id)
+def create_gosi_registration(
+    payload: GosiRegistrationCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    e = assert_entity_in_tenant(db, payload.entity_id, current_user)
     if e.country != "SA":
         raise HTTPException(400, "GOSI خاص بالسعودية")
     existing = db.query(GosiRegistration).filter(
@@ -213,8 +229,9 @@ def list_gosi_registrations(
     entity_id: str,
     active_only: bool = Query(True),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _entity_or_404(db, entity_id)
+    assert_entity_in_tenant(db, entity_id, current_user)
     q = db.query(GosiRegistration).filter(GosiRegistration.entity_id == entity_id)
     if active_only:
         q = q.filter(GosiRegistration.is_active == True)  # noqa: E712
@@ -226,8 +243,12 @@ def list_gosi_registrations(
 # ══════════════════════════════════════════════════════════════════════════
 
 @router.post("/wps/batches", response_model=WpsBatchDetail, status_code=201)
-def create_wps(payload: WpsBatchCreate, db: Session = Depends(get_db)):
-    e = _entity_or_404(db, payload.entity_id)
+def create_wps(
+    payload: WpsBatchCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    e = assert_entity_in_tenant(db, payload.entity_id, current_user)
     try:
         batch = create_wps_batch(
             db, entity=e,
@@ -252,8 +273,12 @@ def create_wps(payload: WpsBatchCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/entities/{entity_id}/wps/batches", response_model=list[WpsBatchRead])
-def list_wps_batches(entity_id: str, db: Session = Depends(get_db)):
-    _entity_or_404(db, entity_id)
+def list_wps_batches(
+    entity_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_entity_in_tenant(db, entity_id, current_user)
     return db.query(WpsBatch).filter(
         WpsBatch.entity_id == entity_id
     ).order_by(WpsBatch.year.desc(), WpsBatch.month.desc()).all()
@@ -305,8 +330,12 @@ def uae_ct_calc(
 
 
 @router.post("/uae-ct/filings", response_model=UaeCtFilingRead, status_code=201)
-def create_ct_filing(payload: UaeCtFilingCreate, db: Session = Depends(get_db)):
-    e = _entity_or_404(db, payload.entity_id)
+def create_ct_filing(
+    payload: UaeCtFilingCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    e = assert_entity_in_tenant(db, payload.entity_id, current_user)
     try:
         filing = create_uae_ct_filing(
             db, entity=e, fiscal_year=payload.fiscal_year,
@@ -321,8 +350,12 @@ def create_ct_filing(payload: UaeCtFilingCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/entities/{entity_id}/uae-ct/filings", response_model=list[UaeCtFilingRead])
-def list_ct_filings(entity_id: str, db: Session = Depends(get_db)):
-    _entity_or_404(db, entity_id)
+def list_ct_filings(
+    entity_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_entity_in_tenant(db, entity_id, current_user)
     return db.query(UaeCtFiling).filter(
         UaeCtFiling.entity_id == entity_id
     ).order_by(UaeCtFiling.fiscal_year.desc()).all()
@@ -333,9 +366,13 @@ def list_ct_filings(entity_id: str, db: Session = Depends(get_db)):
 # ══════════════════════════════════════════════════════════════════════════
 
 @router.post("/vat-returns/generate", response_model=VatReturnRead)
-def generate_vat_return(payload: VatReturnGenerate, db: Session = Depends(get_db)):
+def generate_vat_return(
+    payload: VatReturnGenerate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """يحسب إقرار VAT من GL Postings ويحفظه (idempotent)."""
-    e = _entity_or_404(db, payload.entity_id)
+    e = assert_entity_in_tenant(db, payload.entity_id, current_user)
     try:
         vr = create_vat_return(
             db, entity=e, year=payload.year,
@@ -357,9 +394,10 @@ def preview_vat_return(
     period_number: int = Query(..., ge=1, le=12),
     period_type: str = Query("quarterly", pattern="^(monthly|quarterly)$"),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """معاينة حسابات VAT Return بدون حفظ."""
-    e = _entity_or_404(db, entity_id)
+    e = assert_entity_in_tenant(db, entity_id, current_user)
     result = compute_vat_return(
         db, entity=e, year=year, period_number=period_number, period_type=period_type,
     )
@@ -368,8 +406,12 @@ def preview_vat_return(
 
 
 @router.get("/entities/{entity_id}/vat-returns", response_model=list[VatReturnRead])
-def list_vat_returns(entity_id: str, db: Session = Depends(get_db)):
-    _entity_or_404(db, entity_id)
+def list_vat_returns(
+    entity_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_entity_in_tenant(db, entity_id, current_user)
     return db.query(VatReturn).filter(
         VatReturn.entity_id == entity_id
     ).order_by(VatReturn.year.desc(), VatReturn.period_number.desc()).all()
