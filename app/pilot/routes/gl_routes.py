@@ -40,10 +40,52 @@ router = APIRouter(
 )
 
 
-def _entity_or_404(db: Session, eid: str) -> Entity:
-    e = db.query(Entity).filter(Entity.id == eid, Entity.is_deleted == False).first()  # noqa: E712
+def _entity_or_404(
+    db: Session,
+    eid: str,
+    *,
+    current_user: Optional[dict] = None,
+) -> Entity:
+    """Resolve an entity, enforcing tenant isolation when a user is given.
+
+    G-TB-REAL-DATA-AUDIT (2026-05-08): the previous form filtered only
+    on `Entity.id == eid`, which let user A pull tenant B's GL reports
+    just by knowing or guessing B's entity id. The pilot models don't
+    inherit from `TenantMixin`, so the application-layer
+    `attach_tenant_guard` auto-filter doesn't apply to these queries —
+    isolation has to live in the route handler. Now:
+
+      * Without `current_user` (legacy callers / internal tooling),
+        the function behaves as before: 404 if the entity doesn't
+        exist; no tenant check.
+      * With `current_user` (any user-facing route — and that's the
+        whole pilot GL surface), the function additionally verifies
+        the entity's tenant_id matches the JWT's `tenant_id` claim.
+        Mismatch → 403, never 404, so an attacker can't probe
+        existence by interpreting status codes.
+
+    Legacy users whose JWT predates ERR-2 Phase 3 (no `tenant_id`
+    claim) can't access the pilot GL surface — their token resolves
+    to `None` and any entity row returns 403. The fix is to migrate
+    them via /admin/migrate-legacy-tenants (PR #170) and re-issue
+    their token on next login (PR #169 handles this automatically).
+    """
+    e = db.query(Entity).filter(
+        Entity.id == eid,
+        Entity.is_deleted == False,  # noqa: E712
+    ).first()
     if not e:
         raise HTTPException(404, f"Entity {eid} not found")
+    if current_user is not None:
+        user_tenant = current_user.get("tenant_id") or current_user.get("tid")
+        if not user_tenant or str(e.tenant_id) != str(user_tenant):
+            # Forbidden, not 404 — explicit 403 lets the frontend
+            # show "this isn't your entity" rather than retrying as
+            # if it just doesn't exist.
+            raise HTTPException(
+                403,
+                "Access denied — entity belongs to a different tenant",
+            )
     return e
 
 
@@ -59,9 +101,13 @@ def _je_or_404(db: Session, jid: str) -> JournalEntry:
 # ══════════════════════════════════════════════════════════════════════════
 
 @router.post("/entities/{entity_id}/coa/seed")
-def seed_coa(entity_id: str, db: Session = Depends(get_db)):
+def seed_coa(
+    entity_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """بذر شجرة الحسابات الافتراضية (SOCPA) لكيان."""
-    e = _entity_or_404(db, entity_id)
+    e = _entity_or_404(db, entity_id, current_user=current_user)
     res = seed_default_coa(db, e)
     db.commit()
     return {"success": True, "entity_id": entity_id, **res}
@@ -74,8 +120,9 @@ def list_accounts(
     type: Optional[str] = Query(None, description="header | detail"),
     include_inactive: bool = Query(False),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _entity_or_404(db, entity_id)
+    _entity_or_404(db, entity_id, current_user=current_user)
     q = db.query(GLAccount).filter(GLAccount.entity_id == entity_id)
     if category:
         q = q.filter(GLAccount.category == category)
@@ -87,8 +134,13 @@ def list_accounts(
 
 
 @router.post("/entities/{entity_id}/accounts", response_model=GLAccountRead, status_code=201)
-def create_account(entity_id: str, payload: GLAccountCreate, db: Session = Depends(get_db)):
-    e = _entity_or_404(db, entity_id)
+def create_account(
+    entity_id: str,
+    payload: GLAccountCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    e = _entity_or_404(db, entity_id, current_user=current_user)
     if db.query(GLAccount).filter(GLAccount.entity_id == entity_id, GLAccount.code == payload.code).first():
         raise HTTPException(409, f"الحساب {payload.code} موجود مسبقاً")
     parent_level = 1
@@ -177,8 +229,13 @@ def delete_account(account_id: str, db: Session = Depends(get_db)):
 # ══════════════════════════════════════════════════════════════════════════
 
 @router.post("/entities/{entity_id}/fiscal-periods/seed")
-def seed_periods(entity_id: str, payload: FiscalPeriodSeed, db: Session = Depends(get_db)):
-    e = _entity_or_404(db, entity_id)
+def seed_periods(
+    entity_id: str,
+    payload: FiscalPeriodSeed,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    e = _entity_or_404(db, entity_id, current_user=current_user)
     res = seed_fiscal_periods(db, e, payload.year)
     db.commit()
     return {"success": True, "entity_id": entity_id, **res}
@@ -190,8 +247,9 @@ def list_periods(
     year: Optional[int] = Query(None),
     status: Optional[str] = Query(None),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _entity_or_404(db, entity_id)
+    _entity_or_404(db, entity_id, current_user=current_user)
     q = db.query(FiscalPeriod).filter(FiscalPeriod.entity_id == entity_id)
     if year:
         q = q.filter(FiscalPeriod.year == year)
@@ -231,8 +289,12 @@ def close_period(period_id: str, payload: FiscalPeriodClose, db: Session = Depen
 # ══════════════════════════════════════════════════════════════════════════
 
 @router.post("/journal-entries", response_model=JournalEntryDetail, status_code=201)
-def create_je(payload: JournalEntryCreate, db: Session = Depends(get_db)):
-    e = _entity_or_404(db, payload.entity_id)
+def create_je(
+    payload: JournalEntryCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    e = _entity_or_404(db, payload.entity_id, current_user=current_user)
     try:
         je = build_journal_entry(
             db, entity=e,
@@ -271,8 +333,9 @@ def list_jes(
     source_type: Optional[str] = Query(None),
     limit: int = Query(100, le=500),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _entity_or_404(db, entity_id)
+    _entity_or_404(db, entity_id, current_user=current_user)
     q = db.query(JournalEntry).filter(JournalEntry.entity_id == entity_id)
     if status:
         q = q.filter(JournalEntry.status == status)
@@ -360,12 +423,34 @@ def trial_balance(
     as_of: Optional[_date] = Query(None, description="افتراضياً اليوم"),
     include_zero: bool = Query(False),
     db: Session = Depends(get_db),
+    # G-TB-REAL-DATA-AUDIT (2026-05-08): explicit current_user dep so
+    # _entity_or_404 can enforce tenant isolation. Without this the
+    # router-level dependency authenticates the request but doesn't
+    # expose the JWT payload to the handler — and the prior
+    # implementation read 0 fields from it, so any authenticated user
+    # could pull any entity's TB. Now the handler refuses with 403 if
+    # the entity belongs to a different tenant than the JWT claim.
+    current_user: dict = Depends(get_current_user),
 ):
-    _entity_or_404(db, entity_id)
+    _entity_or_404(db, entity_id, current_user=current_user)
     as_of_date = as_of or datetime.now(timezone.utc).date()
     rows = compute_trial_balance(db, entity_id=entity_id, as_of_date=as_of_date, include_zero=include_zero)
     total_debit = sum((r["total_debit"] for r in rows), Decimal("0"))
     total_credit = sum((r["total_credit"] for r in rows), Decimal("0"))
+    # G-TB-REAL-DATA-AUDIT (2026-05-08): include the count of posted
+    # JEs that fed this TB so the frontend can render the
+    # "المصدر: pilot_journal_lines — N قيد مرحّل" footer without a
+    # second roundtrip. Counts only `status='posted'` to match what
+    # `compute_trial_balance` actually queried.
+    posted_je_count = (
+        db.query(JournalEntry)
+        .filter(
+            JournalEntry.entity_id == entity_id,
+            JournalEntry.status == JournalEntryStatus.posted.value,
+            JournalEntry.je_date <= as_of_date,
+        )
+        .count()
+    )
     return TrialBalanceResponse(
         entity_id=entity_id,
         as_of_date=as_of_date,
@@ -373,6 +458,7 @@ def trial_balance(
         total_debit=total_debit,
         total_credit=total_credit,
         balanced=(total_debit == total_credit),
+        posted_je_count=posted_je_count,
     )
 
 

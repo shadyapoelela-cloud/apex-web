@@ -201,6 +201,12 @@ class TrialBalanceResponse(BaseModel):
     total_debit: Decimal
     total_credit: Decimal
     balanced: bool
+    # G-TB-REAL-DATA-AUDIT (2026-05-08): count of posted JEs whose
+    # je_date <= as_of_date. Lets the frontend render the
+    # "المصدر: pilot_journal_lines — N قيد مرحّل" footer without a
+    # second roundtrip. Defaults to 0 so older callers / fixtures
+    # that don't compute it still satisfy the schema.
+    posted_je_count: int = 0
 
 
 class IncomeStatementResponse(BaseModel):
