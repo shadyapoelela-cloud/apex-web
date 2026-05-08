@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.phase1.models.platform_models import get_db
 from app.phase1.routes.phase1_routes import get_current_user
-from app.pilot.security import assert_entity_in_tenant
+from app.pilot.security import assert_entity_in_tenant, assert_resource_in_tenant
 from app.pilot.models import (
     Entity, PosTransaction,
     ZatcaOnboarding, ZatcaInvoiceSubmission,
@@ -98,8 +98,12 @@ def submit_to_zatca(
     pos_txn_id: str,
     simulate: bool = Query(True),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """توليد QR + hash + إرسال (أو محاكاة إرسال) لـ ZATCA."""
+    assert_resource_in_tenant(
+        db, PosTransaction, pos_txn_id, current_user, soft_delete_field=None,
+    )
     try:
         sub = submit_pos_invoice(db, pos_txn_id=pos_txn_id, simulate=simulate)
         db.commit()
@@ -210,7 +214,11 @@ def gosi_contribution(
     registration_id: str,
     payload: GosiContributionCalc,
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
+    assert_resource_in_tenant(
+        db, GosiRegistration, registration_id, current_user, soft_delete_field=None,
+    )
     try:
         c = record_gosi_contribution(
             db, registration_id=registration_id,
@@ -285,7 +293,11 @@ def list_wps_batches(
 
 
 @router.get("/wps/batches/{batch_id}/sif", response_class=PlainTextResponse)
-def download_sif(batch_id: str, db: Session = Depends(get_db)):
+def download_sif(
+    batch_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """تنزيل ملف SIF كـ plain text.
 
     NOTE: response_class must be PlainTextResponse (not None) — setting
@@ -294,9 +306,9 @@ def download_sif(batch_id: str, db: Session = Depends(get_db)):
     which 500s /openapi.json across the whole API. Caught by
     scripts/post_deploy_check.sh on 2026-04-24.
     """
-    batch = db.query(WpsBatch).filter(WpsBatch.id == batch_id).first()
-    if not batch:
-        raise HTTPException(404, "الدفعة غير موجودة")
+    batch = assert_resource_in_tenant(
+        db, WpsBatch, batch_id, current_user, soft_delete_field=None,
+    )
     if not batch.sif_file_content:
         raise HTTPException(409, "لم يتم توليد ملف SIF بعد")
     return PlainTextResponse(

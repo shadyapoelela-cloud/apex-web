@@ -24,7 +24,7 @@ from app.pilot.schemas.gl import (
     TrialBalanceResponse, TrialBalanceRow,
     IncomeStatementResponse, BalanceSheetResponse,
 )
-from app.pilot.security import assert_entity_in_tenant
+from app.pilot.security import assert_entity_in_tenant, assert_resource_in_tenant
 from app.pilot.services.gl_engine import (
     seed_default_coa, seed_fiscal_periods,
     build_journal_entry, post_journal_entry, reverse_journal_entry,
@@ -133,12 +133,17 @@ def create_account(
 
 
 @router.patch("/accounts/{account_id}", response_model=GLAccountRead)
-def update_account(account_id: str, payload: dict, db: Session = Depends(get_db)):
+def update_account(
+    account_id: str,
+    payload: dict,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """تعديل حساب — مع حماية: لا يمكن تغيير category/normal_balance
     إذا كانت هناك postings على الحساب (لتجنب كسر TB)."""
-    acc = db.query(GLAccount).filter(GLAccount.id == account_id).first()
-    if not acc:
-        raise HTTPException(404, "الحساب غير موجود")
+    acc = assert_resource_in_tenant(
+        db, GLAccount, account_id, current_user, soft_delete_field=None,
+    )
     # فحص postings
     has_postings = db.query(GLPosting).filter(
         GLPosting.account_id == account_id
@@ -170,11 +175,15 @@ def update_account(account_id: str, payload: dict, db: Session = Depends(get_db)
 
 
 @router.delete("/accounts/{account_id}", status_code=204)
-def delete_account(account_id: str, db: Session = Depends(get_db)):
+def delete_account(
+    account_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """حذف حساب — مسموح فقط لو لا توجد postings ولا هو system account."""
-    acc = db.query(GLAccount).filter(GLAccount.id == account_id).first()
-    if not acc:
-        raise HTTPException(404, "الحساب غير موجود")
+    acc = assert_resource_in_tenant(
+        db, GLAccount, account_id, current_user, soft_delete_field=None,
+    )
     if acc.is_system:
         raise HTTPException(403, "حسابات النظام محميّة من الحذف. يمكن تعطيلها (is_active=false).")
     has_postings = db.query(GLPosting).filter(
@@ -320,8 +329,14 @@ def list_jes(
 
 
 @router.get("/journal-entries/{je_id}", response_model=JournalEntryDetail)
-def get_je(je_id: str, db: Session = Depends(get_db)):
-    je = _je_or_404(db, je_id)
+def get_je(
+    je_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    je = assert_resource_in_tenant(
+        db, JournalEntry, je_id, current_user, soft_delete_field=None,
+    )
     lines = db.query(JournalLine).filter(
         JournalLine.journal_entry_id == je.id
     ).order_by(JournalLine.line_number).all()
@@ -332,7 +347,14 @@ def get_je(je_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/journal-entries/{je_id}/post", response_model=JournalEntryRead)
-def post_je(je_id: str, db: Session = Depends(get_db)):
+def post_je(
+    je_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_resource_in_tenant(
+        db, JournalEntry, je_id, current_user, soft_delete_field=None,
+    )
     try:
         je = post_journal_entry(db, je_id)
         db.commit()
@@ -344,7 +366,15 @@ def post_je(je_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/journal-entries/{je_id}/reverse", response_model=JournalEntryDetail)
-def reverse_je(je_id: str, payload: JEReverse, db: Session = Depends(get_db)):
+def reverse_je(
+    je_id: str,
+    payload: JEReverse,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_resource_in_tenant(
+        db, JournalEntry, je_id, current_user, soft_delete_field=None,
+    )
     try:
         rev = reverse_journal_entry(db, je_id, payload.reversal_date, payload.memo_ar, payload.user_id)
         db.commit()
@@ -366,8 +396,15 @@ def reverse_je(je_id: str, payload: JEReverse, db: Session = Depends(get_db)):
 # ══════════════════════════════════════════════════════════════════════════
 
 @router.post("/pos-transactions/{pos_txn_id}/post-to-gl", response_model=JournalEntryDetail)
-def post_pos_to_gl(pos_txn_id: str, db: Session = Depends(get_db)):
+def post_pos_to_gl(
+    pos_txn_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """ترحيل معاملة POS تلقائياً إلى الأستاذ العام."""
+    assert_resource_in_tenant(
+        db, PosTransaction, pos_txn_id, current_user, soft_delete_field=None,
+    )
     try:
         je = auto_post_pos_sale(db, pos_txn_id, auto_post=True)
         db.commit()
@@ -576,11 +613,15 @@ def account_ledger(
     end_date: Optional[_date] = Query(None, description="افتراضياً اليوم"),
     limit: int = Query(500, le=2000),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """دفتر الأستاذ لحساب واحد — تفصيل كل حركاته مع running balance.
 
     الاستخدام: drill-down من Trial Balance → ضغط على حساب → ترى كل حركاته.
     """
+    assert_resource_in_tenant(
+        db, GLAccount, account_id, current_user, soft_delete_field=None,
+    )
     today = datetime.now(timezone.utc).date()
     sd = start_date or _date(today.year, 1, 1)
     ed = end_date or today
