@@ -538,6 +538,11 @@ List<V5Service> v5Services = [
           // 100% real-data guarantee + balance-equation invariant.
           // See docs/BALANCE_SHEET_DATA_FLOW_2026-05-08.md.
           const V5Chip(id: 'balance-sheet', labelAr: 'الميزانية العمومية', labelEn: 'Balance Sheet', icon: Icons.account_balance, phase: ChipPhase.report, category: 'reports'),
+          // G-FIN-CF-1 (2026-05-08): Cash Flow Statement (Indirect)
+          // — same real-data guarantee + reconciliation invariant
+          // (opening_cash + net_change = closing_cash). Closes
+          // UAT Issue #5 (TB + IS + BS + CF all real-data).
+          const V5Chip(id: 'cash-flow', labelAr: 'قائمة التدفقات النقدية', labelEn: 'Cash Flow', icon: Icons.water_drop, phase: ChipPhase.report, category: 'reports'),
           const V5Chip(id: 'statements', labelAr: 'القوائم المالية', labelEn: 'Financial Statements', icon: Icons.insert_chart, phase: ChipPhase.report, category: 'reports'),
           //   6.b الإدارية
           const V5Chip(id: 'budgets', labelAr: 'الموازنات', labelEn: 'Budgets', icon: Icons.pie_chart, phase: ChipPhase.report, category: 'reports'),
