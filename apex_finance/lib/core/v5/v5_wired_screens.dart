@@ -270,6 +270,12 @@ import '../../screens/finance/income_statement_screen.dart';
 // G-FIN-BS-1 (2026-05-08): dedicated Balance Sheet screen.
 // Same 100% real-data guarantee + balance-equation invariant.
 import '../../screens/finance/balance_sheet_screen.dart';
+// G-FIN-CF-1 (2026-05-08): dedicated Cash Flow Statement (Indirect)
+// screen. Real-data + reconciliation invariant. Closes Issue #5.
+// Aliased because `CashFlowScreen` is also the class name of the
+// older compliance cashflow forecast screen — both classes are
+// referenced from this file.
+import '../../screens/finance/cash_flow_screen.dart' as fin_cf;
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -301,6 +307,10 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // /pilot/entities/{id}/reports/balance-sheet — every value sourced
   // from pilot_gl_postings (real, posted JEs only).
   'erp/finance/balance-sheet': (ctx) => const BalanceSheetScreen(),
+  // G-FIN-CF-1 (2026-05-08): Cash Flow Statement (Indirect Method).
+  // Closes UAT Issue #5. Real-data + reconciliation invariant
+  // pinned by tests/test_cash_flow_real_data.py.
+  'erp/finance/cash-flow': (ctx) => const fin_cf.CashFlowScreen(),
   // Rich JE builder — live backend list + entity check + filter chips +
   // bulk actions + AI-warning strip. Row click opens JeBuilderLiveV52Screen
   // (the V5.2 builder) where the partner/cost-center/VAT columns are

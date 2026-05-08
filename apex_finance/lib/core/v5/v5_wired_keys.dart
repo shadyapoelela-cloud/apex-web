@@ -15,6 +15,7 @@ const Set<String> v5WiredKeys = <String>{
   'erp/finance/trial-balance',
   'erp/finance/income-statement',
   'erp/finance/balance-sheet',
+  'erp/finance/cash-flow',
   'erp/finance/je-builder',
   'erp/finance/period-close',
   'erp/finance/close-checklist',

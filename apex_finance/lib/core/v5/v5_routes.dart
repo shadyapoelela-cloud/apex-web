@@ -18,6 +18,7 @@ import '../apex_news_ticker.dart';
 import '../theme.dart' as core_theme;
 import '../../screens/coming_soon_screen.dart';
 import '../../screens/finance/balance_sheet_screen.dart';
+import '../../screens/finance/cash_flow_screen.dart';
 import '../../screens/finance/income_statement_screen.dart';
 import '../../screens/finance/trial_balance_screen.dart';
 import '../../screens/v5_showcase/v5_showcase_screen.dart';
@@ -197,6 +198,25 @@ List<RouteBase> v5Routes() => [
             mainModule: main,
             activeChip: chip,
             bodyOverride: const BalanceSheetScreen(),
+          );
+        },
+      ),
+      // G-FIN-CF-1 (2026-05-08): explicit route for the Cash Flow
+      // Statement (Indirect Method). Same pattern as IS-1 + BS-1.
+      GoRoute(
+        path: '/app/erp/finance/cash-flow',
+        builder: (ctx, state) {
+          final svc = v5ServiceById('erp');
+          final main = svc?.mainModuleById('finance');
+          final chip = main?.chipById('gl');
+          if (svc == null || main == null || chip == null) {
+            return const _V5NotFound();
+          }
+          return ApexV5ServiceShell(
+            service: svc,
+            mainModule: main,
+            activeChip: chip,
+            bodyOverride: const CashFlowScreen(),
           );
         },
       ),

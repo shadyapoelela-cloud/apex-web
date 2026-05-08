@@ -1372,87 +1372,575 @@ def _bs_to_response_dict(snapshot: dict) -> dict:
     }
 
 
-def compute_cash_flow(
-    db: Session, *, entity_id: str, start_date: date, end_date: date,
-) -> dict:
-    """قائمة التدفقات النقدية بطريقة غير مباشرة (Indirect Method).
+# ══════════════════════════════════════════════════════════════════════════
+# Cash Flow Statement — Indirect Method
+# ══════════════════════════════════════════════════════════════════════════
 
-    Net Income
-      + Depreciation & Amortization
-      - Increase in AR / + Decrease in AR
-      - Increase in Inventory / + Decrease
-      + Increase in AP / - Decrease
-    = Cash Flow from Operations
+# Subcategory → CF section map. The map covers asset / liability /
+# equity subcategories only — revenue/expense subcategories are
+# already absorbed into net_income via compute_income_statement, so
+# they do NOT appear as line items here (depreciation is the one
+# exception, surfaced as a non-cash add-back from the IS expense
+# aggregate).
+#
+# Sign convention applied in compute_cash_flow:
+#   - Asset increase  = -CF (cash tied up in receivables, inventory, etc.)
+#   - Asset decrease  = +CF (cash freed)
+#   - Liability/equity increase = +CF (financing inflow, payables grew)
+#   - Liability/equity decrease = -CF
+# `cash` and `bank` subcategories are excluded from sections — they
+# ARE the bottom-line cash whose change we reconcile against.
+_CF_SECTION_MAP = {
+    # Operating — working capital
+    "receivables": "operating_wc",
+    "inventory": "operating_wc",
+    "vat": "operating_wc",          # asset (input) and liability (output) — sign by category
+    "prepaid": "operating_wc",
+    "payables": "operating_wc",
+    "payroll": "operating_wc",      # accrued payroll
+    "zakat": "operating_wc",        # accrued zakat
+    "eosb": "operating_wc",         # end-of-service benefit accrual
+    "accrued": "operating_wc",      # generic accruals
+    # Operating — non-cash (rare on BS; depreciation surfaces from IS expense)
+    "accumulated_dep": "operating_noncash_skip",  # paired with depreciation expense — skip to avoid double-count
+    # Investing
+    "fixed_assets": "investing",
+    "intangibles": "investing",
+    "investments": "investing",
+    # Financing
+    "loans": "financing",
+    "long_term_debt": "financing",
+    "capital": "financing",
+    "retained": "financing",
+    "dividends": "financing",
+    # Cash itself — excluded from sections (the bottom line)
+    "cash": "cash",
+    "bank": "cash",
+    # Closing-balance container — already absorbed via IS net_income
+    "current_earnings": "current_earnings_skip",
+}
 
-    Investing: purchases/sales of fixed assets
-    Financing: loans, equity issuance, dividends
 
-    For v1 we compute Operating activities from P&L + WC changes.
-    Investing/Financing require account tagging (future).
+def classify_for_cf(subcategory: Optional[str]) -> str:
+    """Return the CF section for a subcategory.
+
+    One of:
+      'operating_wc' / 'operating_noncash_skip' / 'investing' /
+      'financing' / 'cash' / 'current_earnings_skip' / 'unmapped'
+
+    Unmapped subcategories surface in the response's
+    `unmapped_subcategories` warning list so admins can either map them
+    to a section or document why they don't belong.
     """
-    # 1) Net income من قائمة الدخل
-    income = compute_income_statement(db, entity_id=entity_id,
-                                       start_date=start_date, end_date=end_date)
+    return _CF_SECTION_MAP.get(subcategory or "", "unmapped")
+
+
+def _cf_period_account_changes(
+    db: Session,
+    *,
+    entity_id: str,
+    period_start: date,
+    period_end: date,
+    include_zero: bool,
+) -> tuple[list[dict], Decimal, Decimal]:
+    """Compute per-account balance changes between two BS snapshots.
+
+    Returns (changes, opening_cash, closing_cash) where:
+      changes — list of dicts with account_id/code/name_ar/category/
+                subcategory + opening_balance + closing_balance + change
+      opening_cash, closing_cash — sums of cash + bank subcategory
+                                    balances at the snapshot dates
+
+    DATA SOURCE: 100% real from `pilot_gl_postings` via two
+    `_bs_compute_snapshot` calls (same code path the BS endpoint
+    uses). NO try/except fallbacks — a TB query failure must
+    propagate so the operator knows their data path is broken.
+    """
+    start_prev_day = period_start - timedelta(days=1)
+
+    opening = _bs_compute_snapshot(
+        db,
+        entity_id=entity_id,
+        as_of_date=start_prev_day,
+        include_zero=True,  # need full account universe for change detection
+    )
+    closing = _bs_compute_snapshot(
+        db,
+        entity_id=entity_id,
+        as_of_date=period_end,
+        include_zero=True,
+    )
+
+    def _index_by_account(snap: dict) -> dict[str, dict]:
+        # _bs_compute_snapshot partitions rows into assets/liabilities/
+        # equity lists but doesn't repeat the category field on each
+        # row, so we tag it here from the bucket name. Without this,
+        # the asset-increase=-CF / liability-increase=+CF sign
+        # convention below would silently default to the wrong branch.
+        bucket_to_cat = {
+            "assets": "asset",
+            "liabilities": "liability",
+            "equity": "equity",
+        }
+        out: dict[str, dict] = {}
+        for section, cat in bucket_to_cat.items():
+            for r in snap[section]:
+                # Skip the synthetic CYE row — already counted in net_income.
+                if r.get("is_synthetic"):
+                    continue
+                out[r["account_id"]] = {**r, "category": cat}
+        return out
+
+    open_idx = _index_by_account(opening)
+    close_idx = _index_by_account(closing)
+
+    all_account_ids = set(open_idx.keys()) | set(close_idx.keys())
+    changes: list[dict] = []
+    opening_cash = Decimal("0")
+    closing_cash = Decimal("0")
+
+    for aid in all_account_ids:
+        op = open_idx.get(aid)
+        cl = close_idx.get(aid)
+        ref = cl or op  # at least one exists; prefer closing for current metadata
+        op_bal = op["balance"] if op else Decimal("0")
+        cl_bal = cl["balance"] if cl else Decimal("0")
+        change = cl_bal - op_bal
+
+        # Map subcategory to section. Cash + current-earnings-skip
+        # accounts are tracked but excluded from sections.
+        section = classify_for_cf(ref.get("subcategory"))
+        if section == "cash":
+            opening_cash += op_bal
+            closing_cash += cl_bal
+            continue  # not a section item
+        if section == "current_earnings_skip":
+            continue
+        if section == "operating_noncash_skip":
+            # accumulated_dep — paired with the IS depreciation expense
+            # which we already add back. Skip to avoid double-counting.
+            continue
+
+        if not include_zero and change == 0:
+            continue
+
+        changes.append({
+            "account_id": aid,
+            "code": ref["code"],
+            "name_ar": ref["name_ar"],
+            "name_en": ref.get("name_en"),
+            "category": ref.get("category", "unknown"),
+            "subcategory": ref.get("subcategory"),
+            "opening_balance": op_bal,
+            "closing_balance": cl_bal,
+            "change": change,
+            "section": section,
+        })
+
+    # Stable sort by code for deterministic output.
+    changes.sort(key=lambda r: (r.get("section", "z"), r.get("code", "")))
+    return changes, opening_cash, closing_cash
+
+
+def _cf_compute_snapshot(
+    db: Session,
+    *,
+    entity_id: str,
+    period_start: date,
+    period_end: date,
+    include_zero: bool,
+) -> dict:
+    """Build one CF Statement snapshot for [period_start, period_end].
+
+    DATA SOURCE: 100% real. Net income from `compute_income_statement`
+    (which sums posted `pilot_gl_postings` for revenue+expense rows).
+    Per-account changes from `_cf_period_account_changes` (BS deltas
+    derived from the same posting query). No fallbacks — failure
+    propagates.
+    """
+    income = compute_income_statement(
+        db,
+        entity_id=entity_id,
+        start_date=period_start,
+        end_date=period_end,
+    )
     net_income = Decimal(str(income["net_income"]))
 
-    # 2) حساب التغيّر في working capital (AR + Inventory + AP)
-    # نحسب رصيد بداية وآخر الفترة لكل category
-    def _category_balance(cat: str, on_date: date) -> Decimal:
-        tb = compute_trial_balance(db, entity_id=entity_id,
-                                    as_of_date=on_date, include_zero=False)
-        return sum((r["balance"] for r in tb if r["category"] == cat),
-                    Decimal("0"))
+    # Non-cash add-back: depreciation expense from the IS aggregate.
+    # If the entity uses a custom CoA without `depreciation` subcat,
+    # this is genuinely zero (no add-back).
+    depreciation_expense = Decimal(
+        str(income["expense_by_subcat"].get("depreciation", 0))
+    )
 
-    # تغيّر الأصول المتداولة (AR, Inventory) — زيادة = استخدام نقدية
-    # نُحدّد الحسابات بـ subcategory (لو موجودة). v1: نستخدم الـ category الكلية
-    start_date_prev = date(start_date.year, start_date.month, start_date.day)
-    # رصيد يوم قبل البداية
-    from datetime import timedelta
-    start_prev_day = start_date - timedelta(days=1)
+    changes, opening_cash, closing_cash = _cf_period_account_changes(
+        db,
+        entity_id=entity_id,
+        period_start=period_start,
+        period_end=period_end,
+        include_zero=include_zero,
+    )
 
-    try:
-        ar_change = _category_balance("asset", end_date) - _category_balance("asset", start_prev_day)
-        ap_change = _category_balance("liability", end_date) - _category_balance("liability", start_prev_day)
-    except Exception:
-        ar_change = Decimal("0")
-        ap_change = Decimal("0")
+    operating_wc_items: list[dict] = []
+    investing_items: list[dict] = []
+    financing_items: list[dict] = []
+    unmapped: list[dict] = []
 
-    # دلالة: زيادة أصول = تدفق خارج، زيادة خصوم = تدفق داخل
-    operating_cf = net_income - ar_change + ap_change
+    for c in changes:
+        change = c["change"]
+        cat = c.get("category")
+        section = c.get("section")
+        if section == "unmapped":
+            unmapped.append({
+                "code": c["code"],
+                "name_ar": c["name_ar"],
+                "subcategory": c["subcategory"],
+                "category": cat,
+                "change": change,
+            })
+            continue
 
-    # 3) الفرق في النقدية (من TB — نقارن رصيد النقدية والبنوك)
-    # حسابات النقدية تبدأ بـ 111x (cash) و 112x (banks) حسب SOCPA
-    cash_start = Decimal("0")
-    cash_end = Decimal("0")
-    tb_end = compute_trial_balance(db, entity_id=entity_id,
-                                    as_of_date=end_date, include_zero=False)
-    for r in tb_end:
-        if r["code"].startswith(("111", "112")):
-            cash_end += r["balance"]
-    tb_start = compute_trial_balance(db, entity_id=entity_id,
-                                      as_of_date=start_prev_day, include_zero=False)
-    for r in tb_start:
-        if r["code"].startswith(("111", "112")):
-            cash_start += r["balance"]
+        # Sign convention:
+        # asset increase = -CF; liability/equity increase = +CF
+        if cat == "asset":
+            cf_impact = -change
+        elif cat in ("liability", "equity"):
+            cf_impact = change
+        else:
+            # Defensive: revenue/expense shouldn't reach here since
+            # they have no balance-sheet representation, but if a
+            # custom CoA assigns subcategory='loans' to a revenue
+            # account, treat the change as +CF (financing inflow).
+            cf_impact = change
 
-    actual_cash_change = cash_end - cash_start
+        item = {
+            "account_id": c["account_id"],
+            "code": c["code"],
+            "name_ar": c["name_ar"],
+            "name_en": c.get("name_en"),
+            "subcategory": c["subcategory"],
+            "category": cat,
+            "opening_balance": c["opening_balance"],
+            "closing_balance": c["closing_balance"],
+            "change": change,
+            "cf_impact": cf_impact,
+            "note": _cf_item_note(cat, c["subcategory"], change),
+        }
+        if section == "operating_wc":
+            operating_wc_items.append(item)
+        elif section == "investing":
+            investing_items.append(item)
+        elif section == "financing":
+            financing_items.append(item)
+
+    # CFO = net_income + non-cash add-backs + WC changes (signed)
+    subtotal_wc = sum((i["cf_impact"] for i in operating_wc_items), Decimal("0"))
+    subtotal_cfo = net_income + depreciation_expense + subtotal_wc
+    subtotal_cfi = sum((i["cf_impact"] for i in investing_items), Decimal("0"))
+    subtotal_cff = sum((i["cf_impact"] for i in financing_items), Decimal("0"))
+    net_change = subtotal_cfo + subtotal_cfi + subtotal_cff
+
+    actual_cash_change = closing_cash - opening_cash
+    reconciliation_diff = (net_change - actual_cash_change).quantize(Q2)
+    is_reconciled = reconciliation_diff == Decimal("0.00")
+
+    noncash_adjustments: list[dict] = []
+    if depreciation_expense != 0:
+        noncash_adjustments.append({
+            "code": "_DEPR",
+            "name_ar": "إهلاك (مشتق من قائمة الدخل)",
+            "name_en": "Depreciation (derived from IS)",
+            "subcategory": "depreciation",
+            "amount": depreciation_expense,
+            "is_synthetic": True,
+        })
+
+    return {
+        "period_start": period_start.isoformat(),
+        "period_end": period_end.isoformat(),
+        "operating_activities": {
+            "net_income": net_income,
+            "noncash_adjustments": noncash_adjustments,
+            "working_capital_changes": operating_wc_items,
+            "subtotal_cfo": subtotal_cfo,
+        },
+        "investing_activities": {
+            "items": investing_items,
+            "subtotal_cfi": subtotal_cfi,
+        },
+        "financing_activities": {
+            "items": financing_items,
+            "subtotal_cff": subtotal_cff,
+        },
+        "totals": {
+            "total_cfo": subtotal_cfo,
+            "total_cfi": subtotal_cfi,
+            "total_cff": subtotal_cff,
+            "net_change_in_cash": net_change,
+            "opening_cash": opening_cash,
+            "closing_cash": closing_cash,
+            "reconciliation_check": opening_cash + net_change,
+            "is_reconciled": is_reconciled,
+            "reconciliation_difference": reconciliation_diff,
+        },
+        "unmapped_items": unmapped,
+    }
+
+
+def _cf_item_note(
+    category: Optional[str], subcategory: Optional[str], change: Decimal
+) -> str:
+    """Human-readable Arabic explanation of how the row affects CF."""
+    direction = "زيادة" if change > 0 else ("نقصان" if change < 0 else "بدون تغيير")
+    name = subcategory or "حساب"
+    if category == "asset":
+        sign = "نقدية مستخدمة" if change > 0 else "نقدية مُحرَّرة"
+    elif category in ("liability", "equity"):
+        sign = "نقدية مكتسبة" if change > 0 else "نقدية مدفوعة"
+    else:
+        sign = "تأثير على التدفق النقدي"
+    return f"{direction} في {name} → {sign}"
+
+
+def _cf_to_response_dict(snap: dict) -> dict:
+    """Float-coerce balances inside a CF snapshot for JSON response."""
+
+    def _row(r: dict) -> dict:
+        out = dict(r)
+        for k in ("opening_balance", "closing_balance", "change", "cf_impact",
+                  "amount"):
+            if k in out and isinstance(out[k], Decimal):
+                out[k] = float(out[k])
+        return out
+
+    op = snap["operating_activities"]
+    inv = snap["investing_activities"]
+    fin = snap["financing_activities"]
+    t = snap["totals"]
+
+    return {
+        "period_start": snap["period_start"],
+        "period_end": snap["period_end"],
+        "operating_activities": {
+            "net_income": float(op["net_income"]),
+            "noncash_adjustments": [_row(r) for r in op["noncash_adjustments"]],
+            "working_capital_changes": [_row(r) for r in op["working_capital_changes"]],
+            "subtotal_cfo": float(op["subtotal_cfo"]),
+        },
+        "investing_activities": {
+            "items": [_row(r) for r in inv["items"]],
+            "subtotal_cfi": float(inv["subtotal_cfi"]),
+        },
+        "financing_activities": {
+            "items": [_row(r) for r in fin["items"]],
+            "subtotal_cff": float(fin["subtotal_cff"]),
+        },
+        "totals": {
+            "total_cfo": float(t["total_cfo"]),
+            "total_cfi": float(t["total_cfi"]),
+            "total_cff": float(t["total_cff"]),
+            "net_change_in_cash": float(t["net_change_in_cash"]),
+            "opening_cash": float(t["opening_cash"]),
+            "closing_cash": float(t["closing_cash"]),
+            "reconciliation_check": float(t["reconciliation_check"]),
+            "is_reconciled": bool(t["is_reconciled"]),
+            "reconciliation_difference": float(t["reconciliation_difference"]),
+        },
+        "unmapped_items": [
+            {
+                **r,
+                "change": float(r["change"]) if isinstance(r.get("change"), Decimal)
+                else r.get("change"),
+            }
+            for r in snap["unmapped_items"]
+        ],
+    }
+
+
+def compute_cash_flow(
+    db: Session,
+    *,
+    entity_id: str,
+    start_date: date,
+    end_date: date,
+    method: str = "indirect",
+    compare_period: str = "none",
+    include_zero: bool = False,
+) -> dict:
+    """قائمة التدفقات النقدية — every value sourced from `pilot_gl_postings`.
+
+    G-FIN-CF-1 (2026-05-08) full rewrite: the prior implementation
+    hardcoded CFI=CFF=0 with a "v2: سنضيف تصنيف" comment, used a
+    fragile `code.startswith("111","112")` cash detector, and silently
+    swallowed exceptions with a `Decimal("0")` fallback. None of that
+    survives this rewrite.
+
+    Indirect Method
+    ---------------
+    1. Net income from `compute_income_statement([period_start, period_end])`.
+    2. Non-cash add-back: depreciation expense from the IS
+       `expense_by_subcat['depreciation']` aggregate.
+    3. Per-account changes from
+       `_cf_period_account_changes` (two `_bs_compute_snapshot` calls
+       at `start - 1d` and `end_date`, then per-account subtraction).
+    4. Each change classified by subcategory via `_CF_SECTION_MAP`:
+       cash / operating_wc / investing / financing /
+       *_skip / unmapped. Cash subcat increments opening_cash /
+       closing_cash; *_skip subcats are silently dropped (already
+       counted elsewhere); unmapped subcats surface in the response's
+       `unmapped_items` list with a warning.
+    5. Sign convention:
+         asset increase  → cf_impact = -change   (cash tied up)
+         liability/equity increase → cf_impact = +change   (cash inflow)
+    6. CFO = net_income + depreciation + sum(operating_wc cf_impact)
+       CFI = sum(investing cf_impact)
+       CFF = sum(financing cf_impact)
+       net_change = CFO + CFI + CFF
+    7. Reconciliation: net_change must equal closing_cash - opening_cash
+       within Q2 (0.01) tolerance. When it doesn't, `is_reconciled=False`
+       and the operator sees a red banner — never silenced.
+
+    Anti-mock guarantees
+    --------------------
+    - `pilot_gl_postings` has exactly one writer (`post_journal_entry`)
+      so drafts can't sneak in.
+    - The `Decimal("0")` exception fallback from the prior version is
+      gone — TB query failures propagate.
+    - The opening_cash + net_change = closing_cash equation is verified
+      against real data and reported (`is_reconciled` flag) instead of
+      forced.
+    - Custom subcategories not in `_CF_SECTION_MAP` surface as
+      `unmapped_items` — admins must map them or document why they're
+      out of scope.
+    """
+    if end_date < start_date:
+        raise ValueError("end_date must be >= start_date")
+    if method not in ("indirect", "direct"):
+        raise ValueError(f"method must be 'indirect' or 'direct' (got {method!r})")
+    if method == "direct":
+        # The direct method walks operating cash receipts/payments from
+        # the GL by tagging cash/bank journal lines. The current
+        # JournalLine schema doesn't carry the per-line tag we need, so
+        # the direct method is a separate ticket. Surface a clean 422
+        # rather than producing wrong numbers.
+        raise ValueError(
+            "Direct method is not yet implemented — قريباً. "
+            "Use method='indirect' for now."
+        )
+    if compare_period not in ("none", "previous_year", "previous_period"):
+        raise ValueError(
+            f"compare_period must be one of: none, previous_year, "
+            f"previous_period (got {compare_period!r})"
+        )
+
+    current = _cf_compute_snapshot(
+        db,
+        entity_id=entity_id,
+        period_start=start_date,
+        period_end=end_date,
+        include_zero=include_zero,
+    )
+
+    posted_je_count = (
+        db.query(JournalEntry)
+        .filter(
+            JournalEntry.entity_id == entity_id,
+            JournalEntry.status == JournalEntryStatus.posted.value,
+            JournalEntry.je_date >= start_date,
+            JournalEntry.je_date <= end_date,
+        )
+        .count()
+    )
+
+    comparison_period: Optional[dict] = None
+    variances: Optional[dict] = None
+    if compare_period == "previous_year":
+        try:
+            prior_start = start_date.replace(year=start_date.year - 1)
+            prior_end = end_date.replace(year=end_date.year - 1)
+        except ValueError:
+            prior_start = start_date.replace(
+                year=start_date.year - 1, day=min(start_date.day, 28)
+            )
+            prior_end = end_date.replace(
+                year=end_date.year - 1, day=min(end_date.day, 28)
+            )
+        prior = _cf_compute_snapshot(
+            db,
+            entity_id=entity_id,
+            period_start=prior_start,
+            period_end=prior_end,
+            include_zero=include_zero,
+        )
+    elif compare_period == "previous_period":
+        delta = end_date - start_date
+        prior_end = start_date - timedelta(days=1)
+        prior_start = prior_end - delta
+        prior = _cf_compute_snapshot(
+            db,
+            entity_id=entity_id,
+            period_start=prior_start,
+            period_end=prior_end,
+            include_zero=include_zero,
+        )
+    else:
+        prior = None
+
+    if prior is not None:
+        comparison_period = _cf_to_response_dict(prior)
+
+        def _pct(c: Decimal, p: Decimal) -> Optional[float]:
+            if p == 0:
+                return None
+            return float(((c - p) / abs(p)) * 100)
+
+        ct = current["totals"]
+        pt = prior["totals"]
+        variances = {
+            "cfo_change_pct": _pct(ct["total_cfo"], pt["total_cfo"]),
+            "cfi_change_pct": _pct(ct["total_cfi"], pt["total_cfi"]),
+            "cff_change_pct": _pct(ct["total_cff"], pt["total_cff"]),
+            "net_change_pct": _pct(
+                ct["net_change_in_cash"], pt["net_change_in_cash"]
+            ),
+        }
+
+    entity_row = db.query(Entity).filter(Entity.id == entity_id).first()
+    currency = (entity_row.functional_currency if entity_row else None) or "SAR"
+
+    warnings: list[str] = []
+    unmapped_subcategories: list[str] = []
+    seen_unmapped: set[str] = set()
+    for it in current["unmapped_items"]:
+        sc = it.get("subcategory") or "(none)"
+        if sc not in seen_unmapped:
+            seen_unmapped.add(sc)
+            unmapped_subcategories.append(sc)
+    if unmapped_subcategories:
+        warnings.append(
+            "subcategories غير مصنّفة لأقسام التدفق النقدي — "
+            "يُرجى مراجعتها مع الإدارة المالية: "
+            + ", ".join(unmapped_subcategories)
+        )
+    if not current["totals"]["is_reconciled"]:
+        warnings.append(
+            f"تحذير: التدفقات النقدية غير متطابقة — فرق "
+            f"{current['totals']['reconciliation_difference']} {currency}. "
+            "راجع القيود غير المتوازنة أو subcategories غير المصنّفة."
+        )
 
     return {
         "entity_id": entity_id,
-        "start_date": start_date.isoformat(),
-        "end_date": end_date.isoformat(),
-        "net_income": float(net_income),
-        "working_capital_change": float(-ar_change + ap_change),
-        "ar_change": float(ar_change),
-        "ap_change": float(ap_change),
-        "operating_cf": float(operating_cf),
-        "investing_cf": 0.0,  # v2: سنضيف تصنيف الأصول الثابتة
-        "financing_cf": 0.0,  # v2: سنضيف تصنيف القروض وحقوق الملكية
-        "net_cash_change": float(operating_cf),
-        "cash_beginning": float(cash_start),
-        "cash_ending": float(cash_end),
-        "actual_cash_change": float(actual_cash_change),
-        "variance": float(actual_cash_change - operating_cf),
+        "period_start": start_date.isoformat(),
+        "period_end": end_date.isoformat(),
+        "method": method,
+        "currency": currency,
+        "current_period": _cf_to_response_dict(current),
+        "comparison_period": comparison_period,
+        "variances": variances,
+        "unmapped_subcategories": unmapped_subcategories,
+        "warnings": warnings,
+        "posted_je_count": posted_je_count,
     }
 
 

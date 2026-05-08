@@ -22,7 +22,7 @@ from app.pilot.schemas.gl import (
     JournalEntryCreate, JournalEntryRead, JournalEntryDetail,
     JournalLineRead, JEReverse,
     TrialBalanceResponse, TrialBalanceRow,
-    IncomeStatementResponse, BalanceSheetResponse,
+    IncomeStatementResponse, BalanceSheetResponse, CashFlowResponse,
 )
 from app.pilot.security import assert_entity_in_tenant, assert_resource_in_tenant
 from app.pilot.services.gl_engine import (
@@ -574,24 +574,78 @@ def balance_sheet(
     return BalanceSheetResponse(**result)
 
 
-@router.get("/entities/{entity_id}/reports/cash-flow")
+@router.get(
+    "/entities/{entity_id}/reports/cash-flow",
+    response_model=CashFlowResponse,
+)
 def cash_flow(
     entity_id: str,
     start_date: _date = Query(...),
     end_date: _date = Query(...),
+    method: str = Query(
+        "indirect",
+        description="Cash flow method. 'indirect' is the only "
+                    "supported method in v1; 'direct' returns 422.",
+    ),
+    compare_period: str = Query(
+        "none",
+        pattern="^(none|previous_year|previous_period)$",
+    ),
+    include_zero: bool = Query(False),
+    response: Response = None,  # type: ignore[assignment]
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    """قائمة التدفقات النقدية (طريقة غير مباشرة).
+    """قائمة التدفقات النقدية (Indirect Method).
 
-    Net Income + Depreciation ± Working Capital Changes = Operating CF
+    G-FIN-CF-1 (2026-05-08) — every value sourced 100% from
+    `pilot_gl_postings`. The reconciliation invariant
+    (`opening_cash + net_change == closing_cash`) is verified
+    server-side; when it breaks, `is_reconciled=False` is returned
+    and a structured `CF_RECONCILIATION_FAILURE` warning is logged.
+    The endpoint still returns 200 — operators must see the
+    breakdown in the UI to fix the underlying data.
+
+    Real-data invariant pinned by:
+      * tests/test_cash_flow_real_data.py::TestAntiMock
+      * tests/test_cash_flow_real_data.py::TestReconciliation
     """
     assert_entity_in_tenant(db, entity_id, current_user)
     if end_date < start_date:
         raise HTTPException(400, "end_date يجب أن يكون ≥ start_date")
-    return compute_cash_flow(
-        db, entity_id=entity_id, start_date=start_date, end_date=end_date
-    )
+    try:
+        result = compute_cash_flow(
+            db,
+            entity_id=entity_id,
+            start_date=start_date,
+            end_date=end_date,
+            method=method,
+            compare_period=compare_period,
+            include_zero=include_zero,
+        )
+    except ValueError as ex:
+        raise HTTPException(422 if "Direct method" in str(ex) else 400, str(ex))
+    if response is not None:
+        response.headers["X-Data-Source"] = "real-time-from-postings"
+    if not result["current_period"]["totals"]["is_reconciled"]:
+        # Log the reconciliation failure with structured fields so
+        # SOC / ops can alert on it. Do not fail the request — the
+        # operator must see the breakdown to fix the underlying JE.
+        import logging
+        logging.getLogger(__name__).warning(
+            "CF_RECONCILIATION_FAILURE entity_id=%s period=[%s,%s] "
+            "net_change=%s actual_cash_change=%s diff=%s "
+            "unmapped_subcats=%s",
+            entity_id,
+            start_date,
+            end_date,
+            result["current_period"]["totals"]["net_change_in_cash"],
+            result["current_period"]["totals"]["closing_cash"]
+            - result["current_period"]["totals"]["opening_cash"],
+            result["current_period"]["totals"]["reconciliation_difference"],
+            result.get("unmapped_subcategories") or [],
+        )
+    return CashFlowResponse(**result)
 
 
 @router.get("/entities/{entity_id}/reports/comparative")

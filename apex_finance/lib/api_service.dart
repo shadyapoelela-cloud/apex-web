@@ -593,8 +593,31 @@ class ApiService {
     final qs = params.isEmpty ? '' : '?${params.join('&')}';
     return _get('/pilot/entities/$entityId/reports/balance-sheet$qs');
   }
-  static Future<ApiResult> pilotCashFlow(String entityId, {required String startDate, required String endDate}) =>
-      _get('/pilot/entities/$entityId/reports/cash-flow?start_date=$startDate&end_date=$endDate');
+  /// G-FIN-CF-1 (2026-05-08): supports method + compare_period +
+  /// include_zero. Backed by `pilot_gl_postings` (real posted JEs
+  /// only — no mocks, no fallbacks). Reconciliation invariant
+  /// (opening_cash + net_change = closing_cash) verified server-side
+  /// via `is_reconciled`. Documented in
+  /// `docs/CASH_FLOW_DATA_FLOW_2026-05-08.md`.
+  static Future<ApiResult> pilotCashFlow(
+    String entityId, {
+    required String startDate,
+    required String endDate,
+    String method = 'indirect',
+    String comparePeriod = 'none',
+    bool includeZero = false,
+  }) {
+    final params = <String>[
+      'start_date=$startDate',
+      'end_date=$endDate',
+    ];
+    if (method != 'indirect') params.add('method=$method');
+    if (comparePeriod != 'none') params.add('compare_period=$comparePeriod');
+    if (includeZero) params.add('include_zero=true');
+    return _get(
+      '/pilot/entities/$entityId/reports/cash-flow?${params.join('&')}',
+    );
+  }
   static Future<ApiResult> pilotAccountLedger(String accountId, {String? startDate, String? endDate, int limit = 500}) {
     final params = <String>['limit=$limit'];
     if (startDate != null) params.add('start_date=$startDate');
