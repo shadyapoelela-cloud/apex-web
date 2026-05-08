@@ -4,6 +4,110 @@
 
 ### 2026-05-08
 
+- [x] **G-FIN-CF-1** — Cash Flow Statement (Indirect Method) with real-data + reconciliation invariant — **closes UAT Issue #5 (TB + IS + BS + CF all real-data)** 🎉
+  - Branch: `feat/g-fin-cf-1`
+  - **Why:** UAT Issue #5 needed four real-data financial statements
+    (TB ✅ from G-TB-DISPLAY-1, IS ✅ from G-FIN-IS-1, BS ✅ from
+    G-FIN-BS-1). CF was the last — and the most flawed pre-rewrite.
+  - **Recon + L1 audit:** the prior `compute_cash_flow` had three
+    distinct anti-mock concerns: (1) **hardcoded `0.0` for CFI/CFF**
+    with `"v2: سنضيف تصنيف"` comment — production was returning
+    genuinely-zero investing/financing sections regardless of the
+    underlying data; (2) **`try/except: Decimal("0")` fallback** that
+    silently swallowed all exceptions; (3) **fragile cash detection**
+    via `code.startswith(("111", "112"))` — broke on any custom
+    CoA. **Full rewrite.**
+  - **Backend:**
+    - New `_CF_SECTION_MAP` classifying asset/liability/equity
+      subcategories into operating_wc / investing / financing / cash
+      / *_skip / unmapped. Custom subcategories surface as warnings
+      (no silent skip).
+    - New `_cf_period_account_changes` helper deriving per-account
+      changes from two `_bs_compute_snapshot` calls (start - 1d and
+      end_date) and tagging by category. Sign convention: asset
+      increase = -CF, liability/equity increase = +CF.
+    - **Side-effect fix in `_index_by_account`:** `_bs_compute_snapshot`
+      partitions rows into asset/liability/equity lists but doesn't
+      include the category field on each row. Without explicit
+      tagging from the bucket name, the sign convention silently
+      defaults to the wrong branch (the bug surfaced as `total_cfo`
+      including capital — found by the happy-path test).
+    - `compute_cash_flow` rewritten to use the helpers. Adds
+      `method`, `compare_period`, `include_zero` kwargs. Reconciliation
+      check `(closing_cash - opening_cash) == net_change` within Q2
+      tolerance — `is_reconciled` is what the data says; never silenced.
+    - Direct method returns 422 with "قريباً" message. The current
+      `JournalLine` schema lacks the per-line cash-tag the direct
+      method needs.
+    - New `CashFlowResponse` + 7 nested Pydantic classes
+      (`CashFlowSnapshot`, `CashFlowOperating`, `CashFlowSection`,
+      `CashFlowItem`, `CashFlowNoncashAdjustment`, `CashFlowTotals`,
+      `CashFlowVariances`).
+    - Endpoint: `X-Data-Source: real-time-from-postings` header.
+      `is_reconciled=False` → 200 with structured
+      `CF_RECONCILIATION_FAILURE` warning log + warnings list in
+      response body. Operator must see the breakdown.
+  - **Frontend:**
+    - New
+      `apex_finance/lib/screens/finance/cash_flow_screen.dart`
+      (~960 lines). RTL header with subtitle "بيانات حقيقية +
+      reconciliation محقق", filters bar (period start/end + method
+      dropdown + compare + include_zero), **reconciliation banner
+      first** (green ✅ / red ⚠️), unmapped-subcategory orange warning
+      bar when present, 4 summary cards (CFO/CFI/CFF/NetChange with
+      opening→closing cash subtitle), 3-section statement table
+      grouped (Operating: net_income → non-cash → WC; Investing;
+      Financing; net change; opening; closing), footer source line
+      + green-dot guarantee, kDebugMode panel, empty-state CTA.
+      **Zero local state initialised with values.**
+    - **Class name aliasing:** `CashFlowScreen` already exists in
+      `screens/compliance/cashflow_screen.dart` (older forecast
+      screen). New imports use `as fin_cf` prefix in `v5_wired_screens`
+      to disambiguate; the route + main.dart imports only the new
+      one so no alias needed there.
+    - `ApiService.pilotCashFlow` extended with `method` +
+      `comparePeriod` + `includeZero` kwargs.
+    - Wired into `v5_data` (chip), `v5_routes` (explicit GoRoute),
+      `v5_wired_screens` (Map entry), `v5_wired_keys` (manual add),
+      `main.dart` Offstage sentinel.
+  - **Tests:**
+    - `tests/test_cash_flow_real_data.py` — **21 cases** across
+      `TestRealDataFlow` (10 — happy path, AR/AP/inventory/depr/
+      fixed-asset/loan), `TestReconciliation` (3 — complex 10-JE
+      scenario, opening+change=closing, unmapped detection),
+      `TestTenantAndValidation` (3 — cross-tenant 404, period
+      validation, invalid method), `TestAntiMock` (4 — empty zeros,
+      12345.67 round-trip, unmapped surface, no reconciliation
+      bypass), plus 1 reconciliation-failure log assertion. **All
+      21 pass.**
+    - `apex_finance/test/screens/finance/cash_flow_test.dart` — **7
+      tests**: chip declaration, wired-keys, validator reachability,
+      source-grep anti-mock (incl. CF-specific `forceReconciled` /
+      `overrideReconciled` / `silentReconciliation`), ApiService
+      kwargs contract, **reconciliation-banner-renders-before-table**
+      ordering, unmapped-warning conditional render.
+  - **Verification:**
+    - `pytest tests/test_cash_flow_real_data.py` → **21/21 pass**.
+    - Pilot regression sweep (CF + BS + IS + TB +
+      tenant_isolation_full + tenant_isolation_v2 + fin_statements
+      + reports_download + dimensions) → **170/170 pass**.
+    - `flutter analyze` → 0 issues.
+    - Flutter regression (CF + BS + IS + TB + v5_routing +
+      auth_guard + err_1_session_redirect) → **52/52 pass**.
+    - `flutter build web --release --no-tree-shake-icons` →
+      succeeds in ~52s.
+    - 0 alembic migrations. 0 schema-breaking changes.
+  - **Docs:** new
+    `docs/CASH_FLOW_DATA_FLOW_2026-05-08.md` — 7-layer walkthrough
+    (anti-mock pre-rewrite findings → CF section map → algorithm →
+    AR sign rationale → endpoint → frontend → tests). Manual UAT
+    (5 JE scenario yields CFO=40k, CFI=-30k, CFF=+120k, balanced)
+    plus deliberate-imbalance UAT for the red-banner contract.
+  - **🎉 UAT Issue #5 (Financial Statements) FULLY CLOSED.**
+    All four statements (TB + IS + BS + CF) now backed by 100% real
+    `pilot_gl_postings` data with test-pinned anti-mock and
+    integrity-equation invariants.
+
 - [x] **G-FIN-BS-1** — Balance Sheet (Statement of Financial Position) with real-data guarantee + balance-equation invariant — closes second-of-three of UAT Issue #5 (BS done; CF deferred to G-FIN-CF-1)
   - Branch: `feat/g-fin-bs-1`
   - **Why:** UAT Issue #5 needs three financial statements with real
