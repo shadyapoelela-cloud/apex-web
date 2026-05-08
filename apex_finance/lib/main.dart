@@ -26,6 +26,7 @@ import 'screens/v4_compliance/zakat_calculator_v5_screen.dart';
 import 'screens/settings/entity_setup_screen.dart';
 import 'screens/finance/trial_balance_screen.dart';
 import 'screens/finance/income_statement_screen.dart';
+import 'screens/finance/balance_sheet_screen.dart';
 
 // Sprint-1 refactor: the root widget now lives in app/apex_app.dart.
 // Re-exported so existing imports of `package:apex_finance/main.dart`
@@ -163,6 +164,8 @@ class _V5KeepAliveSentinel extends StatelessWidget {
                       TrialBalanceScreen(),
                       // G-FIN-IS-1 (2026-05-08).
                       IncomeStatementScreen(),
+                      // G-FIN-BS-1 (2026-05-08).
+                      BalanceSheetScreen(),
                     ],
                   ),
                 ),

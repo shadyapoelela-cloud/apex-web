@@ -576,8 +576,21 @@ class ApiService {
       '/pilot/entities/$entityId/reports/income-statement?${params.join('&')}',
     );
   }
-  static Future<ApiResult> pilotBalanceSheet(String entityId, {String? asOf}) {
-    final qs = asOf != null ? '?as_of=$asOf' : '';
+  /// G-FIN-BS-1 (2026-05-08): supports compare_as_of + include_zero.
+  /// Backed by `pilot_gl_postings` (real posted JEs only — no mocks,
+  /// no fallbacks). Documented in
+  /// `docs/BALANCE_SHEET_DATA_FLOW_2026-05-08.md`.
+  static Future<ApiResult> pilotBalanceSheet(
+    String entityId, {
+    String? asOf,
+    String? compareAsOf,
+    bool includeZero = false,
+  }) {
+    final params = <String>[];
+    if (asOf != null) params.add('as_of=$asOf');
+    if (compareAsOf != null) params.add('compare_as_of=$compareAsOf');
+    if (includeZero) params.add('include_zero=true');
+    final qs = params.isEmpty ? '' : '?${params.join('&')}';
     return _get('/pilot/entities/$entityId/reports/balance-sheet$qs');
   }
   static Future<ApiResult> pilotCashFlow(String entityId, {required String startDate, required String endDate}) =>

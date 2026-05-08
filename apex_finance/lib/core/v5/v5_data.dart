@@ -534,6 +534,10 @@ List<V5Service> v5Services = [
           // value sourced 100% from pilot_gl_postings (real, posted
           // JEs). See docs/INCOME_STATEMENT_DATA_FLOW_2026-05-08.md.
           const V5Chip(id: 'income-statement', labelAr: 'قائمة الدخل', labelEn: 'Income Statement', icon: Icons.assessment, phase: ChipPhase.report, category: 'reports'),
+          // G-FIN-BS-1 (2026-05-08): Balance Sheet screen — same
+          // 100% real-data guarantee + balance-equation invariant.
+          // See docs/BALANCE_SHEET_DATA_FLOW_2026-05-08.md.
+          const V5Chip(id: 'balance-sheet', labelAr: 'الميزانية العمومية', labelEn: 'Balance Sheet', icon: Icons.account_balance, phase: ChipPhase.report, category: 'reports'),
           const V5Chip(id: 'statements', labelAr: 'القوائم المالية', labelEn: 'Financial Statements', icon: Icons.insert_chart, phase: ChipPhase.report, category: 'reports'),
           //   6.b الإدارية
           const V5Chip(id: 'budgets', labelAr: 'الموازنات', labelEn: 'Budgets', icon: Icons.pie_chart, phase: ChipPhase.report, category: 'reports'),
