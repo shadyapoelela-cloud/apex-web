@@ -4,6 +4,77 @@
 
 ### 2026-05-08
 
+- [x] **G-TB-REAL-DATA-AUDIT** — TB real-data audit + cross-tenant fix
+  - Branch: `feat/g-tb-real-data-audit`
+  - **Why:** UAT follow-up to G-TB-DISPLAY-1 — "هل ميزان المراجعة
+    فعلاً يقرأ بيانات حقيقية؟" Walk the full data path (widget →
+    ApiService → FastAPI route → SQL → Postgres) and prove there are
+    no mocks, hardcoded values, or stub fallbacks anywhere.
+  - **Findings:**
+    - **No mocks anywhere.** `compute_trial_balance` (gl_engine.py:720)
+      is a single GROUP BY against `pilot_gl_postings` filtered by
+      `entity_id` + `posting_date <= as_of`. Drafts (which only have
+      `pilot_journal_lines` rows, no `pilot_gl_postings`) correctly
+      never appear in TB output.
+    - **One critical security bug — closed in this PR.** Pre-PR,
+      `_entity_or_404` in `gl_routes.py` checked only `Entity.id == eid`
+      — any authenticated user could pull any entity's TB by guessing
+      the id. Pilot models do **not** inherit `TenantMixin`, so
+      `attach_tenant_guard` silently skipped them. Fix: explicit
+      `current_user.tenant_id` vs `Entity.tenant_id` check + 403 (not
+      404) on cross-tenant probe (404 reserved for genuinely missing
+      ids, so status code carries no existence-leak signal).
+  - **Backend:**
+    - `_entity_or_404(db, eid, *, current_user=None)` in
+      `app/pilot/routes/gl_routes.py` — accepts optional `current_user`
+      keyword arg; if provided, compares `tenant_id` / `tid` claim to
+      `Entity.tenant_id` and 403s on mismatch.
+    - 8 routes updated to pass `current_user=Depends(get_current_user)`
+      through: `seed_coa`, `list_accounts`, `create_account`,
+      `seed_periods`, `list_periods`, `create_je`, `list_jes`,
+      `trial_balance`. Other report endpoints (income-statement,
+      balance-sheet, cash-flow, comparative) still call without it —
+      flagged as out-of-scope follow-up `G-PILOT-REPORTS-TENANT-AUDIT`
+      in the audit doc.
+    - New `posted_je_count: int = 0` on `TrialBalanceResponse`
+      (`app/pilot/schemas/gl.py`) + computed in the TB handler —
+      backs the frontend footer "المصدر: pilot_journal_lines — N
+      قيد مرحّل" without a second roundtrip. Default `= 0` keeps
+      older fixtures and tests valid.
+  - **Frontend:** `apex_finance/lib/screens/finance/trial_balance_screen.dart`
+    +44 / −9.
+    - Freshness badge in header — "آخر تحديث: HH:MM:SS" next to the
+      refresh button, set to `DateTime.now()` after each successful
+      load. Lets the operator distinguish a fresh fetch from a cached
+      pre-deploy response.
+    - Footer source line under the totals row — "المصدر:
+      pilot_journal_lines — N قيد مرحّل" reads `posted_je_count` from
+      the response. If the field is absent (e.g., backend not yet
+      deployed), shows an em-dash (`—`) instead of misleading `0`.
+  - **Tests:** `tests/test_tb_real_data_flow.py` — 11 cases, 3 classes:
+    - `TestCrossTenantIsolation` (5) — user A → entity B → 403; user A
+      → own entity → 200; legacy token without `tenant_id` claim →
+      403; missing entity → 404 (not 403); user B → own entity → 200.
+    - `TestRealDataFlow` (5) — empty entity returns empty rows + 0
+      count; posted JE produces 2 TB rows + correct totals + count=1;
+      draft JE produces zero TB rows; mix posted+draft → count =
+      posted only; future-dated JE excluded by `as_of` filter.
+    - `TestResponseShape` (1) — `posted_je_count` field present + int.
+  - **Verification:**
+    - Backend: 11/11 new + 62/62 TB-adjacent regression sweep
+      (test_tb_real_data_flow + test_reports_download +
+      test_fin_statements + test_dimensions_consolidation_cards) pass.
+    - Frontend: `flutter analyze` 0 issues; full Flutter regression
+      sweep (v5_routing + auth_guard + err_1_session_redirect +
+      trial_balance_test) — 35/35 pass; `flutter build web --release`
+      succeeds in 80s.
+    - No alembic migrations. No `main.dart` edits. No schema-breaking
+      response field changes (default keeps older fixtures green).
+  - **Docs:** `docs/TB_DATA_FLOW_AUDIT_2026-05-08.md` (layer-by-layer
+    walk + tests table + out-of-scope) and
+    `docs/TB_REAL_DATA_UAT_SCRIPT.md` (manual UAT clickthrough,
+    pre-flight, sign-off checklist).
+
 - [x] **G-TB-DISPLAY-1** — Trial Balance display screen — closed UAT Issue #4
   - Branch: `feat/g-tb-display-1`
   - **Bug:** the user-visible `tb` Quick Access pin (ميزان المراجعة)
