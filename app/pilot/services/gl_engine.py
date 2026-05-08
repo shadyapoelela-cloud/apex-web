@@ -1038,31 +1038,337 @@ def compute_income_statement(
     }
 
 
-def compute_balance_sheet(db: Session, *, entity_id: str, as_of_date: date) -> dict:
-    """قائمة المركز المالي حتى تاريخ."""
-    tb = compute_trial_balance(db, entity_id=entity_id, as_of_date=as_of_date, include_zero=False)
-    assets = sum((r["balance"] for r in tb if r["category"] == "asset"), Decimal("0"))
-    liabilities = sum((r["balance"] for r in tb if r["category"] == "liability"), Decimal("0"))
-    equity = sum((r["balance"] for r in tb if r["category"] == "equity"), Decimal("0"))
+_BS_CATEGORIES = ("asset", "liability", "equity")
+# Equity accounts seeded with this subcategory hold the *closing*
+# balance for current-year P&L (filled at year-end closing). The
+# *running* current-year earnings between closings come from
+# compute_income_statement. Including both would double-count, so
+# during the snapshot we drop accounts with this subcategory from
+# the equity rows summation and report the IS-derived figure
+# under the synthetic ``_current_year_earnings`` row instead.
+_CURRENT_EARNINGS_SUBCAT = "current_earnings"
 
-    # صافي الدخل يُضاف كحقوق ملكية حتى الإقفال
-    # نحسب revenue/expense لتاريخ بداية السنة حتى as_of_date
+# Subcategory groupings used by the BS screen for the
+# "current vs fixed" / "current vs long-term" subtotals. Anything
+# not in these lists is bucketed as "other" (which still shows in
+# the rows but doesn't roll up to a named subtotal).
+_CURRENT_ASSET_SUBCATS = {"cash", "bank", "receivables", "inventory", "vat", "prepaid"}
+_FIXED_ASSET_SUBCATS = {"fixed_assets", "accumulated_dep"}
+_CURRENT_LIAB_SUBCATS = {"payables", "vat", "payroll", "zakat"}
+_LONG_TERM_LIAB_SUBCATS = {"loans", "eosb"}
+
+
+def _bs_compute_snapshot(
+    db: Session,
+    *,
+    entity_id: str,
+    as_of_date: date,
+    include_zero: bool,
+) -> dict:
+    """Internal: build a single-date BS snapshot.
+
+    DATA SOURCE: 100% real from `pilot_gl_postings` joined to
+    `pilot_gl_accounts`. No mocks, no fallbacks, no caching, no
+    demo seeds. The query is the same one `compute_trial_balance`
+    runs (we reuse it for consistency — anything else risks the two
+    reports drifting apart for the same data).
+
+    Returns a dict shaped:
+      assets:        list[row]        per-account balances
+      liabilities:   list[row]
+      equity:        list[row]        excludes current_earnings subcat
+      current_earnings: Decimal       IS-derived (running)
+      totals:        nested dict      per-subtotal + overall
+    """
+    tb = compute_trial_balance(
+        db,
+        entity_id=entity_id,
+        as_of_date=as_of_date,
+        include_zero=include_zero,
+    )
+
+    assets: list[dict] = []
+    liabilities: list[dict] = []
+    equity: list[dict] = []
+    for r in tb:
+        cat = r.get("category")
+        if cat not in _BS_CATEGORIES:
+            continue  # revenue / expense rows roll into current_earnings instead
+        # Skip the closing-balance current-earnings account so we
+        # don't double-count alongside the IS-derived figure.
+        if cat == "equity" and r.get("subcategory") == _CURRENT_EARNINGS_SUBCAT:
+            continue
+        row = {
+            "account_id": r["account_id"],
+            "code": r["code"],
+            "name_ar": r["name_ar"],
+            "name_en": r.get("name_en"),
+            "subcategory": r.get("subcategory"),
+            "normal_balance": r["normal_balance"],
+            "balance": Decimal(str(r["balance"])),
+        }
+        if cat == "asset":
+            assets.append(row)
+        elif cat == "liability":
+            liabilities.append(row)
+        else:
+            equity.append(row)
+
+    # Current-year earnings (running) — derived from IS for the
+    # period [Jan 1 of the year .. as_of_date]. The synthetic row
+    # sits at the bottom of the equity section.
     year_start = date(as_of_date.year, 1, 1)
-    income = compute_income_statement(db, entity_id=entity_id, start_date=year_start, end_date=as_of_date)
+    income = compute_income_statement(
+        db,
+        entity_id=entity_id,
+        start_date=year_start,
+        end_date=as_of_date,
+    )
     current_earnings = Decimal(str(income["net_income"]))
+    if include_zero or current_earnings != 0:
+        equity.append(
+            {
+                "account_id": "_current_year_earnings",
+                "code": "_CYE",
+                "name_ar": "أرباح السنة الحالية (مشتقة من قائمة الدخل)",
+                "name_en": "Current Year Earnings (derived from IS)",
+                "subcategory": _CURRENT_EARNINGS_SUBCAT,
+                "normal_balance": "credit",
+                "balance": current_earnings,
+                "is_synthetic": True,
+            }
+        )
 
-    total_equity_effective = equity + current_earnings
+    # Subtotals by subcategory bucket.
+    def _sum(rows: list[dict], pred) -> Decimal:
+        return sum((r["balance"] for r in rows if pred(r)), Decimal("0"))
+
+    total_current_assets = _sum(
+        assets, lambda r: (r["subcategory"] or "") in _CURRENT_ASSET_SUBCATS
+    )
+    total_fixed_assets = _sum(
+        assets, lambda r: (r["subcategory"] or "") in _FIXED_ASSET_SUBCATS
+    )
+    total_other_assets = _sum(
+        assets,
+        lambda r: (r["subcategory"] or "") not in _CURRENT_ASSET_SUBCATS
+        and (r["subcategory"] or "") not in _FIXED_ASSET_SUBCATS,
+    )
+    total_assets = total_current_assets + total_fixed_assets + total_other_assets
+
+    total_current_liabs = _sum(
+        liabilities,
+        lambda r: (r["subcategory"] or "") in _CURRENT_LIAB_SUBCATS,
+    )
+    total_long_term_liabs = _sum(
+        liabilities,
+        lambda r: (r["subcategory"] or "") in _LONG_TERM_LIAB_SUBCATS,
+    )
+    total_other_liabs = _sum(
+        liabilities,
+        lambda r: (r["subcategory"] or "") not in _CURRENT_LIAB_SUBCATS
+        and (r["subcategory"] or "") not in _LONG_TERM_LIAB_SUBCATS,
+    )
+    total_liabilities = total_current_liabs + total_long_term_liabs + total_other_liabs
+
+    total_equity = sum((r["balance"] for r in equity), Decimal("0"))
+    total_liab_and_equity = total_liabilities + total_equity
+    diff = (total_assets - total_liab_and_equity).quantize(Q2)
+    is_balanced = diff == Decimal("0.00")
+
+    return {
+        "as_of_date": as_of_date.isoformat(),
+        "assets": assets,
+        "liabilities": liabilities,
+        "equity": equity,
+        "current_earnings": current_earnings,
+        "totals": {
+            "total_current_assets": total_current_assets,
+            "total_fixed_assets": total_fixed_assets,
+            "total_other_assets": total_other_assets,
+            "total_assets": total_assets,
+            "total_current_liabilities": total_current_liabs,
+            "total_long_term_liabilities": total_long_term_liabs,
+            "total_other_liabilities": total_other_liabs,
+            "total_liabilities": total_liabilities,
+            "total_equity": total_equity,
+            "total_liab_and_equity": total_liab_and_equity,
+            "is_balanced": is_balanced,
+            "balance_difference": diff,
+        },
+    }
+
+
+def compute_balance_sheet(
+    db: Session,
+    *,
+    entity_id: str,
+    as_of_date: date,
+    compare_as_of: Optional[date] = None,
+    include_zero: bool = False,
+) -> dict:
+    """قائمة المركز المالي — every value sourced from `pilot_gl_postings`.
+
+    G-FIN-BS-1 (2026-05-08) extended this from category totals to a
+    full per-account snapshot with optional comparison + variances.
+    The legacy top-level keys (``assets``, ``liabilities``, ``equity``,
+    ``current_earnings``, ``total_equity``, ``balanced``,
+    ``difference``) are preserved as scalar floats so internal callers
+    — particularly ``compute_comparative_report`` — keep working.
+
+    Anti-mock guarantee
+    -------------------
+    Every balance comes from `compute_trial_balance` (which sums
+    `pilot_gl_postings` per account up to `as_of_date`), and
+    `current_earnings` comes from `compute_income_statement` (which
+    sums `pilot_gl_postings` for revenue+expense accounts in
+    [Jan 1 .. as_of_date]). Drafts have no posting rows so they're
+    inherently excluded. There is no in-memory fallback, no cached
+    value, no demo seed — `G-DEMO-DATA-SEEDER` writes master data
+    only.
+
+    Balance integrity
+    -----------------
+    The accounting equation Assets = Liabilities + Equity is verified
+    after summation. When the equation does NOT hold (data integrity
+    issue — usually an unbalanced JE that slipped through), the
+    response carries `is_balanced=False` and `balance_difference !=
+    0`. We do **not** silently bypass the equation — the operator
+    needs to see the imbalance to fix the underlying JE.
+
+    Synthetic current-year earnings row
+    -----------------------------------
+    The default CoA seeds an equity account with
+    ``subcategory='current_earnings'`` (code 3300) — that's the
+    *closing-balance* container, populated at year-end. Between
+    closings, the running current-year earnings come from the IS.
+    To avoid double-counting we drop accounts with that subcategory
+    from the equity rows summation and add a synthetic
+    ``_current_year_earnings`` row at the bottom of the equity
+    section with the IS-derived figure. The synthetic row has
+    ``account_id='_current_year_earnings'`` and ``is_synthetic=True``
+    so the frontend can style it differently if it wants.
+    """
+    if compare_as_of is not None and compare_as_of >= as_of_date:
+        raise ValueError(
+            f"compare_as_of ({compare_as_of}) must be < as_of_date ({as_of_date})"
+        )
+
+    current = _bs_compute_snapshot(
+        db,
+        entity_id=entity_id,
+        as_of_date=as_of_date,
+        include_zero=include_zero,
+    )
+
+    posted_je_count = (
+        db.query(JournalEntry)
+        .filter(
+            JournalEntry.entity_id == entity_id,
+            JournalEntry.status == JournalEntryStatus.posted.value,
+            JournalEntry.je_date <= as_of_date,
+        )
+        .count()
+    )
+
+    comparison_period: Optional[dict] = None
+    variances: Optional[dict] = None
+    if compare_as_of is not None:
+        prior = _bs_compute_snapshot(
+            db,
+            entity_id=entity_id,
+            as_of_date=compare_as_of,
+            include_zero=include_zero,
+        )
+        comparison_period = _bs_to_response_dict(prior)
+
+        def _pct(c: Decimal, p: Decimal) -> Optional[float]:
+            if p == 0:
+                return None
+            return float(((c - p) / abs(p)) * 100)
+
+        ct = current["totals"]
+        pt = prior["totals"]
+        variances = {
+            "total_assets_change_pct": _pct(ct["total_assets"], pt["total_assets"]),
+            "total_liabilities_change_pct": _pct(
+                ct["total_liabilities"], pt["total_liabilities"]
+            ),
+            "total_equity_change_pct": _pct(ct["total_equity"], pt["total_equity"]),
+        }
+
+    # Read entity's functional currency for the response. Defaults to
+    # SAR if the entity row is gone (defensive — should never happen
+    # since the route guard already loaded it).
+    entity_row = db.query(Entity).filter(Entity.id == entity_id).first()
+    currency = (entity_row.functional_currency if entity_row else None) or "SAR"
+
+    # Top-level legacy keys for backward-compat with
+    # compute_comparative_report. Same values as before — total_equity
+    # already includes current_earnings via the equity rows + synthetic
+    # CYE row (the equity rows summation in _bs_compute_snapshot uses
+    # the actual posted equity accounts EXCLUDING the closing CYE
+    # account, then adds the IS-derived CYE row).
+    legacy_assets = float(current["totals"]["total_assets"])
+    legacy_liabilities = float(current["totals"]["total_liabilities"])
+    legacy_equity_only = float(
+        sum(
+            (r["balance"] for r in current["equity"] if not r.get("is_synthetic")),
+            Decimal("0"),
+        )
+    )
+    legacy_total_equity = float(current["totals"]["total_equity"])
 
     return {
         "entity_id": entity_id,
         "as_of_date": as_of_date.isoformat(),
-        "assets": float(assets),
-        "liabilities": float(liabilities),
-        "equity": float(equity),
-        "current_earnings": float(current_earnings),
-        "total_equity": float(total_equity_effective),
-        "balanced": (assets - (liabilities + total_equity_effective)).quantize(Q2) == Decimal("0.00"),
-        "difference": float(assets - (liabilities + total_equity_effective)),
+        "currency": currency,
+        # Legacy scalar fields (callers: compute_comparative_report).
+        "assets": legacy_assets,
+        "liabilities": legacy_liabilities,
+        "equity": legacy_equity_only,
+        "current_earnings": float(current["current_earnings"]),
+        "total_equity": legacy_total_equity,
+        "balanced": current["totals"]["is_balanced"],
+        "difference": float(current["totals"]["balance_difference"]),
+        # New richer shape.
+        "current_period": _bs_to_response_dict(current),
+        "comparison_period": comparison_period,
+        "variances": variances,
+        "posted_je_count": posted_je_count,
+    }
+
+
+def _bs_to_response_dict(snapshot: dict) -> dict:
+    """Float-coerce balances inside a snapshot for JSON response."""
+
+    def _row(r: dict) -> dict:
+        return {
+            **r,
+            "balance": float(r["balance"]),
+        }
+
+    t = snapshot["totals"]
+    return {
+        "as_of_date": snapshot["as_of_date"],
+        "assets": [_row(r) for r in snapshot["assets"]],
+        "liabilities": [_row(r) for r in snapshot["liabilities"]],
+        "equity": [_row(r) for r in snapshot["equity"]],
+        "current_earnings": float(snapshot["current_earnings"]),
+        "totals": {
+            "total_current_assets": float(t["total_current_assets"]),
+            "total_fixed_assets": float(t["total_fixed_assets"]),
+            "total_other_assets": float(t["total_other_assets"]),
+            "total_assets": float(t["total_assets"]),
+            "total_current_liabilities": float(t["total_current_liabilities"]),
+            "total_long_term_liabilities": float(t["total_long_term_liabilities"]),
+            "total_other_liabilities": float(t["total_other_liabilities"]),
+            "total_liabilities": float(t["total_liabilities"]),
+            "total_equity": float(t["total_equity"]),
+            "total_liab_and_equity": float(t["total_liab_and_equity"]),
+            "is_balanced": bool(t["is_balanced"]),
+            "balance_difference": float(t["balance_difference"]),
+        },
     }
 
 
