@@ -324,8 +324,12 @@ def _cleanup(*ids: str) -> None:
 
 class TestCrossTenantIsolation:
     def test_user_a_cannot_read_user_b_entity_tb(self, client):
-        """Closes the L6 audit finding. Before this PR, this request
-        returned 200 with tenant B's TB rows. Now it must 403."""
+        """Closes the L6 audit finding. Before G-TB-REAL-DATA-AUDIT this
+        request returned 200 with tenant B's TB rows. After it, 403.
+        After G-PILOT-REPORTS-TENANT-AUDIT (anti-enumeration migration)
+        the response is **404 with the generic "Entity not found" body**
+        — same shape as a genuinely missing id, so the status code
+        leaks no existence signal."""
         s = SessionLocal()
         ta = _mk_tenant(s, "iso-a")
         tb = _mk_tenant(s, "iso-b")
@@ -339,8 +343,8 @@ class TestCrossTenantIsolation:
                 f"/pilot/entities/{eb.id}/reports/trial-balance",
                 headers={"Authorization": f"Bearer {token_a}"},
             )
-            assert resp.status_code == 403, resp.text
-            assert "different tenant" in resp.text.lower()
+            assert resp.status_code == 404, resp.text
+            assert "entity not found" in resp.text.lower()
         finally:
             s.close()
             _cleanup(*ids)
@@ -367,9 +371,10 @@ class TestCrossTenantIsolation:
 
     def test_token_without_tenant_claim_is_forbidden(self, client):
         """A JWT issued before ERR-2 Phase 3 (no `tenant_id` claim)
-        cannot access the pilot GL surface. It must 403, not silently
-        leak data via the legacy permissive fallback. The fix is to
-        run the legacy migration (PR #170) and re-issue the token."""
+        cannot access the pilot GL surface. After G-PILOT-REPORTS-
+        TENANT-AUDIT this returns **404** (not 403) — anti-enumeration:
+        same shape as missing-id. The fix is to run the legacy
+        migration (PR #170) and re-issue the token."""
         s = SessionLocal()
         t = _mk_tenant(s, "nocl")
         e = _mk_entity(s, t, "nocl")
@@ -381,15 +386,15 @@ class TestCrossTenantIsolation:
                 f"/pilot/entities/{e.id}/reports/trial-balance",
                 headers={"Authorization": f"Bearer {token_no_claim}"},
             )
-            assert resp.status_code == 403, resp.text
+            assert resp.status_code == 404, resp.text
         finally:
             s.close()
             _cleanup(*ids)
 
     def test_404_for_genuinely_missing_entity_no_info_leak(self, client):
-        """A non-existent entity id must 404, not 403 — and 404 must
-        not depend on the JWT's tenant. Otherwise an attacker could
-        probe entity-id existence by interpreting status codes."""
+        """Status code AND body must be identical for missing-id and
+        cross-tenant cases — that's exactly what makes the
+        anti-enumeration design work. Both → 404 + "Entity not found"."""
         token = _user_token(tenant_id=str(uuid.uuid4()))
         resp = client.get(
             f"/pilot/entities/does-not-exist-{uuid.uuid4()}/reports/"
@@ -397,6 +402,7 @@ class TestCrossTenantIsolation:
             headers={"Authorization": f"Bearer {token}"},
         )
         assert resp.status_code == 404
+        assert "entity not found" in resp.text.lower()
 
     def test_user_b_can_read_user_b_entity_tb(self, client):
         """Symmetric to test 1 — assert no over-correction blocked

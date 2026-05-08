@@ -4,6 +4,74 @@
 
 ### 2026-05-08
 
+- [x] **G-PILOT-REPORTS-TENANT-AUDIT** — pilot tenant isolation across all routes
+  - Branch: `feat/g-pilot-reports-tenant-audit`
+  - **Why:** G-TB-REAL-DATA-AUDIT (PR #174) closed cross-tenant TB
+    read but flagged 4 sibling reports + an unknown number of other
+    pilot routes that needed the same fix. This PR audits all of
+    `app/pilot/routes/` and closes the gap across the surface.
+  - **Discovery:** **32 vulnerable routes** spread across 7 files —
+    far more than the 4 the original task brief mentioned. Includes
+    8 **write-leak** paths (cross-tenant entity PATCH/DELETE,
+    cross-tenant ZATCA onboard / GOSI registration / WPS batch /
+    UAE-CT filing / VAT-return generate / PO+PI+VP create) and the
+    completely unguarded `customer_routes.py:list_sales_invoices`.
+    Full per-route classification in the PR body.
+  - **Fix:**
+    - **`app/pilot/security/tenant_guards.py`** (new) —
+      `assert_entity_in_tenant(db, entity_id, current_user)` is the
+      single source of truth for the gate. Anti-enumeration design:
+      cross-tenant probes return **404 with the generic "Entity
+      not found" body** — same shape as missing-id, so status code
+      leaks no existence signal. Server-side, the helper emits a
+      structured `TENANT_GUARD_VIOLATION` warning log so SOC
+      dashboards can still detect probing.
+    - All 32 vulnerable routes upgraded:
+      - `gl_routes.py`: 4 deferred reports (income-statement,
+        balance-sheet, cash-flow, comparative) + the
+        `_debug/posting-counts` diagnostic.
+      - `pilot_routes.py`: entity CRUD (GET/PATCH/DELETE) +
+        branches (GET/POST).
+      - `compliance_routes.py`: 11 routes (ZATCA / GOSI / WPS /
+        UAE-CT / VAT) — both path-shaped GETs and payload-shaped
+        POSTs.
+      - `purchasing_routes.py`: 6 routes (PO / PI / vendor-payment
+        creates + listings).
+      - `ai_routes.py` + `ai_je_routes.py`: 3 AI extraction routes
+        (no more cross-tenant Anthropic spend).
+      - `customer_routes.py`: `list_sales_invoices` (was completely
+        unguarded — no entity helper at all).
+    - The 4 duplicate `_entity_or_404` helpers in gl/pilot/compliance/
+      purchasing/ai routes were kept as **thin shims** delegating to
+      the new helper — keeps the diff small while making
+      `assert_entity_in_tenant` the canonical entry point for new
+      code.
+    - **Migrated G-TB-REAL-DATA-AUDIT tests 403 → 404** to match the
+      anti-enumeration migration. 11/11 still pass.
+  - **Tests:** `tests/test_pilot_tenant_isolation_full.py` — 28
+    parameterized cases × 3 assertions each + 2 dedicated tests
+    (symmetric own-tenant access, structured violation log
+    emission). **84+ assertions total**, all passing. Matrix is
+    parameterized over `ROUTE_MATRIX` (path-shaped) +
+    `PAYLOAD_ROUTE_MATRIX` (entity_id in JSON body) so adding a new
+    pilot route requires one row in the matrix to inherit the full
+    contract.
+  - **Verification:**
+    - `pytest tests/test_tb_real_data_flow.py tests/test_pilot_tenant_isolation_full.py tests/test_reports_download.py tests/test_fin_statements.py tests/test_dimensions_consolidation_cards.py` → **90 / 90 pass**.
+    - `pytest tests/test_compliance.py tests/test_pilot_ai_extraction.py tests/test_hr_wps_eosb.py` → **57 / 57 pass** (no regression on adjacent suites).
+    - 0 alembic migrations. 0 frontend changes (this is backend-only). 0 schema changes.
+  - **Docs:** `docs/PILOT_TENANT_GUARD_PATTERN.md` (new) — explains
+    the pattern, the anti-enumeration choice, when to use the helper
+    vs not, the four-step checklist for adding new pilot routes, and
+    the closure history. CLAUDE.md updated with one consolidated
+    pilot-route-security entry replacing the prior G-TB note.
+  - **Open follow-ups:** `G-PILOT-CATALOG-TENANT-AUDIT` for
+    `catalog_routes.py`'s `/tenants/{tenant_id}/...` shape (different
+    attack surface, needs a sibling `assert_tenant_matches_user`
+    helper); `G-PILOT-PO-PI-TENANT-AUDIT` for routes that resolve a
+    PO / PI / sales-invoice directly by id (different anchor than
+    entity_id, also cross-tenant readable today).
+
 - [x] **G-TB-REAL-DATA-AUDIT** — TB real-data audit + cross-tenant fix
   - Branch: `feat/g-tb-real-data-audit`
   - **Why:** UAT follow-up to G-TB-DISPLAY-1 — "هل ميزان المراجعة

@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.phase1.models.platform_models import get_db
 from app.phase1.routes.phase1_routes import get_current_user
+from app.pilot.security import assert_entity_in_tenant
 from app.pilot.models import (
     Tenant, Entity, Branch, Warehouse, ProductVariant,
     Vendor,
@@ -47,11 +48,13 @@ def _tenant_or_404(db, tid):
     return t
 
 
-def _entity_or_404(db, eid):
-    e = db.query(Entity).filter(Entity.id == eid, Entity.is_deleted == False).first()  # noqa: E712
-    if not e:
-        raise HTTPException(404, f"Entity {eid} not found")
-    return e
+def _entity_or_404(db, eid, current_user: Optional[dict] = None):
+    """Backward-compatible shim — delegates to ``assert_entity_in_tenant``.
+
+    Pre-G-PILOT-REPORTS-TENANT-AUDIT this helper had **no** tenant
+    check. Callers now pass the route's ``current_user`` through.
+    """
+    return assert_entity_in_tenant(db, eid, current_user)
 
 
 def _vendor_or_404(db, vid):
@@ -132,8 +135,12 @@ def get_vendor_ledger(vendor_id: str, db: Session = Depends(get_db)):
 # ══════════════════════════════════════════════════════════════════════════
 
 @router.post("/purchase-orders", response_model=PoDetail, status_code=201)
-def create_po_endpoint(payload: PoCreate, db: Session = Depends(get_db)):
-    entity = _entity_or_404(db, payload.entity_id)
+def create_po_endpoint(
+    payload: PoCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    entity = assert_entity_in_tenant(db, payload.entity_id, current_user)
     vendor = _vendor_or_404(db, payload.vendor_id)
     try:
         po = create_purchase_order(
@@ -170,8 +177,9 @@ def list_pos(
     status: Optional[str] = Query(None),
     limit: int = Query(100, le=500),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _entity_or_404(db, entity_id)
+    assert_entity_in_tenant(db, entity_id, current_user)
     q = db.query(PurchaseOrder).filter(
         PurchaseOrder.entity_id == entity_id,
         PurchaseOrder.is_deleted == False,  # noqa: E712
@@ -343,8 +351,12 @@ def get_grn(grn_id: str, db: Session = Depends(get_db)):
 # ══════════════════════════════════════════════════════════════════════════
 
 @router.post("/purchase-invoices", response_model=PiDetail, status_code=201)
-def create_pi_endpoint(payload: PiCreate, db: Session = Depends(get_db)):
-    entity = _entity_or_404(db, payload.entity_id)
+def create_pi_endpoint(
+    payload: PiCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    entity = assert_entity_in_tenant(db, payload.entity_id, current_user)
     vendor = _vendor_or_404(db, payload.vendor_id)
     po = None
     if payload.po_id:
@@ -397,8 +409,9 @@ def list_pis(
     status: Optional[str] = Query(None),
     limit: int = Query(100, le=500),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _entity_or_404(db, entity_id)
+    assert_entity_in_tenant(db, entity_id, current_user)
     q = db.query(PurchaseInvoice).filter(
         PurchaseInvoice.entity_id == entity_id,
         PurchaseInvoice.is_deleted == False,  # noqa: E712
@@ -429,8 +442,12 @@ def get_pi(pi_id: str, db: Session = Depends(get_db)):
 # ══════════════════════════════════════════════════════════════════════════
 
 @router.post("/vendor-payments", response_model=VendorPaymentRead, status_code=201)
-def create_vp_endpoint(payload: VendorPaymentCreate, db: Session = Depends(get_db)):
-    entity = _entity_or_404(db, payload.entity_id)
+def create_vp_endpoint(
+    payload: VendorPaymentCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    entity = assert_entity_in_tenant(db, payload.entity_id, current_user)
     vendor = _vendor_or_404(db, payload.vendor_id)
     inv = None
     if payload.invoice_id:
@@ -460,8 +477,9 @@ def list_vps(
     vendor_id: Optional[str] = Query(None),
     limit: int = Query(100, le=500),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _entity_or_404(db, entity_id)
+    assert_entity_in_tenant(db, entity_id, current_user)
     q = db.query(VendorPayment).filter(VendorPayment.entity_id == entity_id)
     if vendor_id:
         q = q.filter(VendorPayment.vendor_id == vendor_id)

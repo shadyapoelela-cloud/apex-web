@@ -24,6 +24,7 @@ from app.pilot.schemas.gl import (
     TrialBalanceResponse, TrialBalanceRow,
     IncomeStatementResponse, BalanceSheetResponse,
 )
+from app.pilot.security import assert_entity_in_tenant
 from app.pilot.services.gl_engine import (
     seed_default_coa, seed_fiscal_periods,
     build_journal_entry, post_journal_entry, reverse_journal_entry,
@@ -46,47 +47,17 @@ def _entity_or_404(
     *,
     current_user: Optional[dict] = None,
 ) -> Entity:
-    """Resolve an entity, enforcing tenant isolation when a user is given.
+    """Backward-compatible shim — delegates to ``assert_entity_in_tenant``.
 
-    G-TB-REAL-DATA-AUDIT (2026-05-08): the previous form filtered only
-    on `Entity.id == eid`, which let user A pull tenant B's GL reports
-    just by knowing or guessing B's entity id. The pilot models don't
-    inherit from `TenantMixin`, so the application-layer
-    `attach_tenant_guard` auto-filter doesn't apply to these queries —
-    isolation has to live in the route handler. Now:
-
-      * Without `current_user` (legacy callers / internal tooling),
-        the function behaves as before: 404 if the entity doesn't
-        exist; no tenant check.
-      * With `current_user` (any user-facing route — and that's the
-        whole pilot GL surface), the function additionally verifies
-        the entity's tenant_id matches the JWT's `tenant_id` claim.
-        Mismatch → 403, never 404, so an attacker can't probe
-        existence by interpreting status codes.
-
-    Legacy users whose JWT predates ERR-2 Phase 3 (no `tenant_id`
-    claim) can't access the pilot GL surface — their token resolves
-    to `None` and any entity row returns 403. The fix is to migrate
-    them via /admin/migrate-legacy-tenants (PR #170) and re-issue
-    their token on next login (PR #169 handles this automatically).
+    G-PILOT-REPORTS-TENANT-AUDIT (2026-05-08) extracted the tenant
+    gate to ``app/pilot/security/tenant_guards.py`` and switched the
+    cross-tenant response from 403 to **404** (anti-enumeration —
+    matches the body of a genuinely missing id, so the status code
+    leaks no existence signal). This function preserves the local
+    name + signature so existing call-sites in this file keep working
+    without churn; new routes should call the helper directly.
     """
-    e = db.query(Entity).filter(
-        Entity.id == eid,
-        Entity.is_deleted == False,  # noqa: E712
-    ).first()
-    if not e:
-        raise HTTPException(404, f"Entity {eid} not found")
-    if current_user is not None:
-        user_tenant = current_user.get("tenant_id") or current_user.get("tid")
-        if not user_tenant or str(e.tenant_id) != str(user_tenant):
-            # Forbidden, not 404 — explicit 403 lets the frontend
-            # show "this isn't your entity" rather than retrying as
-            # if it just doesn't exist.
-            raise HTTPException(
-                403,
-                "Access denied — entity belongs to a different tenant",
-            )
-    return e
+    return assert_entity_in_tenant(db, eid, current_user)
 
 
 def _je_or_404(db: Session, jid: str) -> JournalEntry:
@@ -468,8 +439,9 @@ def income_statement(
     start_date: _date = Query(...),
     end_date: _date = Query(...),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _entity_or_404(db, entity_id)
+    assert_entity_in_tenant(db, entity_id, current_user)
     if end_date < start_date:
         raise HTTPException(400, "end_date يجب أن يكون ≥ start_date")
     result = compute_income_statement(db, entity_id=entity_id, start_date=start_date, end_date=end_date)
@@ -481,8 +453,9 @@ def balance_sheet(
     entity_id: str,
     as_of: Optional[_date] = Query(None),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _entity_or_404(db, entity_id)
+    assert_entity_in_tenant(db, entity_id, current_user)
     as_of_date = as_of or datetime.now(timezone.utc).date()
     result = compute_balance_sheet(db, entity_id=entity_id, as_of_date=as_of_date)
     return BalanceSheetResponse(**result)
@@ -494,12 +467,13 @@ def cash_flow(
     start_date: _date = Query(...),
     end_date: _date = Query(...),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """قائمة التدفقات النقدية (طريقة غير مباشرة).
 
     Net Income + Depreciation ± Working Capital Changes = Operating CF
     """
-    _entity_or_404(db, entity_id)
+    assert_entity_in_tenant(db, entity_id, current_user)
     if end_date < start_date:
         raise HTTPException(400, "end_date يجب أن يكون ≥ start_date")
     return compute_cash_flow(
@@ -518,9 +492,10 @@ def comparative_report(
     prior_start: Optional[_date] = Query(None, description="افتراضياً نفس الفترة من السنة السابقة"),
     prior_end: Optional[_date] = Query(None),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """تقرير مقارن — الحالي vs سابق (افتراضياً السنة السابقة)."""
-    _entity_or_404(db, entity_id)
+    assert_entity_in_tenant(db, entity_id, current_user)
     try:
         return compute_comparative_report(
             db, entity_id=entity_id, report_type=report_type,
@@ -532,12 +507,17 @@ def comparative_report(
 
 
 @router.get("/_debug/entities/{entity_id}/posting-counts")
-def debug_posting_counts(entity_id: str, db: Session = Depends(get_db)):
+def debug_posting_counts(
+    entity_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """DIAGNOSTIC — raw counts of JEs, lines, postings for an entity.
 
     Helps catch silent GL-posting failures (e.g., JE.status='posted' but no
     GLPosting rows). Not for production UI.
     """
+    assert_entity_in_tenant(db, entity_id, current_user)
     from sqlalchemy import func as sqlfunc
     je_total = db.query(JournalEntry).filter(JournalEntry.entity_id == entity_id).count()
     je_posted = db.query(JournalEntry).filter(

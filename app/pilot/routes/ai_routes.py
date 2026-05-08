@@ -24,6 +24,7 @@ from sqlalchemy.orm import Session
 from app.phase1.models.platform_models import get_db
 from app.phase1.routes.phase1_routes import get_current_user
 from app.pilot.models import Entity, GLAccount
+from app.pilot.security import assert_entity_in_tenant
 from app.pilot.services.ai_extraction import (
     ALL_SUPPORTED,
     ANTHROPIC_API_KEY,
@@ -69,11 +70,16 @@ class AiHealthResponse(BaseModel):
 # ──────────────────────────────────────────────────────────────────────────
 
 
-def _entity_or_404(db: Session, eid: str) -> Entity:
-    e = db.query(Entity).filter(Entity.id == eid, Entity.is_deleted == False).first()  # noqa: E712
-    if not e:
-        raise HTTPException(404, f"Entity {eid} not found")
-    return e
+def _entity_or_404(
+    db: Session, eid: str, current_user: Optional[dict] = None,
+) -> Entity:
+    """Backward-compatible shim — delegates to ``assert_entity_in_tenant``.
+
+    Pre-G-PILOT-REPORTS-TENANT-AUDIT this helper had **no** tenant
+    check, letting any authenticated caller spend Anthropic credits
+    "as" any entity by guessing the entity_id.
+    """
+    return assert_entity_in_tenant(db, eid, current_user)
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -98,13 +104,14 @@ def extract_je(
     entity_id: str,
     payload: ExtractJeRequest,
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """قراءة مستند مالي واستخراج اقتراح قيد يومية متوازن.
 
     يُستخدم من شاشة قيود اليومية: المستخدم يرفع صورة فاتورة/إيصال،
     والنظام يُولّد اقتراح قيد يُعرَض للمراجعة والتعديل قبل الحفظ.
     """
-    entity = _entity_or_404(db, entity_id)
+    entity = assert_entity_in_tenant(db, entity_id, current_user)
 
     if not ANTHROPIC_API_KEY:
         raise HTTPException(
@@ -258,12 +265,13 @@ async def read_document(
     entity_id: str,
     file: UploadFile = File(..., description="صورة أو PDF للمستند"),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """نسخة multipart/form-data من /extract-je — تقبل رفع الملف مباشرةً.
 
     response shape مختلف (مُغلَّف بـ `{success, data}`) لتوافق dazzling-nash UI.
     """
-    entity = _entity_or_404(db, entity_id)
+    entity = assert_entity_in_tenant(db, entity_id, current_user)
 
     if not ANTHROPIC_API_KEY:
         raise HTTPException(
