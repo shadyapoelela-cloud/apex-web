@@ -556,8 +556,26 @@ class ApiService {
     final qs = params.isEmpty ? '' : '?${params.join('&')}';
     return _get('/pilot/entities/$entityId/reports/trial-balance$qs');
   }
-  static Future<ApiResult> pilotIncomeStatement(String entityId, {required String startDate, required String endDate}) =>
-      _get('/pilot/entities/$entityId/reports/income-statement?start_date=$startDate&end_date=$endDate');
+  /// G-FIN-IS-1 (2026-05-08): supports include_zero + compare_period.
+  /// Backed by `pilot_gl_postings` (real posted JEs only — no mocks,
+  /// no fallbacks). Documented in `docs/INCOME_STATEMENT_DATA_FLOW_2026-05-08.md`.
+  static Future<ApiResult> pilotIncomeStatement(
+    String entityId, {
+    required String startDate,
+    required String endDate,
+    bool includeZero = false,
+    String comparePeriod = 'none',
+  }) {
+    final params = <String>[
+      'start_date=$startDate',
+      'end_date=$endDate',
+    ];
+    if (includeZero) params.add('include_zero=true');
+    if (comparePeriod != 'none') params.add('compare_period=$comparePeriod');
+    return _get(
+      '/pilot/entities/$entityId/reports/income-statement?${params.join('&')}',
+    );
+  }
   static Future<ApiResult> pilotBalanceSheet(String entityId, {String? asOf}) {
     final qs = asOf != null ? '?as_of=$asOf' : '';
     return _get('/pilot/entities/$entityId/reports/balance-sheet$qs');

@@ -264,6 +264,9 @@ import '../../screens/compliance/zatca_status_center_screen.dart';
 // G-TB-DISPLAY-1 (2026-05-08): dedicated trial-balance ledger screen —
 // not the CSV-tie-out tool that lives in screens/simulation/.
 import '../../screens/finance/trial_balance_screen.dart';
+// G-FIN-IS-1 (2026-05-08): dedicated Income Statement (P&L) screen.
+// Backed 100% by pilot_gl_postings (no mocks).
+import '../../screens/finance/income_statement_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -285,7 +288,11 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // the user-visible "ميزان المراجعة" chip now opens a real ledger
   // view backed by /pilot/entities/{id}/reports/trial-balance.
   'erp/finance/trial-balance': (ctx) => const TrialBalanceScreen(),
-  'erp/finance/income-statement': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE alias
+  // G-FIN-IS-1 (2026-05-08): dedicated IncomeStatementScreen replaces
+  // the prior alias to FinancialReportsScreen. Backed by
+  // /pilot/entities/{id}/reports/income-statement — every value
+  // sourced from pilot_gl_postings (real, posted JEs only).
+  'erp/finance/income-statement': (ctx) => const IncomeStatementScreen(),
   'erp/finance/balance-sheet': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE alias
   // Rich JE builder — live backend list + entity check + filter chips +
   // bulk actions + AI-warning strip. Row click opens JeBuilderLiveV52Screen
