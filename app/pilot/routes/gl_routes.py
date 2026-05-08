@@ -518,13 +518,59 @@ def income_statement(
 @router.get("/entities/{entity_id}/reports/balance-sheet", response_model=BalanceSheetResponse)
 def balance_sheet(
     entity_id: str,
-    as_of: Optional[_date] = Query(None),
+    as_of: Optional[_date] = Query(None, description="Snapshot date (default: today)"),
+    compare_as_of: Optional[_date] = Query(
+        None,
+        description="Optional earlier snapshot date for variance analysis. Must be < as_of.",
+    ),
+    include_zero: bool = Query(False, description="Include accounts with zero balance"),
+    response: Response = None,  # type: ignore[assignment]
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
+    """Balance Sheet (Statement of Financial Position).
+
+    G-FIN-BS-1 (2026-05-08): every value sourced 100% from
+    `pilot_gl_postings`. Per-account rows + IS-derived running
+    current-year earnings. Optional `compare_as_of` returns a second
+    snapshot + variances. The response carries `is_balanced` —
+    when False, an unbalanced JE has slipped into the GL and the
+    operator needs to investigate (we never silently bypass the
+    accounting equation). The endpoint returns 200 either way so
+    the operator can see the imbalance in the UI.
+
+    Real-data invariant pinned by:
+      * tests/test_balance_sheet_real_data.py::TestAntiMock
+      * tests/test_balance_sheet_real_data.py::TestBalanceEquation
+    """
     assert_entity_in_tenant(db, entity_id, current_user)
     as_of_date = as_of or datetime.now(timezone.utc).date()
-    result = compute_balance_sheet(db, entity_id=entity_id, as_of_date=as_of_date)
+    try:
+        result = compute_balance_sheet(
+            db,
+            entity_id=entity_id,
+            as_of_date=as_of_date,
+            compare_as_of=compare_as_of,
+            include_zero=include_zero,
+        )
+    except ValueError as ex:
+        raise HTTPException(400, str(ex))
+    if response is not None:
+        response.headers["X-Data-Source"] = "real-time-from-postings"
+    if not result.get("balanced"):
+        # Log the imbalance with structured fields so SOC / ops can
+        # alert on it. Do not fail the request — operators need to
+        # see the imbalance in the UI to fix the underlying JE.
+        import logging
+        logging.getLogger(__name__).warning(
+            "BS_IMBALANCE entity_id=%s as_of=%s assets=%s "
+            "liab+equity=%s diff=%s",
+            entity_id,
+            as_of_date,
+            result.get("assets"),
+            (result.get("liabilities") or 0) + (result.get("total_equity") or 0),
+            result.get("difference"),
+        )
     return BalanceSheetResponse(**result)
 
 

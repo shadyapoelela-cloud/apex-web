@@ -267,6 +267,9 @@ import '../../screens/finance/trial_balance_screen.dart';
 // G-FIN-IS-1 (2026-05-08): dedicated Income Statement (P&L) screen.
 // Backed 100% by pilot_gl_postings (no mocks).
 import '../../screens/finance/income_statement_screen.dart';
+// G-FIN-BS-1 (2026-05-08): dedicated Balance Sheet screen.
+// Same 100% real-data guarantee + balance-equation invariant.
+import '../../screens/finance/balance_sheet_screen.dart';
 
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
@@ -293,7 +296,11 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // /pilot/entities/{id}/reports/income-statement — every value
   // sourced from pilot_gl_postings (real, posted JEs only).
   'erp/finance/income-statement': (ctx) => const IncomeStatementScreen(),
-  'erp/finance/balance-sheet': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE alias
+  // G-FIN-BS-1 (2026-05-08): dedicated BalanceSheetScreen replaces
+  // the prior alias to FinancialReportsScreen. Backed by
+  // /pilot/entities/{id}/reports/balance-sheet — every value sourced
+  // from pilot_gl_postings (real, posted JEs only).
+  'erp/finance/balance-sheet': (ctx) => const BalanceSheetScreen(),
   // Rich JE builder — live backend list + entity check + filter chips +
   // bulk actions + AI-warning strip. Row click opens JeBuilderLiveV52Screen
   // (the V5.2 builder) where the partner/cost-center/VAT columns are

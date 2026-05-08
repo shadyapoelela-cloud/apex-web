@@ -4,6 +4,112 @@
 
 ### 2026-05-08
 
+- [x] **G-FIN-BS-1** — Balance Sheet (Statement of Financial Position) with real-data guarantee + balance-equation invariant — closes second-of-three of UAT Issue #5 (BS done; CF deferred to G-FIN-CF-1)
+  - Branch: `feat/g-fin-bs-1`
+  - **Why:** UAT Issue #5 needs three financial statements with real
+    data — TB (closed by G-TB-DISPLAY-1), IS (closed by G-FIN-IS-1),
+    BS (this PR). The backend already had a working
+    `compute_balance_sheet` (no mocks), but the response shape was
+    category-totals-only (no per-account rows, no comparison, no
+    `posted_je_count`) and there was no dedicated frontend screen —
+    the `balance-sheet` chip aliased to `FinancialReportsScreen`.
+  - **Recon + L1 audit:** scanned `compute_balance_sheet` +
+    `gl_routes.py` + the demo seeder. Zero mocks/fallbacks/seeded
+    values found. `pilot_gl_postings` still has exactly one writer
+    (`post_journal_entry`); demo seeder still writes 0 JEs.
+    `compute_balance_sheet` already calls `compute_income_statement`
+    one-way for `current_earnings` — no risk to IS-1.
+    `compute_comparative_report` reads `assets / liabilities /
+    total_equity` keys → kept as legacy scalar fields for backward
+    compat.
+  - **Critical finding:** the default CoA seeds an equity account
+    with `subcategory='current_earnings'` (code 3300). That's the
+    *closing-balance container*, not a running figure. Including it
+    alongside the IS-derived running CYE would double-count. Fixed
+    by excluding accounts with that subcategory from the equity rows
+    summation and adding a synthetic `_current_year_earnings` row at
+    the bottom of equity with the IS figure. Pinned by the
+    `test_cye_in_equity_equals_is_net_income` test.
+  - **Backend:**
+    - `compute_balance_sheet` rewritten with helper
+      `_bs_compute_snapshot`. New kwargs: `compare_as_of` +
+      `include_zero`. Returns per-account rows (asset/liability/
+      equity), nested `totals` block (current/fixed/long-term
+      subtotals + balance-equation result), `posted_je_count`,
+      optional `comparison_period` + `variances`. **Legacy top-level
+      keys preserved** (`assets`, `liabilities`, `equity`,
+      `current_earnings`, `total_equity`, `balanced`, `difference`)
+      — `compute_comparative_report` keeps working.
+    - `BalanceSheetResponse` extended with
+      `current_period: BalanceSheetSnapshot`, `comparison_period`,
+      `variances`, `posted_je_count`, `currency` — all defaults so
+      legacy fixtures stay green. New `BalanceSheetRow`,
+      `BalanceSheetTotals`, `BalanceSheetSnapshot`,
+      `BalanceSheetVariances` Pydantic classes.
+    - `GET /pilot/entities/{id}/reports/balance-sheet` accepts
+      `compare_as_of` + `include_zero`; emits `X-Data-Source:
+      real-time-from-postings` header. `compare_as_of >= as_of` →
+      400. `is_balanced=False` → 200 with structured `BS_IMBALANCE`
+      warning log (operator must see imbalances; we never silence).
+  - **Frontend:**
+    - New
+      `apex_finance/lib/screens/finance/balance_sheet_screen.dart`
+      (~720 lines). RTL header with freshness badge, filters bar
+      (as-of + compare-as-of date pickers + include_zero switch +
+      "إلغاء المقارنة" button), top **balance banner** (green ✅
+      when balanced, red ⚠️ with diff when not), **4 summary
+      cards** (assets/liabilities/equity/balance-status), three-
+      section statement table (assets grouped current/fixed,
+      liabilities grouped current/long-term, equity per-account
+      with synthetic CYE in italic) — totals + subtotals show
+      comparison values when present, footer source line + green-
+      dot "بيانات حقيقية", empty-state CTA → JE Builder, kDebugMode
+      panel.
+    - `ApiService.pilotBalanceSheet` extended with `compareAsOf` +
+      `includeZero` kwargs.
+    - Wired into `v5_data` (chip), `v5_routes` (explicit GoRoute),
+      `v5_wired_screens` (replaces alias), `main.dart` Offstage
+      sentinel for tree-shake protection.
+  - **Tests:**
+    - `tests/test_balance_sheet_real_data.py` — **15 cases** across
+      `TestRealDataFlow` (8), `TestTenantIsolation` (3),
+      `TestAntiMock` (2), and `TestBalanceEquation` (2). The
+      anti-mock pair pins the guarantee (empty entity → all zeros,
+      12345.67 → byte-for-byte round-trip); the equation pair pins
+      the integrity invariant (5-JE complex scenario; CYE row =
+      IS net_income).
+    - `apex_finance/test/screens/finance/balance_sheet_test.dart`
+      — **6 tests**: chip declaration, wired-keys, validator
+      reachability, source-grep anti-mock (extends IS-1's forbidden
+      list with BS-specific `forceBalanced` / `overrideBalanced`
+      tokens), ApiService kwargs contract, **balance-banner-
+      renders-before-table** structural assertion (regression-proof:
+      buried imbalance banner is easy to miss).
+  - **Verification:**
+    - `pytest tests/test_balance_sheet_real_data.py` → 15/15 pass.
+    - Pilot regression sweep (BS + IS + TB + tenant_isolation_full
+      + tenant_isolation_v2 + fin_statements + reports_download +
+      dimensions) → **149/149 pass**.
+    - `flutter analyze` on the new screen + ApiService → 0 issues.
+    - Flutter regression (BS + IS + TB + v5_routing + auth_guard +
+      err_1_session_redirect) → **45/45 pass**.
+    - `flutter build web --release --no-tree-shake-icons` →
+      succeeds in ~53s.
+    - 0 alembic migrations. 0 schema-breaking changes.
+  - **Docs:** new
+    `docs/BALANCE_SHEET_DATA_FLOW_2026-05-08.md` — 8-layer
+    walkthrough (writer → snapshot service → CYE synthesis →
+    balance-equation → comparison → endpoint → frontend → tests)
+    with verbatim queries, the synthetic-CYE rationale, manual UAT.
+    CLAUDE.md unchanged (reuses the
+    `assert_entity_in_tenant` helper from G-PILOT-REPORTS-TENANT-AUDIT,
+    no new pattern).
+  - **UAT Issue #5 progress:** 2 of 3 statements done (IS + BS).
+    Cash-flow statement (`G-FIN-CF-1`) is the third — separate
+    ticket as scoped (already has an endpoint
+    `/reports/cash-flow`; needs the same treatment as IS-1 and
+    BS-1).
+
 - [x] **G-FIN-IS-1** — Income Statement (P&L) screen with 100% real-data guarantee — closes first half of UAT Issue #5
   - Branch: `feat/g-fin-is-1`
   - **Why:** UAT Issue #5 needs a real Income Statement screen. The

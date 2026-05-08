@@ -255,9 +255,65 @@ class IncomeStatementResponse(BaseModel):
     comparison: Optional[IncomeStatementComparison] = None
 
 
+class BalanceSheetRow(BaseModel):
+    """One per-account row on the BS — backed 1:1 by a row in
+    `pilot_gl_accounts` plus the running balance from
+    `pilot_gl_postings` up to the snapshot date.
+
+    The synthetic ``_current_year_earnings`` row carries
+    ``is_synthetic=True`` and an ``account_id`` of
+    ``"_current_year_earnings"``; its balance is the IS-derived
+    running figure for [Jan 1 .. as_of_date]. See
+    `docs/BALANCE_SHEET_DATA_FLOW_2026-05-08.md` for the full
+    rationale.
+    """
+    account_id: str
+    code: str
+    name_ar: str
+    name_en: Optional[str] = None
+    subcategory: Optional[str] = None
+    normal_balance: str
+    balance: float
+    is_synthetic: bool = False
+
+
+class BalanceSheetTotals(BaseModel):
+    total_current_assets: float
+    total_fixed_assets: float
+    total_other_assets: float = 0.0
+    total_assets: float
+    total_current_liabilities: float
+    total_long_term_liabilities: float
+    total_other_liabilities: float = 0.0
+    total_liabilities: float
+    total_equity: float
+    total_liab_and_equity: float
+    is_balanced: bool
+    balance_difference: float
+
+
+class BalanceSheetSnapshot(BaseModel):
+    """One BS snapshot at a specific date — used for both the current
+    period and the optional comparison period."""
+    as_of_date: date
+    assets: list[BalanceSheetRow] = Field(default_factory=list)
+    liabilities: list[BalanceSheetRow] = Field(default_factory=list)
+    equity: list[BalanceSheetRow] = Field(default_factory=list)
+    current_earnings: float = 0.0
+    totals: BalanceSheetTotals
+
+
+class BalanceSheetVariances(BaseModel):
+    total_assets_change_pct: Optional[float] = None
+    total_liabilities_change_pct: Optional[float] = None
+    total_equity_change_pct: Optional[float] = None
+
+
 class BalanceSheetResponse(BaseModel):
     entity_id: str
     as_of_date: date
+    # Legacy scalar fields (compute_comparative_report reads these —
+    # do not rename without updating that caller).
     assets: float
     liabilities: float
     equity: float
@@ -265,3 +321,11 @@ class BalanceSheetResponse(BaseModel):
     total_equity: float
     balanced: bool
     difference: float
+    # G-FIN-BS-1 (2026-05-08): per-account rows + posted_je_count +
+    # optional comparison + variances. All defaults so older callers
+    # (legacy fixtures, internal report aggregation) stay green.
+    currency: str = "SAR"
+    current_period: Optional[BalanceSheetSnapshot] = None
+    comparison_period: Optional[BalanceSheetSnapshot] = None
+    variances: Optional[BalanceSheetVariances] = None
+    posted_je_count: int = 0
