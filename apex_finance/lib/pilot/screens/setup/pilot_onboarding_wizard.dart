@@ -1068,21 +1068,61 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
       throw 'الحقول المطلوبة: slug، الاسم العربي، الإيميل';
     }
     setState(() => _loading = true);
-    final r = await _client.createTenant({
-      'slug': _slugCtrl.text.trim(),
-      'legal_name_ar': _tenantNameArCtrl.text.trim(),
-      if (_tenantNameEnCtrl.text.isNotEmpty)
-        'legal_name_en': _tenantNameEnCtrl.text.trim(),
-      if (_crCtrl.text.isNotEmpty) 'primary_cr_number': _crCtrl.text.trim(),
-      if (_vatCtrl.text.isNotEmpty) 'primary_vat_number': _vatCtrl.text.trim(),
-      'primary_country': _primaryCountry,
-      'primary_email': _emailCtrl.text.trim(),
-      if (_phoneCtrl.text.isNotEmpty) 'primary_phone': _phoneCtrl.text.trim(),
-      'tier': _tier,
-    });
-    if (!r.success) throw r.error ?? 'فشل إنشاء المستأجر';
-    _tenantId = (r.data as Map)['id'];
-    PilotSession.tenantId = _tenantId;
+
+    // G-WIZARD-TENANT-FIX (2026-05-09): every user now has exactly
+    // one tenant by design — ERR-2 Phase 3 (PR #169) auto-creates
+    // it at registration so the JWT carries a `tenant_id` claim
+    // from day one. After G-PILOT-TENANT-AUDIT-FINAL (PR #176)
+    // every pilot route enforces `assert_tenant_matches_user`, so
+    // creating a *second* tenant via this wizard would leave step 2
+    // (and every subsequent step) calling `/tenants/{new_id}/...`
+    // with a JWT that still points at the original tenant — every
+    // call returns 404 (anti-enumeration). The fix: when the
+    // session already has a tenant (the common path post-PR #169),
+    // PATCH the existing one instead of POSTing a new one. The
+    // create-tenant fallback is retained for legacy users who
+    // registered before ERR-2 Phase 3 and never got migrated by
+    // G-LEGACY-TENANT-MIGRATION (PR #170).
+    if (PilotSession.hasTenant) {
+      // Update path. TenantUpdate schema is more restrictive than
+      // TenantCreate: slug / primary_country / primary_email are
+      // immutable post-registration (slug is the URL-safe id; the
+      // email was set to the registering user's address). We send
+      // only the fields TenantUpdate accepts; Pydantic would
+      // silently drop the immutables, but being explicit here
+      // makes the contract obvious to a future reader.
+      _tenantId = PilotSession.tenantId;
+      final r = await _client.updateTenant(_tenantId!, {
+        'legal_name_ar': _tenantNameArCtrl.text.trim(),
+        if (_tenantNameEnCtrl.text.isNotEmpty)
+          'legal_name_en': _tenantNameEnCtrl.text.trim(),
+        if (_crCtrl.text.isNotEmpty) 'primary_cr_number': _crCtrl.text.trim(),
+        if (_vatCtrl.text.isNotEmpty) 'primary_vat_number': _vatCtrl.text.trim(),
+        if (_phoneCtrl.text.isNotEmpty) 'primary_phone': _phoneCtrl.text.trim(),
+        'tier': _tier,
+      });
+      if (!r.success) throw r.error ?? 'فشل تحديث بيانات المستأجر';
+    } else {
+      // Fallback: legacy user without a JWT tenant claim. Create a
+      // new tenant. After this, the JWT still doesn't carry the
+      // claim until the next login — the user must log out + back
+      // in for the post-PR #169 token shape to take effect.
+      final r = await _client.createTenant({
+        'slug': _slugCtrl.text.trim(),
+        'legal_name_ar': _tenantNameArCtrl.text.trim(),
+        if (_tenantNameEnCtrl.text.isNotEmpty)
+          'legal_name_en': _tenantNameEnCtrl.text.trim(),
+        if (_crCtrl.text.isNotEmpty) 'primary_cr_number': _crCtrl.text.trim(),
+        if (_vatCtrl.text.isNotEmpty) 'primary_vat_number': _vatCtrl.text.trim(),
+        'primary_country': _primaryCountry,
+        'primary_email': _emailCtrl.text.trim(),
+        if (_phoneCtrl.text.isNotEmpty) 'primary_phone': _phoneCtrl.text.trim(),
+        'tier': _tier,
+      });
+      if (!r.success) throw r.error ?? 'فشل إنشاء المستأجر';
+      _tenantId = (r.data as Map)['id'];
+      PilotSession.tenantId = _tenantId;
+    }
     setState(() => _loading = false);
   }
 
