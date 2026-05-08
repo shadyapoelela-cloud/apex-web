@@ -27,6 +27,7 @@ from app.pilot.models import (
     PriceList, PriceListItem, PriceListBranch,
     PriceListScope, PriceListStatus,
 )
+from app.pilot.security import assert_tenant_matches_user
 from app.pilot.schemas.pricing import (
     PriceListCreate, PriceListRead, PriceListDetail, PriceListUpdate,
     PriceListItemCreate, PriceListItemRead, PriceListItemUpdate,
@@ -82,7 +83,9 @@ def list_price_lists(
     kind: Optional[str] = Query(None),
     scope: Optional[str] = Query(None),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
+    assert_tenant_matches_user(tenant_id, current_user)
     _tenant_or_404(db, tenant_id)
     q = db.query(PriceList).filter(
         PriceList.tenant_id == tenant_id,
@@ -98,7 +101,13 @@ def list_price_lists(
 
 
 @router.post("/tenants/{tenant_id}/price-lists", response_model=PriceListDetail, status_code=201)
-def create_price_list(tenant_id: str, payload: PriceListCreate, db: Session = Depends(get_db)):
+def create_price_list(
+    tenant_id: str,
+    payload: PriceListCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     tenant = _tenant_or_404(db, tenant_id)
 
     # Code uniqueness

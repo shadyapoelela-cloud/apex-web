@@ -9,7 +9,11 @@ from sqlalchemy.orm import Session
 
 from app.phase1.models.platform_models import get_db
 from app.phase1.routes.phase1_routes import get_current_user
-from app.pilot.security import assert_entity_in_tenant
+from app.pilot.security import (
+    assert_entity_in_tenant,
+    assert_resource_in_tenant,
+    assert_tenant_matches_user,
+)
 from app.pilot.models import (
     Tenant, Entity, Branch, Warehouse, ProductVariant,
     Vendor,
@@ -75,8 +79,9 @@ def list_vendors(
     kind: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
     q = db.query(Vendor).filter(
         Vendor.tenant_id == tenant_id,
         Vendor.is_deleted == False,  # noqa: E712
@@ -95,8 +100,13 @@ def list_vendors(
 
 
 @router.post("/tenants/{tenant_id}/vendors", response_model=VendorRead, status_code=201)
-def create_vendor(tenant_id: str, payload: VendorCreate, db: Session = Depends(get_db)):
-    _tenant_or_404(db, tenant_id)
+def create_vendor(
+    tenant_id: str,
+    payload: VendorCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     if db.query(Vendor).filter(Vendor.tenant_id == tenant_id, Vendor.code == payload.code).first():
         raise HTTPException(409, f"المورد بكود '{payload.code}' موجود مسبقاً")
     v = Vendor(tenant_id=tenant_id, **payload.model_dump())
@@ -107,13 +117,22 @@ def create_vendor(tenant_id: str, payload: VendorCreate, db: Session = Depends(g
 
 
 @router.get("/vendors/{vendor_id}", response_model=VendorRead)
-def get_vendor(vendor_id: str, db: Session = Depends(get_db)):
-    return _vendor_or_404(db, vendor_id)
+def get_vendor(
+    vendor_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    return assert_resource_in_tenant(db, Vendor, vendor_id, current_user)
 
 
 @router.patch("/vendors/{vendor_id}", response_model=VendorRead)
-def update_vendor(vendor_id: str, payload: VendorUpdate, db: Session = Depends(get_db)):
-    v = _vendor_or_404(db, vendor_id)
+def update_vendor(
+    vendor_id: str,
+    payload: VendorUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    v = assert_resource_in_tenant(db, Vendor, vendor_id, current_user)
     for k, val in payload.model_dump(exclude_unset=True).items():
         setattr(v, k, val)
     db.commit()
@@ -122,8 +141,12 @@ def update_vendor(vendor_id: str, payload: VendorUpdate, db: Session = Depends(g
 
 
 @router.get("/vendors/{vendor_id}/ledger", response_model=VendorLedgerResponse)
-def get_vendor_ledger(vendor_id: str, db: Session = Depends(get_db)):
-    _vendor_or_404(db, vendor_id)
+def get_vendor_ledger(
+    vendor_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_resource_in_tenant(db, Vendor, vendor_id, current_user)
     try:
         return vendor_ledger(db, vendor_id=vendor_id)
     except ValueError as ex:
@@ -192,10 +215,14 @@ def list_pos(
 
 
 @router.get("/purchase-orders/{po_id}", response_model=PoDetail)
-def get_po(po_id: str, db: Session = Depends(get_db)):
-    po = db.query(PurchaseOrder).filter(PurchaseOrder.id == po_id).first()
-    if not po:
-        raise HTTPException(404, "PO not found")
+def get_po(
+    po_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    po = assert_resource_in_tenant(
+        db, PurchaseOrder, po_id, current_user, soft_delete_field=None,
+    )
     lines = db.query(PurchaseOrderLine).filter(
         PurchaseOrderLine.po_id == po_id
     ).order_by(PurchaseOrderLine.line_number).all()
@@ -222,11 +249,16 @@ def _get_approval_limit(db: Session, tenant_id: str, doc_type: str) -> dict:
 
 
 @router.post("/purchase-orders/{po_id}/approve", response_model=PoRead)
-def approve_po_endpoint(po_id: str, payload: PoApprove, db: Session = Depends(get_db)):
+def approve_po_endpoint(
+    po_id: str,
+    payload: PoApprove,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     # جلب الـ PO أولاً للتحقق من مستوى الاعتماد المطلوب
-    po_check = db.query(PurchaseOrder).filter(PurchaseOrder.id == po_id).first()
-    if not po_check:
-        raise HTTPException(404, "PO not found")
+    po_check = assert_resource_in_tenant(
+        db, PurchaseOrder, po_id, current_user, soft_delete_field=None,
+    )
     # فحص approval limits — إنذار فقط (لا نمنع، لكن نُسجِّل warning في response)
     approval_warnings = []
     limits = _get_approval_limit(db, po_check.tenant_id, "po")["thresholds"]
@@ -260,7 +292,14 @@ def approve_po_endpoint(po_id: str, payload: PoApprove, db: Session = Depends(ge
 
 
 @router.post("/purchase-orders/{po_id}/issue", response_model=PoRead)
-def issue_po_endpoint(po_id: str, db: Session = Depends(get_db)):
+def issue_po_endpoint(
+    po_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_resource_in_tenant(
+        db, PurchaseOrder, po_id, current_user, soft_delete_field=None,
+    )
     try:
         po = issue_po(db, po_id)
         db.commit()
@@ -326,17 +365,28 @@ def receive_grn(payload: GrnCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/purchase-orders/{po_id}/receipts", response_model=list[GrnRead])
-def list_grns_for_po(po_id: str, db: Session = Depends(get_db)):
+def list_grns_for_po(
+    po_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_resource_in_tenant(
+        db, PurchaseOrder, po_id, current_user, soft_delete_field=None,
+    )
     return db.query(GoodsReceipt).filter(
         GoodsReceipt.po_id == po_id
     ).order_by(GoodsReceipt.received_at.desc()).all()
 
 
 @router.get("/goods-receipts/{grn_id}", response_model=GrnDetail)
-def get_grn(grn_id: str, db: Session = Depends(get_db)):
-    grn = db.query(GoodsReceipt).filter(GoodsReceipt.id == grn_id).first()
-    if not grn:
-        raise HTTPException(404, "GRN not found")
+def get_grn(
+    grn_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    grn = assert_resource_in_tenant(
+        db, GoodsReceipt, grn_id, current_user, soft_delete_field=None,
+    )
     lines = db.query(GoodsReceiptLine).filter(
         GoodsReceiptLine.grn_id == grn_id
     ).order_by(GoodsReceiptLine.line_number).all()
@@ -391,7 +441,14 @@ def create_pi_endpoint(
 
 
 @router.post("/purchase-invoices/{pi_id}/post", response_model=PiRead)
-def post_pi_endpoint(pi_id: str, db: Session = Depends(get_db)):
+def post_pi_endpoint(
+    pi_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_resource_in_tenant(
+        db, PurchaseInvoice, pi_id, current_user, soft_delete_field=None,
+    )
     try:
         post_purchase_invoice_to_gl(db, pi_id)
         db.commit()
@@ -424,10 +481,14 @@ def list_pis(
 
 
 @router.get("/purchase-invoices/{pi_id}", response_model=PiDetail)
-def get_pi(pi_id: str, db: Session = Depends(get_db)):
-    inv = db.query(PurchaseInvoice).filter(PurchaseInvoice.id == pi_id).first()
-    if not inv:
-        raise HTTPException(404, "Invoice not found")
+def get_pi(
+    pi_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    inv = assert_resource_in_tenant(
+        db, PurchaseInvoice, pi_id, current_user, soft_delete_field=None,
+    )
     lines = db.query(PurchaseInvoiceLine).filter(
         PurchaseInvoiceLine.invoice_id == pi_id
     ).order_by(PurchaseInvoiceLine.line_number).all()
