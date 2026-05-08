@@ -40,6 +40,7 @@ from app.pilot.models import (
     CashMovement, CashMovementKind,
     CompanySettings,
 )
+from app.pilot.security import assert_resource_in_tenant
 from app.pilot.schemas.pos import (
     PosSessionOpen, PosSessionClose, PosSessionRead,
     PosTransactionCreate, PosTransactionRead, PosTransactionDetail,
@@ -200,14 +201,19 @@ def _current_cash_balance(db: Session, session: PosSession) -> Decimal:
 # ══════════════════════════════════════════════════════════════════════════
 
 @router.post("/branches/{branch_id}/pos-sessions", response_model=PosSessionRead, status_code=201)
-def open_session(branch_id: str, payload: PosSessionOpen, db: Session = Depends(get_db)):
+def open_session(
+    branch_id: str,
+    payload: PosSessionOpen,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """فتح وردية جديدة في فرع + محطة.
 
     Rules:
       - يُسمح بوردية واحدة مفتوحة لكل (branch, station_id).
       - opening_cash يُسجَّل كأول CashMovement.
     """
-    branch = _branch_or_404(db, branch_id)
+    branch = assert_resource_in_tenant(db, Branch, branch_id, current_user)
 
     # تحقق من عدم وجود وردية مفتوحة لنفس المحطة
     q = db.query(PosSession).filter(
@@ -284,8 +290,9 @@ def list_sessions(
     status: Optional[str] = Query(None),
     limit: int = Query(50, le=500),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _branch_or_404(db, branch_id)
+    assert_resource_in_tenant(db, Branch, branch_id, current_user)
     q = db.query(PosSession).filter(PosSession.branch_id == branch_id)
     if status:
         q = q.filter(PosSession.status == status)

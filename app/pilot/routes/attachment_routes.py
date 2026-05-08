@@ -9,6 +9,10 @@ from datetime import datetime, timezone
 from app.phase1.models.platform_models import get_db
 from app.phase1.routes.phase1_routes import get_current_user
 from app.pilot.models import Attachment, AttachmentKind, Tenant
+from app.pilot.security import (
+    assert_resource_in_tenant,
+    assert_tenant_matches_user,
+)
 
 
 # G-S9 (Sprint 14): router-level auth dependency. See 09 § 20.1 G-S9.
@@ -66,12 +70,12 @@ class AttachmentRead(BaseModel):
 
 @router.post("/attachments", response_model=AttachmentRead, status_code=201)
 def create_attachment(
-    payload: AttachmentCreate, db: Session = Depends(get_db),
+    payload: AttachmentCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """إنشاء مرفق. Client يرفع الملف أولاً لـ storage ثم يرسل metadata هنا."""
-    # فحص tenant
-    if not db.query(Tenant).filter(Tenant.id == payload.tenant_id).first():
-        raise HTTPException(404, "Tenant not found")
+    assert_tenant_matches_user(payload.tenant_id, current_user)
 
     att = Attachment(
         tenant_id=payload.tenant_id,
@@ -99,11 +103,19 @@ def list_attachments(
     parent_type: str = Query(..., description="نوع الكيان الأب"),
     parent_id: str = Query(..., description="ID الكيان الأب"),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    """جلب كل المرفقات لكيان محدد."""
+    """جلب كل المرفقات لكيان محدد — مفلترة على tenant الـ user."""
+    user_tenant = (current_user or {}).get("tenant_id") or (current_user or {}).get(
+        "tid"
+    )
+    if not user_tenant:
+        # No tenant claim → no rows. Generic response, no leak.
+        return []
     return (
         db.query(Attachment)
         .filter(
+            Attachment.tenant_id == user_tenant,
             Attachment.parent_type == parent_type,
             Attachment.parent_id == parent_id,
         )
@@ -113,11 +125,15 @@ def list_attachments(
 
 
 @router.delete("/attachments/{attachment_id}", status_code=204)
-def delete_attachment(attachment_id: str, db: Session = Depends(get_db)):
+def delete_attachment(
+    attachment_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """حذف مرفق — مسموح فقط لو غير مقفل."""
-    att = db.query(Attachment).filter(Attachment.id == attachment_id).first()
-    if not att:
-        raise HTTPException(404, "المرفق غير موجود")
+    att = assert_resource_in_tenant(
+        db, Attachment, attachment_id, current_user, soft_delete_field=None,
+    )
     if att.is_locked:
         raise HTTPException(
             403,
@@ -132,11 +148,12 @@ def lock_attachment(
     attachment_id: str,
     reason: str = Query(..., min_length=3, max_length=255),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """قفل مرفق (immutability) — بعد ZATCA clearance أو period close."""
-    att = db.query(Attachment).filter(Attachment.id == attachment_id).first()
-    if not att:
-        raise HTTPException(404, "المرفق غير موجود")
+    att = assert_resource_in_tenant(
+        db, Attachment, attachment_id, current_user, soft_delete_field=None,
+    )
     att.is_locked = True
     att.locked_reason = reason
     db.commit()

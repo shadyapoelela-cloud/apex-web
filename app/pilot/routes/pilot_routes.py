@@ -46,7 +46,11 @@ from sqlalchemy import select, and_
 
 from app.phase1.models.platform_models import get_db, User, UserStatus
 from app.phase1.routes.phase1_routes import get_current_user
-from app.pilot.security import assert_entity_in_tenant
+from app.pilot.security import (
+    assert_entity_in_tenant,
+    assert_resource_in_tenant,
+    assert_tenant_matches_user,
+)
 from app.pilot.models import (
     Tenant, CompanySettings, TenantStatus, TenantTier,
     Entity, EntityType, EntityStatus,
@@ -226,12 +230,23 @@ def list_tenants(
 
 
 @router.get("/tenants/{tenant_id}", response_model=TenantRead)
-def get_tenant(tenant_id: str, db: Session = Depends(get_db)):
+def get_tenant(
+    tenant_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     return _get_tenant_or_404(db, tenant_id)
 
 
 @router.patch("/tenants/{tenant_id}", response_model=TenantRead)
-def update_tenant(tenant_id: str, payload: TenantUpdate, db: Session = Depends(get_db)):
+def update_tenant(
+    tenant_id: str,
+    payload: TenantUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     tenant = _get_tenant_or_404(db, tenant_id)
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(tenant, field, value)
@@ -241,8 +256,12 @@ def update_tenant(tenant_id: str, payload: TenantUpdate, db: Session = Depends(g
 
 
 @router.get("/tenants/{tenant_id}/settings", response_model=CompanySettingsRead)
-def get_company_settings(tenant_id: str, db: Session = Depends(get_db)):
-    _get_tenant_or_404(db, tenant_id)
+def get_company_settings(
+    tenant_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     s = db.query(CompanySettings).filter(CompanySettings.tenant_id == tenant_id).first()
     if not s:
         raise HTTPException(status_code=404, detail="settings not found")
@@ -250,7 +269,13 @@ def get_company_settings(tenant_id: str, db: Session = Depends(get_db)):
 
 
 @router.patch("/tenants/{tenant_id}/settings", response_model=CompanySettingsRead)
-def update_company_settings(tenant_id: str, payload: CompanySettingsUpdate, db: Session = Depends(get_db)):
+def update_company_settings(
+    tenant_id: str,
+    payload: CompanySettingsUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     s = db.query(CompanySettings).filter(CompanySettings.tenant_id == tenant_id).first()
     if not s:
         raise HTTPException(status_code=404, detail="settings not found")
@@ -266,16 +291,25 @@ def update_company_settings(tenant_id: str, payload: CompanySettingsUpdate, db: 
 # ═══════════════════════════════════════════════════════════════
 
 @router.get("/tenants/{tenant_id}/entities", response_model=list[EntityRead])
-def list_entities(tenant_id: str, db: Session = Depends(get_db)):
-    _get_tenant_or_404(db, tenant_id)
+def list_entities(
+    tenant_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     return db.query(Entity).filter(
         Entity.tenant_id == tenant_id, Entity.is_deleted == False  # noqa: E712
     ).order_by(Entity.sort_order, Entity.code).all()
 
 
 @router.post("/tenants/{tenant_id}/entities", response_model=EntityRead, status_code=201)
-def create_entity(tenant_id: str, payload: EntityCreate, db: Session = Depends(get_db)):
-    _get_tenant_or_404(db, tenant_id)
+def create_entity(
+    tenant_id: str,
+    payload: EntityCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
 
     existing = db.query(Entity).filter(
         Entity.tenant_id == tenant_id, Entity.code == payload.code, Entity.is_deleted == False  # noqa: E712
@@ -374,13 +408,22 @@ def create_branch(
 
 
 @router.get("/branches/{branch_id}", response_model=BranchRead)
-def get_branch(branch_id: str, db: Session = Depends(get_db)):
-    return _get_branch_or_404(db, branch_id)
+def get_branch(
+    branch_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    return assert_resource_in_tenant(db, Branch, branch_id, current_user)
 
 
 @router.patch("/branches/{branch_id}", response_model=BranchRead)
-def update_branch(branch_id: str, payload: BranchUpdate, db: Session = Depends(get_db)):
-    branch = _get_branch_or_404(db, branch_id)
+def update_branch(
+    branch_id: str,
+    payload: BranchUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    branch = assert_resource_in_tenant(db, Branch, branch_id, current_user)
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(branch, field, value)
     db.commit()
@@ -389,8 +432,12 @@ def update_branch(branch_id: str, payload: BranchUpdate, db: Session = Depends(g
 
 
 @router.delete("/branches/{branch_id}", status_code=204)
-def delete_branch(branch_id: str, db: Session = Depends(get_db)):
-    branch = _get_branch_or_404(db, branch_id)
+def delete_branch(
+    branch_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    branch = assert_resource_in_tenant(db, Branch, branch_id, current_user)
     branch.is_deleted = True
     branch.deleted_at = datetime.now(timezone.utc)
     db.commit()
@@ -401,8 +448,13 @@ def delete_branch(branch_id: str, db: Session = Depends(get_db)):
 # ═══════════════════════════════════════════════════════════════
 
 @router.get("/tenants/{tenant_id}/currencies", response_model=list[CurrencyRead])
-def list_currencies(tenant_id: str, active_only: bool = True, db: Session = Depends(get_db)):
-    _get_tenant_or_404(db, tenant_id)
+def list_currencies(
+    tenant_id: str,
+    active_only: bool = True,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     q = db.query(Currency).filter(Currency.tenant_id == tenant_id)
     if active_only:
         q = q.filter(Currency.is_active == True)  # noqa: E712
@@ -410,8 +462,13 @@ def list_currencies(tenant_id: str, active_only: bool = True, db: Session = Depe
 
 
 @router.post("/tenants/{tenant_id}/currencies", response_model=CurrencyRead, status_code=201)
-def create_currency(tenant_id: str, payload: CurrencyCreate, db: Session = Depends(get_db)):
-    _get_tenant_or_404(db, tenant_id)
+def create_currency(
+    tenant_id: str,
+    payload: CurrencyCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     existing = db.query(Currency).filter(
         Currency.tenant_id == tenant_id, Currency.code == payload.code.upper()
     ).first()
@@ -437,8 +494,9 @@ def list_fx_rates(
     rate_type: Optional[str] = None,
     limit: int = Query(100, le=500),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _get_tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
     q = db.query(FxRate).filter(FxRate.tenant_id == tenant_id)
     if from_code:
         q = q.filter(FxRate.from_currency == from_code.upper())
@@ -450,8 +508,13 @@ def list_fx_rates(
 
 
 @router.post("/tenants/{tenant_id}/fx-rates", response_model=FxRateRead, status_code=201)
-def create_fx_rate(tenant_id: str, payload: FxRateCreate, db: Session = Depends(get_db)):
-    _get_tenant_or_404(db, tenant_id)
+def create_fx_rate(
+    tenant_id: str,
+    payload: FxRateCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     rate = FxRate(
         tenant_id=tenant_id,
         **payload.model_dump(exclude={"from_currency", "to_currency"}),
@@ -471,7 +534,9 @@ def get_latest_fx_rate(
     to_code: str = Query(..., alias="to"),
     rate_type: str = Query("spot"),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
+    assert_tenant_matches_user(tenant_id, current_user)
     rate = db.query(FxRate).filter(
         FxRate.tenant_id == tenant_id,
         FxRate.from_currency == from_code.upper(),
@@ -496,16 +561,25 @@ def list_permissions(category: Optional[str] = None, db: Session = Depends(get_d
 
 
 @router.get("/tenants/{tenant_id}/roles", response_model=list[RoleRead])
-def list_roles(tenant_id: str, db: Session = Depends(get_db)):
-    _get_tenant_or_404(db, tenant_id)
+def list_roles(
+    tenant_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     return db.query(PilotRole).filter(
         PilotRole.tenant_id == tenant_id, PilotRole.is_active == True  # noqa: E712
     ).order_by(PilotRole.sort_order, PilotRole.code).all()
 
 
 @router.post("/tenants/{tenant_id}/roles", response_model=RoleRead, status_code=201)
-def create_role(tenant_id: str, payload: RoleCreate, db: Session = Depends(get_db)):
-    _get_tenant_or_404(db, tenant_id)
+def create_role(
+    tenant_id: str,
+    payload: RoleCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     existing = db.query(PilotRole).filter(
         PilotRole.tenant_id == tenant_id, PilotRole.code == payload.code
     ).first()
@@ -528,13 +602,26 @@ def create_role(tenant_id: str, payload: RoleCreate, db: Session = Depends(get_d
 
 
 @router.get("/roles/{role_id}", response_model=RoleRead)
-def get_role(role_id: str, db: Session = Depends(get_db)):
-    return _get_role_or_404(db, role_id)
+def get_role(
+    role_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    return assert_resource_in_tenant(
+        db, PilotRole, role_id, current_user, soft_delete_field=None
+    )
 
 
 @router.patch("/roles/{role_id}", response_model=RoleRead)
-def update_role(role_id: str, payload: RoleUpdate, db: Session = Depends(get_db)):
-    role = _get_role_or_404(db, role_id)
+def update_role(
+    role_id: str,
+    payload: RoleUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    role = assert_resource_in_tenant(
+        db, PilotRole, role_id, current_user, soft_delete_field=None
+    )
     if role.is_system and payload.is_active is False:
         raise HTTPException(status_code=400, detail="cannot deactivate system role")
 
@@ -713,9 +800,10 @@ def list_members(
     tenant_id: str,
     active_only: bool = Query(True),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """List all users who have at least one access grant in this tenant."""
-    _get_tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
     user_ids = _collect_user_ids_for_tenant(db, tenant_id)
     if not user_ids:
         return []
@@ -731,6 +819,7 @@ def invite_member(
     tenant_id: str,
     payload: MemberInvite,
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """Invite a user to the tenant.
 
@@ -739,6 +828,7 @@ def invite_member(
       (TODO: email the invite link + require password reset on first login.)
     - Always creates the initial access grant.
     """
+    assert_tenant_matches_user(tenant_id, current_user)
     tenant = _get_tenant_or_404(db, tenant_id)
 
     # Validate role belongs to this tenant
@@ -980,9 +1070,14 @@ def _build_member_detail(db: Session, tenant_id: str, user: User) -> MemberDetai
 
 
 @router.get("/tenants/{tenant_id}/members/{user_id}", response_model=MemberDetail)
-def get_member(tenant_id: str, user_id: str, db: Session = Depends(get_db)):
+def get_member(
+    tenant_id: str,
+    user_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """Get a single member with all their access grants resolved."""
-    _get_tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
     # Verify user has at least one grant here (tenant-isolation check)
     has_grant = (
         db.query(UserEntityAccess).filter(
@@ -1008,12 +1103,13 @@ def update_member(
     user_id: str,
     payload: MemberUpdate,
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """Update display_name / mobile / language / status on the phase1 User.
 
     Only allowed for users who are members of this tenant (isolation).
     """
-    _get_tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
     if user_id not in _collect_user_ids_for_tenant(db, tenant_id):
         raise HTTPException(status_code=404, detail="Member not found in this tenant")
     user = db.query(User).filter(User.id == user_id, User.is_deleted == False).first()  # noqa: E712
@@ -1040,6 +1136,7 @@ def remove_member(
     user_id: str,
     reason: Optional[str] = Query(None, max_length=500),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """Revoke ALL access grants for a user in this tenant (soft).
 
@@ -1047,7 +1144,7 @@ def remove_member(
     or have a platform-level account. Sets is_active=False on every grant
     and records revoke_at + reason.
     """
-    _get_tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
     now = datetime.now(timezone.utc)
 
     count = 0
@@ -1086,9 +1183,10 @@ def grant_entity_access(
     user_id: str,
     payload: GrantEntityAccess,
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """Grant a user access to an Entity with a Role (entity-level = all branches in it)."""
-    _get_tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
 
     entity = db.query(Entity).filter(
         Entity.id == payload.entity_id,
@@ -1157,9 +1255,10 @@ def grant_branch_access(
     user_id: str,
     payload: GrantBranchAccess,
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """Grant a user access to a single Branch with a Role."""
-    _get_tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
 
     branch = db.query(Branch).filter(
         Branch.id == payload.branch_id,
@@ -1224,9 +1323,10 @@ def revoke_entity_access(
     grant_id: str,
     reason: Optional[str] = Query(None, max_length=500),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """Revoke a specific entity-level access grant (soft)."""
-    _get_tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
     grant = db.query(UserEntityAccess).filter(
         UserEntityAccess.id == grant_id,
         UserEntityAccess.tenant_id == tenant_id,
@@ -1247,9 +1347,10 @@ def revoke_branch_access(
     tenant_id: str,
     grant_id: str,
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """Revoke a specific branch-level access grant (soft)."""
-    _get_tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
     grant = db.query(UserBranchAccess).filter(
         UserBranchAccess.id == grant_id,
         UserBranchAccess.tenant_id == tenant_id,
@@ -1276,6 +1377,7 @@ def get_effective_permissions(
     tenant_id: str,
     user_id: str,
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     """Resolve the full set of permissions a user effectively holds in this tenant.
 
@@ -1285,7 +1387,7 @@ def get_effective_permissions(
 
     Expired grants (expires_at < now) are treated as inactive.
     """
-    _get_tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
 
     now = datetime.now(timezone.utc)
     results: list[EffectivePermission] = []

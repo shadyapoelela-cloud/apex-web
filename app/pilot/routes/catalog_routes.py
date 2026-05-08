@@ -49,6 +49,10 @@ from app.pilot.models import (
     Warehouse, StockLevel, StockMovement,
     ProductStatus, WarehouseStatus,
 )
+from app.pilot.security import (
+    assert_resource_in_tenant,
+    assert_tenant_matches_user,
+)
 from app.pilot.schemas.catalog import (
     ProductCategoryCreate, ProductCategoryRead, ProductCategoryUpdate,
     BrandCreate, BrandRead,
@@ -118,8 +122,9 @@ def list_categories(
     parent_id: Optional[str] = Query(None, description="If set, only children of this parent"),
     include_inactive: bool = Query(False),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
     q = db.query(ProductCategory).filter(ProductCategory.tenant_id == tenant_id)
     if parent_id is not None:
         q = q.filter(ProductCategory.parent_id == parent_id)
@@ -129,8 +134,13 @@ def list_categories(
 
 
 @router.post("/tenants/{tenant_id}/categories", response_model=ProductCategoryRead, status_code=201)
-def create_category(tenant_id: str, payload: ProductCategoryCreate, db: Session = Depends(get_db)):
-    _tenant_or_404(db, tenant_id)
+def create_category(
+    tenant_id: str,
+    payload: ProductCategoryCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     if db.query(ProductCategory).filter(
         ProductCategory.tenant_id == tenant_id,
         ProductCategory.code == payload.code,
@@ -161,10 +171,15 @@ def create_category(tenant_id: str, payload: ProductCategoryCreate, db: Session 
 
 
 @router.patch("/categories/{category_id}", response_model=ProductCategoryRead)
-def update_category(category_id: str, payload: ProductCategoryUpdate, db: Session = Depends(get_db)):
-    cat = db.query(ProductCategory).filter(ProductCategory.id == category_id).first()
-    if not cat:
-        raise HTTPException(404, "Category not found")
+def update_category(
+    category_id: str,
+    payload: ProductCategoryUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    cat = assert_resource_in_tenant(
+        db, ProductCategory, category_id, current_user, soft_delete_field=None,
+    )
     for field, val in payload.model_dump(exclude_unset=True).items():
         setattr(cat, field, val)
     db.commit()
@@ -177,16 +192,25 @@ def update_category(category_id: str, payload: ProductCategoryUpdate, db: Sessio
 # ═══════════════════════════════════════════════════════════════
 
 @router.get("/tenants/{tenant_id}/brands", response_model=list[BrandRead])
-def list_brands(tenant_id: str, db: Session = Depends(get_db)):
-    _tenant_or_404(db, tenant_id)
+def list_brands(
+    tenant_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     return db.query(Brand).filter(
         Brand.tenant_id == tenant_id, Brand.is_active == True  # noqa: E712
     ).order_by(Brand.sort_order, Brand.code).all()
 
 
 @router.post("/tenants/{tenant_id}/brands", response_model=BrandRead, status_code=201)
-def create_brand(tenant_id: str, payload: BrandCreate, db: Session = Depends(get_db)):
-    _tenant_or_404(db, tenant_id)
+def create_brand(
+    tenant_id: str,
+    payload: BrandCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     if db.query(Brand).filter(Brand.tenant_id == tenant_id, Brand.code == payload.code).first():
         raise HTTPException(409, f"Brand code '{payload.code}' already exists")
     b = Brand(tenant_id=tenant_id, **payload.model_dump())
@@ -201,8 +225,12 @@ def create_brand(tenant_id: str, payload: BrandCreate, db: Session = Depends(get
 # ═══════════════════════════════════════════════════════════════
 
 @router.get("/tenants/{tenant_id}/attributes", response_model=list[ProductAttributeRead])
-def list_attributes(tenant_id: str, db: Session = Depends(get_db)):
-    _tenant_or_404(db, tenant_id)
+def list_attributes(
+    tenant_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     attrs = db.query(ProductAttribute).filter(
         ProductAttribute.tenant_id == tenant_id
     ).order_by(ProductAttribute.sort_order, ProductAttribute.code).all()
@@ -219,8 +247,13 @@ def list_attributes(tenant_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/tenants/{tenant_id}/attributes", response_model=ProductAttributeRead, status_code=201)
-def create_attribute(tenant_id: str, payload: ProductAttributeCreate, db: Session = Depends(get_db)):
-    _tenant_or_404(db, tenant_id)
+def create_attribute(
+    tenant_id: str,
+    payload: ProductAttributeCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_tenant_matches_user(tenant_id, current_user)
     if db.query(ProductAttribute).filter(
         ProductAttribute.tenant_id == tenant_id,
         ProductAttribute.code == payload.code,
@@ -258,10 +291,15 @@ def create_attribute(tenant_id: str, payload: ProductAttributeCreate, db: Sessio
 
 
 @router.post("/attributes/{attribute_id}/values", response_model=AttributeValueRead, status_code=201)
-def add_attribute_value(attribute_id: str, payload: AttributeValueCreate, db: Session = Depends(get_db)):
-    attr = db.query(ProductAttribute).filter(ProductAttribute.id == attribute_id).first()
-    if not attr:
-        raise HTTPException(404, "Attribute not found")
+def add_attribute_value(
+    attribute_id: str,
+    payload: AttributeValueCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    attr = assert_resource_in_tenant(
+        db, ProductAttribute, attribute_id, current_user, soft_delete_field=None,
+    )
     if db.query(ProductAttributeValue).filter(
         ProductAttributeValue.attribute_id == attribute_id,
         ProductAttributeValue.code == payload.code,
@@ -288,8 +326,9 @@ def list_products(
     limit: int = Query(100, le=500),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
     query = db.query(Product).filter(
         Product.tenant_id == tenant_id, Product.is_deleted == False  # noqa: E712
     )
@@ -308,9 +347,14 @@ def list_products(
 
 
 @router.post("/tenants/{tenant_id}/products", response_model=ProductDetail, status_code=201)
-def create_product(tenant_id: str, payload: ProductCreate, db: Session = Depends(get_db)):
+def create_product(
+    tenant_id: str,
+    payload: ProductCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """Create a product — optionally with N variants in a single call."""
-    _tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
     if db.query(Product).filter(Product.tenant_id == tenant_id, Product.code == payload.code).first():
         raise HTTPException(409, f"Product code '{payload.code}' already exists")
 
@@ -383,8 +427,12 @@ def create_product(tenant_id: str, payload: ProductCreate, db: Session = Depends
 
 
 @router.get("/products/{product_id}", response_model=ProductDetail)
-def get_product(product_id: str, db: Session = Depends(get_db)):
-    p = _product_or_404(db, product_id)
+def get_product(
+    product_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    p = assert_resource_in_tenant(db, Product, product_id, current_user)
     variants = db.query(ProductVariant).filter(
         ProductVariant.product_id == product_id,
         ProductVariant.is_deleted == False,  # noqa: E712
@@ -396,8 +444,13 @@ def get_product(product_id: str, db: Session = Depends(get_db)):
 
 
 @router.patch("/products/{product_id}", response_model=ProductRead)
-def update_product(product_id: str, payload: ProductUpdate, db: Session = Depends(get_db)):
-    p = _product_or_404(db, product_id)
+def update_product(
+    product_id: str,
+    payload: ProductUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    p = assert_resource_in_tenant(db, Product, product_id, current_user)
     for field, val in payload.model_dump(exclude_unset=True).items():
         setattr(p, field, val)
     db.commit()
@@ -406,8 +459,12 @@ def update_product(product_id: str, payload: ProductUpdate, db: Session = Depend
 
 
 @router.delete("/products/{product_id}", status_code=204)
-def delete_product(product_id: str, db: Session = Depends(get_db)):
-    p = _product_or_404(db, product_id)
+def delete_product(
+    product_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    p = assert_resource_in_tenant(db, Product, product_id, current_user)
     p.is_deleted = True
     p.deleted_at = datetime.now(timezone.utc)
     p.status = ProductStatus.archived.value
@@ -420,8 +477,12 @@ def delete_product(product_id: str, db: Session = Depends(get_db)):
 # ═══════════════════════════════════════════════════════════════
 
 @router.get("/products/{product_id}/variants", response_model=list[ProductVariantRead])
-def list_variants(product_id: str, db: Session = Depends(get_db)):
-    _product_or_404(db, product_id)
+def list_variants(
+    product_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_resource_in_tenant(db, Product, product_id, current_user)
     return db.query(ProductVariant).filter(
         ProductVariant.product_id == product_id,
         ProductVariant.is_deleted == False,  # noqa: E712
@@ -429,8 +490,13 @@ def list_variants(product_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/products/{product_id}/variants", response_model=ProductVariantRead, status_code=201)
-def create_variant(product_id: str, payload: ProductVariantCreate, db: Session = Depends(get_db)):
-    p = _product_or_404(db, product_id)
+def create_variant(
+    product_id: str,
+    payload: ProductVariantCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    p = assert_resource_in_tenant(db, Product, product_id, current_user)
     if db.query(ProductVariant).filter(
         ProductVariant.tenant_id == p.tenant_id, ProductVariant.sku == payload.sku
     ).first():
@@ -456,16 +522,25 @@ def create_variant(product_id: str, payload: ProductVariantCreate, db: Session =
 # ═══════════════════════════════════════════════════════════════
 
 @router.get("/variants/{variant_id}/barcodes", response_model=list[BarcodeRead])
-def list_barcodes(variant_id: str, db: Session = Depends(get_db)):
-    _variant_or_404(db, variant_id)
+def list_barcodes(
+    variant_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_resource_in_tenant(db, ProductVariant, variant_id, current_user)
     return db.query(Barcode).filter(
         Barcode.variant_id == variant_id, Barcode.is_active == True  # noqa: E712
     ).all()
 
 
 @router.post("/variants/{variant_id}/barcodes", response_model=BarcodeRead, status_code=201)
-def create_barcode(variant_id: str, payload: BarcodeCreate, db: Session = Depends(get_db)):
-    v = _variant_or_404(db, variant_id)
+def create_barcode(
+    variant_id: str,
+    payload: BarcodeCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    v = assert_resource_in_tenant(db, ProductVariant, variant_id, current_user)
     # Tenant-wide uniqueness
     if db.query(Barcode).filter(
         Barcode.tenant_id == v.tenant_id,
@@ -512,12 +587,17 @@ def create_barcode(variant_id: str, payload: BarcodeCreate, db: Session = Depend
 
 
 @router.get("/tenants/{tenant_id}/barcode/{value}")
-def scan_barcode(tenant_id: str, value: str, db: Session = Depends(get_db)):
+def scan_barcode(
+    tenant_id: str,
+    value: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """Scanner lookup — returns variant + product + active stock across all warehouses.
 
     Used by the POS at checkout when the clerk scans a barcode.
     """
-    _tenant_or_404(db, tenant_id)
+    assert_tenant_matches_user(tenant_id, current_user)
     bc = db.query(Barcode).filter(
         Barcode.tenant_id == tenant_id,
         Barcode.value == value,
@@ -555,8 +635,12 @@ def scan_barcode(tenant_id: str, value: str, db: Session = Depends(get_db)):
 # ═══════════════════════════════════════════════════════════════
 
 @router.get("/branches/{branch_id}/warehouses", response_model=list[WarehouseRead])
-def list_warehouses(branch_id: str, db: Session = Depends(get_db)):
-    _branch_or_404(db, branch_id)
+def list_warehouses(
+    branch_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    assert_resource_in_tenant(db, Branch, branch_id, current_user)
     return db.query(Warehouse).filter(
         Warehouse.branch_id == branch_id,
         Warehouse.is_deleted == False,  # noqa: E712
@@ -564,8 +648,13 @@ def list_warehouses(branch_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/branches/{branch_id}/warehouses", response_model=WarehouseRead, status_code=201)
-def create_warehouse(branch_id: str, payload: WarehouseCreate, db: Session = Depends(get_db)):
-    b = _branch_or_404(db, branch_id)
+def create_warehouse(
+    branch_id: str,
+    payload: WarehouseCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    b = assert_resource_in_tenant(db, Branch, branch_id, current_user)
     if db.query(Warehouse).filter(
         Warehouse.tenant_id == b.tenant_id, Warehouse.code == payload.code
     ).first():
@@ -585,8 +674,13 @@ def create_warehouse(branch_id: str, payload: WarehouseCreate, db: Session = Dep
 
 
 @router.patch("/warehouses/{warehouse_id}", response_model=WarehouseRead)
-def update_warehouse(warehouse_id: str, payload: WarehouseUpdate, db: Session = Depends(get_db)):
-    w = _warehouse_or_404(db, warehouse_id)
+def update_warehouse(
+    warehouse_id: str,
+    payload: WarehouseUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    w = assert_resource_in_tenant(db, Warehouse, warehouse_id, current_user)
     for field, val in payload.model_dump(exclude_unset=True).items():
         setattr(w, field, val)
     db.commit()
@@ -595,8 +689,12 @@ def update_warehouse(warehouse_id: str, payload: WarehouseUpdate, db: Session = 
 
 
 @router.delete("/warehouses/{warehouse_id}", status_code=204)
-def delete_warehouse(warehouse_id: str, db: Session = Depends(get_db)):
-    w = _warehouse_or_404(db, warehouse_id)
+def delete_warehouse(
+    warehouse_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    w = assert_resource_in_tenant(db, Warehouse, warehouse_id, current_user)
     # Prevent delete if stock exists
     has_stock = db.query(StockLevel).filter(
         StockLevel.warehouse_id == warehouse_id,
@@ -616,21 +714,33 @@ def delete_warehouse(warehouse_id: str, db: Session = Depends(get_db)):
 # ═══════════════════════════════════════════════════════════════
 
 @router.get("/warehouses/{warehouse_id}/stock", response_model=list[StockLevelRead])
-def get_warehouse_stock(warehouse_id: str, db: Session = Depends(get_db)):
+def get_warehouse_stock(
+    warehouse_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """All stock levels in one warehouse."""
-    _warehouse_or_404(db, warehouse_id)
+    assert_resource_in_tenant(db, Warehouse, warehouse_id, current_user)
     return db.query(StockLevel).filter(StockLevel.warehouse_id == warehouse_id).all()
 
 
 @router.get("/variants/{variant_id}/stock", response_model=list[StockLevelRead])
-def get_variant_stock(variant_id: str, db: Session = Depends(get_db)):
+def get_variant_stock(
+    variant_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """Stock levels for one variant across all warehouses."""
-    _variant_or_404(db, variant_id)
+    assert_resource_in_tenant(db, ProductVariant, variant_id, current_user)
     return db.query(StockLevel).filter(StockLevel.variant_id == variant_id).all()
 
 
 @router.post("/stock/movements", response_model=StockMovementRead, status_code=201)
-def record_stock_movement(payload: StockMovementCreate, db: Session = Depends(get_db)):
+def record_stock_movement(
+    payload: StockMovementCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     """Record an inventory movement and update StockLevel + variant totals atomically.
 
     This is the ONLY way to change stock. Sales, PO receipts, transfers,
@@ -639,8 +749,8 @@ def record_stock_movement(payload: StockMovementCreate, db: Session = Depends(ge
     qty sign convention: + inbound, - outbound. Absolute value is used
     for the unit_cost * |qty| total_cost calculation.
     """
-    w = _warehouse_or_404(db, payload.warehouse_id)
-    v = _variant_or_404(db, payload.variant_id)
+    w = assert_resource_in_tenant(db, Warehouse, payload.warehouse_id, current_user)
+    v = assert_resource_in_tenant(db, ProductVariant, payload.variant_id, current_user)
     if w.tenant_id != v.tenant_id:
         raise HTTPException(400, "Warehouse and variant belong to different tenants")
 
@@ -726,8 +836,9 @@ def list_warehouse_movements(
     variant_id: Optional[str] = Query(None),
     limit: int = Query(100, le=1000),
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
-    _warehouse_or_404(db, warehouse_id)
+    assert_resource_in_tenant(db, Warehouse, warehouse_id, current_user)
     q = db.query(StockMovement).filter(StockMovement.warehouse_id == warehouse_id)
     if variant_id:
         q = q.filter(StockMovement.variant_id == variant_id)

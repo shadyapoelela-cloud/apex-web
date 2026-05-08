@@ -4,6 +4,76 @@
 
 ### 2026-05-08
 
+- [x] **G-PILOT-TENANT-AUDIT-FINAL** — closed remaining tenant isolation gaps; **Issue #3 FULLY CLOSED across 117 routes**
+  - Branch: `feat/g-pilot-tenant-audit-final`
+  - **Why:** G-PILOT-REPORTS-TENANT-AUDIT (PR #175) closed the
+    `entity_id`-shaped routes but flagged two remaining gaps:
+    `/tenants/{tenant_id}/...` URLs and routes that resolve a
+    resource directly by id (PO, PI, JE, Customer, Vendor, Product,
+    Branch, Warehouse, Attachment, GosiRegistration, WpsBatch,
+    PosTransaction, …). This PR closes both.
+  - **Discovery:** **85 routes** vulnerable across the two shapes
+    (37 tenant_id-path + 48 id-based) — broader than the brief's
+    estimate. Surprises: (a) almost every pilot table has
+    `tenant_id` directly so no FK chasing needed for ~95% of cases;
+    (b) the most severe finding was 8 cross-tenant write/delete
+    routes (cross-tenant ZATCA submission + PI post-to-GL + entity
+    PATCH/DELETE + access-grant DELETE).
+  - **Two new helpers** in `app/pilot/security/tenant_guards.py`:
+    - `assert_tenant_matches_user(tenant_id, current_user)` — pure
+      JWT-vs-URL compare, no DB hit.
+    - `assert_resource_in_tenant(db, Model, resource_id, current_user, *, tenant_field='tenant_id', tenant_resolver=None)`
+      — generic ID-based gate; default reads `tenant_id` column,
+      `tenant_resolver` callback handles
+      `ProductAttributeValue → ProductAttribute.tenant_id`.
+    - Both return 404 + generic body on rejection (anti-enumeration,
+      consistent with `assert_entity_in_tenant`); both emit
+      `TENANT_GUARD_VIOLATION` warning logs with structured fields.
+  - **Routes migrated:**
+    - `pilot_routes.py`: 22 tenant + 5 ID = 27 routes (incl.
+      tenant CRUD, settings, entities/branches lists, currencies,
+      fx-rates, roles, members, access grants, branch by id, role
+      by id).
+    - `catalog_routes.py`: 9 tenant + 14 ID = 23 routes (incl.
+      categories/brands/attributes/products/variants/barcodes/
+      warehouses/stock CRUD).
+    - `customer_routes.py`: 2 tenant + 5 ID = 7 routes (customers
+      CRUD + sales-invoice issue/payment).
+    - `purchasing_routes.py`: 2 tenant + 10 ID = 12 routes (vendors
+      CRUD + PO/GRN/PI by id).
+    - `gl_routes.py`: 7 ID routes (account PATCH/DELETE/ledger,
+      JE GET/post/reverse, pos-txn post-to-gl).
+    - `compliance_routes.py`: 3 ID routes (ZATCA submit, GOSI
+      contribution, WPS SIF download).
+    - `attachment_routes.py`: 2 ID + 2 retained (POST/GET now use
+      tenant guard via payload/JWT).
+    - `pricing_routes.py`: 2 tenant routes.
+    - `pos_routes.py`: 2 ID routes (sessions list + open).
+  - **Tests:** `tests/test_pilot_tenant_isolation_v2.py` — 29
+    parameterized cases × 3 assertions + 4 dedicated tests
+    (symmetric own-tenant access × 2, structured log emission for
+    both helper variants, ProductAttributeValue chain resolution).
+    **100+ assertions, all passing.**
+  - **Verification:**
+    - `pytest tests/test_pilot_tenant_isolation_v2.py` → **29/29 pass**.
+    - Full pilot+adjacent regression sweep
+      (test_pilot_tenant_isolation_v2 + test_pilot_tenant_isolation_full
+      + test_tb_real_data_flow + test_compliance + test_reports_download
+      + test_fin_statements + test_dimensions_consolidation_cards
+      + test_pilot_ai_extraction + test_hr_wps_eosb) → **176/176 pass**.
+    - 0 alembic migrations. 0 frontend changes. 0 schema changes.
+      100% backward-compat for valid (own-tenant) usage.
+  - **Docs:** `docs/PILOT_TENANT_GUARD_PATTERN.md` updated with the
+    3-pattern decision table and combined 4-step new-route
+    checklist. New `docs/PILOT_TENANT_AUDIT_FINAL_2026-05-08.md`
+    consolidates the three audits with per-file coverage matrix +
+    recommended production monitoring (TENANT_GUARD_VIOLATION log
+    rate alert ≥ 10/min/user). CLAUDE.md updated.
+  - **Final tally:** Audit 1 (G-TB) closed 1 route; Audit 2
+    (G-PILOT-REPORTS-TENANT-AUDIT) closed 32; Audit 3 (this PR)
+    closed 85. **Total: 117 routes. Pilot route surface fully
+    covered.**
+
 - [x] **G-PILOT-REPORTS-TENANT-AUDIT** — pilot tenant isolation across all routes
   - Branch: `feat/g-pilot-reports-tenant-audit`
   - **Why:** G-TB-REAL-DATA-AUDIT (PR #174) closed cross-tenant TB

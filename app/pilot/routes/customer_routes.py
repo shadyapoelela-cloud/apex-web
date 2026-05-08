@@ -26,7 +26,11 @@ from sqlalchemy.orm import Session
 
 from app.phase1.models.platform_models import SessionLocal, gen_uuid
 from app.phase1.routes.phase1_routes import get_current_user
-from app.pilot.security import assert_entity_in_tenant
+from app.pilot.security import (
+    assert_entity_in_tenant,
+    assert_resource_in_tenant,
+    assert_tenant_matches_user,
+)
 from app.pilot.models import (
     Customer,
     CustomerKind,
@@ -169,7 +173,9 @@ def list_customers(
     active_only: bool = Query(True),
     search: Optional[str] = Query(None),
     limit: int = Query(100, ge=1, le=500),
+    current_user: dict = Depends(get_current_user),
 ):
+    assert_tenant_matches_user(tenant_id, current_user)
     db = _db()
     try:
         q = db.query(Customer).filter(Customer.tenant_id == tenant_id)
@@ -192,7 +198,9 @@ def list_customers(
 def create_customer(
     tenant_id: str = Path(...),
     payload: CustomerCreate = Body(...),
+    current_user: dict = Depends(get_current_user),
 ):
+    assert_tenant_matches_user(tenant_id, current_user)
     db = _db()
     try:
         # Uniqueness check on code
@@ -233,13 +241,15 @@ def create_customer(
 
 
 @router.get("/customers/{customer_id}", response_model=CustomerRead)
-def get_customer(customer_id: str = Path(...)):
+def get_customer(
+    customer_id: str = Path(...),
+    current_user: dict = Depends(get_current_user),
+):
     db = _db()
     try:
-        row = db.query(Customer).filter(Customer.id == customer_id).first()
-        if row is None:
-            raise HTTPException(status_code=404, detail="customer not found")
-        return row
+        return assert_resource_in_tenant(
+            db, Customer, customer_id, current_user, soft_delete_field=None,
+        )
     finally:
         db.close()
 
@@ -248,12 +258,13 @@ def get_customer(customer_id: str = Path(...)):
 def update_customer(
     customer_id: str = Path(...),
     payload: CustomerUpdate = Body(...),
+    current_user: dict = Depends(get_current_user),
 ):
     db = _db()
     try:
-        row = db.query(Customer).filter(Customer.id == customer_id).first()
-        if row is None:
-            raise HTTPException(status_code=404, detail="customer not found")
+        row = assert_resource_in_tenant(
+            db, Customer, customer_id, current_user, soft_delete_field=None,
+        )
         for field, value in payload.model_dump(exclude_unset=True).items():
             setattr(row, field, value)
         db.commit()
@@ -264,13 +275,17 @@ def update_customer(
 
 
 @router.get("/customers/{customer_id}/ledger")
-def customer_ledger(customer_id: str = Path(...), limit: int = Query(100, ge=1, le=500)):
+def customer_ledger(
+    customer_id: str = Path(...),
+    limit: int = Query(100, ge=1, le=500),
+    current_user: dict = Depends(get_current_user),
+):
     """Return the customer's recent invoices + payments + running balance."""
     db = _db()
     try:
-        cust = db.query(Customer).filter(Customer.id == customer_id).first()
-        if cust is None:
-            raise HTTPException(status_code=404, detail="customer not found")
+        cust = assert_resource_in_tenant(
+            db, Customer, customer_id, current_user, soft_delete_field=None,
+        )
 
         invs = (
             db.query(SalesInvoice)
@@ -579,14 +594,17 @@ def list_sales_invoices(
 
 
 @router.post("/sales-invoices/{invoice_id}/issue", response_model=SalesInvoiceRead)
-def issue_sales_invoice(invoice_id: str = Path(...)):
+def issue_sales_invoice(
+    invoice_id: str = Path(...),
+    current_user: dict = Depends(get_current_user),
+):
     """Move draft → issued — posts the auto-JE and updates inventory
     (where product_id is set on any line)."""
     db = _db()
     try:
-        inv = db.query(SalesInvoice).filter(SalesInvoice.id == invoice_id).first()
-        if inv is None:
-            raise HTTPException(status_code=404, detail="invoice not found")
+        inv = assert_resource_in_tenant(
+            db, SalesInvoice, invoice_id, current_user, soft_delete_field=None,
+        )
         if inv.status != SalesInvoiceStatus.draft.value:
             raise HTTPException(status_code=409, detail=f"cannot issue from status {inv.status!r}")
 
@@ -630,13 +648,14 @@ def issue_sales_invoice(invoice_id: str = Path(...)):
 def record_customer_payment(
     invoice_id: str = Path(...),
     payload: CustomerPaymentInput = Body(...),
+    current_user: dict = Depends(get_current_user),
 ):
     """Record a payment against an invoice. Updates paid_amount + status."""
     db = _db()
     try:
-        inv = db.query(SalesInvoice).filter(SalesInvoice.id == invoice_id).first()
-        if inv is None:
-            raise HTTPException(status_code=404, detail="invoice not found")
+        inv = assert_resource_in_tenant(
+            db, SalesInvoice, invoice_id, current_user, soft_delete_field=None,
+        )
 
         pay = CustomerPayment(
             id=gen_uuid(),
