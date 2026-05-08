@@ -53,6 +53,11 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen> {
   // here — the API schema is documented above and lives in
   // `app/pilot/schemas/gl.py`; we adapt at the call site.
   Map<String, dynamic>? _data;
+  // G-TB-REAL-DATA-AUDIT (2026-05-08): when the rows were last
+  // fetched from the backend. Surfaces in the freshness badge so
+  // the user can tell at a glance whether they're looking at
+  // stale data.
+  DateTime? _lastFetchedAt;
 
   @override
   void initState() {
@@ -93,6 +98,7 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen> {
             ? res.data as Map<String, dynamic>
             : <String, dynamic>{};
         _loading = false;
+        _lastFetchedAt = DateTime.now();
       });
     } else {
       setState(() {
@@ -257,6 +263,20 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen> {
               ],
             ),
           ),
+          // G-TB-REAL-DATA-AUDIT (2026-05-08): freshness badge.
+          // Shows "آخر تحديث: HH:MM:SS" alongside the refresh icon
+          // so the user can tell at a glance whether the rows on
+          // screen are stale.
+          if (_lastFetchedAt != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Text(
+                'آخر تحديث: ${_lastFetchedAt!.hour.toString().padLeft(2, '0')}'
+                ':${_lastFetchedAt!.minute.toString().padLeft(2, '0')}'
+                ':${_lastFetchedAt!.second.toString().padLeft(2, '0')}',
+                style: TextStyle(color: AC.ts, fontSize: 11),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             color: AC.gold,
@@ -432,11 +452,22 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen> {
     }
     final totalDebit = _num(_data?['total_debit']);
     final totalCredit = _num(_data?['total_credit']);
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
+    // G-TB-REAL-DATA-AUDIT (2026-05-08): the backend now surfaces
+    // `posted_je_count` (count of pilot_journal_entries with
+    // status='posted' and je_date <= as_of_date) so the footer can
+    // show the data provenance without a second roundtrip. Older
+    // backend deploys default this to 0 — the footer renders a
+    // softer "—" in that case rather than misleadingly saying "0
+    // قيد مرحّل".
+    final postedJeCount = (_data?['posted_je_count'] as num?)?.toInt() ?? 0;
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
           columnSpacing: 24,
           headingTextStyle: TextStyle(
               color: AC.gold, fontWeight: FontWeight.w800, fontSize: 12),
@@ -519,7 +550,35 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen> {
             ),
           ],
         ),
-      ),
+            ),
+          ),
+        ),
+        // G-TB-REAL-DATA-AUDIT footer: shows the data provenance
+        // (the actual table the rows come from) and the count of
+        // posted JEs that fed into the totals. If the backend
+        // hasn't deployed yet (posted_je_count=0 from the schema
+        // default), fall back to a soft em-dash rather than the
+        // misleading "0 قيد مرحّل" reading.
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: AC.navy2,
+            border: Border(top: BorderSide(color: AC.bdr)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.source_outlined, size: 14, color: AC.ts),
+              const SizedBox(width: 6),
+              Text(
+                postedJeCount > 0
+                    ? 'المصدر: pilot_journal_lines — $postedJeCount قيد مرحّل'
+                    : 'المصدر: pilot_journal_lines — — قيد مرحّل',
+                style: TextStyle(color: AC.ts, fontSize: 11),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
