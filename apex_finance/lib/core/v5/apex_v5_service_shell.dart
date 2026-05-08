@@ -965,7 +965,10 @@ const _kAllPins = <_Pin>[
       id: 'tb',
       labelAr: 'ميزان المراجعة',
       icon: Icons.table_chart,
-      route: '/app/erp/finance/statements'),
+      // G-TB-DISPLAY-1 (2026-05-08): repoint to the dedicated TB
+      // screen now that one exists. Was redirected to /statements
+      // by HOTFIX-Routing because no TB chip resolved at the time.
+      route: '/app/erp/finance/trial-balance'),
   _Pin(
       id: 'financial_reports',
       labelAr: 'القوائم المالية',

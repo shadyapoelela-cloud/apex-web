@@ -261,6 +261,10 @@ import '../../screens/operations/receipt_capture_screen.dart';
 import '../../screens/settings/entity_setup_screen.dart';
 import '../../screens/compliance/zatca_status_center_screen.dart';
 
+// G-TB-DISPLAY-1 (2026-05-08): dedicated trial-balance ledger screen —
+// not the CSV-tie-out tool that lives in screens/simulation/.
+import '../../screens/finance/trial_balance_screen.dart';
+
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
 ///
@@ -276,7 +280,11 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // ── 1.1 Finance (GL) ─────────────────────────────────────────────
   'erp/finance/gl': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE — Trial Balance + P&L + Balance Sheet
-  'erp/finance/trial-balance': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE alias
+  // G-TB-DISPLAY-1 (2026-05-08): dedicated TrialBalanceScreen replaces
+  // the prior alias to FinancialReportsScreen. Closes UAT Issue #4 —
+  // the user-visible "ميزان المراجعة" chip now opens a real ledger
+  // view backed by /pilot/entities/{id}/reports/trial-balance.
+  'erp/finance/trial-balance': (ctx) => const TrialBalanceScreen(),
   'erp/finance/income-statement': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE alias
   'erp/finance/balance-sheet': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE alias
   // Rich JE builder — live backend list + entity check + filter chips +

@@ -17,6 +17,7 @@ import '../apex_ask_panel.dart';
 import '../apex_news_ticker.dart';
 import '../theme.dart' as core_theme;
 import '../../screens/coming_soon_screen.dart';
+import '../../screens/finance/trial_balance_screen.dart';
 import '../../screens/v5_showcase/v5_showcase_screen.dart';
 import '../../pilot/screens/setup/je_builder_live_v52.dart';
 import 'apex_v5_service_shell.dart';
@@ -127,6 +128,32 @@ List<RouteBase> v5Routes() => [
             chipBodyBuilder: wired != null
                 ? (ctx, _) => wired(ctx)
                 : null,
+          );
+        },
+      ),
+      // G-TB-DISPLAY-1 (2026-05-08): explicit route for the dedicated
+      // trial-balance ledger view. The chip id `trial-balance` isn't
+      // declared as a `V5Chip(id:)` literal in v5_data.dart finance
+      // chips list, so the parametric `/app/:service/:main/:chip`
+      // handler above would 404 on the chip lookup. This explicit
+      // route uses the existing `gl` chip for breadcrumb / activeChip
+      // chrome (semantically the closest match — TB renders the GL
+      // posting balances) and overrides the body with our screen.
+      GoRoute(
+        path: '/app/erp/finance/trial-balance',
+        builder: (ctx, state) {
+          final svc = v5ServiceById('erp');
+          final main = svc?.mainModuleById('finance');
+          // Use the gl chip for chrome — TB is just one view of GL.
+          final chip = main?.chipById('gl');
+          if (svc == null || main == null || chip == null) {
+            return const _V5NotFound();
+          }
+          return ApexV5ServiceShell(
+            service: svc,
+            mainModule: main,
+            activeChip: chip,
+            bodyOverride: const TrialBalanceScreen(),
           );
         },
       ),

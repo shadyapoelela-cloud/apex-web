@@ -525,6 +525,11 @@ List<V5Service> v5Services = [
 
           // ━━━ 6️⃣ Financial Reports — التقارير المالية ━━━
           //   6.a النظامية (Statutory)
+          // G-TB-DISPLAY-1 (2026-05-08): trial-balance now has a
+          // dedicated chip + screen (TrialBalanceScreen). Pre-2026-05-08
+          // the pin redirected to `statements` because no `trial-balance`
+          // chip existed; that detour is gone now.
+          const V5Chip(id: 'trial-balance', labelAr: 'ميزان المراجعة', labelEn: 'Trial Balance', icon: Icons.table_chart, phase: ChipPhase.report, category: 'reports'),
           const V5Chip(id: 'statements', labelAr: 'القوائم المالية', labelEn: 'Financial Statements', icon: Icons.insert_chart, phase: ChipPhase.report, category: 'reports'),
           //   6.b الإدارية
           const V5Chip(id: 'budgets', labelAr: 'الموازنات', labelEn: 'Budgets', icon: Icons.pie_chart, phase: ChipPhase.report, category: 'reports'),
