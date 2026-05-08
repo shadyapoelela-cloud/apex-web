@@ -21,7 +21,8 @@ class V5PinRoute {
 const List<V5PinRoute> kAllPinsForValidation = <V5PinRoute>[
   V5PinRoute(id: 'coa', route: '/app/erp/finance/coa-editor'),
   V5PinRoute(id: 'je', route: '/app/erp/finance/je-builder'),
-  V5PinRoute(id: 'tb', route: '/app/erp/finance/statements'),
+  // G-TB-DISPLAY-1 (2026-05-08): mirrored from apex_v5_service_shell.dart.
+  V5PinRoute(id: 'tb', route: '/app/erp/finance/trial-balance'),
   V5PinRoute(id: 'financial_reports', route: '/app/erp/finance/statements'),
   V5PinRoute(id: 'journal', route: '/app/erp/finance/statements'),
   V5PinRoute(id: 'vat', route: '/app/erp/finance/vat-return'),

@@ -4,6 +4,55 @@
 
 ### 2026-05-08
 
+- [x] **G-TB-DISPLAY-1** — Trial Balance display screen — closed UAT Issue #4
+  - Branch: `feat/g-tb-display-1`
+  - **Bug:** the user-visible `tb` Quick Access pin (ميزان المراجعة)
+    aliased to `FinancialReportsScreen` — a broader summary view —
+    instead of a dedicated ledger trial-balance screen. UAT Issue
+    #4 flagged the missing dedicated view.
+  - **Reconnaissance changed scope:** the spec asked for a new
+    backend endpoint with opening / period-movement / closing
+    columns. The real codebase already has
+    `GET /pilot/entities/{id}/reports/trial-balance` (gl_routes.py:357
+    + compute_trial_balance in gl_engine.py:720) returning a
+    snapshot view (running totals up to as_of). The endpoint shape
+    differs from the spec but covers the actual user-visible need;
+    extending to a period-split is a separate ticket. **No backend
+    changes** in this PR.
+  - **Frontend:** new `apex_finance/lib/screens/finance/trial_balance_screen.dart`
+    (584 lines). Filters bar (date / hide-zero / search) + 3
+    summary cards (debit / credit / balanced indicator) + sortable
+    DataTable with category-color coding + loading / error / empty
+    states + Excel/PDF placeholder buttons (snackbar "قريبًا").
+  - **Routing:** new `V5Chip(id: 'trial-balance')` in v5_data
+    finance chips; `v5_wired_screens` repointed from the prior
+    `FinancialReportsScreen` alias to the new screen; explicit
+    `GoRoute('/app/erp/finance/trial-balance')` in v5_routes
+    wrapping in `ApexV5ServiceShell` for breadcrumb chrome; `tb`
+    pin moved from `/app/erp/finance/statements` (HOTFIX-Routing
+    detour) back to `/app/erp/finance/trial-balance`. G-TREESHAKE-FIX-2
+    Offstage instance added in main.dart.
+  - **Tests:** 6 wiring tests in
+    `apex_finance/test/screens/finance/trial_balance_test.dart`
+    (chip declaration, wired-keys, validator reachability, pin
+    route, /statements detour gone, pin contract). 35/35 pass
+    across the routing-adjacent test sweep. Direct widget tests
+    of `TrialBalanceScreen` blocked by the G-T1.1 `package:web`
+    SDK mismatch (same blocker as `ask_panel_test.dart`); deeper
+    UAT runs out of band against the deployed app.
+  - **Build verified:** `flutter analyze` 0 issues in changed
+    files; `flutter build web --release --no-tree-shake-icons`
+    succeeds (the `--no-tree-shake-icons` flag is a pre-existing
+    requirement from G-WEB-BUILD-1, unchanged by this PR).
+  - **Out of scope (separate tickets):**
+    - Period-split TB (`opening_debit`/`opening_credit`/
+      `period_debit`/`period_credit`/`closing_debit`/
+      `closing_credit`) — needs a backend extension to take a
+      `period_start` parameter alongside `as_of`.
+    - Excel / PDF export — placeholders today.
+    - Hierarchical indenting by GLAccount level — current screen
+      flat-lists the detail accounts in code order.
+
 - [x] **G-OPS-RUNBOOK** — single-script orchestrator for post-deploy ops
   - Branch: `feat/g-ops-runbook`
   - **Why:** the four post-merge actions (verify gh-pages bundle,
