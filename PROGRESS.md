@@ -2,6 +2,53 @@
 
 ## Sprint 18 — Invoicing (Q2 2026, week 7) — IN PROGRESS
 
+### 2026-05-09
+
+- [x] **G-WIZARD-TENANT-FIX** — closed onboarding regression from G-PILOT-TENANT-AUDIT-FINAL
+  - Branch: `hotfix/g-wizard-tenant-fix`
+  - **Why:** the onboarding wizard's `_doStep1` always called
+    `createTenant`, which post-PR-#176 broke for every fresh user.
+    Three previously-correct decisions collided: ERR-2 Phase 3
+    (PR #169) auto-creates a tenant at registration with the JWT
+    holding its id; G-PILOT-TENANT-AUDIT-FINAL (PR #176) made every
+    pilot route enforce `assert_tenant_matches_user` (404 on
+    mismatch); and the wizard predates both. Result: step 1
+    created a *second* tenant, step 2's `createEntity` 404'd
+    against the new (non-JWT) tid, and onboarding failed silently
+    with "Entity not found" on a tenant the user just created.
+  - **Fix:** `_doStep1` now branches on `PilotSession.hasTenant`.
+    The `true` branch (the common path post-PR-#169) PATCHes the
+    existing tenant via `_client.updateTenant(tid, …)` and sets
+    `_tenantId = PilotSession.tenantId`. The `false` branch (legacy
+    users from before ERR-2 who never got migrated by PR #170)
+    retains the original `createTenant` flow. Sends only fields
+    `TenantUpdate` accepts (slug / primary_email / primary_country
+    are immutable post-registration).
+  - **Tests:** `apex_finance/test/pilot/screens/setup/pilot_onboarding_wizard_test.dart`
+    — 4 source-grep regression tests (widget tests blocked by the
+    G-T1.1 `session.dart → dart:html` SDK mismatch). Pins:
+    `hasTenant` branching; `_tenantId = PilotSession.tenantId`
+    assignment; `updateTenant` call; `createTenant` fallback
+    retained; the `G-WIZARD-TENANT-FIX` marker comment.
+  - **Verification:**
+    - `flutter test test/pilot/screens/setup/pilot_onboarding_wizard_test.dart`
+      → 4/4 pass.
+    - Flutter regression sweep (wizard + CF + BS + IS + TB +
+      v5_routing + auth_guard + err_1_session_redirect) →
+      **56/56 pass**.
+    - `flutter analyze` on the modified file → 2 pre-existing
+      warnings unchanged (not from this fix).
+    - `flutter build web --release --no-tree-shake-icons` →
+      succeeds in ~88s.
+    - 0 backend changes. 0 alembic migrations. 0 schema changes.
+  - **Docs:** new
+    `docs/WIZARD_TENANT_FIX_2026-05-09.md` — root-cause analysis
+    (the three-decision collision), fix walkthrough, immutable-
+    field rationale, manual UAT path, sibling-regression watchlist.
+  - **Hotfix scope discipline:** no other files touched. The fix
+    is one method body change + tests + doc. No backend,
+    no schema, no other screens.
+
 ### 2026-05-08
 
 - [x] **G-FIN-CF-1** — Cash Flow Statement (Indirect Method) with real-data + reconciliation invariant — **closes UAT Issue #5 (TB + IS + BS + CF all real-data)** 🎉
