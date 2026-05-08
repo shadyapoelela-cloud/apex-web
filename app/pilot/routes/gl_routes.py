@@ -4,7 +4,7 @@ from datetime import date as _date, datetime, timezone
 from decimal import Decimal
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Response
 from sqlalchemy.orm import Session
 
 from app.phase1.models.platform_models import get_db
@@ -475,13 +475,43 @@ def income_statement(
     entity_id: str,
     start_date: _date = Query(...),
     end_date: _date = Query(...),
+    include_zero: bool = Query(False, description="Include accounts with zero net activity"),
+    compare_period: str = Query(
+        "none",
+        pattern="^(none|previous_year|previous_period)$",
+        description="Optional comparison window — shifts the same-shape query.",
+    ),
+    response: Response = None,  # type: ignore[assignment]
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
+    """Income Statement (P&L).
+
+    G-FIN-IS-1 (2026-05-08): every value sourced 100% from
+    `pilot_gl_postings` (real, posted journal entries) joined to
+    `pilot_gl_accounts`. No mocks, no fallbacks, no caching, no
+    demo-data short-circuits — drafts have no postings rows so they
+    are inherently excluded.
+
+    The `X-Data-Source` response header documents this contract for
+    auditors / SOC pipelines.
+    """
     assert_entity_in_tenant(db, entity_id, current_user)
     if end_date < start_date:
         raise HTTPException(400, "end_date يجب أن يكون ≥ start_date")
-    result = compute_income_statement(db, entity_id=entity_id, start_date=start_date, end_date=end_date)
+    try:
+        result = compute_income_statement(
+            db,
+            entity_id=entity_id,
+            start_date=start_date,
+            end_date=end_date,
+            include_zero=include_zero,
+            compare_period=compare_period,
+        )
+    except ValueError as ex:
+        raise HTTPException(400, str(ex))
+    if response is not None:
+        response.headers["X-Data-Source"] = "real-time-from-postings"
     return IncomeStatementResponse(**result)
 
 

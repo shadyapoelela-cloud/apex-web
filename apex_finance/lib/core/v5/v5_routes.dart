@@ -17,6 +17,7 @@ import '../apex_ask_panel.dart';
 import '../apex_news_ticker.dart';
 import '../theme.dart' as core_theme;
 import '../../screens/coming_soon_screen.dart';
+import '../../screens/finance/income_statement_screen.dart';
 import '../../screens/finance/trial_balance_screen.dart';
 import '../../screens/v5_showcase/v5_showcase_screen.dart';
 import '../../pilot/screens/setup/je_builder_live_v52.dart';
@@ -154,6 +155,28 @@ List<RouteBase> v5Routes() => [
             mainModule: main,
             activeChip: chip,
             bodyOverride: const TrialBalanceScreen(),
+          );
+        },
+      ),
+      // G-FIN-IS-1 (2026-05-08): explicit route for the Income
+      // Statement (P&L) screen. Same pattern as trial-balance —
+      // the chip id `income-statement` is in v5_data.dart but
+      // it's the dedicated screen we want to render, not a
+      // parametric chip body. Uses the `gl` chip for chrome.
+      GoRoute(
+        path: '/app/erp/finance/income-statement',
+        builder: (ctx, state) {
+          final svc = v5ServiceById('erp');
+          final main = svc?.mainModuleById('finance');
+          final chip = main?.chipById('gl');
+          if (svc == null || main == null || chip == null) {
+            return const _V5NotFound();
+          }
+          return ApexV5ServiceShell(
+            service: svc,
+            mainModule: main,
+            activeChip: chip,
+            bodyOverride: const IncomeStatementScreen(),
           );
         },
       ),

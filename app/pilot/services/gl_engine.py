@@ -11,7 +11,7 @@
   • auto_post_pos_sale(db, pos_txn_id) — توليد JE تلقائي من بيع POS
 """
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Optional
 
@@ -772,53 +772,269 @@ def compute_trial_balance(
     return result
 
 
-def compute_income_statement(
-    db: Session, *, entity_id: str, start_date: date, end_date: date,
+def _is_compute_period(
+    db: Session,
+    *,
+    entity_id: str,
+    start_date: date,
+    end_date: date,
+    include_zero: bool,
 ) -> dict:
-    """قائمة الدخل (P&L) لفترة."""
+    """Internal: aggregate revenue+expense postings for a single window.
+
+    DATA SOURCE: 100% real from `pilot_gl_postings` joined to
+    `pilot_gl_accounts`. No mocks, no fallbacks, no caching, no demo
+    seeds — drafts (no GLPosting rows) are inherently excluded.
+
+    Returns a dict with `accounts` (per-account rows), `revenue_total`,
+    `expense_total`, `net_income`, plus the legacy `revenue_by_subcat`
+    / `expense_by_subcat` aggregations (kept so internal callers like
+    `compute_balance_sheet` stay backward-compatible).
+
+    The query is reproduced verbatim in
+    `docs/INCOME_STATEMENT_DATA_FLOW_2026-05-08.md` so anyone auditing
+    the data path can verify it matches what production runs.
+    """
+    # Per-account rows — what the IS screen displays line-by-line.
     rows = (
         db.query(
+            GLAccount.id.label("account_id"),
+            GLAccount.code,
+            GLAccount.name_ar,
+            GLAccount.name_en,
             GLAccount.category,
             GLAccount.subcategory,
-            func.sum(GLPosting.debit_amount).label("total_debit"),
-            func.sum(GLPosting.credit_amount).label("total_credit"),
+            GLAccount.normal_balance,
+            func.coalesce(func.sum(GLPosting.debit_amount), 0).label("total_debit"),
+            func.coalesce(func.sum(GLPosting.credit_amount), 0).label("total_credit"),
         )
-        .join(GLAccount, GLAccount.id == GLPosting.account_id)
+        .outerjoin(
+            GLPosting,
+            and_(
+                GLPosting.account_id == GLAccount.id,
+                GLPosting.entity_id == entity_id,
+                GLPosting.posting_date >= start_date,
+                GLPosting.posting_date <= end_date,
+            ),
+        )
         .filter(
-            GLPosting.entity_id == entity_id,
-            GLPosting.posting_date >= start_date,
-            GLPosting.posting_date <= end_date,
-            GLAccount.category.in_([AccountCategory.revenue.value, AccountCategory.expense.value]),
+            GLAccount.entity_id == entity_id,
+            GLAccount.is_active == True,  # noqa: E712
+            GLAccount.type == AccountType.detail.value,
+            GLAccount.category.in_(
+                [AccountCategory.revenue.value, AccountCategory.expense.value]
+            ),
         )
-        .group_by(GLAccount.category, GLAccount.subcategory)
+        .group_by(
+            GLAccount.id,
+            GLAccount.code,
+            GLAccount.name_ar,
+            GLAccount.name_en,
+            GLAccount.category,
+            GLAccount.subcategory,
+            GLAccount.normal_balance,
+        )
+        .order_by(GLAccount.code)
         .all()
     )
 
+    accounts: list[dict] = []
     revenue_total = Decimal("0")
     expense_total = Decimal("0")
-    by_subcat = {"revenue": {}, "expense": {}}
-    for cat, subcat, dr, cr in rows:
-        dr = Decimal(str(dr or 0))
-        cr = Decimal(str(cr or 0))
-        if cat == "revenue":
-            amount = cr - dr   # الإيرادات طبيعتها دائنة
+    by_subcat: dict[str, dict[str, Decimal]] = {"revenue": {}, "expense": {}}
+    for r in rows:
+        dr = Decimal(str(r.total_debit or 0))
+        cr = Decimal(str(r.total_credit or 0))
+        if r.category == AccountCategory.revenue.value:
+            amount = cr - dr  # الإيرادات طبيعتها دائنة
             revenue_total += amount
-            by_subcat["revenue"][subcat or "other"] = amount
+            by_subcat["revenue"][r.subcategory or "other"] = (
+                by_subcat["revenue"].get(r.subcategory or "other", Decimal("0"))
+                + amount
+            )
         else:
-            amount = dr - cr   # المصروفات طبيعتها مدينة
+            amount = dr - cr  # المصروفات طبيعتها مدينة
             expense_total += amount
-            by_subcat["expense"][subcat or "other"] = amount
+            by_subcat["expense"][r.subcategory or "other"] = (
+                by_subcat["expense"].get(r.subcategory or "other", Decimal("0"))
+                + amount
+            )
 
-    net_income = revenue_total - expense_total
+        if not include_zero and amount == 0:
+            continue
+        accounts.append(
+            {
+                "account_id": r.account_id,
+                "code": r.code,
+                "name_ar": r.name_ar,
+                "name_en": r.name_en,
+                "category": r.category,
+                "subcategory": r.subcategory,
+                "normal_balance": r.normal_balance,
+                "total_debit": dr,
+                "total_credit": cr,
+                "amount": amount,
+            }
+        )
+
+    return {
+        "accounts": accounts,
+        "revenue_total": revenue_total,
+        "expense_total": expense_total,
+        "net_income": revenue_total - expense_total,
+        "by_subcat": by_subcat,
+    }
+
+
+def compute_income_statement(
+    db: Session,
+    *,
+    entity_id: str,
+    start_date: date,
+    end_date: date,
+    include_zero: bool = False,
+    compare_period: str = "none",
+) -> dict:
+    """قائمة الدخل (P&L) — every value sourced from `pilot_gl_postings`.
+
+    G-FIN-IS-1 (2026-05-08) extended this from a subcategory-only roll-up
+    to a full IS shape: per-account rows + comparison period + posted-JE
+    count for the freshness footer. The legacy
+    ``revenue_by_subcat`` / ``expense_by_subcat`` keys are preserved so
+    `compute_balance_sheet` (and any other internal caller) keeps
+    working.
+
+    Parameters
+    ----------
+    entity_id
+        Tenant-scoped already by the caller's
+        :func:`assert_entity_in_tenant`.
+    start_date, end_date
+        Inclusive window.
+    include_zero
+        When ``False`` (default) accounts with zero net activity are
+        omitted from the per-account ``accounts`` list. Totals are
+        unaffected.
+    compare_period
+        ``"none"`` (default), ``"previous_year"``, or
+        ``"previous_period"``. When non-default, the same query runs
+        for the shifted window and the result is attached as
+        ``comparison`` on the response.
+
+    Anti-mock guarantee: drafts have no ``pilot_gl_postings`` rows, so
+    they are inherently excluded by the SQL. There is no in-memory
+    fallback, no cache, no demo seed — `G-DEMO-DATA-SEEDER` writes
+    master data only and explicitly notes ``journal_entries: 0``.
+    """
+    if end_date < start_date:
+        raise ValueError("end_date must be >= start_date")
+    if compare_period not in ("none", "previous_year", "previous_period"):
+        raise ValueError(
+            f"compare_period must be one of: none, previous_year, "
+            f"previous_period (got {compare_period!r})"
+        )
+
+    current = _is_compute_period(
+        db,
+        entity_id=entity_id,
+        start_date=start_date,
+        end_date=end_date,
+        include_zero=include_zero,
+    )
+
+    # Posted JE count in the window — backs the frontend's
+    # "N قيد مرحّل" footer. Real query, no fallback.
+    posted_je_count = (
+        db.query(JournalEntry)
+        .filter(
+            JournalEntry.entity_id == entity_id,
+            JournalEntry.status == JournalEntryStatus.posted.value,
+            JournalEntry.je_date >= start_date,
+            JournalEntry.je_date <= end_date,
+        )
+        .count()
+    )
+
+    comparison: Optional[dict] = None
+    if compare_period == "previous_year":
+        try:
+            prior_start = start_date.replace(year=start_date.year - 1)
+            prior_end = end_date.replace(year=end_date.year - 1)
+        except ValueError:
+            # Feb 29 → Feb 28 fallback for non-leap years
+            prior_start = start_date.replace(
+                year=start_date.year - 1, day=min(start_date.day, 28)
+            )
+            prior_end = end_date.replace(
+                year=end_date.year - 1, day=min(end_date.day, 28)
+            )
+    elif compare_period == "previous_period":
+        delta = end_date - start_date
+        prior_end = start_date - timedelta(days=1)
+        prior_start = prior_end - delta
+    else:
+        prior_start = prior_end = None  # type: ignore[assignment]
+
+    if prior_start is not None and prior_end is not None:
+        prior = _is_compute_period(
+            db,
+            entity_id=entity_id,
+            start_date=prior_start,
+            end_date=prior_end,
+            include_zero=include_zero,
+        )
+        rev_var = (
+            ((current["revenue_total"] - prior["revenue_total"]) / prior["revenue_total"]) * 100
+            if prior["revenue_total"] != 0
+            else None
+        )
+        exp_var = (
+            ((current["expense_total"] - prior["expense_total"]) / prior["expense_total"]) * 100
+            if prior["expense_total"] != 0
+            else None
+        )
+        net_var = (
+            ((current["net_income"] - prior["net_income"]) / abs(prior["net_income"])) * 100
+            if prior["net_income"] != 0
+            else None
+        )
+        comparison = {
+            "kind": compare_period,
+            "start_date": prior_start.isoformat(),
+            "end_date": prior_end.isoformat(),
+            "revenue_total": float(prior["revenue_total"]),
+            "expense_total": float(prior["expense_total"]),
+            "net_income": float(prior["net_income"]),
+            "revenue_variance_pct": float(rev_var) if rev_var is not None else None,
+            "expense_variance_pct": float(exp_var) if exp_var is not None else None,
+            "net_income_variance_pct": float(net_var) if net_var is not None else None,
+        }
+
     return {
         "entity_id": entity_id,
         "start_date": start_date.isoformat(),
         "end_date": end_date.isoformat(),
-        "revenue_total": float(revenue_total),
-        "expense_total": float(expense_total),
-        "net_income": float(net_income),
-        "revenue_by_subcat": {k: float(v) for k, v in by_subcat["revenue"].items()},
-        "expense_by_subcat": {k: float(v) for k, v in by_subcat["expense"].items()},
+        "revenue_total": float(current["revenue_total"]),
+        "expense_total": float(current["expense_total"]),
+        "net_income": float(current["net_income"]),
+        "revenue_by_subcat": {
+            k: float(v) for k, v in current["by_subcat"]["revenue"].items()
+        },
+        "expense_by_subcat": {
+            k: float(v) for k, v in current["by_subcat"]["expense"].items()
+        },
+        "accounts": [
+            {
+                **a,
+                "total_debit": float(a["total_debit"]),
+                "total_credit": float(a["total_credit"]),
+                "amount": float(a["amount"]),
+            }
+            for a in current["accounts"]
+        ],
+        "posted_je_count": posted_je_count,
+        "compare_period": compare_period,
+        "comparison": comparison,
     }
 
 

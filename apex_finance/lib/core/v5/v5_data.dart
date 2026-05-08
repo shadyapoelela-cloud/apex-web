@@ -530,6 +530,10 @@ List<V5Service> v5Services = [
           // the pin redirected to `statements` because no `trial-balance`
           // chip existed; that detour is gone now.
           const V5Chip(id: 'trial-balance', labelAr: 'ميزان المراجعة', labelEn: 'Trial Balance', icon: Icons.table_chart, phase: ChipPhase.report, category: 'reports'),
+          // G-FIN-IS-1 (2026-05-08): Income Statement screen — every
+          // value sourced 100% from pilot_gl_postings (real, posted
+          // JEs). See docs/INCOME_STATEMENT_DATA_FLOW_2026-05-08.md.
+          const V5Chip(id: 'income-statement', labelAr: 'قائمة الدخل', labelEn: 'Income Statement', icon: Icons.assessment, phase: ChipPhase.report, category: 'reports'),
           const V5Chip(id: 'statements', labelAr: 'القوائم المالية', labelEn: 'Financial Statements', icon: Icons.insert_chart, phase: ChipPhase.report, category: 'reports'),
           //   6.b الإدارية
           const V5Chip(id: 'budgets', labelAr: 'الموازنات', labelEn: 'Budgets', icon: Icons.pie_chart, phase: ChipPhase.report, category: 'reports'),

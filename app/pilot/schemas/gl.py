@@ -209,6 +209,34 @@ class TrialBalanceResponse(BaseModel):
     posted_je_count: int = 0
 
 
+class IncomeStatementRow(BaseModel):
+    """One per-account row in the IS table — backed 1:1 by a row in
+    `pilot_gl_accounts` plus its aggregated postings in the period."""
+    account_id: str
+    code: str
+    name_ar: str
+    name_en: Optional[str] = None
+    category: str
+    subcategory: Optional[str] = None
+    normal_balance: str
+    total_debit: float
+    total_credit: float
+    amount: float  # natural-balance amount (revenue: cr-dr; expense: dr-cr)
+
+
+class IncomeStatementComparison(BaseModel):
+    """Comparison-period block. Present when `compare_period != 'none'`."""
+    kind: str  # 'previous_year' | 'previous_period'
+    start_date: date
+    end_date: date
+    revenue_total: float
+    expense_total: float
+    net_income: float
+    revenue_variance_pct: Optional[float] = None
+    expense_variance_pct: Optional[float] = None
+    net_income_variance_pct: Optional[float] = None
+
+
 class IncomeStatementResponse(BaseModel):
     entity_id: str
     start_date: date
@@ -218,6 +246,13 @@ class IncomeStatementResponse(BaseModel):
     net_income: float
     revenue_by_subcat: dict
     expense_by_subcat: dict
+    # G-FIN-IS-1 (2026-05-08): per-account rows + posted_je_count +
+    # optional comparison. All defaults so older callers
+    # (e.g., compute_balance_sheet, legacy fixtures) stay green.
+    accounts: list[IncomeStatementRow] = Field(default_factory=list)
+    posted_je_count: int = 0
+    compare_period: str = "none"
+    comparison: Optional[IncomeStatementComparison] = None
 
 
 class BalanceSheetResponse(BaseModel):
