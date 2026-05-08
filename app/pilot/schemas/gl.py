@@ -309,6 +309,108 @@ class BalanceSheetVariances(BaseModel):
     total_equity_change_pct: Optional[float] = None
 
 
+class CashFlowItem(BaseModel):
+    """One per-account row in the CF Statement — backed by the
+    period change of an underlying `pilot_gl_accounts` row.
+
+    `cf_impact` carries the signed contribution to net change in
+    cash: asset increase yields negative impact, liability/equity
+    increase yields positive. The `note` field is a short Arabic
+    explanation of the sign convention for that row."""
+    account_id: str
+    code: str
+    name_ar: str
+    name_en: Optional[str] = None
+    subcategory: Optional[str] = None
+    category: Optional[str] = None
+    opening_balance: float
+    closing_balance: float
+    change: float
+    cf_impact: float
+    note: Optional[str] = None
+
+
+class CashFlowNoncashAdjustment(BaseModel):
+    """One non-cash add-back (e.g., depreciation) applied to net income
+    in the operating-activities section. Synthetic — derived from the
+    IS aggregates, not directly from a balance-sheet account."""
+    code: str
+    name_ar: str
+    name_en: Optional[str] = None
+    subcategory: Optional[str] = None
+    amount: float
+    is_synthetic: bool = True
+
+
+class CashFlowOperating(BaseModel):
+    net_income: float
+    noncash_adjustments: list[CashFlowNoncashAdjustment] = Field(default_factory=list)
+    working_capital_changes: list[CashFlowItem] = Field(default_factory=list)
+    subtotal_cfo: float
+
+
+class CashFlowSection(BaseModel):
+    """Investing / Financing section."""
+    items: list[CashFlowItem] = Field(default_factory=list)
+    subtotal_cfi: Optional[float] = None  # populated for investing
+    subtotal_cff: Optional[float] = None  # populated for financing
+
+
+class CashFlowTotals(BaseModel):
+    total_cfo: float
+    total_cfi: float
+    total_cff: float
+    net_change_in_cash: float
+    opening_cash: float
+    closing_cash: float
+    reconciliation_check: float
+    is_reconciled: bool
+    reconciliation_difference: float
+
+
+class CashFlowSnapshot(BaseModel):
+    """One CF snapshot for [period_start, period_end] — used for both
+    the current period and the optional comparison period."""
+    period_start: date
+    period_end: date
+    operating_activities: CashFlowOperating
+    investing_activities: CashFlowSection
+    financing_activities: CashFlowSection
+    totals: CashFlowTotals
+    unmapped_items: list[dict] = Field(default_factory=list)
+
+
+class CashFlowVariances(BaseModel):
+    cfo_change_pct: Optional[float] = None
+    cfi_change_pct: Optional[float] = None
+    cff_change_pct: Optional[float] = None
+    net_change_pct: Optional[float] = None
+
+
+class CashFlowResponse(BaseModel):
+    """Cash Flow Statement — Indirect Method.
+
+    G-FIN-CF-1 (2026-05-08): every value sourced 100% from
+    `pilot_gl_postings`. The reconciliation invariant
+    (`opening_cash + net_change == closing_cash`) is verified server-
+    side and reported via `is_reconciled` (never silenced). Custom
+    subcategories that don't map to a CF section surface in
+    `unmapped_subcategories` so admins can either map them or
+    document the exclusion.
+    """
+    entity_id: str
+    period_start: date
+    period_end: date
+    method: str  # 'indirect' (only supported in v1; 'direct' returns 422)
+    currency: str = "SAR"
+    current_period: CashFlowSnapshot
+    comparison_period: Optional[CashFlowSnapshot] = None
+    variances: Optional[CashFlowVariances] = None
+    unmapped_subcategories: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+    posted_je_count: int = 0
+
+
 class BalanceSheetResponse(BaseModel):
     entity_id: str
     as_of_date: date
