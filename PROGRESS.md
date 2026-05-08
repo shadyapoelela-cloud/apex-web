@@ -4,6 +4,92 @@
 
 ### 2026-05-08
 
+- [x] **G-FIN-IS-1** — Income Statement (P&L) screen with 100% real-data guarantee — closes first half of UAT Issue #5
+  - Branch: `feat/g-fin-is-1`
+  - **Why:** UAT Issue #5 needs a real Income Statement screen. The
+    backend already had a working `compute_income_statement` (no
+    mocks), but the response shape was subcategory-only (no
+    per-account rows, no comparison, no posted_je_count) and there
+    was no dedicated frontend screen — the `income-statement` chip
+    aliased to the broader `FinancialReportsScreen`.
+  - **Recon + audit:** scanned `gl_engine.py`, `gl_routes.py`, the
+    demo seeder, and the response shape; found **zero**
+    mock/hardcoded/fake/stub patterns. Confirmed `pilot_gl_postings`
+    has exactly one writer (`post_journal_entry`) and the demo
+    seeder explicitly skips JEs (`"journal_entries": 0`). Real-data
+    invariant intact.
+  - **Backend:**
+    - `compute_income_statement` extended in
+      `app/pilot/services/gl_engine.py`: per-account rows, optional
+      `compare_period` ("none" / "previous_year" / "previous_period"),
+      `include_zero` toggle, `posted_je_count`. Internal callers
+      (e.g., `compute_balance_sheet`) keep working — all new fields
+      have defaults. The query was rewritten as an outerjoin from
+      `GLAccount → GLPosting` so accounts with zero activity yield
+      `0.0` rather than dropping out (preserves include_zero=true
+      semantics).
+    - `IncomeStatementResponse` schema gained `accounts:
+      list[IncomeStatementRow]`, `posted_je_count: int = 0`,
+      `compare_period: str = 'none'`, `comparison: Optional[…]`. New
+      `IncomeStatementRow` + `IncomeStatementComparison` Pydantic
+      classes.
+    - `GET /pilot/entities/{id}/reports/income-statement` accepts
+      `include_zero` + `compare_period` query params and emits
+      `X-Data-Source: real-time-from-postings` response header.
+  - **Frontend:**
+    - New
+      `apex_finance/lib/screens/finance/income_statement_screen.dart`
+      (~700 lines). Mirrors `trial_balance_screen.dart` structure:
+      RTL header with refresh + Excel + PDF buttons, freshness
+      badge ("آخر تحديث: HH:MM:SS"), filters bar (date pickers +
+      compare-period dropdown + include_zero switch), 3 summary
+      cards (revenue / expenses / net-profit + variance % when
+      comparing), statement table grouped Revenue + Expenses with
+      subtotals + a final net-income row, footer source line
+      ("المصدر: pilot_journal_lines — N قيد مرحّل" + "بيانات حقيقية
+      — لا توجد قيم وهمية"), empty-state CTA → JE Builder, kDebugMode
+      panel (entity_id, period, account counts, raw comparison).
+      **Zero local state initialised with values** — no `_demoRows`,
+      no `_defaultRows`, no fallback `'0.00'` strings; `_data`
+      stays `null` until first fetch.
+    - `ApiService.pilotIncomeStatement` extended with
+      `includeZero` + `comparePeriod` params.
+    - Wired into `v5_data` (chip), `v5_routes` (explicit
+      `/app/erp/finance/income-statement` GoRoute), `v5_wired_screens`
+      (replaces the old alias), `main.dart` Offstage instance for
+      tree-shake protection.
+  - **Tests:**
+    - `tests/test_income_statement_real_data.py` — **15 cases**
+      across `TestRealDataFlow` (10), `TestTenantIsolation` (3),
+      `TestAntiMock` (2). The two anti-mock tests pin the
+      guarantee: empty entity → genuine zeros (no defaults), and
+      a 12345.67 JE round-trips byte-for-byte. **All 15 pass.**
+    - `apex_finance/test/screens/finance/income_statement_test.dart`
+      — **4 tests**: chip declaration, wired-keys registration,
+      validator reachability, and a source-grep anti-mock test
+      that scans `income_statement_screen.dart` (excluding doc
+      comments) for forbidden tokens and asserts the
+      "Real-data guarantee" doc-block is present. All 4 pass.
+  - **Verification:**
+    - `pytest tests/test_income_statement_real_data.py` → 15/15 pass.
+    - Pilot regression sweep (TB + IS + tenant_isolation_full +
+      tenant_isolation_v2 + fin_statements + reports_download +
+      dimensions) → **134/134 pass**.
+    - `flutter analyze` on the new screen → 0 issues.
+    - Flutter regression (IS + TB + v5_routing + auth_guard +
+      err_1_session_redirect) → **39/39 pass**.
+    - `flutter build web --release --no-tree-shake-icons` →
+      succeeds in ~123s.
+    - 0 alembic migrations. 0 schema-breaking changes (all new
+      response fields default).
+  - **Docs:** new
+    `docs/INCOME_STATEMENT_DATA_FLOW_2026-05-08.md` walks the full
+    layer-by-layer real-data path (writer → service query →
+    comparison → endpoint → frontend → tests) with the verbatim
+    SQL, anti-mock test summaries, and a manual UAT checklist.
+    CLAUDE.md unchanged (no new pattern; reuses the
+    `assert_entity_in_tenant` helper from G-PILOT-REPORTS-TENANT-AUDIT).
+
 - [x] **G-PILOT-TENANT-AUDIT-FINAL** — closed remaining tenant isolation gaps; **Issue #3 FULLY CLOSED across 117 routes**
   - Branch: `feat/g-pilot-tenant-audit-final`
   - **Why:** G-PILOT-REPORTS-TENANT-AUDIT (PR #175) closed the
