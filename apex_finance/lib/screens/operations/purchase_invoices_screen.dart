@@ -505,10 +505,14 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
       GlobalKey<ScaffoldState>();
 
   // No dedicated /app/erp/finance/purchase-bills/new screen yet (parallel to sales has
-  // SalesInvoiceCreateScreen at /app/erp/sales/invoice-create). Route to the
-  // purchase hub for now — the user picks the right action there.
-  // TODO(wave-4): build PurchaseInvoiceCreateScreen + register route.
-  void _onCreate() => context.go('/purchase');
+  // G-FIN-PURCHASE-INVOICE-JE-AUTOPOST (Sprint 6, 2026-05-09):
+  // PurchaseInvoiceCreateScreen now exists at
+  // /app/erp/finance/purchase-bills/new. It pairs with
+  // _post_purchase_invoice_je-equivalent (post_purchase_invoice_to_gl)
+  // server-side — issuing the invoice triggers the standard 3-leg JE
+  // (DR Inventory or Expense / DR VAT Input / CR Vendor Payable).
+  // Closes the wave-4 TODO that previously redirected to /purchase.
+  void _onCreate() => context.go('/app/erp/finance/purchase-bills/new');
 
   void _onAiCreate() {
     _scaffoldKey.currentState?.openEndDrawer();
