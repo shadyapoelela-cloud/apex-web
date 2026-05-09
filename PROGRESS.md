@@ -4,6 +4,233 @@
 
 ### 2026-05-09
 
+- [x] **G-FIN-POS-JE-AUTOPOST** (Sprint 7 of the Finance Module 7-sprint plan — FINAL)
+  - Branch: `feat/g-fin-pos-je-autopost`
+  - **Why:** Sprint 1 audit Gap §3 row 7. Backend
+    `auto_post_pos_sale` (gl_engine.py:578) has shipped
+    since well before this sprint and posts up to 3 JEs
+    on every completed POS transaction (sales JE always
+    + COGS JE when product lines have costs + reverse JE
+    on refunds). The verification surface was missing —
+    pilots had no place to confirm that today's POS sales
+    moved the trial balance correctly.
+  - **What landed:**
+    - `apex_finance/lib/screens/operations/pos_daily_report_screen.dart`
+      — two-pane screen. Left rail lists POS sessions
+      for the active branch; right pane shows the
+      Z-report KPIs (gross / VAT / net / count + cash
+      reconciliation), payment-method breakdown chips,
+      and per-transaction rows each surfacing the JE id
+      with a link to `/app/erp/finance/je-builder`.
+    - New chip `erp/finance/pos-report` wired in both
+      `v5_wired_screens.dart` and `v5_wired_keys.dart`.
+    - 5 source-grep tests, all pass.
+    - `docs/POS_JE_FLOW_2026-05-09.md` documenting the
+      JE shapes, KPIs, and 7-step manual UAT script
+      that ends in a TB/IS verification.
+  - **Verification:** `flutter analyze` clean across all
+    3 changed files; 5/5 POS tests + 5/5 routing tests
+    pass.
+
+- [x] **G-FIN-PURCHASE-INVOICE-JE-AUTOPOST** (Sprint 6 of the Finance Module 7-sprint plan)
+  - Branch: `feat/g-fin-purchase-invoice-je-autopost`
+  - **Why:** Sprint 1 audit Gap §3 row 6. The backend
+    `post_purchase_invoice_to_gl`
+    (purchasing_engine.py) has shipped since well before
+    this sprint and auto-builds the standard 3-leg
+    purchase JE on `POST /pilot/purchase-invoices/{id}/post`
+    (DR Inventory or Expense / DR VAT Input / CR Payable).
+    What was missing was the frontend create screen —
+    the previous `+ جديد` button routed to a `/purchase`
+    placeholder.
+  - **What landed:** dedicated
+    `PurchaseInvoiceCreateScreen` mirroring the Sprint 5
+    pattern with vendor-side specifics (60-day default
+    due date, vendor_invoice_number field, shipping
+    field). Two save buttons (Draft / Save+Post). Success
+    snackbar surfaces `journal_entry_id` with action
+    link. New API method `pilotCreatePurchaseInvoice`.
+    New GoRoute. List `+ جديد` rewired to the create
+    screen. 7 source-grep tests, all pass.
+  - **Verification:** `flutter analyze` clean across all
+    4 changed files; 7/7 tests pass.
+
+- [x] **G-FIN-PRODUCT-CATALOG** (Sprint 4 of the Finance Module 7-sprint plan)
+  - Branch: `feat/g-fin-product-catalog`
+  - **Why:** Sprint 1 audit Gap §3 row 4. Sprints 5/6
+    invoice line pickers need an inline product-create flow.
+    The full multi-tab catalog management UI already
+    exists (`pilot/screens/setup/products_screen.dart`,
+    2179 lines, 5 tabs) but isn't reachable from inside an
+    invoice form — a 5-tab management UI is too heavy for
+    the "add this one item to my line" use case.
+  - **What landed:**
+    - `apex_finance/lib/core/barcode_utils.dart` —
+      pure-Dart EAN-13 helpers (`ean13CheckDigit`,
+      `generateEan13`). Pure Dart so they're testable
+      under flutter_test without the package:web SDK gate.
+    - `apex_finance/lib/screens/inventory/product_create_modal.dart`
+      — focused modal that POSTs `/pilot/tenants/{id}/products`
+      with one inline variant so the product is invoice-ready
+      immediately. Stashes typed barcode on
+      `_pending_barcode` for the caller to attach.
+    - `apex_finance/lib/widgets/forms/product_picker_or_create.dart`
+      — picker with 3 modes: type-to-search, barcode
+      lookup (Enter or dedicated button), inline create.
+      On barcode miss, opens the modal with the typed
+      barcode pre-filled.
+    - 6 new API methods: `pilotGetProduct`,
+      `pilotListProductVariants`,
+      `pilotCreateProductVariant`, `pilotBarcodeLookup`,
+      `pilotListCategories`, `pilotListBrands`.
+    - 12 tests (7 real EAN-13 unit tests with known
+      vectors + 5 source-grep) — all pass.
+  - **Verification:** `flutter analyze` clean across all
+    4 changed files; 12/12 tests pass.
+
+- [x] **G-FIN-VENDORS-COMPLETE** (Sprint 3 of the Finance Module 7-sprint plan)
+  - Branch: `feat/g-fin-vendors-complete`
+  - **Why:** Sprint 1 audit Gap §3 row 3. Mirror of
+    Sprint 2 (Customers) with vendor-specific
+    differences: KSA IBAN validator, default
+    `payment_terms=net_60`, bank fields (`bank_name`,
+    `bank_iban`, `bank_swift`), `is_preferred` flag, and
+    purchase-invoice tab 3 (instead of sales-invoice).
+  - **What landed:** modal (19 fields), 3-tab details
+    screen, picker widget, list rewire, new GoRoute
+    `/app/erp/finance/vendors/:vendorId`, 9 source-grep
+    tests, flow doc.
+  - **Verification:** `flutter analyze` clean across all
+    5 changed files; 9/9 tests pass.
+
+- [x] **G-FIN-SALES-INVOICE-JE-AUTOPOST** (Sprint 5 of the Finance Module 7-sprint plan)
+  - Branch: `feat/g-fin-sales-invoice-je-autopost`
+  - **Why:** Sprint 1 audit Gap §3 row 5. The backend
+    JE auto-post engine
+    (`_post_sales_invoice_je` at
+    `app/pilot/routes/customer_routes.py:364`)
+    has shipped since well before this sprint and produces
+    the standard 3-leg sales JE
+    (DR Receivable / CR Revenue / CR VAT Output) on
+    `POST /sales-invoices/{id}/issue`. What was missing was
+    the frontend signal: the create screen used a customer
+    dropdown that forced users to leave the form, had no
+    "save as draft" button (so any save auto-posted a JE),
+    and the success snackbar buried the JE id without an
+    action link.
+  - **What landed:**
+    - `apex_finance/lib/screens/operations/sales_invoice_create_screen.dart`
+      — replaced the dropdown with `CustomerPickerOrCreate`
+      from Sprint 2; split `_submit` into `_buildPayload` +
+      `_saveDraft` + `_submit`; the `_saveDraft` path
+      explicitly does NOT call `pilotIssueSalesInvoice` so
+      drafts do not pollute the trial balance with un-issued
+      invoices; the success snackbar surfaces
+      `journal_entry_id` with an action button labelled
+      "عرض القيد" linking to `/app/erp/finance/je-builder`.
+    - `apex_finance/test/screens/sales_invoice_je_autopost_test.dart`
+      — 6 source-grep contracts pinning the picker import,
+      the draft-skips-issue rule, the create-then-issue
+      order, the snackbar JE-link, and the 2-button ratchet.
+    - `docs/SALES_INVOICE_JE_FLOW_2026-05-09.md` — flow
+      diagram, manual UAT script, explicit "what's NOT in
+      this sprint" note (multi-line + COGS JE deferred to a
+      future sprint that bundles them with Sprint 4 product
+      catalog work).
+  - **Verification:** `flutter analyze` clean;
+    `flutter test test/screens/sales_invoice_je_autopost_test.dart`
+    → 6/6 pass.
+
+- [x] **G-FIN-CUSTOMERS-COMPLETE** (Sprint 2 of the Finance Module 7-sprint plan)
+  - Branch: `feat/g-fin-customers-complete`
+  - **Why:** Sprint 1 audit Gap §3 row 1 ("Customer creation
+    form missing — `+ جديد` routed to a placeholder `/sales`
+    page") + row 2 ("Customer details — clicking a row routed
+    to `/operations/customer-360/:id`, an archived path that
+    rendered the coming-soon banner"). Both gaps closed with
+    pure frontend work — backend endpoints
+    (`POST /pilot/tenants/{tid}/customers`,
+    `GET /pilot/customers/{id}`,
+    `GET /pilot/customers/{id}/ledger`) all pre-existed.
+  - **What landed:**
+    - `apex_finance/lib/screens/operations/customer_create_modal.dart`
+      — 14-field modal with KSA-15-digit VAT validator,
+      auto-generated `CUST-NNN` code on blank, `show()`
+      returns `Future<Map<String, dynamic>?>` for downstream
+      auto-select use.
+    - `apex_finance/lib/screens/operations/customer_details_screen.dart`
+      — 3-tab screen (تفاصيل / السجل المالي / الفواتير).
+      Tab 3 filters the entity-scoped sales-invoices list by
+      `customer_id` client-side.
+    - `apex_finance/lib/widgets/forms/customer_picker_or_create.dart`
+      — autocomplete picker + inline `+ عميل جديد` that
+      opens `CustomerCreateModal` pre-filled with the typed
+      query. Designed for Sprint 5's Sales Invoice line.
+    - `apex_finance/lib/screens/operations/customers_list_screen.dart`
+      — `_onCreate` opens the modal and refreshes inline
+      (no nav). Row tap routes to the new
+      `/app/erp/finance/customers/:id` path.
+    - `apex_finance/lib/core/router.dart` — new GoRoute
+      `/app/erp/finance/customers/:customerId` →
+      `CustomerDetailsScreen`.
+    - `apex_finance/test/screens/customers_complete_test.dart`
+      — 8 source-grep contracts pinning the modal payload
+      shape, the 15-digit VAT rule, the new row-tap route,
+      the 3-tab structure, and the inline-create
+      pre-fill flow.
+    - `docs/CUSTOMERS_FLOW_2026-05-09.md` — full audit doc
+      with the before/after diagram, validation rules,
+      manual UAT script, and roadmap context.
+  - **Verification:** `flutter analyze` clean across all 5
+    changed dart files; `flutter test test/screens/customers_complete_test.dart`
+    → 8/8 pass.
+
+- [x] **G-FIN-AUDIT-CLEANUP** (Sprint 1 of the Finance Module 7-sprint plan)
+  - Branch: `feat/g-fin-audit-cleanup`
+  - **Why:** the Finance module today has 70 chips under
+    `erp/finance/*`. Five of them (`gl`, `trial-balance`,
+    `income-statement`, `balance-sheet`, `cash-flow`,
+    `statements`) were already unified on 2026-05-08 to
+    point at dedicated screens (G-FIN-IS-1 / G-FIN-BS-1 /
+    G-FIN-CF-1 / G-TB-DISPLAY-1) but the unification was
+    not yet documented or pinned by tests, leaving the
+    door open for a silent re-collapse. 18 V5.2 chips
+    rendered hardcoded fixtures with no UI signal that
+    the data wasn't real — users couldn't tell which
+    "ميزانية" was a real backend wire and which was a
+    placeholder.
+  - **What landed:**
+    - `docs/FINANCE_MODULE_AUDIT_2026-05-09.md` —
+      3-table audit (Screen × Chip × Backend × Type;
+      Duplicates; Gaps + Sprint mapping). Documents
+      that all three JE auto-post engines
+      (`_post_sales_invoice_je`,
+      `post_purchase_invoice_to_gl`, `auto_post_pos_sale`)
+      already exist server-side, so Sprints 5/6/7
+      remaining work is purely frontend.
+    - `apex_finance/lib/widgets/v52_mock_wrap.dart` —
+      reusable banner widget rendering "🚧 قيد التطوير"
+      above any wrapped screen, dismissible per-session.
+    - `apex_finance/lib/core/v5/v5_wired_screens.dart` —
+      18 V5.2 mock chip mappings now wrapped with
+      `V52MockWrap(child: ...)`. No widget code
+      duplicated, no fixtures removed; one-line drop of
+      the wrapper when each chip gets a real backend wire.
+    - `apex_finance/test/v5_routing_test.dart` — new
+      regression-prevention pin: the 6 financial-statement
+      chips (`gl`, `trial-balance`, `income-statement`,
+      `balance-sheet`, `cash-flow`, `statements`) must
+      all stay wired. If a refactor silently re-collapses
+      them, this test fails.
+  - **Verification:** `py scripts/dev/repro_routing_bugs.py`
+    reports 0 errors. Chip-key count in
+    `v5_wired_keys.dart` matches `v5_wired_screens.dart`
+    (70 entries each, unchanged).
+  - **Roadmap:** Sprints 2-7 (customers/vendors/products
+    full CRUD, sales/purchase invoice create screens,
+    POS daily summary). Tabulated in audit doc § "6-Sprint
+    Roadmap".
+
 - [x] **G-WIZARD-STALE-STATE** — defensive init + null-safety guards in onboarding wizard
   - Branch: `hotfix/g-wizard-stale-state`
   - **Why:** G-LEGACY-KEY-AUDIT (PR #183) closed the localStorage

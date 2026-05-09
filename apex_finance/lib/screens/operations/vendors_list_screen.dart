@@ -16,6 +16,7 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../widgets/apex_copilot_drawer.dart';
 import '../../widgets/apex_list_toolbar.dart';
+import 'vendor_create_modal.dart';
 
 const String _kScreenKey = '/app/erp/purchasing/suppliers';
 
@@ -269,7 +270,19 @@ class _VendorsListScreenState extends State<VendorsListScreen> {
   }
 
   // ── CTA actions ──────────────────────────────────────────────────────
-  void _onCreate() => context.go('/purchase');
+  // G-FIN-VENDORS-COMPLETE (Sprint 3, 2026-05-09): toolbar `+ جديد`
+  // opens VendorCreateModal and refreshes the list inline. Pre-fix
+  // the button routed to the placeholder `/purchase` page.
+  Future<void> _onCreate() async {
+    final created = await VendorCreateModal.show(context);
+    if (created == null || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AC.ok,
+      content: Text(
+          'تم إنشاء المورد ${created['legal_name_ar'] ?? ''} (${created['code'] ?? ''})'),
+    ));
+    await _load();
+  }
   void _onAiCreate() => _scaffoldKey.currentState?.openEndDrawer();
 
   void _bulkExportCsv() {
@@ -597,7 +610,7 @@ class _VendorsListScreenState extends State<VendorsListScreen> {
     return InkWell(
       onTap: () => inSelectionMode
           ? _toggleSelected(v)
-          : context.go('/operations/vendor-360/${v['id']}'),
+          : context.go('/app/erp/finance/vendors/${v['id']}'),
       onLongPress: () => _toggleSelected(v),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
@@ -675,7 +688,7 @@ class _VendorsListScreenState extends State<VendorsListScreen> {
     return InkWell(
       onTap: () => inSelectionMode
           ? _toggleSelected(v)
-          : context.go('/operations/vendor-360/${v['id']}'),
+          : context.go('/app/erp/finance/vendors/${v['id']}'),
       onLongPress: () => _toggleSelected(v),
       borderRadius: BorderRadius.circular(10),
       child: Container(

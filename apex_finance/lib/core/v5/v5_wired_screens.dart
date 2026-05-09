@@ -277,6 +277,14 @@ import '../../screens/finance/balance_sheet_screen.dart';
 // referenced from this file.
 import '../../screens/finance/cash_flow_screen.dart' as fin_cf;
 
+// G-FIN-AUDIT-CLEANUP (Sprint 1, 2026-05-09): wraps V5.2 mock screens
+// with a "🚧 قيد التطوير" banner so users know not to expect real
+// persistence. See docs/FINANCE_MODULE_AUDIT_2026-05-09.md Table 1.7-1.8.
+import '../../widgets/v52_mock_wrap.dart';
+
+// G-FIN-POS-JE-AUTOPOST (Sprint 7, 2026-05-09): daily POS Z-report.
+import '../../screens/operations/pos_daily_report_screen.dart';
+
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
 ///
@@ -316,24 +324,31 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   // (the V5.2 builder) where the partner/cost-center/VAT columns are
   // visible by default + decimal-formatter + tabbed partner picker.
   'erp/finance/je-builder': (ctx) => const pilot_je.JeBuilderScreen(),
-  'erp/finance/period-close': (ctx) => const ClosingCockpitV52Screen(),  // V5.2 with DAG
-  'erp/finance/close-checklist': (ctx) => const CloseChecklistScreen(),
+  // G-FIN-AUDIT-CLEANUP (Sprint 1, 2026-05-09): V5.2 mock screens wrapped
+  // with V52MockWrap. The wrapper renders a dismissible "🚧 قيد التطوير"
+  // banner above the existing fixture-driven screen. Drop the wrapper
+  // when the chip is wired to real backend data.
+  'erp/finance/period-close': (ctx) => V52MockWrap(child: const ClosingCockpitV52Screen()),  // V5.2 with DAG (mock)
+  'erp/finance/close-checklist': (ctx) => V52MockWrap(child: const CloseChecklistScreen()),  // (no backend wire)
   'erp/finance/coa-editor': (ctx) => const pilot_coa.CoaEditorScreen(),  // LIVE — real SOCPA CoA + seed + create
-  'erp/finance/fixed-assets': (ctx) => const FixedAssetsV52Screen(),  // V5.2
+  'erp/finance/fixed-assets': (ctx) => V52MockWrap(child: const FixedAssetsV52Screen()),  // V5.2 mock
   'erp/finance/statements': (ctx) => const pilot_reports.FinancialReportsScreen(),  // LIVE — real financial statements
-  'erp/finance/budgets': (ctx) => const BudgetsV52Screen(),  // V5.2
-  'erp/finance/budget-actual': (ctx) => const BudgetActualV52Screen(),  // V5.2
-  'erp/finance/budget-planning': (ctx) => const BudgetPlanningV52Screen(),  // V5.2
-  'erp/finance/cost-centers': (ctx) => const CostCentersV52Screen(),  // V5.2 Hierarchy
-  'erp/finance/scenarios': (ctx) => const ScenariosV52Screen(),  // V5.2
-  'erp/finance/breakeven': (ctx) => const BreakEvenV52Screen(),  // V5.2
-  'erp/finance/anomalies': (ctx) => const AnomaliesV52Screen(),  // V5.2
-  'erp/finance/ai-analyst': (ctx) => const AiAnalystV52Screen(),  // V5.2
-  'erp/finance/workflows': (ctx) => const WorkflowsV52Screen(),  // V5.2
-  'erp/finance/integrations': (ctx) => const IntegrationsHubV52Screen(),  // V5.2 Card Grid
-  'erp/finance/documents': (ctx) => const DocumentsV52Screen(),  // V5.2
+  'erp/finance/budgets': (ctx) => V52MockWrap(child: const BudgetsV52Screen()),  // V5.2 mock
+  'erp/finance/budget-actual': (ctx) => V52MockWrap(child: const BudgetActualV52Screen()),  // V5.2 mock
+  'erp/finance/budget-planning': (ctx) => V52MockWrap(child: const BudgetPlanningV52Screen()),  // V5.2 mock
+  'erp/finance/cost-centers': (ctx) => V52MockWrap(child: const CostCentersV52Screen()),  // V5.2 Hierarchy mock
+  'erp/finance/scenarios': (ctx) => V52MockWrap(child: const ScenariosV52Screen()),  // V5.2 mock
+  'erp/finance/breakeven': (ctx) => V52MockWrap(child: const BreakEvenV52Screen()),  // V5.2 mock
+  'erp/finance/anomalies': (ctx) => V52MockWrap(child: const AnomaliesV52Screen()),  // V5.2 mock
+  'erp/finance/ai-analyst': (ctx) => V52MockWrap(child: const AiAnalystV52Screen()),  // V5.2 mock
+  'erp/finance/workflows': (ctx) => V52MockWrap(child: const WorkflowsV52Screen()),  // V5.2 mock
+  'erp/finance/integrations': (ctx) => V52MockWrap(child: const IntegrationsHubV52Screen()),  // V5.2 Card Grid mock
+  'erp/finance/documents': (ctx) => V52MockWrap(child: const DocumentsV52Screen()),  // V5.2 mock
   'erp/finance/onboarding': (ctx) => const PilotOnboardingWizard(),  // LIVE — creates real tenant+entity+branch+CoA
   'erp/finance/pos': (ctx) => const RetailPosScreen(),  // LIVE — self-contained retail POS wired to /pilot/* (products + variants + barcodes + sessions + sale)
+  // G-FIN-POS-JE-AUTOPOST (Sprint 7, 2026-05-09): daily Z-report screen
+  // surfacing the auto-posted sales + COGS JEs from auto_post_pos_sale.
+  'erp/finance/pos-report': (ctx) => const PosDailyReportScreen(),
   'erp/finance/purchase-bills': (ctx) => const PurchaseInvoicesScreen(),  // LIVE — Odoo-style toolbar + filter/group/sort/view backed by /pilot/purchase-invoices
   // Wave 2 of APEX_IMPROVEMENT_PLAN.md — both chips live in the Finance
   // main module's chips list (see v5_data.dart line 498/502), so the
@@ -342,12 +357,12 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/sales-customers': (ctx) => const CustomersListScreen(),
   'erp/finance/purchase-vendors': (ctx) => const VendorsListScreen(),
 
-  // V5.2 New Finance Chips (Week 1)
-  'erp/finance/profit-centers': (ctx) => const ProfitCentersV52Screen(),
-  'erp/finance/internal-orders': (ctx) => const InternalOrdersV52Screen(),
-  'erp/finance/dimensions': (ctx) => const DimensionsV52Screen(),
-  'erp/finance/recurring-entries': (ctx) => const RecurringEntriesV52Screen(),
-  'erp/finance/ai-reconciliation': (ctx) => const AiReconciliationV52Screen(),
+  // V5.2 New Finance Chips (Week 1) — wrapped with V52MockWrap (Sprint 1)
+  'erp/finance/profit-centers': (ctx) => V52MockWrap(child: const ProfitCentersV52Screen()),
+  'erp/finance/internal-orders': (ctx) => V52MockWrap(child: const InternalOrdersV52Screen()),
+  'erp/finance/dimensions': (ctx) => V52MockWrap(child: const DimensionsV52Screen()),
+  'erp/finance/recurring-entries': (ctx) => V52MockWrap(child: const RecurringEntriesV52Screen()),
+  'erp/finance/ai-reconciliation': (ctx) => V52MockWrap(child: const AiReconciliationV52Screen()),
   'erp/finance/advanced-settings': (ctx) => const CompanySettingsScreen(),  // LIVE — Tenant+Entities+Branches+Settings CRUD
   'erp/finance/company-settings': (ctx) => const CompanySettingsScreen(),  // LIVE alias
 
@@ -361,14 +376,14 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/entity-setup': (ctx) => const EntitySetupScreen(),
   'erp/finance/ar-aging': (ctx) => const ArAgingScreen(),
   'erp/finance/ap-aging': (ctx) => const ApAgingScreen(),
-  'erp/finance/vat-return': (ctx) => const VatReturnV52Screen(),
+  'erp/finance/vat-return': (ctx) => V52MockWrap(child: const VatReturnV52Screen()),  // V5.2 mock (Sprint 1)
   'erp/finance/cash-flow-forecast': (ctx) => const CashFlowForecastScreen(),
   'erp/finance/tax-calendar': (ctx) => const TaxTimelineScreen(),
   'erp/finance/wht': (ctx) => const WhtCalculatorV5Screen(),
   'erp/finance/zakat': (ctx) => const ZakatCalculatorV5Screen(),
   'erp/finance/zatca-status': (ctx) => const ZatcaStatusCenterScreen(),
   'erp/finance/activity-log': (ctx) => const ActivityLogScreen(),
-  'erp/finance/receipt-capture': (ctx) => const ReceiptCaptureScreen(),
+  'erp/finance/receipt-capture': (ctx) => V52MockWrap(child: const ReceiptCaptureScreen()),  // V5.2 mock (Sprint 1)
 
   // ── 1.2 Consolidation ────────────────────────────────────────────
   'erp/consolidation/consolidation': (ctx) => const ConsolidationV2Screen(),

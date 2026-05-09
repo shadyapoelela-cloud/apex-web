@@ -35,6 +35,7 @@ const Set<String> v5WiredKeys = <String>{
   'erp/finance/documents',
   'erp/finance/onboarding',
   'erp/finance/pos',
+  'erp/finance/pos-report',
   'erp/finance/purchase-bills',
   'erp/finance/sales-customers',
   'erp/finance/purchase-vendors',

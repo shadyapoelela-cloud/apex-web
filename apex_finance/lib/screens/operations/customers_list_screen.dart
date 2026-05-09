@@ -15,6 +15,7 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../widgets/apex_copilot_drawer.dart';
 import '../../widgets/apex_list_toolbar.dart';
+import 'customer_create_modal.dart';
 
 const String _kScreenKey = '/app/erp/finance/sales-customers';
 
@@ -272,7 +273,20 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
   }
 
   // ── CTA actions ──────────────────────────────────────────────────────
-  void _onCreate() => context.go('/sales');
+  // G-FIN-CUSTOMERS-COMPLETE (Sprint 2, 2026-05-09): the toolbar
+  // "+ جديد" button now opens `CustomerCreateModal` (POSTs
+  // `/pilot/tenants/{id}/customers`) and refreshes the list inline on
+  // success, instead of routing to the placeholder /sales page.
+  Future<void> _onCreate() async {
+    final created = await CustomerCreateModal.show(context);
+    if (created == null || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AC.ok,
+      content: Text(
+          'تم إنشاء العميل ${created['name_ar'] ?? ''} (${created['code'] ?? ''})'),
+    ));
+    await _load();
+  }
   void _onAiCreate() => _scaffoldKey.currentState?.openEndDrawer();
 
   void _bulkExportCsv() {
@@ -602,7 +616,7 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
     return InkWell(
       onTap: () => inSelectionMode
           ? _toggleSelected(c)
-          : context.go('/operations/customer-360/${c['id']}'),
+          : context.go('/app/erp/finance/customers/${c['id']}'),
       onLongPress: () => _toggleSelected(c),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
@@ -679,7 +693,7 @@ class _CustomersListScreenState extends State<CustomersListScreen> {
     return InkWell(
       onTap: () => inSelectionMode
           ? _toggleSelected(c)
-          : context.go('/operations/customer-360/${c['id']}'),
+          : context.go('/app/erp/finance/customers/${c['id']}'),
       onLongPress: () => _toggleSelected(c),
       borderRadius: BorderRadius.circular(10),
       child: Container(

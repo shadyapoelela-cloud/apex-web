@@ -93,6 +93,16 @@ import '../screens/settings/unified_settings_screen.dart';
 import '../screens/notifications/notifications_panel_screen.dart';
 import '../screens/operations/pos_quick_sale_screen.dart';
 import '../screens/operations/customer_payment_screen.dart';
+// G-FIN-CUSTOMERS-COMPLETE (Sprint 2, 2026-05-09): customer details
+// (3-tab screen with details / ledger / invoices) lives here.
+import '../screens/operations/customer_details_screen.dart';
+// G-FIN-VENDORS-COMPLETE (Sprint 3, 2026-05-09): vendor details
+// (3-tab screen with details / ledger / purchase-invoices) lives here.
+import '../screens/operations/vendor_details_screen.dart';
+// G-FIN-PURCHASE-INVOICE-JE-AUTOPOST (Sprint 6, 2026-05-09): dedicated
+// purchase invoice create screen with vendor picker + save-draft +
+// JE-link snackbar.
+import '../screens/operations/purchase_invoice_create_screen.dart';
 import '../screens/operations/vendor_payment_screen.dart';
 // G-CLEANUP-1 Stage 4b: JeListScreen archived to _archive/2026-05-04/v4-routes/.
 // Replaced by V5 list at /app/erp/finance/je-builder.
@@ -686,6 +696,31 @@ final appRouter = GoRouter(
         CustomerPaymentScreen(invoiceId: s.pathParameters['invoiceId']!),
         s,
       ),
+    ),
+    // G-FIN-CUSTOMERS-COMPLETE (Sprint 2, 2026-05-09): customer details
+    // 3-tab screen (details / ledger / invoices). Path-keyed by customer id.
+    GoRoute(
+      path: '/app/erp/finance/customers/:customerId',
+      pageBuilder: (c, s) => _apexPage(
+        CustomerDetailsScreen(customerId: s.pathParameters['customerId']!),
+        s,
+      ),
+    ),
+    // G-FIN-VENDORS-COMPLETE (Sprint 3, 2026-05-09): vendor details
+    // 3-tab screen (details / ledger / purchase-invoices).
+    GoRoute(
+      path: '/app/erp/finance/vendors/:vendorId',
+      pageBuilder: (c, s) => _apexPage(
+        VendorDetailsScreen(vendorId: s.pathParameters['vendorId']!),
+        s,
+      ),
+    ),
+    // G-FIN-PURCHASE-INVOICE-JE-AUTOPOST (Sprint 6, 2026-05-09): dedicated
+    // create screen. Closes Sprint 1 audit Gap §3 row 6.
+    GoRoute(
+      path: '/app/erp/finance/purchase-bills/new',
+      pageBuilder: (c, s) =>
+          _apexPage(const PurchaseInvoiceCreateScreen(), s),
     ),
     // Sprint 15 Stage 4f: V4 /analytics/cash-flow-forecast archived (HAS_V5) -> V5 /app/erp/finance/cash-flow-forecast
     GoRoute(

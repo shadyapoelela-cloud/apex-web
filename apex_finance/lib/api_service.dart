@@ -530,12 +530,35 @@ class ApiService {
       _get('/api/v1/pilot/tenants/$tenantId/vendors?limit=$limit');
   static Future<ApiResult> pilotCreateVendor(String tenantId, Map<String, dynamic> payload) =>
       _post('/api/v1/pilot/tenants/$tenantId/vendors', payload);
+  // G-FIN-VENDORS-COMPLETE (Sprint 3, 2026-05-09): get + ledger
+  // backing the new VendorDetailsScreen 3-tab UI.
+  static Future<ApiResult> pilotGetVendor(String id) =>
+      _get('/api/v1/pilot/vendors/$id');
+  static Future<ApiResult> pilotUpdateVendor(String id, Map<String, dynamic> patch) =>
+      _patch('/api/v1/pilot/vendors/$id', patch);
+  static Future<ApiResult> pilotVendorLedger(String id) =>
+      _get('/api/v1/pilot/vendors/$id/ledger');
+  // pilotListPurchaseInvoices already defined further down — see line 681.
 
   // ── Pilot: Products (existing) ──
   static Future<ApiResult> pilotListProducts(String tenantId, {int limit=100}) =>
       _get('/api/v1/pilot/tenants/$tenantId/products?limit=$limit');
   static Future<ApiResult> pilotCreateProduct(String tenantId, Map<String, dynamic> payload) =>
       _post('/api/v1/pilot/tenants/$tenantId/products', payload);
+  // G-FIN-PRODUCT-CATALOG (Sprint 4, 2026-05-09): get + variants + barcode lookup
+  // backing the new ProductPickerOrCreate widget and barcode-scan flows.
+  static Future<ApiResult> pilotGetProduct(String id) =>
+      _get('/api/v1/pilot/products/$id');
+  static Future<ApiResult> pilotListProductVariants(String productId) =>
+      _get('/api/v1/pilot/products/$productId/variants');
+  static Future<ApiResult> pilotCreateProductVariant(String productId, Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/products/$productId/variants', payload);
+  static Future<ApiResult> pilotBarcodeLookup(String tenantId, String value) =>
+      _get('/api/v1/pilot/tenants/$tenantId/barcode/${Uri.encodeComponent(value)}');
+  static Future<ApiResult> pilotListCategories(String tenantId) =>
+      _get('/api/v1/pilot/tenants/$tenantId/categories');
+  static Future<ApiResult> pilotListBrands(String tenantId) =>
+      _get('/api/v1/pilot/tenants/$tenantId/brands');
 
   // ── Pilot: Journal Entries (existing) ──
   static Future<ApiResult> pilotListJournalEntries(String entityId, {int limit=100}) =>
@@ -672,6 +695,10 @@ class ApiService {
       _get('/api/v1/pilot/entities/$entityId/purchase-invoices?limit=$limit');
   static Future<ApiResult> pilotPostPurchaseInvoice(String piId) =>
       _post('/api/v1/pilot/purchase-invoices/$piId/post', {});
+  // G-FIN-PURCHASE-INVOICE-JE-AUTOPOST (Sprint 6, 2026-05-09):
+  // create endpoint backing the new PurchaseInvoiceCreateScreen.
+  static Future<ApiResult> pilotCreatePurchaseInvoice(Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/purchase-invoices', payload);
   static Future<ApiResult> pilotCreateVendorPayment(Map<String, dynamic> payload) =>
       _post('/api/v1/pilot/vendor-payments', payload);
 

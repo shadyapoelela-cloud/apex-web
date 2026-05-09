@@ -57,6 +57,34 @@ void main() {
               'vat-return must remain wired — pin vat depends on it');
     });
 
+    // G-FIN-AUDIT-CLEANUP (Sprint 1, 2026-05-09):
+    // The five financial-statement chips (`gl`, `trial-balance`,
+    // `income-statement`, `balance-sheet`, `cash-flow`) were unified
+    // on 2026-05-08 to point at dedicated screens. This test pins
+    // them so a future refactor can't silently re-collapse them back
+    // into the FinancialReportsScreen hub. See
+    // docs/FINANCE_MODULE_AUDIT_2026-05-09.md Table 2 Group A.
+    test('financial-statement chips remain wired (G-FIN-AUDIT pin)', () {
+      final all = validateAllChips();
+      const required = [
+        'erp/finance/gl',
+        'erp/finance/trial-balance',
+        'erp/finance/income-statement',
+        'erp/finance/balance-sheet',
+        'erp/finance/cash-flow',
+        'erp/finance/statements',
+      ];
+      for (final key in required) {
+        final chip = all.firstWhere(
+          (s) => s.key == key,
+          orElse: () => throw Exception('chip $key not found in inventory'),
+        );
+        expect(chip.isReachable, isTrue,
+            reason: '$key must stay wired — financial-statement '
+                'audit pin (G-FIN-AUDIT-CLEANUP, Sprint 1).');
+      }
+    });
+
     test('reports broken chips count within baseline', () {
       final all = validateAllChips();
       final unreachable = all.where((s) => !s.isReachable).toList();
