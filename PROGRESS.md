@@ -4,6 +4,92 @@
 
 ### 2026-05-09
 
+- [x] **G-ERP-UNIFICATION** — closed UAT Issue #6 (duplicate setup journey)
+  - Branch: `feat/g-erp-unification`
+  - **Why:** APEX had two parallel paths for setting up companies +
+    branches: the legacy `/settings/entities` screen writing to
+    localStorage (invisible to backend → never reaches pilot_gl_postings
+    → financial statements render empty for users who set themselves
+    up via this path) and the unified `/app/erp/finance/onboarding`
+    wizard writing to pilot_* tables. The four legacy redirects
+    (`/onboarding/wizard`, `/clients/onboarding`, `/clients/new`,
+    `/clients/create`) all pointed at the legacy localStorage screen,
+    so users following any of them silently bypassed the ERP. UAT
+    Issue #6.
+  - **Recon:** confirmed only 3 callers of `EntityStore` in the
+    codebase (the store itself, the screen, one merge call in
+    `api_service.dart` that returns `[]` after migration → safe).
+    Gotchas found: pilot's `code` field has `min_length=2` +
+    `^[A-Z0-9_-]+$` pattern but `CompanyRecord` / `BranchRecord` carry
+    no `code` field at all → synthesize from id with `MIG-` / `BR-`
+    prefixes. `BranchCreate.city` is required but
+    `BranchRecord.city` is nullable → fall back to "غير محدد".
+  - **Frontend:**
+    - `apex_finance/lib/screens/settings/entity_setup_screen.dart`:
+      added one-shot migration banner (renders only when
+      `EntityStore.listCompanies()` or `listEntities()` non-empty)
+      with two buttons. "نعم، انقلها" runs `_runMigration()` —
+      POSTs each company via `pilotClient.createEntity(tid, ...)`,
+      builds a `legacy_company_id → new_entity_id` map, then POSTs
+      each branch via `pilotClient.createBranch(newEntityId, ...)`.
+      Per-record failures recorded in `_MigrationResult.failures`
+      and surfaced in a result dialog (no silent drops).
+      `EntityStore.clearAll()` runs after; redirect to wizard.
+      "لا، تجاهل واحذف" gates a destructive wipe behind a confirm
+      dialog. Banner-render gated on `PilotSession.hasTenant` to
+      prevent calling /tenants/{null}/... — disabled button + clear
+      error message when tenant absent.
+    - `apex_finance/lib/core/router.dart`: empty-store redirect
+      guard on `/settings/entities` (returns
+      `/app/erp/finance/onboarding` when both lists empty —
+      bypasses the legacy screen entirely for clean accounts).
+      All 4 legacy redirects re-pointed from
+      `/settings/entities?action=new-company` →
+      `/app/erp/finance/onboarding`.
+  - **Tests:** 13 cases across two files in
+    `apex_finance/test/screens/settings/`:
+    - `entity_setup_migration_test.dart` (7) — pins banner render
+      condition, both action buttons, `pilotClient.createEntity` +
+      `createBranch` call sites, the legacy-id mapping for
+      branches, the `_MigrationResult` failure recording, the
+      `_showMigrationResultDialog` surfacing, the
+      `EntityStore.clearAll()` on completion, the
+      `_confirmIgnoreAndDelete` confirm-dialog gate, the
+      `PilotSession.hasTenant` button guard, and the
+      `_legacyCompanyCode` / `_legacyBranchCode` helpers + their
+      `MIG-` / `BR-` prefix conventions.
+    - `legacy_redirect_test.dart` (6) — 4 individual tests for the
+      legacy paths (each asserts redirect target is
+      `/app/erp/finance/onboarding` AND not the old
+      `/settings/entities?action=new-company`); the empty-store
+      guard at `/settings/entities`; a belt-and-braces grep that
+      no `?action=new-company` reference remains anywhere in
+      `router.dart`.
+  - **Verification:**
+    - `flutter test test/screens/settings/{entity_setup_migration,legacy_redirect}_test.dart`
+      → 13/13 pass.
+    - Flutter regression sweep (these 13 + wizard + CF + BS + IS +
+      TB + v5_routing + auth_guard + err_1_session_redirect) →
+      **69/69 pass**.
+    - Backend regression sweep (CF + BS + IS + TB +
+      tenant_isolation_full + tenant_isolation_v2) → **119/119 pass**.
+    - `flutter analyze` on the modified files → 0 issues.
+    - `flutter build web --release --no-tree-shake-icons` → ~49s.
+    - 0 backend changes. 0 alembic migrations. 0 schema changes.
+  - **Docs:** new `docs/ERP_UNIFICATION_2026-05-09.md` — before/
+    after diagrams, migration algorithm + edge-case handling
+    (null tenant, parent didn't migrate, code collision, network
+    failure mid-migration), 4 manual UAT paths (fresh user / legacy
+    with data / pick-ignore / each legacy redirect), explicit
+    rollback plan (the deliberate decision to keep
+    `entity_store.dart` on disk).
+  - **Decision:** `entity_store.dart` is **kept on disk** even
+    though no new code writes through it. Enables a clean
+    `git revert` rollback if the migration surfaces a class of
+    legacy data the helpers don't handle. Cost: ~600 lines of
+    quiescent code. Benefit: hours-not-days MTTR on any rollback
+    path. UAT Issue #6 closed.
+
 - [x] **G-WIZARD-TENANT-FIX** — closed onboarding regression from G-PILOT-TENANT-AUDIT-FINAL
   - Branch: `hotfix/g-wizard-tenant-fix`
   - **Why:** the onboarding wizard's `_doStep1` always called
