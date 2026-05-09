@@ -22,8 +22,73 @@ class PilotSession {
   static const _legacyTenantKey = 'apex_tenant_id';
   static const _legacyEntityKey = 'apex_entity_id';
 
+  // G-LEGACY-KEY-AUDIT (2026-05-09): the migration helper has run
+  // at least once this session. Lazy + once — the first call
+  // (typically via the `tenantId` getter) reconciles any drift
+  // between `pilot.tenant_id` and `apex_tenant_id` left over from
+  // earlier sessions. Subsequent reads skip the work.
+  static bool _legacyMigrated = false;
+
+  /// G-LEGACY-KEY-AUDIT (2026-05-09): one-shot reconciliation of the
+  /// pilot ↔ legacy localStorage keys.
+  ///
+  /// Three scenarios this helper handles when the session loads:
+  ///
+  ///   * **Both keys exist and agree** — no-op.
+  ///   * **Both exist but differ** — trust `pilot.tenant_id`
+  ///     (the canonical, written by the post-PR-#182 setter chain).
+  ///     Sync the legacy key so any pre-pilot reader (e.g. the
+  ///     20+ screens still calling `S.tenantId`) sees the right
+  ///     value. Console-warn so the drift is visible during dev.
+  ///   * **Only legacy exists** (a session from before the pilot
+  ///     keys existed) — copy it to `pilot.tenant_id` so
+  ///     `PilotSession.hasTenant` returns true and the wizard's
+  ///     `if (PilotSession.hasTenant)` branch fires.
+  ///
+  /// Idempotent: subsequent calls in the same session are no-ops
+  /// thanks to the `_legacyMigrated` guard.
+  static void migrateLegacyKey() {
+    if (_legacyMigrated) return;
+    _legacyMigrated = true;
+    try {
+      final pilot = html.window.localStorage[_tenantKey];
+      final legacy = html.window.localStorage[_legacyTenantKey];
+
+      if (pilot != null && pilot.isNotEmpty) {
+        // Pilot is canonical; sync the legacy key if it's missing
+        // or drifted.
+        if (legacy != pilot) {
+          html.window.localStorage[_legacyTenantKey] = pilot;
+          if (legacy != null && legacy.isNotEmpty) {
+            // Both existed and differed → drift. Visible in console
+            // so devs notice during pre-prod testing.
+            // ignore: avoid_print
+            print(
+              '[APEX][G-LEGACY-KEY-AUDIT] tenant_id drift detected '
+              '(pilot=$pilot, legacy=$legacy). Synced legacy → pilot.',
+            );
+          }
+        }
+      } else if (legacy != null && legacy.isNotEmpty) {
+        // Only legacy exists (a very old session). Migrate up to
+        // pilot so post-PR-#182 readers see hasTenant=true.
+        html.window.localStorage[_tenantKey] = legacy;
+      }
+      // Else: both missing → nothing to migrate. Genuine logged-out
+      // / fresh-browser state.
+    } catch (_) {
+      // localStorage unavailable (incognito quota exceeded /
+      // sandboxed iframe / similar). Bail silently — the app
+      // continues without the migration; no value lost.
+    }
+  }
+
   // ── Tenant ──────────────────────────────────────────────────
-  static String? get tenantId => _get(_tenantKey);
+  static String? get tenantId {
+    // First read of the session triggers the legacy reconciliation.
+    if (!_legacyMigrated) migrateLegacyKey();
+    return _get(_tenantKey);
+  }
   static set tenantId(String? v) {
     _set(_tenantKey, v);
     _set(_legacyTenantKey, v); // keep S.savedTenantId in sync
