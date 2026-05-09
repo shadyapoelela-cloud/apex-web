@@ -4,6 +4,34 @@
 
 ### 2026-05-09
 
+- [x] **G-FIN-POS-JE-AUTOPOST** (Sprint 7 of the Finance Module 7-sprint plan — FINAL)
+  - Branch: `feat/g-fin-pos-je-autopost`
+  - **Why:** Sprint 1 audit Gap §3 row 7. Backend
+    `auto_post_pos_sale` (gl_engine.py:578) has shipped
+    since well before this sprint and posts up to 3 JEs
+    on every completed POS transaction (sales JE always
+    + COGS JE when product lines have costs + reverse JE
+    on refunds). The verification surface was missing —
+    pilots had no place to confirm that today's POS sales
+    moved the trial balance correctly.
+  - **What landed:**
+    - `apex_finance/lib/screens/operations/pos_daily_report_screen.dart`
+      — two-pane screen. Left rail lists POS sessions
+      for the active branch; right pane shows the
+      Z-report KPIs (gross / VAT / net / count + cash
+      reconciliation), payment-method breakdown chips,
+      and per-transaction rows each surfacing the JE id
+      with a link to `/app/erp/finance/je-builder`.
+    - New chip `erp/finance/pos-report` wired in both
+      `v5_wired_screens.dart` and `v5_wired_keys.dart`.
+    - 5 source-grep tests, all pass.
+    - `docs/POS_JE_FLOW_2026-05-09.md` documenting the
+      JE shapes, KPIs, and 7-step manual UAT script
+      that ends in a TB/IS verification.
+  - **Verification:** `flutter analyze` clean across all
+    3 changed files; 5/5 POS tests + 5/5 routing tests
+    pass.
+
 - [x] **G-FIN-PURCHASE-INVOICE-JE-AUTOPOST** (Sprint 6 of the Finance Module 7-sprint plan)
   - Branch: `feat/g-fin-purchase-invoice-je-autopost`
   - **Why:** Sprint 1 audit Gap §3 row 6. The backend
