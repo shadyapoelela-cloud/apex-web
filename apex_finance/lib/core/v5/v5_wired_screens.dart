@@ -282,6 +282,9 @@ import '../../screens/finance/cash_flow_screen.dart' as fin_cf;
 // persistence. See docs/FINANCE_MODULE_AUDIT_2026-05-09.md Table 1.7-1.8.
 import '../../widgets/v52_mock_wrap.dart';
 
+// G-FIN-POS-JE-AUTOPOST (Sprint 7, 2026-05-09): daily POS Z-report.
+import '../../screens/operations/pos_daily_report_screen.dart';
+
 /// Key format: `{serviceId}/{mainId}/{chipId}`.
 /// Returns the Flutter widget to render for that chip.
 ///
@@ -343,6 +346,9 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
   'erp/finance/documents': (ctx) => V52MockWrap(child: const DocumentsV52Screen()),  // V5.2 mock
   'erp/finance/onboarding': (ctx) => const PilotOnboardingWizard(),  // LIVE — creates real tenant+entity+branch+CoA
   'erp/finance/pos': (ctx) => const RetailPosScreen(),  // LIVE — self-contained retail POS wired to /pilot/* (products + variants + barcodes + sessions + sale)
+  // G-FIN-POS-JE-AUTOPOST (Sprint 7, 2026-05-09): daily Z-report screen
+  // surfacing the auto-posted sales + COGS JEs from auto_post_pos_sale.
+  'erp/finance/pos-report': (ctx) => const PosDailyReportScreen(),
   'erp/finance/purchase-bills': (ctx) => const PurchaseInvoicesScreen(),  // LIVE — Odoo-style toolbar + filter/group/sort/view backed by /pilot/purchase-invoices
   // Wave 2 of APEX_IMPROVEMENT_PLAN.md — both chips live in the Finance
   // main module's chips list (see v5_data.dart line 498/502), so the
