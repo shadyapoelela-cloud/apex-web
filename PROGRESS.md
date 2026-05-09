@@ -4,6 +4,21 @@
 
 ### 2026-05-09
 
+- [x] **G-FIN-VENDORS-COMPLETE** (Sprint 3 of the Finance Module 7-sprint plan)
+  - Branch: `feat/g-fin-vendors-complete`
+  - **Why:** Sprint 1 audit Gap §3 row 3. Mirror of
+    Sprint 2 (Customers) with vendor-specific
+    differences: KSA IBAN validator, default
+    `payment_terms=net_60`, bank fields (`bank_name`,
+    `bank_iban`, `bank_swift`), `is_preferred` flag, and
+    purchase-invoice tab 3 (instead of sales-invoice).
+  - **What landed:** modal (19 fields), 3-tab details
+    screen, picker widget, list rewire, new GoRoute
+    `/app/erp/finance/vendors/:vendorId`, 9 source-grep
+    tests, flow doc.
+  - **Verification:** `flutter analyze` clean across all
+    5 changed files; 9/9 tests pass.
+
 - [x] **G-FIN-SALES-INVOICE-JE-AUTOPOST** (Sprint 5 of the Finance Module 7-sprint plan)
   - Branch: `feat/g-fin-sales-invoice-je-autopost`
   - **Why:** Sprint 1 audit Gap §3 row 5. The backend
