@@ -1,6 +1,10 @@
 ﻿import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+// G-ERP-UNIFICATION (2026-05-09): the /settings/entities redirect
+// guard reads the legacy localStorage to decide whether to bypass
+// the screen entirely.
+import 'entity_store.dart';
 import '../screens/copilot/copilot_screen.dart';
 import '../screens/showcase/apex_showcase_screen.dart';
 import '../screens/whats_new/apex_whats_new_hub.dart';
@@ -833,24 +837,46 @@ final appRouter = GoRouter(
     // Unified entity/company/branch setup (single source of truth).
     // Old onboarding paths below all redirect here to eliminate the
     // duplicate setup journeys the user reported.
+    // G-ERP-UNIFICATION (2026-05-09): the legacy /settings/entities
+    // screen now exists ONLY to migrate localStorage data into the
+    // pilot ERP. When the local store is empty (the common path for
+    // any account post-G-WIZARD-TENANT-FIX), redirect straight to
+    // the unified onboarding wizard. The screen itself still
+    // renders — the migration banner inside it handles the legacy
+    // payload before pushing the user to the wizard.
     GoRoute(
       path: '/settings/entities',
+      redirect: (c, s) {
+        final hasLegacy = EntityStore.listCompanies().isNotEmpty ||
+            EntityStore.listEntities().isNotEmpty;
+        if (!hasLegacy) {
+          return '/app/erp/finance/onboarding';
+        }
+        return null; // allow the screen to render with the migration banner
+      },
       pageBuilder: (c, s) {
         final q = s.uri.queryParameters['action'];
         return _apexPage(EntitySetupScreen(initialAction: q), s);
       },
     ),
+    // G-ERP-UNIFICATION (2026-05-09): every legacy onboarding /
+    // create-client path now redirects DIRECTLY to the unified
+    // onboarding wizard (PilotOnboardingWizard at
+    // /app/erp/finance/onboarding). Pre-fix these paths landed on
+    // the legacy /settings/entities screen which created a parallel
+    // localStorage path — the duplicate setup journey UAT Issue #6
+    // is closing.
     GoRoute(
       path: '/onboarding/wizard',
-      redirect: (c, s) => '/settings/entities?action=new-company',
+      redirect: (c, s) => '/app/erp/finance/onboarding',
     ),
     GoRoute(
       path: '/clients/onboarding',
-      redirect: (c, s) => '/settings/entities?action=new-company',
+      redirect: (c, s) => '/app/erp/finance/onboarding',
     ),
     GoRoute(
       path: '/clients/new',
-      redirect: (c, s) => '/settings/entities?action=new-company',
+      redirect: (c, s) => '/app/erp/finance/onboarding',
     ),
     GoRoute(path: '/coa/journey', pageBuilder: (c, s) {
       final args = s.extra as Map<String, dynamic>? ?? {};
@@ -866,10 +892,11 @@ final appRouter = GoRouter(
       return _apexPage(KnowledgeFeedbackScreen(resultId: args?['resultId'] as String?), s);
     }),
     // Sprint 15 Stage 4f: V4 /marketplace/new-request archived (REAL_NEW_V5) -> V5 /app/marketplace/browse/new-request
-    // /clients/create — legacy path; redirect to the unified setup.
+    // /clients/create — legacy path; redirect to the unified
+    // PilotOnboardingWizard (G-ERP-UNIFICATION 2026-05-09).
     GoRoute(
       path: '/clients/create',
-      redirect: (c, s) => '/settings/entities?action=new-company',
+      redirect: (c, s) => '/app/erp/finance/onboarding',
     ),
     // G-CLEANUP-1 Stage 4c-prep: V4 /audit/service SHELL archived (marketplace audit-tier wrapper, no ownership).
     // Sprint 15 Stage 4f: V4 /audit/service archived (SHELL) -> V5 /app/marketplace/dashboard
