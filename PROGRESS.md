@@ -4,6 +4,29 @@
 
 ### 2026-05-09
 
+- [x] **G-FIN-PURCHASE-INVOICE-JE-AUTOPOST** (Sprint 6 of the Finance Module 7-sprint plan)
+  - Branch: `feat/g-fin-purchase-invoice-je-autopost`
+  - **Why:** Sprint 1 audit Gap §3 row 6. The backend
+    `post_purchase_invoice_to_gl`
+    (purchasing_engine.py) has shipped since well before
+    this sprint and auto-builds the standard 3-leg
+    purchase JE on `POST /pilot/purchase-invoices/{id}/post`
+    (DR Inventory or Expense / DR VAT Input / CR Payable).
+    What was missing was the frontend create screen —
+    the previous `+ جديد` button routed to a `/purchase`
+    placeholder.
+  - **What landed:** dedicated
+    `PurchaseInvoiceCreateScreen` mirroring the Sprint 5
+    pattern with vendor-side specifics (60-day default
+    due date, vendor_invoice_number field, shipping
+    field). Two save buttons (Draft / Save+Post). Success
+    snackbar surfaces `journal_entry_id` with action
+    link. New API method `pilotCreatePurchaseInvoice`.
+    New GoRoute. List `+ جديد` rewired to the create
+    screen. 7 source-grep tests, all pass.
+  - **Verification:** `flutter analyze` clean across all
+    4 changed files; 7/7 tests pass.
+
 - [x] **G-FIN-PRODUCT-CATALOG** (Sprint 4 of the Finance Module 7-sprint plan)
   - Branch: `feat/g-fin-product-catalog`
   - **Why:** Sprint 1 audit Gap §3 row 4. Sprints 5/6
