@@ -4,6 +4,52 @@
 
 ### 2026-05-09
 
+- [x] **G-FIN-AUDIT-CLEANUP** (Sprint 1 of the Finance Module 7-sprint plan)
+  - Branch: `feat/g-fin-audit-cleanup`
+  - **Why:** the Finance module today has 70 chips under
+    `erp/finance/*`. Five of them (`gl`, `trial-balance`,
+    `income-statement`, `balance-sheet`, `cash-flow`,
+    `statements`) were already unified on 2026-05-08 to
+    point at dedicated screens (G-FIN-IS-1 / G-FIN-BS-1 /
+    G-FIN-CF-1 / G-TB-DISPLAY-1) but the unification was
+    not yet documented or pinned by tests, leaving the
+    door open for a silent re-collapse. 18 V5.2 chips
+    rendered hardcoded fixtures with no UI signal that
+    the data wasn't real — users couldn't tell which
+    "ميزانية" was a real backend wire and which was a
+    placeholder.
+  - **What landed:**
+    - `docs/FINANCE_MODULE_AUDIT_2026-05-09.md` —
+      3-table audit (Screen × Chip × Backend × Type;
+      Duplicates; Gaps + Sprint mapping). Documents
+      that all three JE auto-post engines
+      (`_post_sales_invoice_je`,
+      `post_purchase_invoice_to_gl`, `auto_post_pos_sale`)
+      already exist server-side, so Sprints 5/6/7
+      remaining work is purely frontend.
+    - `apex_finance/lib/widgets/v52_mock_wrap.dart` —
+      reusable banner widget rendering "🚧 قيد التطوير"
+      above any wrapped screen, dismissible per-session.
+    - `apex_finance/lib/core/v5/v5_wired_screens.dart` —
+      18 V5.2 mock chip mappings now wrapped with
+      `V52MockWrap(child: ...)`. No widget code
+      duplicated, no fixtures removed; one-line drop of
+      the wrapper when each chip gets a real backend wire.
+    - `apex_finance/test/v5_routing_test.dart` — new
+      regression-prevention pin: the 6 financial-statement
+      chips (`gl`, `trial-balance`, `income-statement`,
+      `balance-sheet`, `cash-flow`, `statements`) must
+      all stay wired. If a refactor silently re-collapses
+      them, this test fails.
+  - **Verification:** `py scripts/dev/repro_routing_bugs.py`
+    reports 0 errors. Chip-key count in
+    `v5_wired_keys.dart` matches `v5_wired_screens.dart`
+    (70 entries each, unchanged).
+  - **Roadmap:** Sprints 2-7 (customers/vendors/products
+    full CRUD, sales/purchase invoice create screens,
+    POS daily summary). Tabulated in audit doc § "6-Sprint
+    Roadmap".
+
 - [x] **G-WIZARD-STALE-STATE** — defensive init + null-safety guards in onboarding wizard
   - Branch: `hotfix/g-wizard-stale-state`
   - **Why:** G-LEGACY-KEY-AUDIT (PR #183) closed the localStorage
