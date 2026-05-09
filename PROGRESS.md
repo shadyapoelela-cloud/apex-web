@@ -4,6 +4,44 @@
 
 ### 2026-05-09
 
+- [x] **G-FIN-SALES-INVOICE-JE-AUTOPOST** (Sprint 5 of the Finance Module 7-sprint plan)
+  - Branch: `feat/g-fin-sales-invoice-je-autopost`
+  - **Why:** Sprint 1 audit Gap §3 row 5. The backend
+    JE auto-post engine
+    (`_post_sales_invoice_je` at
+    `app/pilot/routes/customer_routes.py:364`)
+    has shipped since well before this sprint and produces
+    the standard 3-leg sales JE
+    (DR Receivable / CR Revenue / CR VAT Output) on
+    `POST /sales-invoices/{id}/issue`. What was missing was
+    the frontend signal: the create screen used a customer
+    dropdown that forced users to leave the form, had no
+    "save as draft" button (so any save auto-posted a JE),
+    and the success snackbar buried the JE id without an
+    action link.
+  - **What landed:**
+    - `apex_finance/lib/screens/operations/sales_invoice_create_screen.dart`
+      — replaced the dropdown with `CustomerPickerOrCreate`
+      from Sprint 2; split `_submit` into `_buildPayload` +
+      `_saveDraft` + `_submit`; the `_saveDraft` path
+      explicitly does NOT call `pilotIssueSalesInvoice` so
+      drafts do not pollute the trial balance with un-issued
+      invoices; the success snackbar surfaces
+      `journal_entry_id` with an action button labelled
+      "عرض القيد" linking to `/app/erp/finance/je-builder`.
+    - `apex_finance/test/screens/sales_invoice_je_autopost_test.dart`
+      — 6 source-grep contracts pinning the picker import,
+      the draft-skips-issue rule, the create-then-issue
+      order, the snackbar JE-link, and the 2-button ratchet.
+    - `docs/SALES_INVOICE_JE_FLOW_2026-05-09.md` — flow
+      diagram, manual UAT script, explicit "what's NOT in
+      this sprint" note (multi-line + COGS JE deferred to a
+      future sprint that bundles them with Sprint 4 product
+      catalog work).
+  - **Verification:** `flutter analyze` clean;
+    `flutter test test/screens/sales_invoice_je_autopost_test.dart`
+    → 6/6 pass.
+
 - [x] **G-FIN-CUSTOMERS-COMPLETE** (Sprint 2 of the Finance Module 7-sprint plan)
   - Branch: `feat/g-fin-customers-complete`
   - **Why:** Sprint 1 audit Gap §3 row 1 ("Customer creation
