@@ -4,6 +4,77 @@
 
 ### 2026-05-09
 
+- [x] **G-WIZARD-STALE-STATE** — defensive init + null-safety guards in onboarding wizard
+  - Branch: `hotfix/g-wizard-stale-state`
+  - **Why:** G-LEGACY-KEY-AUDIT (PR #183) closed the localStorage
+    *drift* but didn't audit the wizard's *initialization*. Three
+    gaps survived: (1) wizard had no `initState` override, so
+    `migrateLegacyKey()` ran transitively only via the
+    `PilotSession.hasTenant` getter on line 1086 — fragile to
+    refactors; (2) `_tenantId` was populated only at step 1, so a
+    reload on step ≥ 2 wiped it and every `_tenantId!` bang in
+    steps 3-8 exploded; (3) orphan `pilot.entity_id` /
+    `pilot.branch_id` (entity without tenant — pre-pilot residue)
+    polluted other screens reading PilotSession during wizard use.
+    Plus four sub-bombs: `_doStep3` `_createdEntityIds[..]!`,
+    `_doStep4` `_createdBranchIds[..]!`, `_doStep5` `_tenantId!`,
+    `_doStep6/7` silent no-op on empty entity map (user thought
+    CoA / fiscal periods were seeded when they weren't).
+  - **Fix shape:** new `initState()` block does three things in
+    three lines — explicit `PilotSession.migrateLegacyKey()`
+    (defensive even though the getter calls it lazily), hydrate
+    `_tenantId = PilotSession.tenantId` (so reload-on-step-≥2
+    doesn't null-bang), and `clearEntityAndBranch()` if the
+    orphan condition `!hasTenant && hasEntity` is true. Plus
+    null-safety guards in `_doStep3..7`: each checks `_tenantId`
+    and the required collection up-front, throwing translated
+    Arabic messages that point users back to the right step
+    instead of throwing `Null check operator used on a null
+    value` Dart errors. The two `!` bangs on map lookups in
+    steps 3/4 are replaced with explicit null-check throws.
+  - **Audit table sweep:** `getEntity()` / `getTenant()` methods
+    don't exist — the brief meant `PilotSession.tenantId` /
+    `.entityId` getters. 12 screens call them in `initState`; all
+    are correct by transitivity (the post-PR-#183 lazy migration
+    in the getter handles drift on first read). The wizard is
+    unique because it makes a state-changing API call (PATCH or
+    POST) on its first user action — that's why it gets the
+    explicit `initState` reconciliation while the rest stay on
+    the lazy guarantee.
+  - **Tests:**
+    `apex_finance/test/pilot/screens/setup/wizard_stale_state_test.dart`
+    — **8 source-grep tests** across three groups (3 initState
+    contract + 4 null-safety guard + 1 institutional memory).
+    Each pins a specific defensive line: migrateLegacyKey() call,
+    _tenantId hydration, orphan cleanup, step 3/4/5/6/7 guards,
+    absence of the two `!` bangs, and the G-WIZARD-STALE-STATE
+    marker count (≥5). **8/8 pass.** Full Flutter regression
+    sweep (these 8 + G-LEGACY-KEY-AUDIT + provider auth +
+    ERP-unification + financial statements + TB + v5_routing +
+    auth_guard + err_1): **93/93 pass.**
+  - **What we did NOT do:** did not hydrate `_createdEntityIds`
+    from the backend on init — that's a feature (let users
+    continue from where they left off after a reload), not a
+    hotfix; separate ticket. Did not enable widget tests
+    (G-T1.1 SDK mismatch on `package:web` 1.1.1 still blocks
+    the wizard from loading in a Dart-VM test runner). Did not
+    refactor the duplicated `_loading = true` boilerplate. Did
+    not change the backend.
+  - **Verification:** `flutter analyze` on
+    `pilot_onboarding_wizard.dart` → 2 pre-existing infos (not
+    from this fix). `flutter build web --release
+    --no-tree-shake-icons` ~94s clean. 0 backend changes ·
+    0 alembic migrations · 0 schema changes.
+  - **Manual UAT:** documented in
+    `docs/WIZARD_STALE_STATE_2026-05-09.md` — full 9-step
+    walkthrough plus a "reload-mid-wizard" probe and an
+    "orphan-cleanup" probe that proves the new defensive layer.
+  - Files: `apex_finance/lib/pilot/screens/setup/pilot_onboarding_wizard.dart`
+    (initState block + 4 step guards);
+    `apex_finance/test/pilot/screens/setup/wizard_stale_state_test.dart`
+    (8 tests); `docs/WIZARD_STALE_STATE_2026-05-09.md` (audit
+    table + UAT walkthrough + 2 probes).
+
 - [x] **G-LEGACY-KEY-AUDIT** — closes the legacy/pilot key drift
   - Branch: `hotfix/g-legacy-key-audit`
   - **Why:** the frontend has been carrying two localStorage keys
