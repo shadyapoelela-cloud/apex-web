@@ -7,6 +7,8 @@ import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/theme.dart' as core_theme;
 import '../../core/ui_components.dart';
+// G-AUTH-TENANT-PERSIST (2026-05-09): see app_providers.dart.
+import '../../pilot/session.dart';
 
 class SlideAuthScreen extends StatefulWidget {
   const SlideAuthScreen({super.key});
@@ -47,6 +49,15 @@ class _SAS extends State<SlideAuthScreen> {
       S.plan = d['user']['plan'];
       S.email = d['user']['email'];
       S.roles = List<String>.from(d['user']['roles'] ?? []);
+      // G-AUTH-TENANT-PERSIST (2026-05-09): persist tenant_id from
+      // ERR-2 auto-tenant so the wizard's hasTenant branch fires.
+      // The slide-auth `_register()` method below is snackbar-only
+      // (no S.* writes) — the user logs in afterwards, which hits
+      // this same code path.
+      final tenantId = d['user']['tenant_id'];
+      if (tenantId is String && tenantId.isNotEmpty) {
+        PilotSession.tenantId = tenantId;
+      }
       // ERR-1 (2026-05-07): if we got bounced here by the 401
       // interceptor, the original path is in `?return_to=…`. Honor it
       // (after sanity-checking it's a safe in-app path) so the user

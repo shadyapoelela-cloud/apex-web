@@ -4,6 +4,8 @@ import '../../api_service.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../widgets/form_helpers.dart';
+// G-AUTH-TENANT-PERSIST (2026-05-09): see app_providers.dart.
+import '../../pilot/session.dart';
 
 class RegScreen extends StatefulWidget {
   const RegScreen({super.key});
@@ -29,6 +31,12 @@ class _RegS extends State<RegScreen> {
         S.token=d['tokens']['access_token']; S.uid=d['user']['id'];
         S.uname=d['user']['username']; S.dname=d['user']['display_name'];
         S.plan=d['user']['plan']; S.email=d['user']['email'];
+        // G-AUTH-TENANT-PERSIST (2026-05-09): persist tenant_id from
+        // ERR-2 auto-tenant so the wizard's hasTenant branch fires.
+        final tenantId = d['user']['tenant_id'];
+        if (tenantId is String && tenantId.isNotEmpty) {
+          PilotSession.tenantId = tenantId;
+        }
         ApiService.setToken(S.token!);
         S.save();
         if(mounted) context.go('/home');
