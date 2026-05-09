@@ -63,6 +63,67 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
   bool _loading = false;
   String? _error;
 
+  // G-WIZARD-STALE-STATE (2026-05-09): defensive init.
+  //
+  // The wizard's first API call (step 1's updateTenant or createTenant)
+  // must run against a clean, drift-free PilotSession. Pre-fix, two
+  // assumptions held only by accident:
+  //
+  //   1. `migrateLegacyKey()` was invoked transitively via the
+  //      `PilotSession.hasTenant` read in `_doStep1` — but only at
+  //      step 1, not at construction time. If a future code path read
+  //      tenantId via a different surface (e.g., a watcher, an
+  //      intercepted API call), drift could persist past the first
+  //      decision.
+  //
+  //   2. `_tenantId` was populated only when step 1 ran. A reload on
+  //      step ≥ 2 left in-memory `_tenantId` null while
+  //      `PilotSession.tenantId` still held the right id — every
+  //      `_tenantId!` bang in `_doStep3..8` would explode rather
+  //      than gracefully reuse the persisted tenant.
+  //
+  //   3. `pilot.entity_id` / `pilot.branch_id` from a previous wizard
+  //      run (or a pre-pilot session) survived even when
+  //      `pilot.tenant_id` was clear — orphan entity/branch ids that
+  //      pointed at a tenant the user no longer has access to. Other
+  //      screens reading PilotSession during wizard use saw stale
+  //      data and 404'd against pilot routes.
+  //
+  // The `initState` override below closes all three with three
+  // simple lines: explicit migrateLegacyKey(), tenantId hydration,
+  // and orphan-state cleanup.
+  @override
+  void initState() {
+    super.initState();
+    // Explicit drift reconciliation — defensive even though the
+    // tenantId getter calls this lazily. Running it here means every
+    // subsequent read in this wizard sees a reconciled state, and
+    // any future code that bypasses the getter (e.g., a direct
+    // localStorage read in an intercepted API call) inherits the
+    // post-migration state.
+    PilotSession.migrateLegacyKey();
+
+    // Hydrate `_tenantId` from PilotSession so that:
+    //   * step 1's PATCH path has a stable id even if the user
+    //     reloaded the page.
+    //   * step ≥ 2's `_tenantId!` bangs gracefully fall back on the
+    //     persisted tenant rather than exploding when the user reloads
+    //     mid-wizard.
+    _tenantId = PilotSession.tenantId;
+
+    // Cleanup orphan state. By design (post-ERR-2 Phase 3, PR #169)
+    // every user has a tenant; an entity_id without a tenant_id is
+    // pre-pilot residue from before the dual-key sync (PR #176). Wipe
+    // it so other screens reading PilotSession during wizard use don't
+    // pick up an entity that belongs to a tenant the user no longer
+    // has access to. The wizard's step 2 will set a fresh
+    // `pilot.entity_id` after the new entity is created (existing
+    // logic at the bottom of `_doStep2`).
+    if (!PilotSession.hasTenant && PilotSession.hasEntity) {
+      PilotSession.clearEntityAndBranch();
+    }
+  }
+
   static const _gccCountries = [
     {'code': 'SA', 'name': 'السعودية', 'currency': 'SAR'},
     {'code': 'AE', 'name': 'الإمارات', 'currency': 'AED'},
@@ -1150,10 +1211,21 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
 
   Future<void> _doStep3() async {
     if (_branchesToCreate.isEmpty) throw 'أضف فرعاً واحداً على الأقل';
+    // G-WIZARD-STALE-STATE: guard the `_createdEntityIds[..]!` bang on
+    // line below. Pre-fix a reload on step 3 wiped in-memory
+    // `_createdEntityIds`, then the first iteration of the loop
+    // bombed with a `Null check operator used on a null value`.
+    if (_tenantId == null) throw 'المستأجر غير محدد — ارجع للخطوة 1';
+    if (_createdEntityIds.isEmpty) {
+      throw 'أنشئ الكيانات أولاً (الخطوة 2) — تم فقد الحالة بعد إعادة التحميل';
+    }
     setState(() => _loading = true);
     for (final b in _branchesToCreate) {
       if (_createdBranchIds.containsKey(b['code'])) continue;
-      final eid = _createdEntityIds[b['_entity_code']]!;
+      final eid = _createdEntityIds[b['_entity_code']];
+      if (eid == null) {
+        throw 'الكيان ${b['_entity_code']} لم يُنشأ — أعد الخطوة 2';
+      }
       final payload = Map<String, dynamic>.from(b)..remove('_entity_code');
       final r = await _client.createBranch(eid, payload);
       if (!r.success) throw 'فشل فرع ${b['code']}: ${r.error}';
@@ -1164,9 +1236,17 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
   }
 
   Future<void> _doStep4() async {
+    // G-WIZARD-STALE-STATE: same defensive shape as step 3.
+    if (_tenantId == null) throw 'المستأجر غير محدد — ارجع للخطوة 1';
+    if (_createdBranchIds.isEmpty) {
+      throw 'أنشئ الفروع أولاً (الخطوة 3) — تم فقد الحالة بعد إعادة التحميل';
+    }
     setState(() => _loading = true);
     for (final b in _branchesToCreate) {
-      final bid = _createdBranchIds[b['code']]!;
+      final bid = _createdBranchIds[b['code']];
+      if (bid == null) {
+        throw 'الفرع ${b['code']} لم يُنشأ — أعد الخطوة 3';
+      }
       // check if already has warehouse
       final existing = await _client.listWarehouses(bid);
       if (existing.success && (existing.data as List).isNotEmpty) continue;
@@ -1184,6 +1264,8 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
   }
 
   Future<void> _doStep5() async {
+    // G-WIZARD-STALE-STATE: guard `_tenantId!` bang in createCurrency.
+    if (_tenantId == null) throw 'المستأجر غير محدد — ارجع للخطوة 1';
     setState(() => _loading = true);
     for (final c in _activeCurrencies) {
       final r = await _client.createCurrency(_tenantId!, {
@@ -1202,6 +1284,11 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
   }
 
   Future<void> _doStep6() async {
+    // G-WIZARD-STALE-STATE: empty entity list silently does nothing.
+    // Surface it as a clear error so users know to redo step 2.
+    if (_createdEntityIds.isEmpty) {
+      throw 'لا توجد كيانات لبذر شجرة الحسابات — أعد الخطوة 2';
+    }
     setState(() => _loading = true);
     for (final eid in _createdEntityIds.values) {
       final r = await _client.seedCoa(eid);
@@ -1211,6 +1298,10 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
   }
 
   Future<void> _doStep7() async {
+    // G-WIZARD-STALE-STATE: same shape — silent no-op becomes clear error.
+    if (_createdEntityIds.isEmpty) {
+      throw 'لا توجد كيانات لبذر الفترات المحاسبية — أعد الخطوة 2';
+    }
     setState(() => _loading = true);
     for (final eid in _createdEntityIds.values) {
       final r = await _client.seedFiscalPeriods(eid, _fiscalYear);
@@ -1220,6 +1311,11 @@ class _PilotOnboardingWizardState extends State<PilotOnboardingWizard> {
   }
 
   Future<void> _doStep8() async {
+    // G-WIZARD-STALE-STATE: ZATCA is SA-only and the existing
+    // `whereType<String>()` already filters out null lookups, so this
+    // step is the safest of the lot — but if the entity map is empty
+    // we want a clear message rather than a silent skip that looks
+    // like a successful step.
     setState(() => _loading = true);
     final saEntities = _entitiesToCreate
         .where((e) => e['country'] == 'SA')
