@@ -4,6 +4,81 @@
 
 ### 2026-05-09
 
+- [x] **G-LEGACY-KEY-AUDIT** — closes the legacy/pilot key drift
+  - Branch: `hotfix/g-legacy-key-audit`
+  - **Why:** the frontend has been carrying two localStorage keys
+    for the same value: `apex_tenant_id` (legacy, used by 20+
+    screens via `S.tenantId`) and `pilot.tenant_id` (canonical,
+    used by the wizard / ERP-unification / every pilot route).
+    Three call sites wrote one without the other:
+    `S.setActiveScope` wrote only the legacy key directly via
+    `localStorage[…] = …`, bypassing `PilotSession.tenantId`'s
+    dual-key sync. `S.clear` removed only the legacy key — the
+    next user logging in on the same browser inherited the
+    previous user's `tenantId`, silently bypassing tenant-isolation
+    guards. `S.savedTenantId` read only the legacy key, blind to
+    pilot-only writes. Each is a different shape of the same bug,
+    each survived G-AUTH-TENANT-PERSIST because that PR added
+    *new* persistence without fixing the *legacy* drift below it.
+  - **Audit table:** 1 direct writer in `core/session.dart:41`
+    replaced; setters in `pilot/session.dart` already correct;
+    auth flows (provider + 3 screens) already routed through
+    `PilotSession.tenantId` post-G-AUTH-TENANT-PERSIST. 20+
+    readers via `S.tenantId` / `S.savedTenantId` unchanged —
+    fed transparently by the dual-key sync.
+  - **Migration helper:** `PilotSession.migrateLegacyKey()` —
+    lazy, idempotent (`_legacyMigrated` flag), runs once per
+    session on first read of `tenantId`. Three drift scenarios:
+    (1) both agree → no-op; (2) both differ → trust pilot, sync
+    legacy ← pilot, console-warn `[APEX][G-LEGACY-KEY-AUDIT]
+    tenant_id drift detected …`; (3) only legacy exists (pre-pilot
+    session) → migrate up to `pilot.tenant_id`. Lazy + first-read
+    means correctness lands at exactly the moment it matters —
+    the wizard's `hasTenant` check or the API tenant_id injection.
+  - **Four structural changes:** (1) `lib/pilot/session.dart` —
+    `migrateLegacyKey()` helper + lazy invocation on `tenantId`
+    getter; (2) `lib/core/session.dart` — `setActiveScope`
+    routes through `PilotSession.tenantId/entityId` setters
+    instead of writing localStorage directly; (3)
+    `lib/core/session.dart` — `S.clear()` calls
+    `PilotSession.clear()` so every clear path (logout, 401
+    interceptor, future code) is symmetric without each caller
+    having to remember; (4) `lib/core/session.dart` —
+    `savedTenantId` falls back through `pilot.tenant_id` first,
+    `apex_tenant_id` second, so screens still on `S.tenantId`
+    see pilot-only writes.
+  - **Tests:** `apex_finance/test/pilot/session_legacy_migration_test.dart`
+    — **8 source-grep tests** across two groups (5 pilot setter/clear,
+    3 core/session contract). Each pins a specific drift scenario:
+    setter writes both keys; clear wipes both keys; drift detection;
+    legacy-only migrate-up; lazy invocation; logout symmetry;
+    setActiveScope routing; reader fallback chain order. **8/8 pass.**
+    Full Flutter regression sweep
+    (these 8 + provider auth + ERP-unification + financial statements +
+    TB + v5_routing + auth_guard + err_1): **85/85 pass.**
+  - **What we did NOT do:** did not touch the 20+ screens reading
+    `S.tenantId` / `S.savedTenantId` — the fallback chain in
+    `savedTenantId` handles them transparently; refactoring readers
+    to use `PilotSession.tenantId` directly is a separate ticket.
+    Did not delete the legacy `apex_tenant_id` key — it stays as a
+    mirror, no longer a source of truth. Did not eager-init the
+    helper in `main.dart` — lazy on first read decouples
+    session.dart from main.dart's init order.
+  - **Verification:** `flutter analyze lib/core/session.dart
+    lib/pilot/session.dart` → 1 pre-existing `dart:html` info
+    (not from this fix). 0 backend changes · 0 alembic
+    migrations · 0 schema changes.
+  - **Manual UAT:** documented in
+    `docs/LEGACY_KEY_AUDIT_2026-05-09.md` — 6 steps including a
+    "manually corrupt apex_tenant_id then reload" check that
+    proves the migration helper auto-fixes drift.
+  - Files: `apex_finance/lib/pilot/session.dart` (migration
+    helper + lazy getter); `apex_finance/lib/core/session.dart`
+    (setActiveScope reroute + clear symmetry + savedTenantId
+    fallback); `apex_finance/test/pilot/session_legacy_migration_test.dart`
+    (8 tests); `docs/LEGACY_KEY_AUDIT_2026-05-09.md` (audit table,
+    drift scenarios, migration logic, manual UAT).
+
 - [x] **G-AUTH-TENANT-PERSIST** — closed the missing piece in G-WIZARD-TENANT-FIX chain
   - Branch: `hotfix/g-auth-tenant-persist`
   - **Why:** G-WIZARD-TENANT-FIX (PR #180) made the wizard branch on

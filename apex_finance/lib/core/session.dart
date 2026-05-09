@@ -1,11 +1,26 @@
 import 'dart:convert';
 import 'dart:html' as html;
 
+import '../pilot/session.dart';
+
 class S {
   static String? _token, uid, uname, dname, plan, email;
   static String? tenantId, entityId;
-  static String? get savedTenantId => tenantId ?? html.window.localStorage['apex_tenant_id'];
-  static String? get savedEntityId => entityId ?? html.window.localStorage['apex_entity_id'];
+  // G-LEGACY-KEY-AUDIT (2026-05-09): canonical key is `pilot.tenant_id`.
+  // Fall back through both localStorage keys (pilot first, then
+  // legacy) so screens that still read S.savedTenantId see whatever
+  // was written through PilotSession or any pre-pilot session
+  // writer. The PilotSession.tenantId setter keeps both keys in
+  // sync going forward; this fallback chain handles read-time
+  // drift detection from earlier sessions.
+  static String? get savedTenantId =>
+      tenantId ??
+      html.window.localStorage['pilot.tenant_id'] ??
+      html.window.localStorage['apex_tenant_id'];
+  static String? get savedEntityId =>
+      entityId ??
+      html.window.localStorage['pilot.entity_id'] ??
+      html.window.localStorage['apex_entity_id'];
 
   /// DASH-1.1: cached effective permission set for the active user.
   /// Populated from JWT claims after login, plus refreshed whenever the
@@ -38,8 +53,12 @@ class S {
   static void setActiveScope({required String tenant, required String entity}) {
     tenantId = tenant;
     entityId = entity;
-    html.window.localStorage['apex_tenant_id'] = tenant;
-    html.window.localStorage['apex_entity_id'] = entity;
+    // G-LEGACY-KEY-AUDIT (2026-05-09): route through PilotSession's
+    // setter so BOTH `pilot.tenant_id` AND `apex_tenant_id` stay in
+    // sync. Pre-fix this method wrote only the legacy key, so any
+    // PilotSession-canonical reader got a stale value.
+    PilotSession.tenantId = tenant;
+    PilotSession.entityId = entity;
   }
   static String? get token {
     _token ??= html.window.localStorage['apex_token'];
@@ -70,6 +89,14 @@ class S {
     st.remove('apex_dname'); st.remove('apex_plan'); st.remove('apex_email');
     st.remove('apex_roles'); st.remove('apex_tenant_id'); st.remove('apex_entity_id');
     st.remove('apex_user_perms');
+    // G-LEGACY-KEY-AUDIT (2026-05-09): clear the new pilot.* keys
+    // too. Pre-fix, S.clear() wiped only the legacy keys — the
+    // 401 interceptor (api_service.dart:51) and any other caller
+    // of S.clear() would leave pilot.tenant_id behind, so the next
+    // user logging in on the same browser would see hasTenant=true
+    // with the previous user's tenantId. PilotSession.clear() is
+    // idempotent (safe to call when already cleared).
+    PilotSession.clear();
   }
   static String planAr() {
     const m = {'free':'مجاني','pro':'احترافي','business':'أعمال','expert':'خبير','enterprise':'مؤسسي'};
