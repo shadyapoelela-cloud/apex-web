@@ -5,6 +5,10 @@ import '../../api_service.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/ui_components.dart';
+// G-AUTH-TENANT-PERSIST (2026-05-09): see app_providers.dart for the
+// full bug-chain rationale — the user response carries a tenant_id
+// from ERR-2 Phase 3 (PR #169) that the wizard depends on.
+import '../../pilot/session.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,6 +51,12 @@ class _LoginS extends State<LoginScreen> {
         S.uname = d['user']['username']; S.dname = d['user']['display_name'];
         S.plan = d['user']['plan']; S.email = d['user']['email'];
         S.roles = List<String>.from(d['user']['roles'] ?? []);
+        // G-AUTH-TENANT-PERSIST (2026-05-09): persist tenant_id to
+        // PilotSession so the wizard's hasTenant branch fires.
+        final tenantId = d['user']['tenant_id'];
+        if (tenantId is String && tenantId.isNotEmpty) {
+          PilotSession.tenantId = tenantId;
+        }
         ApiService.setToken(S.token!);
         S.save();
       } else { setState(() { _e = res.error ?? 'خطأ في الدخول'; _l = false; }); }

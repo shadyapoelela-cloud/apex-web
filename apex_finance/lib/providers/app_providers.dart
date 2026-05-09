@@ -2,6 +2,14 @@
 import '../api_service.dart';
 import '../core/session.dart';
 import '../core/theme.dart';
+// G-AUTH-TENANT-PERSIST (2026-05-09): persist user.tenant_id to
+// PilotSession on login/register so the onboarding wizard's
+// hasTenant branch (G-WIZARD-TENANT-FIX, PR #180) actually fires.
+// Without this import the bug chain is intact: backend returns
+// user.tenant_id (ERR-2 Phase 3, PR #169) → nothing reads it →
+// PilotSession.hasTenant stays false → wizard falls back to
+// createTenant → second tenant created → JWT mismatch → 404.
+import '../pilot/session.dart';
 
 // ── Auth State ──
 class AuthState {
@@ -31,6 +39,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
       S.plan = user['plan'];
       S.email = user['email'];
       S.roles = List<String>.from(user['roles'] ?? []);
+      // G-AUTH-TENANT-PERSIST (2026-05-09): the user response carries
+      // a `tenant_id` claim (auto-created by ERR-2 Phase 3 / PR #169
+      // at registration). Persist it to PilotSession so the wizard's
+      // `if (PilotSession.hasTenant)` branch from G-WIZARD-TENANT-FIX
+      // (PR #180) fires. Skip silently if absent (legacy users
+      // pre-ERR-2 who were never migrated by PR #170 — they fall
+      // through to the wizard's createTenant fallback).
+      final tenantId = user['tenant_id'];
+      if (tenantId is String && tenantId.isNotEmpty) {
+        PilotSession.tenantId = tenantId;
+      }
       state = state.copyWith(isLoggedIn: true, isLoading: false, user: user);
       return true;
     } else {
@@ -51,6 +70,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
       S.dname = user['display_name'];
       S.plan = user['plan'];
       S.email = user['email'];
+      // G-AUTH-TENANT-PERSIST (2026-05-09): drift fix — login() set
+      // S.roles but register() didn't. Roles come from the same
+      // user blob; without this line a freshly-registered user has
+      // an empty role set until they log out and back in.
+      S.roles = List<String>.from(user['roles'] ?? []);
+      // G-AUTH-TENANT-PERSIST: same as login() — ERR-2 Phase 3 (PR
+      // #169) creates a dedicated tenant per registration and the
+      // backend includes its id in the user blob. Persist so the
+      // wizard PATCHes (not POSTs) the tenant in step 1.
+      final tenantId = user['tenant_id'];
+      if (tenantId is String && tenantId.isNotEmpty) {
+        PilotSession.tenantId = tenantId;
+      }
       state = state.copyWith(isLoggedIn: true, isLoading: false, user: user);
       return true;
     } else {
@@ -61,6 +93,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   void logout() {
     S.clear();
+    // G-AUTH-TENANT-PERSIST (2026-05-09): S.clear() wipes the legacy
+    // apex_tenant_id key but leaves the new pilot.* localStorage keys
+    // untouched. Without PilotSession.clear() the next user who logs
+    // in on this browser would inherit the previous user's tenantId
+    // — which silently bypasses tenant-isolation guards on every
+    // pilot route.
+    PilotSession.clear();
     state = const AuthState();
   }
 }

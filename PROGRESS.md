@@ -4,6 +4,87 @@
 
 ### 2026-05-09
 
+- [x] **G-AUTH-TENANT-PERSIST** — closed the missing piece in G-WIZARD-TENANT-FIX chain
+  - Branch: `hotfix/g-auth-tenant-persist`
+  - **Why:** G-WIZARD-TENANT-FIX (PR #180) made the wizard branch on
+    `PilotSession.hasTenant` to PATCH (not POST) the existing
+    JWT-bound tenant. But that fix relied on
+    `PilotSession.tenantId` being populated post-login — and the
+    four production auth flows all silently dropped the `tenant_id`
+    field from the auth response. ERR-2 Phase 3 (PR #169) put it
+    in the user blob; nothing read it. So
+    `PilotSession.hasTenant` returned `false`, the wizard fell back
+    to `createTenant`, a second tenant was created, and step 2
+    404'd against the JWT-bound first tenant — same bug
+    G-WIZARD-TENANT-FIX was supposed to close, just one layer up.
+  - **Recon:** the brief asked me to fix `app_providers.dart` only,
+    but `grep -rn "ApiService.login\|ApiService.register"` returned
+    **5 files**. Three of the four production flows had the same
+    bug: `app_providers.dart`, `screens/auth/login_screen.dart`,
+    `screens/auth/register_screen.dart`,
+    `screens/auth/slide_auth_screen.dart`. The slide-auth
+    `_register()` is snackbar-only (no `S.*` writes) — the user
+    logs in afterwards which hits the fixed `_login`, so out of
+    scope. **No OAuth flows in the frontend** (verified via
+    grep — zero matches for `googleSignIn` / `appleSignIn` /
+    `oauthLogin` / `socialLogin`).
+  - **Drift fix found in passing:** `app_providers.register()` was
+    missing the `S.roles = List<String>.from(user['roles'] ?? [])`
+    line that `login()` has. A freshly-registered user walked
+    around with empty roles until they re-logged. Same
+    neighbourhood; added the missing line.
+  - **Logout cleanup:** `S.clear()` wipes the legacy
+    `apex_tenant_id` localStorage key but leaves the new
+    `pilot.tenant_id` untouched. Pre-fix, the next user logging
+    in on the same browser inherited the previous user's
+    `tenantId` — silently bypassing tenant-isolation guards.
+    Fix: `app_providers.logout()` now calls `PilotSession.clear()`
+    after `S.clear()`.
+  - **Fix:** in every auth-success branch (4 call sites):
+    ```dart
+    final tenantId = user['tenant_id'];
+    if (tenantId is String && tenantId.isNotEmpty) {
+      PilotSession.tenantId = tenantId;
+    }
+    ```
+    Plus `import '../pilot/session.dart';` at the top. The
+    `is String && isNotEmpty` guard handles three cases gracefully:
+    normal post-PR-#169 user (persists), legacy pre-ERR-2 user not
+    yet migrated (silent skip — wizard's createTenant fallback
+    fires), and a bug-returns-empty-string defense (rejected
+    rather than silently breaking the wizard while LOOKING set).
+  - **Tests:** `apex_finance/test/providers/app_providers_test.dart`
+    — 8 source-grep regression tests across two groups (5 provider
+    flow tests + 3 auth-screen tests). Pins: register persists
+    tenant_id, login persists tenant_id, register persists roles
+    (drift fix), logout calls `PilotSession.clear()`, the marker
+    comment preservation, and per-screen the import + the read +
+    the write + the `isNotEmpty` guard + the marker. All 8 pass.
+  - **Verification:**
+    - `flutter test test/providers/app_providers_test.dart` →
+      **8/8 pass**.
+    - Full Flutter regression sweep (these 8 + ERP unification +
+      wizard + financial statements + TB + v5_routing +
+      auth_guard + err_1_session_redirect) → **77/77 pass**.
+    - Backend regression sweep (CF + BS + IS + TB +
+      tenant_isolation_full + tenant_isolation_v2) → **119/119 pass**.
+    - `flutter analyze` on the 4 modified files → 2 pre-existing
+      infos (not introduced by this fix; `dart:html` import +
+      curly-braces lint in untouched code).
+    - `flutter build web --release --no-tree-shake-icons` → ~50s.
+    - 0 backend changes. 0 alembic migrations. 0 schema changes.
+  - **Docs:** new `docs/AUTH_TENANT_PERSIST_2026-05-09.md` —
+    bug-chain walkthrough (3 PRs explained), the 5-line fix, the
+    drift fix, the logout invariant, manual UAT (InPrivate window
+    → register → DevTools verify `pilot.tenant_id` exists →
+    wizard PATCH not POST → step 2 no 404 → logout wipes the key).
+    Includes "what we did NOT do" section (no backend changes, no
+    architectural refactor of the 4 duplicate auth flows, no
+    OAuth fix because no OAuth flows exist).
+  - **Hotfix scope discipline:** four file edits + one test file +
+    one doc. No backend, no schema, no router, no architectural
+    reshaping.
+
 - [x] **G-ERP-UNIFICATION** — closed UAT Issue #6 (duplicate setup journey)
   - Branch: `feat/g-erp-unification`
   - **Why:** APEX had two parallel paths for setting up companies +
