@@ -545,6 +545,20 @@ class ApiService {
       _get('/api/v1/pilot/tenants/$tenantId/products?limit=$limit');
   static Future<ApiResult> pilotCreateProduct(String tenantId, Map<String, dynamic> payload) =>
       _post('/api/v1/pilot/tenants/$tenantId/products', payload);
+  // G-FIN-PRODUCT-CATALOG (Sprint 4, 2026-05-09): get + variants + barcode lookup
+  // backing the new ProductPickerOrCreate widget and barcode-scan flows.
+  static Future<ApiResult> pilotGetProduct(String id) =>
+      _get('/api/v1/pilot/products/$id');
+  static Future<ApiResult> pilotListProductVariants(String productId) =>
+      _get('/api/v1/pilot/products/$productId/variants');
+  static Future<ApiResult> pilotCreateProductVariant(String productId, Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/products/$productId/variants', payload);
+  static Future<ApiResult> pilotBarcodeLookup(String tenantId, String value) =>
+      _get('/api/v1/pilot/tenants/$tenantId/barcode/${Uri.encodeComponent(value)}');
+  static Future<ApiResult> pilotListCategories(String tenantId) =>
+      _get('/api/v1/pilot/tenants/$tenantId/categories');
+  static Future<ApiResult> pilotListBrands(String tenantId) =>
+      _get('/api/v1/pilot/tenants/$tenantId/brands');
 
   // ── Pilot: Journal Entries (existing) ──
   static Future<ApiResult> pilotListJournalEntries(String entityId, {int limit=100}) =>
