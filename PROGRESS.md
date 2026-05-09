@@ -4,6 +4,39 @@
 
 ### 2026-05-09
 
+- [x] **G-FIN-PRODUCT-CATALOG** (Sprint 4 of the Finance Module 7-sprint plan)
+  - Branch: `feat/g-fin-product-catalog`
+  - **Why:** Sprint 1 audit Gap §3 row 4. Sprints 5/6
+    invoice line pickers need an inline product-create flow.
+    The full multi-tab catalog management UI already
+    exists (`pilot/screens/setup/products_screen.dart`,
+    2179 lines, 5 tabs) but isn't reachable from inside an
+    invoice form — a 5-tab management UI is too heavy for
+    the "add this one item to my line" use case.
+  - **What landed:**
+    - `apex_finance/lib/core/barcode_utils.dart` —
+      pure-Dart EAN-13 helpers (`ean13CheckDigit`,
+      `generateEan13`). Pure Dart so they're testable
+      under flutter_test without the package:web SDK gate.
+    - `apex_finance/lib/screens/inventory/product_create_modal.dart`
+      — focused modal that POSTs `/pilot/tenants/{id}/products`
+      with one inline variant so the product is invoice-ready
+      immediately. Stashes typed barcode on
+      `_pending_barcode` for the caller to attach.
+    - `apex_finance/lib/widgets/forms/product_picker_or_create.dart`
+      — picker with 3 modes: type-to-search, barcode
+      lookup (Enter or dedicated button), inline create.
+      On barcode miss, opens the modal with the typed
+      barcode pre-filled.
+    - 6 new API methods: `pilotGetProduct`,
+      `pilotListProductVariants`,
+      `pilotCreateProductVariant`, `pilotBarcodeLookup`,
+      `pilotListCategories`, `pilotListBrands`.
+    - 12 tests (7 real EAN-13 unit tests with known
+      vectors + 5 source-grep) — all pass.
+  - **Verification:** `flutter analyze` clean across all
+    4 changed files; 12/12 tests pass.
+
 - [x] **G-FIN-VENDORS-COMPLETE** (Sprint 3 of the Finance Module 7-sprint plan)
   - Branch: `feat/g-fin-vendors-complete`
   - **Why:** Sprint 1 audit Gap §3 row 3. Mirror of
