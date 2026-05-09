@@ -695,6 +695,10 @@ class ApiService {
       _get('/api/v1/pilot/entities/$entityId/purchase-invoices?limit=$limit');
   static Future<ApiResult> pilotPostPurchaseInvoice(String piId) =>
       _post('/api/v1/pilot/purchase-invoices/$piId/post', {});
+  // G-FIN-PURCHASE-INVOICE-JE-AUTOPOST (Sprint 6, 2026-05-09):
+  // create endpoint backing the new PurchaseInvoiceCreateScreen.
+  static Future<ApiResult> pilotCreatePurchaseInvoice(Map<String, dynamic> payload) =>
+      _post('/api/v1/pilot/purchase-invoices', payload);
   static Future<ApiResult> pilotCreateVendorPayment(Map<String, dynamic> payload) =>
       _post('/api/v1/pilot/vendor-payments', payload);
 
