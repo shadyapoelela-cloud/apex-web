@@ -2,6 +2,43 @@
 
 ## Sprint 18 — Invoicing (Q2 2026, week 7) — IN PROGRESS
 
+### 2026-05-10
+
+- [x] **G-SALES-INVOICE-UX-COMPLETE** — 4 user-reported issues from
+  the live UAT walkthrough closed in one bundled PR.
+  - Branch: `feat/g-sales-invoice-ux-complete`
+  - **Bug #1**: list-row click jumped to JE-builder, skipping the
+    invoice. Fixed: `_openInvoice` now navigates to the new
+    `SalesInvoiceDetailsScreen` at `/app/erp/finance/sales-invoices/:id`.
+    The JE-builder is reachable only via the explicit "عرض القيد"
+    button on the details screen.
+  - **UX #2**: invoice line was a free-text box with no link to the
+    product catalogue. Fixed: `ProductPickerOrCreate` (existing
+    Sprint-4 widget with search + barcode lookup + inline create)
+    integrated into `SalesInvoiceCreateScreen`. Selecting a product
+    auto-fills description (name_ar), unit_price (variant.list_price),
+    and vat_rate (0 for zero_rated/exempt). Payload now persists
+    `product_id` + `variant_id` so the backend can run the optional
+    COGS JE leg when product cost is known.
+  - **Feature #3**: no payment-recording UI. Fixed: new
+    `CustomerPaymentModal` (cash / bank_transfer / cheque / card /
+    mada). Backend `record_customer_payment` now auto-builds and
+    posts the 2-leg payment JE (DR Cash/Bank/Cheques-on-hand /
+    CR AR) and rejects overpayments with 409. Method routing:
+    cash→1110, bank/card/mada→1120, cheque→1310 (Cheques on Hand,
+    newly seeded into the SOCPA CoA).
+  - **Feature #4**: ZATCA Phase 1 QR code on the details screen.
+    Pure-Dart TLV helper at `apex_finance/lib/core/zatca_tlv.dart`
+    (5 tags: seller / VAT / timestamp / total / VAT-amount;
+    UTF-8 byte length encoding). Renders via qr_flutter on
+    issued invoices; placeholder hint on drafts.
+  - **Tests**: 16 frontend (12 source-grep + 4 real ZATCA TLV unit
+    tests) + 5 backend integration tests against the real DB. All
+    21/21 pass.
+  - **Docs**: `docs/SALES_INVOICE_UX_COMPLETE_2026-05-10.md` —
+    full flow diagram, 10-step manual UAT, payment-method routing
+    table, ZATCA Phase 1 tag schedule.
+
 ### 2026-05-09
 
 - [x] **G-FIN-POS-JE-AUTOPOST** (Sprint 7 of the Finance Module 7-sprint plan — FINAL)
