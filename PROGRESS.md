@@ -4,6 +4,50 @@
 
 ### 2026-05-09
 
+- [x] **G-FIN-CUSTOMERS-COMPLETE** (Sprint 2 of the Finance Module 7-sprint plan)
+  - Branch: `feat/g-fin-customers-complete`
+  - **Why:** Sprint 1 audit Gap §3 row 1 ("Customer creation
+    form missing — `+ جديد` routed to a placeholder `/sales`
+    page") + row 2 ("Customer details — clicking a row routed
+    to `/operations/customer-360/:id`, an archived path that
+    rendered the coming-soon banner"). Both gaps closed with
+    pure frontend work — backend endpoints
+    (`POST /pilot/tenants/{tid}/customers`,
+    `GET /pilot/customers/{id}`,
+    `GET /pilot/customers/{id}/ledger`) all pre-existed.
+  - **What landed:**
+    - `apex_finance/lib/screens/operations/customer_create_modal.dart`
+      — 14-field modal with KSA-15-digit VAT validator,
+      auto-generated `CUST-NNN` code on blank, `show()`
+      returns `Future<Map<String, dynamic>?>` for downstream
+      auto-select use.
+    - `apex_finance/lib/screens/operations/customer_details_screen.dart`
+      — 3-tab screen (تفاصيل / السجل المالي / الفواتير).
+      Tab 3 filters the entity-scoped sales-invoices list by
+      `customer_id` client-side.
+    - `apex_finance/lib/widgets/forms/customer_picker_or_create.dart`
+      — autocomplete picker + inline `+ عميل جديد` that
+      opens `CustomerCreateModal` pre-filled with the typed
+      query. Designed for Sprint 5's Sales Invoice line.
+    - `apex_finance/lib/screens/operations/customers_list_screen.dart`
+      — `_onCreate` opens the modal and refreshes inline
+      (no nav). Row tap routes to the new
+      `/app/erp/finance/customers/:id` path.
+    - `apex_finance/lib/core/router.dart` — new GoRoute
+      `/app/erp/finance/customers/:customerId` →
+      `CustomerDetailsScreen`.
+    - `apex_finance/test/screens/customers_complete_test.dart`
+      — 8 source-grep contracts pinning the modal payload
+      shape, the 15-digit VAT rule, the new row-tap route,
+      the 3-tab structure, and the inline-create
+      pre-fill flow.
+    - `docs/CUSTOMERS_FLOW_2026-05-09.md` — full audit doc
+      with the before/after diagram, validation rules,
+      manual UAT script, and roadmap context.
+  - **Verification:** `flutter analyze` clean across all 5
+    changed dart files; `flutter test test/screens/customers_complete_test.dart`
+    → 8/8 pass.
+
 - [x] **G-FIN-AUDIT-CLEANUP** (Sprint 1 of the Finance Module 7-sprint plan)
   - Branch: `feat/g-fin-audit-cleanup`
   - **Why:** the Finance module today has 70 chips under
