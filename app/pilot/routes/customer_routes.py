@@ -164,6 +164,57 @@ class CustomerPaymentInput(BaseModel):
     receipt_number: Optional[str] = None
 
 
+# G-SALES-INVOICE-UX-COMPLETE (2026-05-10): full invoice detail with
+# line items + payment history. Backs the new SalesInvoiceDetailsScreen.
+class SalesInvoiceLineRead(BaseModel):
+    id: str
+    line_number: int
+    product_id: Optional[str] = None
+    variant_id: Optional[str] = None
+    description: str
+    quantity: float
+    unit_price: float
+    discount_pct: float
+    discount_amount: float
+    vat_rate: float
+    subtotal: float
+    vat_amount: float
+    line_total: float
+
+
+class CustomerPaymentRead(BaseModel):
+    id: str
+    receipt_number: str
+    payment_date: str
+    amount: float
+    method: str
+    reference: Optional[str] = None
+    journal_entry_id: Optional[str] = None
+
+
+class SalesInvoiceDetail(BaseModel):
+    id: str
+    invoice_number: str
+    entity_id: str
+    customer_id: str
+    customer_name_ar: Optional[str] = None
+    customer_name_en: Optional[str] = None
+    customer_vat_number: Optional[str] = None
+    issue_date: str
+    due_date: Optional[str] = None
+    status: str
+    currency: str
+    subtotal: float
+    vat_amount: float
+    total: float
+    paid_amount: float
+    remaining_balance: float
+    journal_entry_id: Optional[str] = None
+    memo: Optional[str] = None
+    lines: list[SalesInvoiceLineRead] = []
+    payments: list[CustomerPaymentRead] = []
+
+
 # ── Customer CRUD ────────────────────────────────────────
 
 
@@ -672,21 +723,245 @@ def record_customer_payment(
         db.add(pay)
 
         new_paid = (inv.paid_amount or Decimal(0)) + pay.amount
+        # G-SALES-INVOICE-UX-COMPLETE (2026-05-10): reject overpayment.
+        if new_paid > inv.total:
+            raise HTTPException(
+                status_code=409,
+                detail=f"overpayment: invoice total {inv.total}, "
+                       f"already paid {inv.paid_amount or 0}, attempted {pay.amount}",
+            )
         inv.paid_amount = new_paid
         if new_paid >= inv.total:
             inv.status = SalesInvoiceStatus.paid.value
         elif new_paid > 0:
             inv.status = SalesInvoiceStatus.partially_paid.value
 
+        # G-SALES-INVOICE-UX-COMPLETE (2026-05-10): auto-post payment JE.
+        # DR Cash/Bank (depending on method) / CR Customer Receivable.
+        je = _post_customer_payment_je(db, inv, pay)
+        db.flush()
+        try:
+            from app.pilot.services.gl_engine import post_journal_entry
+            post_journal_entry(db, je.id)
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(status_code=409, detail=f"payment JE post failed: {e}")
+        pay.journal_entry_id = je.id
+
         db.commit()
         db.refresh(pay)
+        db.refresh(inv)
 
         return {
             "payment_id": pay.id,
             "receipt_number": pay.receipt_number,
             "amount": float(pay.amount),
+            "method": pay.method,
             "invoice_status": inv.status,
             "invoice_paid_amount": float(inv.paid_amount),
+            "remaining_balance": float(inv.total - inv.paid_amount),
+            "journal_entry_id": pay.journal_entry_id,
         }
+    finally:
+        db.close()
+
+
+# G-SALES-INVOICE-UX-COMPLETE (2026-05-10): auto-post payment JE helper.
+def _post_customer_payment_je(
+    db: Session, inv: SalesInvoice, pay: CustomerPayment
+) -> JournalEntry:
+    """Build the auto-JE for a customer payment.
+
+    Pattern: DR Cash/Bank / CR Customer Receivable.
+
+    Method routing:
+      - cash       → 1110  (Cash on hand)
+      - card       → 1120  (Bank — credit card pre-settlement)
+      - bank       → 1120  (Bank — direct deposit / wire)
+      - cheque     → 1310  (Cheques on hand — settles to bank later)
+      - default    → 1120  (treat unknown as bank)
+    """
+    def _find_account(code: str, category: str, subcategory: Optional[str] = None):
+        q = db.query(GLAccount).filter(
+            GLAccount.entity_id == inv.entity_id,
+            GLAccount.type == "detail",
+        )
+        acc = q.filter(GLAccount.code == code).first()
+        if acc:
+            return acc
+        q = q.filter(GLAccount.category == category)
+        if subcategory:
+            q = q.filter(GLAccount.subcategory == subcategory)
+        return q.first()
+
+    method_lower = (pay.method or "").lower()
+    if method_lower == "cash":
+        cash_code, cash_sub = "1110", "cash"
+    elif method_lower in ("cheque", "check"):
+        cash_code, cash_sub = "1310", "cash_equivalent"
+    else:
+        # bank_transfer / card / mada / etc → bank
+        cash_code, cash_sub = "1120", "bank"
+
+    cash = _find_account(cash_code, "asset", cash_sub) or _find_account(
+        "1120", "asset", "bank"
+    ) or _find_account("1110", "asset", "cash")
+    ar = _find_account("1130", "asset", "receivables")
+
+    if not (cash and ar):
+        raise HTTPException(
+            status_code=409,
+            detail="missing Cash/Bank or AR accounts — seed the entity's CoA first",
+        )
+
+    period = (
+        db.query(FiscalPeriod)
+        .filter(FiscalPeriod.entity_id == inv.entity_id)
+        .filter(FiscalPeriod.start_date <= pay.payment_date)
+        .filter(FiscalPeriod.end_date >= pay.payment_date)
+        .filter(FiscalPeriod.status == PeriodStatus.open.value)
+        .first()
+    )
+    if period is None:
+        raise HTTPException(
+            status_code=409,
+            detail=f"no open fiscal period covering {pay.payment_date}",
+        )
+
+    customer = db.query(Customer).filter(Customer.id == inv.customer_id).first()
+    customer_name = customer.name_ar if customer else "—"
+
+    je = JournalEntry(
+        id=gen_uuid(),
+        tenant_id=inv.tenant_id,
+        entity_id=inv.entity_id,
+        fiscal_period_id=period.id,
+        je_number=f"PMT-{pay.receipt_number}",
+        kind=JournalEntryKind.manual.value,
+        status=JournalEntryStatus.draft.value,
+        source_type="customer_payment",
+        source_id=pay.id,
+        source_reference=pay.receipt_number,
+        memo_ar=f"تحصيل من {customer_name} — فاتورة {inv.invoice_number}",
+        je_date=pay.payment_date,
+        currency=pay.currency,
+        total_debit=pay.amount,
+        total_credit=pay.amount,
+    )
+    db.add(je)
+    db.flush()
+
+    # DR Cash/Bank
+    db.add(JournalLine(
+        id=gen_uuid(),
+        tenant_id=inv.tenant_id,
+        journal_entry_id=je.id,
+        line_number=1,
+        account_id=cash.id,
+        currency=pay.currency,
+        debit_amount=pay.amount,
+        credit_amount=0,
+        functional_debit=pay.amount,
+        functional_credit=0,
+        description=f"تحصيل {pay.method} — {pay.receipt_number}",
+    ))
+    # CR Customer Receivable
+    db.add(JournalLine(
+        id=gen_uuid(),
+        tenant_id=inv.tenant_id,
+        journal_entry_id=je.id,
+        line_number=2,
+        account_id=ar.id,
+        currency=pay.currency,
+        debit_amount=0,
+        credit_amount=pay.amount,
+        functional_debit=0,
+        functional_credit=pay.amount,
+        partner_type="customer",
+        partner_id=inv.customer_id,
+        partner_name=customer_name,
+        description=f"تخفيض الذمم — فاتورة {inv.invoice_number}",
+    ))
+    return je
+
+
+# G-SALES-INVOICE-UX-COMPLETE (2026-05-10): full invoice detail + lines + payments.
+# Backs the new SalesInvoiceDetailsScreen — list-row click now opens this
+# detail view instead of jumping straight to the JE-builder.
+@router.get("/sales-invoices/{invoice_id}", response_model=SalesInvoiceDetail)
+def get_sales_invoice_detail(
+    invoice_id: str = Path(...),
+    current_user: dict = Depends(get_current_user),
+):
+    db = _db()
+    try:
+        inv = assert_resource_in_tenant(
+            db, SalesInvoice, invoice_id, current_user, soft_delete_field=None,
+        )
+        customer = (
+            db.query(Customer).filter(Customer.id == inv.customer_id).first()
+        )
+        line_rows = (
+            db.query(SalesInvoiceLine)
+            .filter(SalesInvoiceLine.invoice_id == inv.id)
+            .order_by(SalesInvoiceLine.line_number)
+            .all()
+        )
+        payment_rows = (
+            db.query(CustomerPayment)
+            .filter(CustomerPayment.invoice_id == inv.id)
+            .order_by(CustomerPayment.payment_date)
+            .all()
+        )
+        return SalesInvoiceDetail(
+            id=inv.id,
+            invoice_number=inv.invoice_number,
+            entity_id=inv.entity_id,
+            customer_id=inv.customer_id,
+            customer_name_ar=customer.name_ar if customer else None,
+            customer_name_en=customer.name_en if customer else None,
+            customer_vat_number=customer.vat_number if customer else None,
+            issue_date=inv.issue_date.isoformat(),
+            due_date=inv.due_date.isoformat() if inv.due_date else None,
+            status=inv.status,
+            currency=inv.currency,
+            subtotal=float(inv.subtotal),
+            vat_amount=float(inv.vat_amount),
+            total=float(inv.total),
+            paid_amount=float(inv.paid_amount or 0),
+            remaining_balance=float((inv.total or 0) - (inv.paid_amount or 0)),
+            journal_entry_id=inv.journal_entry_id,
+            memo=inv.memo,
+            lines=[
+                SalesInvoiceLineRead(
+                    id=ln.id,
+                    line_number=ln.line_number,
+                    product_id=ln.product_id,
+                    variant_id=ln.variant_id,
+                    description=ln.description,
+                    quantity=float(ln.quantity),
+                    unit_price=float(ln.unit_price),
+                    discount_pct=float(ln.discount_pct or 0),
+                    discount_amount=float(ln.discount_amount or 0),
+                    vat_rate=float(ln.vat_rate),
+                    subtotal=float(ln.subtotal),
+                    vat_amount=float(ln.vat_amount),
+                    line_total=float(ln.line_total),
+                )
+                for ln in line_rows
+            ],
+            payments=[
+                CustomerPaymentRead(
+                    id=p.id,
+                    receipt_number=p.receipt_number,
+                    payment_date=p.payment_date.isoformat(),
+                    amount=float(p.amount),
+                    method=p.method,
+                    reference=p.reference,
+                    journal_entry_id=p.journal_entry_id,
+                )
+                for p in payment_rows
+            ],
+        )
     finally:
         db.close()
