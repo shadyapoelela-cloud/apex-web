@@ -93,6 +93,9 @@ import '../screens/settings/unified_settings_screen.dart';
 import '../screens/notifications/notifications_panel_screen.dart';
 import '../screens/operations/pos_quick_sale_screen.dart';
 import '../screens/operations/customer_payment_screen.dart';
+// G-FIN-CUSTOMERS-COMPLETE (Sprint 2, 2026-05-09): customer details
+// (3-tab screen with details / ledger / invoices) lives here.
+import '../screens/operations/customer_details_screen.dart';
 import '../screens/operations/vendor_payment_screen.dart';
 // G-CLEANUP-1 Stage 4b: JeListScreen archived to _archive/2026-05-04/v4-routes/.
 // Replaced by V5 list at /app/erp/finance/je-builder.
@@ -684,6 +687,15 @@ final appRouter = GoRouter(
       path: '/sales/payment/:invoiceId',
       pageBuilder: (c, s) => _apexPage(
         CustomerPaymentScreen(invoiceId: s.pathParameters['invoiceId']!),
+        s,
+      ),
+    ),
+    // G-FIN-CUSTOMERS-COMPLETE (Sprint 2, 2026-05-09): customer details
+    // 3-tab screen (details / ledger / invoices). Path-keyed by customer id.
+    GoRoute(
+      path: '/app/erp/finance/customers/:customerId',
+      pageBuilder: (c, s) => _apexPage(
+        CustomerDetailsScreen(customerId: s.pathParameters['customerId']!),
         s,
       ),
     ),
