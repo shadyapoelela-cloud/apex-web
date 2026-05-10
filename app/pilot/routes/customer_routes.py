@@ -644,6 +644,65 @@ def list_sales_invoices(
         db.close()
 
 
+# G-SALES-INVOICE-UX-FOLLOWUP (2026-05-11): cancel endpoint. Moves
+# invoice → cancelled. If a JE was already posted (issued status),
+# posts a reversal JE so the GL stays consistent. Refuses when any
+# payment was already applied — those need to be voided first.
+@router.post("/sales-invoices/{invoice_id}/cancel", response_model=SalesInvoiceRead)
+def cancel_sales_invoice(
+    invoice_id: str = Path(...),
+    current_user: dict = Depends(get_current_user),
+):
+    db = _db()
+    try:
+        inv = assert_resource_in_tenant(
+            db, SalesInvoice, invoice_id, current_user, soft_delete_field=None,
+        )
+        if inv.status == SalesInvoiceStatus.cancelled.value:
+            raise HTTPException(status_code=409, detail="invoice already cancelled")
+        if inv.status == SalesInvoiceStatus.paid.value:
+            raise HTTPException(
+                status_code=409,
+                detail="cannot cancel a paid invoice — void payments first",
+            )
+        if (inv.paid_amount or Decimal(0)) > 0:
+            raise HTTPException(
+                status_code=409,
+                detail="cannot cancel: invoice has applied payments",
+            )
+
+        # If a JE was already posted (issued state), reverse it.
+        if inv.journal_entry_id:
+            try:
+                from app.pilot.services.gl_engine import reverse_journal_entry
+                reverse_journal_entry(
+                    db,
+                    inv.journal_entry_id,
+                    reversal_date=date.today(),
+                    memo_ar=f"عكس قيد فاتورة ملغاة {inv.invoice_number}",
+                )
+            except Exception as e:
+                db.rollback()
+                raise HTTPException(
+                    status_code=409, detail=f"reversal failed: {e}",
+                )
+
+        inv.status = SalesInvoiceStatus.cancelled.value
+        db.commit()
+        db.refresh(inv)
+        return SalesInvoiceRead(
+            id=inv.id, invoice_number=inv.invoice_number, customer_id=inv.customer_id,
+            issue_date=inv.issue_date.isoformat(),
+            due_date=inv.due_date.isoformat() if inv.due_date else None,
+            status=inv.status, currency=inv.currency,
+            subtotal=float(inv.subtotal), vat_amount=float(inv.vat_amount),
+            total=float(inv.total), paid_amount=float(inv.paid_amount or 0),
+            journal_entry_id=inv.journal_entry_id,
+        )
+    finally:
+        db.close()
+
+
 @router.post("/sales-invoices/{invoice_id}/issue", response_model=SalesInvoiceRead)
 def issue_sales_invoice(
     invoice_id: str = Path(...),
