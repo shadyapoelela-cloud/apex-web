@@ -69,6 +69,13 @@ DEFAULT_COA: list[dict] = [
     {"code": "1160", "name_ar": "مصروفات مدفوعة مقدماً", "name_en": "Prepaid Expenses",
      "parent": "1100", "category": "asset", "subcategory": "prepaid", "type": "detail",
      "normal_balance": "debit", "level": 3},
+    # G-SALES-INVOICE-UX-COMPLETE (2026-05-10): Cheques on Hand —
+    # holds cheque receipts before they clear the bank. Routed to from
+    # `_post_customer_payment_je` when method='cheque' so the AR
+    # decreases on receipt and 1310 carries the float until clearing.
+    {"code": "1310", "name_ar": "شيكات تحت التحصيل", "name_en": "Cheques on Hand",
+     "parent": "1100", "category": "asset", "subcategory": "cash_equivalent", "type": "detail",
+     "normal_balance": "debit", "level": 3},
 
     {"code": "1200", "name_ar": "الأصول الثابتة", "name_en": "Fixed Assets",
      "parent": "1000", "category": "asset", "type": "header", "normal_balance": "debit", "level": 2},

@@ -1150,14 +1150,15 @@ class _SalesInvoicesScreenState extends State<SalesInvoicesScreen> {
     );
   }
 
+  // G-SALES-INVOICE-UX-COMPLETE (2026-05-10): row click opens the
+  // dedicated details screen (with lines / payments / QR / actions),
+  // NOT the JE-builder. Pre-fix the click jumped to the JE — that
+  // skipped past the invoice payload and confused users into thinking
+  // the JE was the invoice. The JE is reachable from inside the
+  // details screen via the explicit "عرض القيد" button.
   void _openInvoice(Map<String, dynamic> inv) {
-    final jeId = inv['journal_entry_id'] as String?;
-    if (jeId != null) {
-      context.go('/app/erp/finance/je-builder/$jeId');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('الفاتورة ${inv['invoice_number']} لم تُصدر بعد'),
-      ));
-    }
+    final id = inv['id'] as String?;
+    if (id == null) return;
+    context.go('/app/erp/finance/sales-invoices/$id');
   }
 }

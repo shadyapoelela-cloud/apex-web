@@ -103,6 +103,9 @@ import '../screens/operations/vendor_details_screen.dart';
 // purchase invoice create screen with vendor picker + save-draft +
 // JE-link snackbar.
 import '../screens/operations/purchase_invoice_create_screen.dart';
+// G-SALES-INVOICE-UX-COMPLETE (2026-05-10): sales-invoice details screen.
+// Closes the Bug-#1 (row click was opening JE-builder instead of details).
+import '../screens/operations/sales_invoice_details_screen.dart';
 import '../screens/operations/vendor_payment_screen.dart';
 // G-CLEANUP-1 Stage 4b: JeListScreen archived to _archive/2026-05-04/v4-routes/.
 // Replaced by V5 list at /app/erp/finance/je-builder.
@@ -721,6 +724,17 @@ final appRouter = GoRouter(
       path: '/app/erp/finance/purchase-bills/new',
       pageBuilder: (c, s) =>
           _apexPage(const PurchaseInvoiceCreateScreen(), s),
+    ),
+    // G-SALES-INVOICE-UX-COMPLETE (2026-05-10): sales invoice details.
+    // Pre-fix the list-row click jumped straight to /je-builder/{jeId}.
+    // Now it lands here, and the JE-builder is reachable only via the
+    // explicit "عرض القيد" button on this screen.
+    GoRoute(
+      path: '/app/erp/finance/sales-invoices/:invoiceId',
+      pageBuilder: (c, s) => _apexPage(
+        SalesInvoiceDetailsScreen(invoiceId: s.pathParameters['invoiceId']!),
+        s,
+      ),
     ),
     // Sprint 15 Stage 4f: V4 /analytics/cash-flow-forecast archived (HAS_V5) -> V5 /app/erp/finance/cash-flow-forecast
     GoRoute(

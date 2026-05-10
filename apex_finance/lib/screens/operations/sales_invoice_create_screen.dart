@@ -28,6 +28,11 @@ import '../../api_service.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../widgets/forms/customer_picker_or_create.dart';
+// G-SALES-INVOICE-UX-COMPLETE (2026-05-10): product picker (search +
+// barcode) integrated as the primary line input. Selecting a product
+// auto-fills description / unit_price / vat_rate. Closes UX issue #2:
+// the line was a free-text box with no link to the product catalogue.
+import '../../widgets/forms/product_picker_or_create.dart';
 
 class SalesInvoiceCreateScreen extends StatefulWidget {
   const SalesInvoiceCreateScreen({super.key});
@@ -42,6 +47,11 @@ class _SalesInvoiceCreateScreenState extends State<SalesInvoiceCreateScreen> {
   final _descCtrl = TextEditingController();
 
   Map<String, dynamic>? _selectedCustomer;
+  // G-SALES-INVOICE-UX-COMPLETE (2026-05-10): selected product/variant
+  // for the (single) invoice line. Persisted onto the payload as
+  // `product_id` + `variant_id` so the backend can later run the COGS
+  // JE leg when product cost is known.
+  Map<String, dynamic>? _selectedProduct;
   DateTime _issueDate = DateTime.now();
   DateTime _dueDate = DateTime.now().add(const Duration(days: 30));
 
@@ -65,6 +75,34 @@ class _SalesInvoiceCreateScreenState extends State<SalesInvoiceCreateScreen> {
       (_selectedCustomer?['id'] ?? '').toString().isEmpty
           ? null
           : _selectedCustomer!['id'].toString();
+
+  /// G-SALES-INVOICE-UX-COMPLETE (2026-05-10): on product pick, fill
+  /// the description + unit_price + VAT-rate fields. The user can still
+  /// override any of them after selection. Reads variant fields when
+  /// the product was created via the modal's inline-variant flow.
+  void _onProductSelected(Map<String, dynamic> p) {
+    setState(() {
+      _selectedProduct = p;
+      // description: prefer name_ar, fall back to name_en or code.
+      final desc = (p['name_ar'] ?? p['name_en'] ?? p['code'] ?? '').toString();
+      if (desc.isNotEmpty) _descCtrl.text = desc;
+      // unit price: read from first variant.list_price if present.
+      final variants = (p['variants'] as List?) ?? const [];
+      if (variants.isNotEmpty) {
+        final v0 = variants.first as Map?;
+        final price = v0?['list_price'];
+        if (price != null) _amountCtrl.text = '$price';
+      }
+      // vat_rate: backend uses vat_code at the product level — UI keeps
+      // the existing 15% default unless code says zero/exempt.
+      final vatCode = (p['vat_code'] ?? '').toString();
+      if (vatCode == 'zero_rated' || vatCode == 'exempt') {
+        _vatRateCtrl.text = '0';
+      } else {
+        _vatRateCtrl.text = '15';
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -123,6 +161,13 @@ class _SalesInvoiceCreateScreenState extends State<SalesInvoiceCreateScreen> {
       setState(() => _error = 'الوصف مطلوب');
       return null;
     }
+    final productId = _selectedProduct?['id']?.toString();
+    final variants = (_selectedProduct?['variants'] as List?) ?? const [];
+    String? variantId;
+    if (variants.isNotEmpty) {
+      final v0 = variants.first;
+      if (v0 is Map) variantId = v0['id']?.toString();
+    }
     return {
       'tenant_id': tenantId,
       'entity_id': entityId,
@@ -132,6 +177,8 @@ class _SalesInvoiceCreateScreenState extends State<SalesInvoiceCreateScreen> {
       'currency': 'SAR',
       'lines': [
         {
+          if (productId != null) 'product_id': productId,
+          if (variantId != null) 'variant_id': variantId,
           'description': desc,
           'quantity': 1,
           'unit_price': amount,
@@ -257,6 +304,18 @@ class _SalesInvoiceCreateScreenState extends State<SalesInvoiceCreateScreen> {
                       _section('تفاصيل الفاتورة', Icons.receipt_long, child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          // G-SALES-INVOICE-UX-COMPLETE (2026-05-10):
+                          // Product picker first — selecting a product
+                          // auto-fills description + unit_price + VAT.
+                          // The picker also handles barcode lookup
+                          // (numeric input on Enter or via the dedicated
+                          // QR icon button) and inline product-create.
+                          ProductPickerOrCreate(
+                            initial: _selectedProduct,
+                            labelText: 'المنتج (اختياري — أو اكتب وصفاً يدوياً)',
+                            onSelected: _onProductSelected,
+                          ),
+                          const SizedBox(height: 10),
                           _input(_descCtrl, 'الوصف (الخدمة/المنتج)',
                               Icons.description),
                           const SizedBox(height: 10),

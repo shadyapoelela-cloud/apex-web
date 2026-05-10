@@ -524,6 +524,11 @@ class ApiService {
   }
   static Future<ApiResult> pilotRecordCustomerPayment(String invoiceId, Map<String, dynamic> payload) =>
       _post('/api/v1/pilot/sales-invoices/$invoiceId/payment', payload);
+  // G-SALES-INVOICE-UX-COMPLETE (2026-05-10): sales-invoice detail
+  // (lines + payments) backing the new SalesInvoiceDetailsScreen.
+  // customer_routes.py mounts at /api/v1/pilot — keep that prefix.
+  static Future<ApiResult> pilotGetSalesInvoice(String id) =>
+      _get('/api/v1/pilot/sales-invoices/$id');
 
   // ── Pilot: Vendors (existing) ──
   // G-FIN-PILOT-API-PREFIX (hotfix, 2026-05-09): purchasing_routes.py mounts
