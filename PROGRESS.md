@@ -2,6 +2,48 @@
 
 ## Sprint 18 — Invoicing (Q2 2026, week 7) — IN PROGRESS
 
+### 2026-05-11
+
+- [x] **G-SALES-INVOICE-UX-FOLLOWUP** — QA report on PR #187
+  surfaced 2 live bugs + 4 spec gaps. All closed.
+  - Branch: `feat/g-sales-invoice-ux-followup`
+  - **Bug A — details screen no-scroll**: `SingleChildScrollView`
+    attached to the parent `ApexMagneticShell`'s
+    `PrimaryScrollController` and silently lost wheel events. User
+    could not reach totals / payment history / "+ تسجيل دفع"
+    button. Fix: explicit `ScrollController` + `Scrollbar`
+    (`thumbVisibility:true`) + `PrimaryScrollController.none`
+    wrapper + `AlwaysScrollableScrollPhysics`.
+  - **Bug B — picker unit_price never auto-fills**:
+    `pilotListProducts` returns `ProductRead` (no `variants`);
+    handler read `p['variants']?.first?['list_price']` and always
+    saw null. Fix: `_onProductSelected` now branches — use inline
+    variants when present (modal-create path), else fetch
+    `/pilot/products/{id}` for `ProductDetail` and read
+    `list_price`. Mirrors variants back onto `_selectedProduct`
+    so the line payload picks up `variant_id` for the COGS leg.
+  - **Spec compliance**: 4 features the original spec asked for
+    but the prior PR skipped:
+    - **Edit** button on draft details (`isDraft` gated, routes
+      to `/invoice-create?invoice_id=...`; pre-fill in next sprint)
+    - **Cancel** button + backend
+      `POST /sales-invoices/{id}/cancel` that reverses any posted
+      JE via `reverse_journal_entry`. Confirmation dialog before
+      destructive action. Refused 409 if `paid_amount > 0`.
+    - **Print** button + `kIsWeb`-guarded `html.window.print()` —
+      one-page invoice + ZATCA QR copy.
+    - **PaymentModal**: always-visible `notes` field + conditional
+      `bank_account` field (only when `method=bank_transfer`).
+      Merged into the existing `reference` wire field with Arabic
+      labels (`بنك:` / `ملاحظات:`) since the wire model has no
+      separate columns.
+  - **Tests**: 12 frontend (source-grep) + 3 backend
+    (integration). 15/15 pass.
+  - **Docs**: `docs/SALES_INVOICE_UX_FOLLOWUP_2026-05-11.md`
+    captures the full bug/fix matrix, deferred items
+    (multi-line, prefill, camera scanner, …), and a 13-step
+    manual UAT script the QA can re-run after deploy.
+
 ### 2026-05-10
 
 - [x] **G-SALES-INVOICE-UX-COMPLETE** — 4 user-reported issues from

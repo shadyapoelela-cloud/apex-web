@@ -517,6 +517,10 @@ class ApiService {
       _post('/api/v1/pilot/sales-invoices', payload);
   static Future<ApiResult> pilotIssueSalesInvoice(String id) =>
       _post('/api/v1/pilot/sales-invoices/$id/issue', {});
+  // G-SALES-INVOICE-UX-FOLLOWUP (2026-05-11): cancel endpoint.
+  // Reverses any posted JE; rejects 409 if any payments applied.
+  static Future<ApiResult> pilotCancelSalesInvoice(String id) =>
+      _post('/api/v1/pilot/sales-invoices/$id/cancel', {});
   static Future<ApiResult> pilotListSalesInvoices(String entityId, {String? status, int limit=100}) {
     final qs = <String>['limit=$limit'];
     if (status != null) qs.add('status=${Uri.encodeQueryComponent(status)}');

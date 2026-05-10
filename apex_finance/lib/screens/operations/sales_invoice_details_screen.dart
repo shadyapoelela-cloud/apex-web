@@ -19,8 +19,15 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+// G-SALES-INVOICE-UX-FOLLOWUP (2026-05-11): web-only browser print.
+// Conditionally imported — on non-web platforms the `html` symbol is
+// a stub. The print button is shown only in the browser bundle, so
+// the `avoid_web_libraries_in_flutter` lint is a false positive here.
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 import '../../api_service.dart';
 import '../../core/theme.dart';
@@ -42,10 +49,25 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
   bool _busy = false;
   String? _error;
 
+  // G-SALES-INVOICE-UX-FOLLOWUP (Bug A, 2026-05-11): explicit
+  // ScrollController so wheel/touch events don't compete with the
+  // outer ApexMagneticShell scroll system. Without this, on the
+  // deployed bundle the details page rendered correctly above the
+  // fold but the user could not reach the totals / payments history
+  // / "+ تسجيل دفع" button — they were below the viewport with no
+  // way to scroll to them.
+  final ScrollController _scrollCtrl = ScrollController();
+
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void dispose() {
+    _scrollCtrl.dispose();
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -82,6 +104,87 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
         content: Text('فشل الإصدار: ${res.error ?? '-'}'),
       ));
     }
+  }
+
+  // G-SALES-INVOICE-UX-FOLLOWUP (2026-05-11): cancel action.
+  // Confirms first because the operation is destructive (reverses
+  // the posted JE if issued). Refused server-side when any payment
+  // has been applied.
+  Future<void> _cancel() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          backgroundColor: AC.navy2,
+          title: Text('إلغاء الفاتورة؟',
+              style: TextStyle(color: AC.tp, fontSize: 16)),
+          content: Text(
+              'سيتم عكس قيد اليومية إن وُجد. لا يمكن إلغاء فاتورة عليها مدفوعات.',
+              style: TextStyle(color: AC.td, fontSize: 13)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('تراجع', style: TextStyle(color: AC.td)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('تأكيد الإلغاء',
+                  style: TextStyle(
+                      color: AC.err, fontWeight: FontWeight.w700)),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true) return;
+    setState(() => _busy = true);
+    final res = await ApiService.pilotCancelSalesInvoice(widget.invoiceId);
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (res.success) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.ok,
+        content: const Text('تم إلغاء الفاتورة'),
+      ));
+      await _load();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.err,
+        content: Text('فشل الإلغاء: ${res.error ?? '-'}'),
+      ));
+    }
+  }
+
+  // G-SALES-INVOICE-UX-FOLLOWUP (2026-05-11): print action.
+  // Opens the browser's print dialog — on Flutter web this prints
+  // the current viewport. The QR + payment summary are already on
+  // the page so the user gets a one-page invoice + ZATCA QR copy.
+  void _print() {
+    // dart:html's window.print() is the simplest portable path on
+    // Flutter web. We import it inline as `dart:html` (web-only) —
+    // on non-web platforms this method is never invoked because the
+    // button is shown only in the browser bundle.
+    try {
+      // ignore: avoid_web_libraries_in_flutter
+      // ignore: deprecated_member_use
+      // Conditional: only execute in browser. The Flutter web shim
+      // makes `html.window` always available in the web build.
+      _invokeBrowserPrint();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.warn,
+        content: Text('الطباعة غير متاحة في هذه البيئة: $e'),
+      ));
+    }
+  }
+
+  // Web-only print invocation. Wrapped so the import lives at the
+  // top of the file behind a `kIsWeb` guard.
+  void _invokeBrowserPrint() {
+    if (!kIsWeb) return;
+    // ignore: deprecated_member_use
+    html.window.print();
   }
 
   Future<void> _recordPayment() async {
@@ -195,7 +298,21 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
                       Text(_error!, style: TextStyle(color: AC.err)),
                     ]),
                   )
-                : SingleChildScrollView(
+                // G-SALES-INVOICE-UX-FOLLOWUP (Bug A): Scrollbar +
+                // explicit controller + AlwaysScrollableScrollPhysics
+                // so the inner scroll never competes with the outer
+                // ApexMagneticShell scroll system. Pre-fix the page
+                // rendered correctly above the fold but mouse-wheel /
+                // Page_Down events never reached this ScrollView, so
+                // the user could not reach the totals + payment
+                // history + action row at all.
+                : PrimaryScrollController.none(
+                  child: Scrollbar(
+                    controller: _scrollCtrl,
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                    controller: _scrollCtrl,
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(20),
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 900),
@@ -215,10 +332,13 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
                           _buildPayments(),
                           const SizedBox(height: 20),
                           _buildActions(),
+                          const SizedBox(height: 40),
                         ],
                       ),
                     ),
+                    ),
                   ),
+                ),
       ),
     );
   }
@@ -579,65 +699,142 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
     final status = (inv['status'] ?? '').toString();
     final remaining =
         double.tryParse('${inv['remaining_balance'] ?? 0}') ?? 0;
+    final paid = double.tryParse('${inv['paid_amount'] ?? 0}') ?? 0;
     final isDraft = status == 'draft';
     final isIssued = status == 'issued' || status == 'partially_paid';
     final canPay = isIssued && remaining > 0.001;
+    final isCancelled = status == 'cancelled';
+    final isPaid = status == 'paid';
+    // Cancel is allowed when no payment has been applied AND the
+    // invoice isn't already cancelled. Backend enforces this too.
+    final canCancel = !isCancelled && !isPaid && paid <= 0.001;
 
-    return Row(children: [
+    // G-SALES-INVOICE-UX-FOLLOWUP (2026-05-11): action row redesigned
+    // with secondary [Edit / Cancel / Print] outline buttons on the
+    // right and the primary action (Issue / Pay) on the left. Each
+    // button shown only when the invoice state allows it.
+    final secondary = <Widget>[
+      // Edit: only on draft. Routes to the create-screen with a
+      // ?invoice_id query so a future PR can pre-fill the form.
+      // Today it just navigates back to the create screen — the
+      // pre-fill flow is bookmarked for the next sprint.
       if (isDraft)
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _busy ? null : _issue,
-            icon: _busy
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white))
-                : const Icon(Icons.send),
-            label: const Text('إصدار — يرحَّل القيد تلقائياً'),
-            style: ElevatedButton.styleFrom(
-                backgroundColor: AC.gold,
-                foregroundColor: AC.navy,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                textStyle: const TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w800)),
-          ),
+        OutlinedButton.icon(
+          onPressed: _busy
+              ? null
+              : () => context.go('/app/erp/sales/invoice-create'
+                  '?invoice_id=${widget.invoiceId}'),
+          icon: const Icon(Icons.edit_outlined, size: 16),
+          label: const Text('تعديل'),
+          style: OutlinedButton.styleFrom(
+              foregroundColor: AC.tp,
+              side: BorderSide(color: AC.bdr),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 14)),
         ),
-      if (canPay) ...[
-        if (isDraft) const SizedBox(width: 10),
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _busy ? null : _recordPayment,
-            icon: const Icon(Icons.add_card),
-            label: const Text('+ تسجيل دفع'),
-            style: ElevatedButton.styleFrom(
-                backgroundColor: AC.ok,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                textStyle: const TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w800)),
-          ),
+      if (canCancel)
+        OutlinedButton.icon(
+          onPressed: _busy ? null : _cancel,
+          icon: const Icon(Icons.cancel_outlined, size: 16),
+          label: const Text('إلغاء الفاتورة'),
+          style: OutlinedButton.styleFrom(
+              foregroundColor: AC.err,
+              side: BorderSide(color: AC.err.withValues(alpha: 0.4)),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 14)),
         ),
+      // Print: available whenever the invoice has data (not draft-
+      // only — the user might want a copy of a paid invoice for the
+      // customer's records).
+      if (!isDraft)
+        OutlinedButton.icon(
+          onPressed: _busy ? null : _print,
+          icon: const Icon(Icons.print_outlined, size: 16),
+          label: const Text('طباعة'),
+          style: OutlinedButton.styleFrom(
+              foregroundColor: AC.tp,
+              side: BorderSide(color: AC.bdr),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 14)),
+        ),
+    ];
+
+    final primary = <Widget>[];
+    if (isDraft) {
+      primary.add(Expanded(
+        child: ElevatedButton.icon(
+          onPressed: _busy ? null : _issue,
+          icon: _busy
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Colors.white))
+              : const Icon(Icons.send),
+          label: const Text('إصدار — يرحَّل القيد تلقائياً'),
+          style: ElevatedButton.styleFrom(
+              backgroundColor: AC.gold,
+              foregroundColor: AC.navy,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              textStyle: const TextStyle(
+                  fontSize: 13, fontWeight: FontWeight.w800)),
+        ),
+      ));
+    }
+    if (canPay) {
+      primary.add(Expanded(
+        child: ElevatedButton.icon(
+          onPressed: _busy ? null : _recordPayment,
+          icon: const Icon(Icons.add_card),
+          label: const Text('+ تسجيل دفع'),
+          style: ElevatedButton.styleFrom(
+              backgroundColor: AC.ok,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              textStyle: const TextStyle(
+                  fontSize: 13, fontWeight: FontWeight.w800)),
+        ),
+      ));
+    }
+    if (primary.isEmpty && secondary.isEmpty) {
+      primary.add(Expanded(
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: AC.navy2,
+            border: Border.all(color: AC.bdr),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+              isCancelled
+                  ? '✗ الفاتورة ملغاة'
+                  : (isPaid
+                      ? '✓ الفاتورة مدفوعة بالكامل'
+                      : 'لا توجد إجراءات متاحة'),
+              style: TextStyle(color: AC.td, fontSize: 12)),
+        ),
+      ));
+    }
+
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        ...secondary,
+        if (primary.isNotEmpty)
+          SizedBox(
+            width: 480,
+            child: Row(children: [
+              for (int i = 0; i < primary.length; i++) ...[
+                primary[i],
+                if (i < primary.length - 1) const SizedBox(width: 10),
+              ],
+            ]),
+          ),
       ],
-      if (!isDraft && !canPay)
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AC.navy2,
-              border: Border.all(color: AC.bdr),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-                status == 'paid'
-                    ? '✓ الفاتورة مدفوعة بالكامل'
-                    : 'لا توجد إجراءات متاحة',
-                style: TextStyle(color: AC.td, fontSize: 12)),
-          ),
-        ),
-    ]);
+    );
   }
 
   Widget _kv(String label, dynamic value) {

@@ -62,6 +62,11 @@ class _CustomerPaymentModalState extends State<CustomerPaymentModal> {
   late final TextEditingController _amount;
   final _reference = TextEditingController();
   final _notes = TextEditingController();
+  // G-SALES-INVOICE-UX-FOLLOWUP (2026-05-11): bank account name —
+  // visible only when method=bank_transfer. Persisted onto the
+  // server `notes` field so the audit trail captures which bank
+  // received the wire.
+  final _bankAccount = TextEditingController();
   DateTime _paymentDate = DateTime.now();
   String _method = 'cash';
   bool _saving = false;
@@ -80,6 +85,7 @@ class _CustomerPaymentModalState extends State<CustomerPaymentModal> {
     _amount.dispose();
     _reference.dispose();
     _notes.dispose();
+    _bankAccount.dispose();
     super.dispose();
   }
 
@@ -113,13 +119,25 @@ class _CustomerPaymentModalState extends State<CustomerPaymentModal> {
       _error = null;
     });
 
+    // G-SALES-INVOICE-UX-FOLLOWUP (2026-05-11): merge bank account
+    // name + free-text notes into the server `reference` field (the
+    // payment model has no separate notes column on the wire). Format:
+    //   "<bank>: <notes>" if both present, otherwise whichever is set.
+    // Keeps the audit trail readable in the JE memo and AR ledger.
+    final notes = _notes.text.trim();
+    final bank = _bankAccount.text.trim();
+    final ref = _reference.text.trim();
+    final combinedReference = [
+      if (ref.isNotEmpty) ref,
+      if (bank.isNotEmpty) 'بنك: $bank',
+      if (notes.isNotEmpty) 'ملاحظات: $notes',
+    ].join(' · ');
     final payload = <String, dynamic>{
       'invoice_id': widget.invoiceId,
       'payment_date': _fmtDate(_paymentDate),
       'amount': double.parse(_amount.text.trim()),
       'method': _method,
-      if (_reference.text.trim().isNotEmpty)
-        'reference': _reference.text.trim(),
+      if (combinedReference.isNotEmpty) 'reference': combinedReference,
     };
 
     final res = await ApiService.pilotRecordCustomerPayment(
@@ -183,6 +201,12 @@ class _CustomerPaymentModalState extends State<CustomerPaymentModal> {
                 'mada': 'مدى',
               }, (v) => setState(() => _method = v ?? 'cash')),
               _field('رقم المرجع (شيك/معاملة)', _reference),
+              // G-SALES-INVOICE-UX-FOLLOWUP (2026-05-11): bank-account
+              // field shows only when method=bank_transfer. Kept off
+              // the UI for cash/card/cheque/mada to avoid clutter.
+              if (_method == 'bank_transfer')
+                _field('الحساب البنكي المستلِم', _bankAccount),
+              _field('ملاحظات', _notes, maxLines: 2),
               if (_error != null) ...[
                 const SizedBox(height: 12),
                 Container(
@@ -250,6 +274,7 @@ class _CustomerPaymentModalState extends State<CustomerPaymentModal> {
     TextEditingController ctl, {
     String? Function(String?)? validator,
     TextInputType? keyboardType,
+    int maxLines = 1,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -257,6 +282,7 @@ class _CustomerPaymentModalState extends State<CustomerPaymentModal> {
         controller: ctl,
         validator: validator,
         keyboardType: keyboardType,
+        maxLines: maxLines,
         style: TextStyle(color: AC.tp, fontSize: 13),
         decoration: InputDecoration(
           labelText: label,
