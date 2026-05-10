@@ -80,19 +80,21 @@ class _SalesInvoiceCreateScreenState extends State<SalesInvoiceCreateScreen> {
   /// the description + unit_price + VAT-rate fields. The user can still
   /// override any of them after selection. Reads variant fields when
   /// the product was created via the modal's inline-variant flow.
-  void _onProductSelected(Map<String, dynamic> p) {
+  ///
+  /// G-SALES-INVOICE-UX-FOLLOWUP (Bug B, 2026-05-11): the products
+  /// LIST endpoint returns `ProductRead` (no `variants` field) — so
+  /// reading `p['variants']?.first?['list_price']` always saw null
+  /// and unit_price stayed empty. The auto-fill now branches: if
+  /// `variants` is already on the payload (came from the inline-
+  /// create modal which returns `ProductDetail`), use it directly;
+  /// otherwise fetch `/pilot/products/{id}` to get the full detail
+  /// and read list_price from there.
+  Future<void> _onProductSelected(Map<String, dynamic> p) async {
     setState(() {
       _selectedProduct = p;
       // description: prefer name_ar, fall back to name_en or code.
       final desc = (p['name_ar'] ?? p['name_en'] ?? p['code'] ?? '').toString();
       if (desc.isNotEmpty) _descCtrl.text = desc;
-      // unit price: read from first variant.list_price if present.
-      final variants = (p['variants'] as List?) ?? const [];
-      if (variants.isNotEmpty) {
-        final v0 = variants.first as Map?;
-        final price = v0?['list_price'];
-        if (price != null) _amountCtrl.text = '$price';
-      }
       // vat_rate: backend uses vat_code at the product level — UI keeps
       // the existing 15% default unless code says zero/exempt.
       final vatCode = (p['vat_code'] ?? '').toString();
@@ -102,6 +104,30 @@ class _SalesInvoiceCreateScreenState extends State<SalesInvoiceCreateScreen> {
         _vatRateCtrl.text = '15';
       }
     });
+
+    // unit_price: try the payload first; if absent, fetch full detail.
+    final inlineVariants = (p['variants'] as List?) ?? const [];
+    if (inlineVariants.isNotEmpty) {
+      final v0 = inlineVariants.first;
+      if (v0 is Map && v0['list_price'] != null) {
+        _amountCtrl.text = '${v0['list_price']}';
+        return;
+      }
+    }
+    final pid = p['id']?.toString();
+    if (pid == null || pid.isEmpty) return;
+    final detailRes = await ApiService.pilotGetProduct(pid);
+    if (!mounted || !detailRes.success || detailRes.data is! Map) return;
+    final detail = (detailRes.data as Map).cast<String, dynamic>();
+    // Mirror the variants back onto _selectedProduct so the line
+    // payload below picks up the variant_id for COGS auto-post.
+    setState(() => _selectedProduct = detail);
+    final variants = (detail['variants'] as List?) ?? const [];
+    if (variants.isEmpty) return;
+    final v0 = variants.first;
+    if (v0 is Map && v0['list_price'] != null) {
+      _amountCtrl.text = '${v0['list_price']}';
+    }
   }
 
   @override
