@@ -42,10 +42,25 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
   bool _busy = false;
   String? _error;
 
+  // G-SALES-INVOICE-UX-FOLLOWUP (Bug A, 2026-05-11): explicit
+  // ScrollController so wheel/touch events don't compete with the
+  // outer ApexMagneticShell scroll system. Without this, on the
+  // deployed bundle the details page rendered correctly above the
+  // fold but the user could not reach the totals / payments history
+  // / "+ تسجيل دفع" button — they were below the viewport with no
+  // way to scroll to them.
+  final ScrollController _scrollCtrl = ScrollController();
+
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void dispose() {
+    _scrollCtrl.dispose();
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -195,7 +210,21 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
                       Text(_error!, style: TextStyle(color: AC.err)),
                     ]),
                   )
-                : SingleChildScrollView(
+                // G-SALES-INVOICE-UX-FOLLOWUP (Bug A): Scrollbar +
+                // explicit controller + AlwaysScrollableScrollPhysics
+                // so the inner scroll never competes with the outer
+                // ApexMagneticShell scroll system. Pre-fix the page
+                // rendered correctly above the fold but mouse-wheel /
+                // Page_Down events never reached this ScrollView, so
+                // the user could not reach the totals + payment
+                // history + action row at all.
+                : PrimaryScrollController.none(
+                  child: Scrollbar(
+                    controller: _scrollCtrl,
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                    controller: _scrollCtrl,
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(20),
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 900),
@@ -215,10 +244,13 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
                           _buildPayments(),
                           const SizedBox(height: 20),
                           _buildActions(),
+                          const SizedBox(height: 40),
                         ],
                       ),
                     ),
+                    ),
                   ),
+                ),
       ),
     );
   }
