@@ -509,6 +509,17 @@ def create_transaction(payload: PosTransactionCreate, db: Session = Depends(get_
       7. ولّد receipt_number
     """
     session = _open_session_or_409(db, payload.session_id)
+    # G-POS-SESSION-HARDENING (2026-05-11): enforce cashier == session owner.
+    # Pre-fix the docstring claimed "from same cashier enforced" but the
+    # code persisted payload.cashier_user_id without checking. Cashier B
+    # could log sales on cashier A's open shift — GL stayed correct but
+    # Z-Report attribution was wrong.
+    if payload.cashier_user_id != session.opened_by_user_id:
+        raise HTTPException(
+            403,
+            f"الكاشير {payload.cashier_user_id} غير مُخوَّل للوردية "
+            f"{session.code} (مفتوحة بواسطة {session.opened_by_user_id})",
+        )
     branch = _branch_or_404(db, session.branch_id)
     warehouse = db.query(Warehouse).filter(Warehouse.id == session.warehouse_id).first()
     if not warehouse:
