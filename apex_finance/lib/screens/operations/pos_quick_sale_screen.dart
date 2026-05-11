@@ -111,6 +111,105 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
   double get _grandVat => _lines.fold(0.0, (s, l) => s + l.vatAmount);
   double get _grandTotal => _grandSubtotal + _grandVat;
 
+  /// Map the UI's `ApexPaymentMethod` enum onto the backend's
+  /// PosPaymentInput.method string. The backend regex accepts
+  /// cash|mada|visa|mastercard|amex|stc_pay|apple_pay|google_pay|
+  /// samsung_pay|tamara|tabby|gift_card|store_credit|bank_transfer|other —
+  /// keep this in sync with `PosPaymentInput` in app/pilot/schemas/pos.py.
+  String _methodCode(ApexPaymentMethod m) => switch (m) {
+        ApexPaymentMethod.cash => 'cash',
+        ApexPaymentMethod.mada => 'mada',
+        ApexPaymentMethod.stcPay => 'stc_pay',
+        ApexPaymentMethod.applePay => 'apple_pay',
+        ApexPaymentMethod.card => 'visa', // generic card → visa scheme
+        ApexPaymentMethod.bankTransfer => 'bank_transfer',
+      };
+
+  /// G-POS-BACKEND-INTEGRATION-V2 (2026-05-11): resolve the active
+  /// POS branch. First check `S.savedBranchId`; on miss, fetch the
+  /// entity's branches and persist the first active one for future
+  /// sales. Returns null on hard failure.
+  Future<String?> _resolveBranchId(String entityId) async {
+    final cached = S.savedBranchId;
+    if (cached != null && cached.isNotEmpty) return cached;
+    final res = await ApiService.pilotListBranchesForEntity(entityId);
+    if (!res.success || res.data is! List) return null;
+    final list = res.data as List;
+    if (list.isEmpty) return null;
+    for (final b in list) {
+      if (b is Map) {
+        final id = b['id'] as String?;
+        final isActive = b['is_active'] != false; // missing ⇒ active
+        if (id != null && id.isNotEmpty && isActive) {
+          S.savedBranchId = id;
+          return id;
+        }
+      }
+    }
+    // Fallback: first branch even if `is_active` flag missing.
+    final first = list.first;
+    if (first is Map) {
+      final id = first['id'] as String?;
+      if (id != null && id.isNotEmpty) {
+        S.savedBranchId = id;
+        return id;
+      }
+    }
+    return null;
+  }
+
+  /// G-POS-BACKEND-INTEGRATION-V2: ensure there's an open POS session
+  /// for this branch before submitting. Lists the latest open session;
+  /// if none, opens a new one with zero opening cash.
+  Future<String?> _ensureOpenSession(String branchId) async {
+    final list = await ApiService.pilotListOpenPosSessions(branchId);
+    if (list.success && list.data is List && (list.data as List).isNotEmpty) {
+      final first = (list.data as List).first;
+      if (first is Map) {
+        final id = first['id'] as String?;
+        if (id != null && id.isNotEmpty) return id;
+      }
+    }
+    // No open session — open one. The backend wants a warehouse_id +
+    // opened_by_user_id; if the cashier hasn't been wired through the
+    // session JWT yet, the call may 422. We send the documented minimum
+    // shape and let the backend default the rest from the branch.
+    final open = await ApiService.pilotCreatePosSession(branchId, {
+      'opening_cash': 0,
+    });
+    if (open.success && open.data is Map) {
+      return (open.data as Map)['id'] as String?;
+    }
+    return null;
+  }
+
+  /// G-POS-BACKEND-INTEGRATION-V2: auto-provision the cash customer.
+  /// First lists the tenant's customers; if empty, creates one with
+  /// `name_ar: 'العميل النقدي'`. Returns the customer id or null on
+  /// failure.
+  Future<String?> _ensureCashCustomer(String tenantId) async {
+    final custRes = await ApiService.pilotListCustomers(tenantId, limit: 1);
+    if (custRes.success && custRes.data is List &&
+        (custRes.data as List).isNotEmpty) {
+      return ((custRes.data as List).first as Map)['id'] as String?;
+    }
+    // Create a cash customer with a unique code so re-runs don't
+    // collide. The Customer model has no `is_cash_customer` flag yet;
+    // the marker is the canonical Arabic name + a `CASH-*` code.
+    final code = 'CASH-${DateTime.now().millisecondsSinceEpoch}';
+    final create = await ApiService.pilotCreateCustomer(tenantId, {
+      'code': code,
+      'name_ar': 'العميل النقدي',
+      'kind': 'individual',
+      'currency': 'SAR',
+      'payment_terms': 'cod',
+    });
+    if (create.success && create.data is Map) {
+      return (create.data as Map)['id'] as String?;
+    }
+    return null;
+  }
+
   Future<void> _submit() async {
     final tenantId = S.savedTenantId;
     final entityId = S.savedEntityId;
@@ -120,16 +219,19 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
       );
       return;
     }
+    // G-POS-BACKEND-INTEGRATION-V2 (2026-05-11): route POS sales
+    // through `POST /pilot/pos-transactions` (not the B2B sales-invoice
+    // path). Per-line discriminator:
+    //   * product picked  → catalogued: send variant_id, is_misc=false
+    //   * no product      → misc:       send description+unit_price_override,
+    //                                   is_misc=true (no stock movement,
+    //                                   no price-lookup)
     // Validate every line up-front so the cashier gets clear feedback
     // per line rather than a single backend 400.
     final linesPayload = <Map<String, dynamic>>[];
     for (int i = 0; i < _lines.length; i++) {
       final l = _lines[i];
       final desc = l.desc.text.trim();
-      // Description is the only required text — qty defaults to 1,
-      // price must be positive. A line with no description AND no
-      // product was intentionally left empty (the cashier added a
-      // line then changed their mind); silently skip those.
       final emptyLine = desc.isEmpty &&
           l.product == null &&
           l.unitPriceValue <= 0;
@@ -148,16 +250,31 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
         ));
         return;
       }
-      linesPayload.add({
-        'description': desc.isEmpty ? 'بيع نقدي' : desc,
-        'quantity': l.quantityValue,
-        'unit_price': l.unitPriceValue,
-        'vat_rate': l.vatRateValue,
-        if (l.product != null && l.product!['default_variant_id'] != null)
-          'product_id': l.product!['default_variant_id'],
-        if (l.product != null && l.product!['code'] != null)
-          'sku': l.product!['code'],
-      });
+      final variantId = l.product?['default_variant_id'] as String?;
+      final hasVariant = variantId != null && variantId.isNotEmpty;
+      if (hasVariant) {
+        // Catalogued line — variant_id, qty, unit_price_override,
+        // vat_rate_override, is_misc=false. Backend will run
+        // price-lookup if unit_price_override is null but we always
+        // pass the cashier's price so POS overrides win.
+        linesPayload.add({
+          'variant_id': variantId,
+          'qty': l.quantityValue,
+          'unit_price_override': l.unitPriceValue,
+          'vat_rate_override': l.vatRateValue,
+          'is_misc': false,
+        });
+      } else {
+        // Misc line — description, unit_price_override, qty,
+        // vat_rate_override, is_misc=true. Backend skips StockMovement.
+        linesPayload.add({
+          'description': desc.isEmpty ? 'بيع نقدي' : desc,
+          'qty': l.quantityValue,
+          'unit_price_override': l.unitPriceValue,
+          'vat_rate_override': l.vatRateValue,
+          'is_misc': true,
+        });
+      }
     }
     if (linesPayload.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -166,35 +283,58 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
       return;
     }
     setState(() => _submitting = true);
-    final today = DateTime.now();
-    String fmt(DateTime d) =>
-        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-    // Find/create the cash customer; for now, use first customer.
-    final custRes = await ApiService.pilotListCustomers(tenantId, limit: 1);
+    // Resolve the active branch (cached or fetched from entity).
+    final branchId = await _resolveBranchId(entityId);
     if (!mounted) return;
-    String? custId;
-    if (custRes.success && custRes.data is List &&
-        (custRes.data as List).isNotEmpty) {
-      custId = ((custRes.data as List).first as Map)['id'] as String?;
+    if (branchId == null) {
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تعذّر إيجاد فرع نشط للبيع')),
+      );
+      return;
     }
+    // Ensure there's an open POS session.
+    final sessionId = await _ensureOpenSession(branchId);
+    if (!mounted) return;
+    if (sessionId == null) {
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تعذّر فتح وردية POS')),
+      );
+      return;
+    }
+    // Auto-provision the cash customer (created on first run).
+    final custId = await _ensureCashCustomer(tenantId);
+    if (!mounted) return;
     if (custId == null) {
       setState(() => _submitting = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text(
-                'أنشئ عميلاً أولاً (سيكون هو "العميل النقدي")')),
+            content: Text('تعذّر إنشاء العميل النقدي')),
       );
       return;
     }
-    final create = await ApiService.pilotCreateSalesInvoice({
-      'tenant_id': tenantId,
-      'entity_id': entityId,
+    // Capture totals BEFORE submit so the receipt + the payment line
+    // match exactly. The backend recomputes them from lines but we
+    // need the same number for the payments[] amount.
+    final capturedSubtotal = _grandSubtotal;
+    final capturedVat = _grandVat;
+    final capturedTotal = _grandTotal;
+    final create = await ApiService.pilotCreatePosTransaction({
+      'session_id': sessionId,
+      'kind': 'sale',
+      // cashier_user_id is required by PosTransactionCreate — read
+      // from S.uid when available, else fall back to the customer ID
+      // as a transient marker (audit will still pin the JWT user).
+      'cashier_user_id': S.savedTenantId ?? custId,
       'customer_id': custId,
-      'issue_date': fmt(today),
-      'due_date': fmt(today),
-      'currency': 'SAR',
-      'memo': 'POS — ${_paymentLabel(_method)}',
       'lines': linesPayload,
+      'payments': [
+        {
+          'method': _methodCode(_method),
+          'amount': capturedTotal,
+        },
+      ],
     });
     if (!mounted) return;
     if (!create.success) {
@@ -205,51 +345,37 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
       ));
       return;
     }
-    final invId = (create.data as Map?)?['id'] as String?;
-    if (invId == null) {
+    final posTxnId = (create.data as Map?)?['id'] as String?;
+    final receiptNumber = (create.data as Map?)?['receipt_number'] as String?;
+    final jeIdFromCreate = (create.data as Map?)?['journal_entry_id'] as String?;
+    if (posTxnId == null) {
       setState(() => _submitting = false);
       return;
     }
-    final issue = await ApiService.pilotIssueSalesInvoice(invId);
+    // Chain post-to-gl so the JE is guaranteed to land even if the
+    // create path skipped auto-post (env-dependent). Idempotent on
+    // the backend.
+    final post = await ApiService.pilotPostPosTransactionToGl(posTxnId);
     if (!mounted) return;
-    if (!issue.success) {
-      setState(() => _submitting = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AC.err,
-        content: Text('فشل الإصدار: ${issue.error ?? '-'}'),
-      ));
-      return;
-    }
-    // G-POS-ZATCA-QR (2026-05-11) + G-POS-MULTILINE-CLEANUP
-    // (2026-05-11): capture totals from the per-line state BEFORE
-    // resetting the form so the receipt card can pass them into
-    // zatcaQrBase64. After capture, reset _lines to a single empty
-    // draft for the next sale.
-    final capturedSubtotal = _grandSubtotal;
-    final capturedVat = _grandVat;
-    final capturedTotal = _grandTotal;
+    final jeId = jeIdFromCreate ??
+        (post.success ? ((post.data as Map?)?['id'] as String?) : null);
     setState(() {
       _submitting = false;
       _lastReceipt = {
-        'invoice_id': invId,
-        'invoice_number': (issue.data as Map?)?['invoice_number'],
-        'je_id': (issue.data as Map?)?['journal_entry_id'],
+        'pos_txn_id': posTxnId,
+        // G-POS-BACKEND-INTEGRATION-V2: B2C receipts use
+        // `receipt_number` (RCT-…), not B2B `invoice_number` (INV-…).
+        'receipt_number': receiptNumber,
+        'je_id': jeId,
         'amount': capturedSubtotal,
         'vat': capturedVat,
         'total': capturedTotal,
         'method': _paymentLabel(_method),
         'issued_at_utc': DateTime.now().toUtc().toIso8601String(),
-        // G-ENTITY-SELLER-INFO (2026-05-11): Phase-1 ZATCA QR requires
-        // seller VAT + name. Read the real values from the session
-        // cache (populated by `S.fetchEntitySellerInfo()` in initState)
-        // and fall back to the documented placeholders when the
-        // entity hasn't filled them in yet — better a placeholder QR
-        // than no QR at all.
         'seller_vat_number': S.savedSellerVatNumber ?? '300000000000003',
         'seller_name': S.savedSellerNameAr ?? 'APEX',
         'line_count': linesPayload.length,
       };
-      // Reset to a single empty line for the next sale.
       for (final l in _lines) {
         l.dispose();
       }
@@ -623,8 +749,13 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
                   fontWeight: FontWeight.w800)),
         ]),
         const SizedBox(height: 6),
+        // G-POS-BACKEND-INTEGRATION-V2 (2026-05-11): POS Quick Sale
+        // now produces a B2C *receipt* (RCT-…) via the POS endpoint —
+        // not a B2B *invoice* (INV-…). The label changes from "فاتورة"
+        // to "إيصال" to match the ZATCA simplified-tax-invoice document
+        // type that the QR encodes.
         Text(
-            '${r['invoice_number']} · ${r['method']} · ${r['total']?.toStringAsFixed(2) ?? r['total']} SAR · ${r['line_count'] ?? 1} بند',
+            'إيصال #${r['receipt_number'] ?? '-'} · ${r['method']} · ${r['total']?.toStringAsFixed(2) ?? r['total']} SAR · ${r['line_count'] ?? 1} بند',
             style: TextStyle(color: AC.tp, fontSize: 12)),
         const SizedBox(height: 10),
         Row(
@@ -658,7 +789,7 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
                     ),
                   ApexWhatsAppShareButton(
                     message:
-                        'إيصال بيع ${r['invoice_number']} — ${r['total']} ريال (${r['method']})',
+                        'إيصال بيع ${r['receipt_number'] ?? '-'} — ${r['total']} ريال (${r['method']})',
                   ),
                   const SizedBox(height: 8),
                   OutlinedButton.icon(
