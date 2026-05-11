@@ -158,9 +158,19 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
     return null;
   }
 
-  /// G-POS-BACKEND-INTEGRATION-V2: ensure there's an open POS session
-  /// for this branch before submitting. Lists the latest open session;
-  /// if none, opens a new one with zero opening cash.
+  /// G-POS-BACKEND-INTEGRATION-V2 + G-POS-V2-HOTFIX: ensure there's an
+  /// open POS session for this branch before submitting. Lists the
+  /// latest open session; if none, opens a new one with the resolved
+  /// warehouse_id + cashier user_id.
+  ///
+  /// HOTFIX: pre-hotfix payload was `{'opening_cash': 0}` only, which
+  /// 422'd on first sale because PosSessionOpen requires `branch_id`,
+  /// `warehouse_id`, AND `opened_by_user_id`. The backend can't default
+  /// these from the branch (warehouse is 1:N per branch; user comes
+  /// from the JWT but the schema still validates the body). We now:
+  ///   1. fetch warehouses for the branch
+  ///   2. pick the first active one (or the first one period)
+  ///   3. pass S.uid as opened_by_user_id (early-return if null)
   Future<String?> _ensureOpenSession(String branchId) async {
     final list = await ApiService.pilotListOpenPosSessions(branchId);
     if (list.success && list.data is List && (list.data as List).isNotEmpty) {
@@ -170,11 +180,41 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
         if (id != null && id.isNotEmpty) return id;
       }
     }
-    // No open session — open one. The backend wants a warehouse_id +
-    // opened_by_user_id; if the cashier hasn't been wired through the
-    // session JWT yet, the call may 422. We send the documented minimum
-    // shape and let the backend default the rest from the branch.
+    // No open session — open one. Resolve warehouse_id first.
+    final whRes = await ApiService.pilotListBranchWarehouses(branchId);
+    if (!whRes.success || whRes.data is! List) return null;
+    final whList = whRes.data as List;
+    if (whList.isEmpty) return null;
+    String? warehouseId;
+    for (final w in whList) {
+      if (w is Map) {
+        final id = w['id'] as String?;
+        final isActive = w['is_active'] != false;
+        if (id != null && id.isNotEmpty && isActive) {
+          warehouseId = id;
+          break;
+        }
+      }
+    }
+    // Fallback to the first warehouse if none flagged active.
+    if (warehouseId == null) {
+      final first = whList.first;
+      if (first is Map) {
+        warehouseId = first['id'] as String?;
+      }
+    }
+    if (warehouseId == null || warehouseId.isEmpty) return null;
+    // Resolve cashier user id (HOTFIX bug #1): caller already gated on
+    // S.uid being non-empty before invoking this method, so the lookup
+    // here is purely a re-read for the payload field. We still null-
+    // guard so the bug surfaces as a returned-null (caller shows the
+    // snackbar) instead of a silent partial payload.
+    final cashierUid = S.uid;
+    if (cashierUid == null || cashierUid.isEmpty) return null;
     final open = await ApiService.pilotCreatePosSession(branchId, {
+      'branch_id': branchId,
+      'warehouse_id': warehouseId,
+      'opened_by_user_id': cashierUid,
       'opening_cash': 0,
     });
     if (open.success && open.data is Map) {
@@ -183,29 +223,68 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
     return null;
   }
 
-  /// G-POS-BACKEND-INTEGRATION-V2: auto-provision the cash customer.
-  /// First lists the tenant's customers; if empty, creates one with
-  /// `name_ar: 'العميل النقدي'`. Returns the customer id or null on
-  /// failure.
+  /// G-POS-V2-HOTFIX: stable canonical code for the auto-provisioned
+  /// cash customer. Pre-hotfix the code was `CASH-${timestamp}` which
+  /// re-created a new customer on every retry/refresh, polluting the
+  /// AR ledger with hundreds of one-off "cash customer" rows that all
+  /// referred to the same conceptual party. Switching to a stable code
+  /// + GET-by-code lookup makes the helper idempotent.
+  static const _kCashCustomerCode = 'CASH-DEFAULT';
+
+  /// G-POS-BACKEND-INTEGRATION-V2 + G-POS-V2-HOTFIX: auto-provision
+  /// the cash customer idempotently.
+  ///
+  /// Flow:
+  ///   1. GET by code (`CASH-DEFAULT`) — return id if found.
+  ///   2. POST create with the canonical code + Arabic name.
+  ///   3. If POST returns 409 (Customer already exists), retry the
+  ///      GET-by-code so two concurrent cashiers don't both create.
   Future<String?> _ensureCashCustomer(String tenantId) async {
-    final custRes = await ApiService.pilotListCustomers(tenantId, limit: 1);
-    if (custRes.success && custRes.data is List &&
-        (custRes.data as List).isNotEmpty) {
-      return ((custRes.data as List).first as Map)['id'] as String?;
+    // (1) GET by canonical code first. customer_routes.py's list
+    // endpoint supports `search=` which ILIKE-matches across code +
+    // name_ar + name_en + vat_number, so we filter client-side to
+    // exact-match on code to avoid picking up a `CASH-DEFAULT-X` twin.
+    final lookup = await ApiService.pilotGetCustomerByCode(
+        tenantId, _kCashCustomerCode);
+    if (lookup.success && lookup.data is List) {
+      for (final c in (lookup.data as List)) {
+        if (c is Map && c['code'] == _kCashCustomerCode) {
+          final id = c['id'] as String?;
+          if (id != null && id.isNotEmpty) return id;
+        }
+      }
     }
-    // Create a cash customer with a unique code so re-runs don't
-    // collide. The Customer model has no `is_cash_customer` flag yet;
-    // the marker is the canonical Arabic name + a `CASH-*` code.
-    final code = 'CASH-${DateTime.now().millisecondsSinceEpoch}';
+    // (2) Not found — POST create with the canonical code.
     final create = await ApiService.pilotCreateCustomer(tenantId, {
-      'code': code,
+      'code': _kCashCustomerCode,
       'name_ar': 'العميل النقدي',
       'kind': 'individual',
       'currency': 'SAR',
       'payment_terms': 'cod',
     });
     if (create.success && create.data is Map) {
-      return (create.data as Map)['id'] as String?;
+      final id = (create.data as Map)['id'] as String?;
+      if (id != null && id.isNotEmpty) return id;
+    }
+    // (3) Race-loser path: a concurrent cashier raced us to the create
+    // and the backend returned 409. Re-run the GET-by-code lookup so
+    // the second cashier picks up the row the first one wrote. We
+    // detect 409 by sniffing the error text since ApiResult flattens
+    // status codes — the message contains "already exists" per
+    // customer_routes.py:268. Be liberal in what we accept (any error
+    // string containing the literal) since the wrapper may prefix.
+    final err = (create.error ?? '').toLowerCase();
+    if (!create.success && err.contains('already exists')) {
+      final retry = await ApiService.pilotGetCustomerByCode(
+          tenantId, _kCashCustomerCode);
+      if (retry.success && retry.data is List) {
+        for (final c in (retry.data as List)) {
+          if (c is Map && c['code'] == _kCashCustomerCode) {
+            final id = c['id'] as String?;
+            if (id != null && id.isNotEmpty) return id;
+          }
+        }
+      }
     }
     return null;
   }
@@ -216,6 +295,21 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
     if (tenantId == null || entityId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('لا يوجد كيان نشط')),
+      );
+      return;
+    }
+    // G-POS-V2-HOTFIX bug #1 + #2: PosSessionOpen.opened_by_user_id
+    // AND PosTransactionCreate.cashier_user_id both require a real
+    // user id. Pre-hotfix the session payload silently omitted it
+    // (→ 422) and the transaction payload used S.savedTenantId as
+    // cashier_user_id (→ tenant.id leaking into the audit trail).
+    // Hard-gate the submit on S.uid before touching the backend so
+    // the cashier sees a single, clear Arabic snackbar instead of two
+    // mysterious 4xx errors back-to-back.
+    final cashierUid = S.uid;
+    if (cashierUid == null || cashierUid.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('لا يوجد مستخدم مسجّل دخول')),
       );
       return;
     }
@@ -323,10 +417,14 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
     final create = await ApiService.pilotCreatePosTransaction({
       'session_id': sessionId,
       'kind': 'sale',
-      // cashier_user_id is required by PosTransactionCreate — read
-      // from S.uid when available, else fall back to the customer ID
-      // as a transient marker (audit will still pin the JWT user).
-      'cashier_user_id': S.savedTenantId ?? custId,
+      // G-POS-V2-HOTFIX bug #2: cashier_user_id is required by
+      // PosTransactionCreate and represents the user who rang up the
+      // sale. Pre-hotfix this was `S.savedTenantId ?? custId`, which
+      // wrote the TENANT id (not a user id) into the audit row — the
+      // backend would either reject it (FK to users) or pin sales to
+      // a meaningless id forever. We gate the whole _submit on S.uid
+      // above so this read is guaranteed non-null here.
+      'cashier_user_id': cashierUid,
       'customer_id': custId,
       'lines': linesPayload,
       'payments': [
