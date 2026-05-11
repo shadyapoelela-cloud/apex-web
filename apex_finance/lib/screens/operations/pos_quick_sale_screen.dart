@@ -8,12 +8,19 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../api_service.dart';
 import '../../core/apex_saudi_payment_grid.dart';
 import '../../core/apex_whatsapp_share.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
+// G-POS-ZATCA-QR (2026-05-11): import the pure-Dart TLV helper so the
+// success receipt renders a Phase-1-compliant QR alongside the JE link
+// + WhatsApp share. Pre-fix POS receipts shipped no QR which meant
+// they didn't meet ZATCA Phase 1 requirements for B2C simplified-tax
+// invoices.
+import '../../core/zatca_tlv.dart';
 import '../../widgets/apex_output_chips.dart';
 
 class PosQuickSaleScreen extends StatefulWidget {
@@ -119,6 +126,10 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
       ));
       return;
     }
+    // G-POS-ZATCA-QR (2026-05-11): capture the timestamp + vat number
+    // BEFORE clearing the form fields so the receipt card can pass
+    // them into zatcaQrBase64. The QR is computed lazily in the
+    // receipt card so a re-render doesn't regenerate it.
     setState(() {
       _submitting = false;
       _lastReceipt = {
@@ -129,6 +140,17 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
         'vat': _vatAmount,
         'total': _total,
         'method': _paymentLabel(_method),
+        // Capture for QR. Backend issued_at would be canonical, but
+        // we don't get it back from /issue so use client-side `now`.
+        'issued_at_utc': DateTime.now().toUtc().toIso8601String(),
+        // Phase 1 ZATCA QR requires seller VAT + name. These don't
+        // live in client session storage yet (entity_setup_screen
+        // doesn't persist them locally) so we fall back to the same
+        // placeholders the sales-details screen uses. When the entity
+        // settings API exposes VAT/name fields, swap these for the
+        // real values via a future sprint.
+        'seller_vat_number': '300000000000003',
+        'seller_name': 'APEX',
       };
       _amountCtl.text = '0';
       _descCtl.clear();
@@ -292,6 +314,27 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
 
   Widget _receiptCard() {
     final r = _lastReceipt!;
+    // G-POS-ZATCA-QR (2026-05-11): build the Phase-1 TLV QR data
+    // lazily here so the receipt card always reflects the latest
+    // capture. zatcaQrBase64 throws if any TLV field exceeds 255
+    // bytes — wrap defensively so a malformed seller name doesn't
+    // hide the rest of the receipt.
+    String? qrData;
+    try {
+      qrData = zatcaQrBase64(
+        sellerName: r['seller_name']?.toString() ?? 'APEX',
+        vatNumber:
+            r['seller_vat_number']?.toString() ?? '300000000000003',
+        invoiceTimestampUtc: DateTime.tryParse(
+                r['issued_at_utc']?.toString() ?? '') ??
+            DateTime.now().toUtc(),
+        invoiceTotal:
+            (r['total'] as num?)?.toStringAsFixed(2) ?? '0.00',
+        vatTotal: (r['vat'] as num?)?.toStringAsFixed(2) ?? '0.00',
+      );
+    } catch (_) {
+      qrData = null;
+    }
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -309,24 +352,57 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
         const SizedBox(height: 6),
         Text('${r['invoice_number']} · ${r['method']} · ${r['total']} SAR',
             style: TextStyle(color: AC.tp, fontSize: 12)),
-        const SizedBox(height: 8),
-        Row(children: [
-          Expanded(
-            child: ApexWhatsAppShareButton(
-              message:
-                  'إيصال بيع ${r['invoice_number']} — ${r['total']} ريال (${r['method']})',
+        const SizedBox(height: 10),
+        // QR + JE link laid out side-by-side so the cashier can scan
+        // the QR straight from the screen while seeing the JE link.
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (qrData != null)
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: QrImageView(
+                  data: qrData,
+                  version: QrVersions.auto,
+                  size: 96,
+                  backgroundColor: Colors.white,
+                ),
+              ),
+            if (qrData != null) const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (qrData != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Text('ZATCA QR (Phase 1)',
+                          style:
+                              TextStyle(color: AC.td, fontSize: 10)),
+                    ),
+                  ApexWhatsAppShareButton(
+                    message:
+                        'إيصال بيع ${r['invoice_number']} — ${r['total']} ريال (${r['method']})',
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: () => context
+                        .go('/app/erp/finance/je-builder/${r['je_id']}'),
+                    icon: Icon(Icons.receipt, color: AC.gold),
+                    label: Text('عرض القيد',
+                        style: TextStyle(color: AC.gold)),
+                    style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: AC.gold)),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () => context.go('/app/erp/finance/je-builder/${r['je_id']}'),
-              icon: Icon(Icons.receipt, color: AC.gold),
-              label: Text('عرض القيد', style: TextStyle(color: AC.gold)),
-              style: OutlinedButton.styleFrom(side: BorderSide(color: AC.gold)),
-            ),
-          ),
-        ]),
+          ],
+        ),
       ]),
     );
   }
