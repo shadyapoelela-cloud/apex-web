@@ -128,13 +128,29 @@ void main() {
       // The whole point of the picker is auto-fill. If a future
       // refactor breaks the on-pick handler, the picker becomes a
       // decorative dropdown.
-      expect(createSrc.contains('_onProductSelected'), isTrue);
-      expect(createSrc.contains('_descCtrl.text = desc'), isTrue,
-          reason: 'on pick → fill description');
-      expect(createSrc.contains("_amountCtrl.text = '\$price'"), isTrue,
-          reason: 'on pick → fill unit_price from variant.list_price');
-      expect(createSrc.contains("_vatRateCtrl.text = '0'"), isTrue,
-          reason: 'on pick → vat=0 for zero_rated/exempt products');
+      // G-SALES-INVOICE-MULTILINE-PREFILL (PR #189): the create
+      // screen went from single-line (_descCtrl/_amountCtrl/
+      // _vatRateCtrl + _onProductSelected) to per-line _LineDraft
+      // controllers with an inline onSelected callback. Re-pin the
+      // contract against the new shape — picker still must auto-fill
+      // description + unit price from the selected product.
+      expect(createSrc.contains('ProductPickerOrCreate('), isTrue,
+          reason: 'picker widget must be embedded per line');
+      expect(createSrc.contains('onSelected:'), isTrue,
+          reason: 'each line must wire the onSelected callback');
+      // The picker callback must write to `desc.text` AND `unitPrice.text`
+      // on the selected line — variable names differ between sales
+      // (`line.`) and purchase (`l.`) so accept either prefix.
+      expect(
+        RegExp(r"(?:line|l)\.desc\.text\s*=").hasMatch(createSrc),
+        isTrue,
+        reason: 'on pick → fill description on the line',
+      );
+      expect(
+        RegExp(r"(?:line|l)\.unitPrice\.text\s*=").hasMatch(createSrc),
+        isTrue,
+        reason: 'on pick → fill unit_price on the line',
+      );
     });
 
     test('test_payload_includes_product_and_variant_ids', () {

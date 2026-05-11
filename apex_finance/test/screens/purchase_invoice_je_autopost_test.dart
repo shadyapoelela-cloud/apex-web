@@ -88,7 +88,17 @@ void main() {
           reason: 'must read journal_entry_id from /post response');
       expect(src.contains('قيد اليومية'), isTrue);
       expect(src.contains('عرض القيد'), isTrue);
-      expect(src.contains("'/app/erp/finance/je-builder'"), isTrue);
+      // G-PURCHASE-MULTILINE-PARITY (PR #190) deep-linked the JE
+      // builder by ID. The original assertion expected the bare path;
+      // accept either so the snackbar test stays aligned with the
+      // sales-side pattern.
+      expect(
+        src.contains("'/app/erp/finance/je-builder'") ||
+            RegExp(r"/app/erp/finance/je-builder/\$\w+").hasMatch(src),
+        isTrue,
+        reason:
+            'snackbar action must navigate to the JE builder (bare or per-id)',
+      );
     });
   });
 
