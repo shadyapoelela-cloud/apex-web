@@ -65,12 +65,17 @@ void main() {
       expect(posSrc.contains('linesPayload.add({'), isTrue,
           reason: 'payload must loop over _lines and serialise each');
       expect(posSrc.contains("'lines': linesPayload"), isTrue);
-      // POS routes through the sales-invoice endpoint so it uses
-      // sales-side keys: quantity + unit_price + vat_rate. Mirror of
-      // SalesInvoiceCreateScreen payload shape.
-      expect(posSrc.contains("'quantity': l.quantityValue"), isTrue);
-      expect(posSrc.contains("'unit_price': l.unitPriceValue"), isTrue);
-      expect(posSrc.contains("'vat_rate': l.vatRateValue"), isTrue);
+      // G-POS-BACKEND-INTEGRATION-V2 (2026-05-11): POS no longer
+      // routes through the sales-invoice endpoint — it now calls
+      // `POST /pilot/pos-transactions` directly. The PosLineInput
+      // schema uses `qty` + `unit_price_override` + `vat_rate_override`
+      // (NOT the sales-side `quantity`/`unit_price`/`vat_rate`).
+      expect(posSrc.contains("'qty': l.quantityValue"), isTrue,
+          reason: 'POS payload must serialise qty (PosLineInput shape)');
+      expect(posSrc.contains("'unit_price_override': l.unitPriceValue"), isTrue,
+          reason: 'POS payload must serialise unit_price_override');
+      expect(posSrc.contains("'vat_rate_override': l.vatRateValue"), isTrue,
+          reason: 'POS payload must serialise vat_rate_override');
     });
 
     test('test_pos_uses_product_picker_in_line_card', () {

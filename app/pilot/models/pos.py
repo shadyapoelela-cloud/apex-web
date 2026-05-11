@@ -269,8 +269,14 @@ class PosTransactionLine(Base):
     line_number = Column(Integer, nullable=False)                           # تسلسلي 1..N
 
     # المنتج
-    variant_id = Column(String(36), ForeignKey("pilot_product_variants.id", ondelete="RESTRICT"), nullable=False, index=True)
-    sku = Column(String(80), nullable=False)                                # مخزَّن في البند للتدقيق
+    # G-POS-BACKEND-INTEGRATION-V2 (2026-05-11): variant_id is now
+    # nullable to support ad-hoc/misc lines (services, custom items,
+    # quick rings without a barcoded SKU). When `is_misc=True`,
+    # variant_id is NULL and the line's price/description come straight
+    # from the cashier's input — no StockMovement is recorded.
+    variant_id = Column(String(36), ForeignKey("pilot_product_variants.id", ondelete="RESTRICT"), nullable=True, index=True)
+    is_misc = Column(Boolean, nullable=False, default=False)                # discriminator: True ⇒ un-catalogued line
+    sku = Column(String(80), nullable=True)                                 # مخزَّن في البند للتدقيق
     description = Column(String(500), nullable=False)                       # اسم المنتج لحظة البيع
     barcode_scanned = Column(String(50), nullable=True)                     # الباركود الذي مُسح
 

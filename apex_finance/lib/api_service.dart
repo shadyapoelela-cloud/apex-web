@@ -764,6 +764,37 @@ class ApiService {
   static Future<ApiResult> pilotPostPosToGL(String posTxnId) =>
       _post('/pilot/pos-transactions/$posTxnId/post-to-gl', {});
 
+  // ── G-POS-BACKEND-INTEGRATION-V2 (2026-05-11) ──
+  // POS Quick Sale switches off the B2B sales-invoice path and onto
+  // the real POS endpoints. The B2B path produced ghost AR (no payment
+  // recorded), zero stock movement, and an empty Z-report. The methods
+  // below wire the frontend to `POST /pilot/pos-transactions` →
+  // `POST /pilot/pos-transactions/{id}/post-to-gl` so every POS sale
+  // single-step posts a JE, deducts stock, attaches to a session, and
+  // is reported on Z-Report.
+  /// Create a POS transaction (sale/return). Payload mirrors
+  /// `PosTransactionCreate` — session_id, kind, customer_id, lines[],
+  /// payments[]. Lines now carry an `is_misc` discriminator so ad-hoc
+  /// cash sales (no variant) work end-to-end.
+  static Future<ApiResult> pilotCreatePosTransaction(Map<String, dynamic> payload) =>
+      _post('/pilot/pos-transactions', payload);
+  /// Idempotent JE auto-post for an already-completed POS transaction.
+  /// Route lives in `gl_routes.py` (not `pos_routes.py`) but is mounted
+  /// under the same `/pilot` prefix.
+  static Future<ApiResult> pilotPostPosTransactionToGl(String posTxnId) =>
+      _post('/pilot/pos-transactions/$posTxnId/post-to-gl', {});
+  /// List open POS sessions for a branch — used to find the cashier's
+  /// current shift before submitting a sale. Returns at most 1 with
+  /// status=open; if empty, caller should open a new session first.
+  static Future<ApiResult> pilotListOpenPosSessions(String branchId) =>
+      _get('/pilot/branches/$branchId/pos-sessions?status=open&limit=1');
+  /// List branches owned by an entity. Used by the POS to resolve the
+  /// active branch when `S.savedBranchId` isn't set yet. Aliases
+  /// `pilotEntityBranches` above which has the same signature — keep
+  /// both since the V2 name is what new screens reach for.
+  static Future<ApiResult> pilotListBranchesForEntity(String entityId) =>
+      _get('/pilot/entities/$entityId/branches');
+
   // Financial Statements endpoints are declared below (fsTrialBalance / fsIncomeStatement / fsBalanceSheet) — reused.
 
   // ── HR: Employees (existing) ──

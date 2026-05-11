@@ -18,6 +18,12 @@ class S {
   static String? _cachedSellerVat;
   static String? _cachedSellerNameAr;
   static String? _cachedSellerAddressAr;
+  // G-POS-BACKEND-INTEGRATION-V2 (2026-05-11): cached active POS
+  // branch ID. Persisted in localStorage (`pilot.branch_id`) so future
+  // POS Quick Sale submissions skip the entity-branches lookup. Set
+  // after the first sale resolves the branch; cleared by S.clear()
+  // so the next user on the same browser doesn't inherit it.
+  static String? _cachedBranchId;
   // G-LEGACY-KEY-AUDIT (2026-05-09): canonical key is `pilot.tenant_id`.
   // Fall back through both localStorage keys (pilot first, then
   // legacy) so screens that still read S.savedTenantId see whatever
@@ -65,6 +71,25 @@ class S {
       st['pilot.seller_name_ar'] = _cachedSellerNameAr!;
     } else {
       st.remove('pilot.seller_name_ar');
+    }
+  }
+
+  /// G-POS-BACKEND-INTEGRATION-V2 (2026-05-11): active POS branch ID
+  /// for the cashier. Read order: in-memory cache → localStorage. Set
+  /// by `_submit` after resolving the first branch from
+  /// `pilotListBranchesForEntity` so subsequent sales skip the lookup.
+  /// Null means "resolve from /entities/{eid}/branches and pick the
+  /// first active one".
+  static String? get savedBranchId =>
+      _cachedBranchId ??
+      html.window.localStorage['pilot.branch_id'];
+  static set savedBranchId(String? v) {
+    _cachedBranchId = (v != null && v.isNotEmpty) ? v : null;
+    final st = html.window.localStorage;
+    if (_cachedBranchId != null) {
+      st['pilot.branch_id'] = _cachedBranchId!;
+    } else {
+      st.remove('pilot.branch_id');
     }
   }
 
@@ -182,6 +207,9 @@ class S {
     _cachedSellerVat = null;
     _cachedSellerNameAr = null;
     _cachedSellerAddressAr = null;
+    // G-POS-BACKEND-INTEGRATION-V2: clear cached branch so next user
+    // on same browser doesn't inherit the previous cashier's branch.
+    _cachedBranchId = null;
     final st = html.window.localStorage;
     st.remove('apex_token'); st.remove('apex_uid'); st.remove('apex_uname');
     st.remove('apex_dname'); st.remove('apex_plan'); st.remove('apex_email');
@@ -190,6 +218,8 @@ class S {
     st.remove('pilot.seller_vat');
     st.remove('pilot.seller_name_ar');
     st.remove('pilot.seller_address_ar');
+    // G-POS-BACKEND-INTEGRATION-V2: clear cached POS branch too.
+    st.remove('pilot.branch_id');
     // G-LEGACY-KEY-AUDIT (2026-05-09): clear the new pilot.* keys
     // too. Pre-fix, S.clear() wiped only the legacy keys — the
     // 401 interceptor (api_service.dart:51) and any other caller

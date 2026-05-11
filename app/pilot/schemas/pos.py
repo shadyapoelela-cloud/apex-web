@@ -3,7 +3,7 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional, Literal
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, model_validator
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -64,8 +64,27 @@ class PosSessionRead(BaseModel):
 # ──────────────────────────────────────────────────────────────────────────
 
 class PosLineInput(BaseModel):
-    """سطر دخَل نقطة البيع — يحتوي ما يكفي لحساب السعر والضريبة."""
-    variant_id: str
+    """سطر دخَل نقطة البيع — يحتوي ما يكفي لحساب السعر والضريبة.
+
+    G-POS-BACKEND-INTEGRATION-V2 (2026-05-11): soft variant_id. The
+    previous shape REQUIRED `variant_id` on every line which broke
+    ad-hoc cash sales (services, custom items, quick rings without
+    a barcoded SKU). The new shape introduces an `is_misc` discriminator:
+
+      * `is_misc=False` (default): catalogued SKU — `variant_id` MUST
+        be set, price-lookup runs against the price list, StockMovement
+        is recorded.
+      * `is_misc=True`: ad-hoc line — `variant_id` is ignored,
+        `description` + `unit_price_override` MUST be supplied, NO
+        StockMovement is recorded (un-catalogued items have no
+        inventory to deduct from).
+
+    The `vat_rate_override` lets the cashier pin a non-default rate
+    per line (e.g. zero-rated services); when absent the route falls
+    back to the product's `vat_code` (catalogued path) or the
+    company's `default_vat_rate` (misc path).
+    """
+    variant_id: Optional[str] = None
     qty: Decimal = Field(..., description="موجب للبيع، سالب للمرتجع")
     barcode_scanned: Optional[str] = None
     # اختياري: تجاوز تسعير قائمة الأسعار
@@ -74,6 +93,33 @@ class PosLineInput(BaseModel):
     discount_amount: Optional[Decimal] = Field(None, ge=0)
     discount_reason: Optional[str] = None
     salesperson_user_id: Optional[str] = None
+    # G-POS-BACKEND-INTEGRATION-V2: soft-variant fields
+    is_misc: bool = False
+    description: Optional[str] = None
+    vat_rate_override: Optional[Decimal] = Field(None, ge=0, le=100)
+
+    @model_validator(mode="after")
+    def _check_variant_vs_misc(self) -> "PosLineInput":
+        """Enforce the discriminator:
+          * catalogued (is_misc=False) → variant_id required
+          * misc      (is_misc=True)  → description + unit_price_override required
+        """
+        if not self.is_misc:
+            if not self.variant_id:
+                raise ValueError(
+                    "variant_id مطلوب للبنود المُفهرَسة (is_misc=False)"
+                )
+        else:
+            if not self.description or not self.description.strip():
+                raise ValueError(
+                    "description مطلوب للبنود المتنوّعة (is_misc=True)"
+                )
+            if self.unit_price_override is None:
+                raise ValueError(
+                    "unit_price_override مطلوب للبنود المتنوّعة (is_misc=True) "
+                    "— لا يمكن لـ price-lookup إيجاد سعر بدون variant_id"
+                )
+        return self
 
 
 class PosLineRead(BaseModel):
@@ -81,8 +127,12 @@ class PosLineRead(BaseModel):
 
     id: str
     line_number: int
-    variant_id: str
-    sku: str
+    # G-POS-BACKEND-INTEGRATION-V2: variant_id is now nullable so misc
+    # lines (un-catalogued ad-hoc sales) can round-trip through the read
+    # model without violating the schema.
+    variant_id: Optional[str] = None
+    is_misc: bool = False
+    sku: Optional[str] = None
     description: str
     barcode_scanned: Optional[str]
     qty: Decimal
