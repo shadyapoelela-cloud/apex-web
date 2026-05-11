@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href='https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap' rel='stylesheet'>
+<style>body{font-family:'Tajawal',sans-serif!important}*{font-family:'Tajawal',sans-serif!important}</style><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/apex-web/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="APEX — منصّة العمليات والامتثال والاستشارات المالية">
+
+  <!-- PWA + iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="APEX">
+  <!-- Theme colour matches APEX dark navy so the Edge / Chrome PWA
+       window-controls-overlay blends with the app's own top bar. -->
+  <meta name="theme-color" content="#0A1628">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>APEX</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- When installed as PWA with window-controls-overlay, keep the
+       app's canvas clear of the OS title-bar area. The browser exposes
+       env(titlebar-area-*) vars; our Flutter top bar renders underneath
+       but we reserve the WCO area so window controls remain clickable. -->
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #0A1628; }
+  </style>
+
+  <!-- APEX: unregister stale service workers + purge caches on load (fix stale cache issues) -->
+  <script id="apex_sw_cleanup">
+    (function() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var r of regs) {
+            r.unregister().then(function(ok) {
+              if (ok) console.log('[APEX] Unregistered stale service worker');
+            });
+          }
+        }).catch(function(e) { console.warn('[APEX] SW cleanup failed:', e); });
+      }
+      if (window.caches && caches.keys) {
+        caches.keys().then(function(keys) {
+          for (var k of keys) {
+            caches.delete(k).then(function(ok) {
+              if (ok) console.log('[APEX] Deleted cache:', k);
+            });
+          }
+        }).catch(function(e) { console.warn('[APEX] cache cleanup failed:', e); });
+      }
+    })();
+  </script>
+
+  <!-- APEX Pre-redirect (v6.5.3): auth-disabled build — no forced redirects.
+       The app's GoRouter already redirects /login → /app, so the old
+       JS-level hash override was silently discarding the user's target
+       route (e.g. #/clients → #/login → #/app). Now: only the "already
+       logged-in and sitting on /login" case still redirects to home. -->
+  <script id="apex_pre_redirect">
+    (function() {
+      var token = localStorage.getItem('apex_token');
+      var hash = window.location.hash || '';
+      if (token && token.length > 10) {
+        if (hash === '#/login') {
+          window.location.hash = '#/home';
+        }
+      }
+    })();
+  </script>
+
+  <!-- APEX PWA install prompt capture + standalone detection -->
+  <script id="apex_pwa_install">
+    (function() {
+      window.__APEX_PWA__ = {
+        installEvent: null,
+        canInstall: false,
+        isStandalone: window.matchMedia('(display-mode: standalone)').matches ||
+                      window.navigator.standalone === true,
+        promptInstall: function() {
+          if (!this.installEvent) return false;
+          this.installEvent.prompt();
+          this.installEvent.userChoice.then(function(choice) {
+            console.log('[APEX] PWA install choice:', choice.outcome);
+            window.__APEX_PWA__.installEvent = null;
+            window.__APEX_PWA__.canInstall = false;
+            window.dispatchEvent(new Event('apex:pwa-changed'));
+          });
+          return true;
+        }
+      };
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        window.__APEX_PWA__.installEvent = e;
+        window.__APEX_PWA__.canInstall = true;
+        window.dispatchEvent(new Event('apex:pwa-changed'));
+        console.log('[APEX] PWA install prompt ready');
+      });
+      window.addEventListener('appinstalled', function() {
+        window.__APEX_PWA__.installEvent = null;
+        window.__APEX_PWA__.canInstall = false;
+        window.__APEX_PWA__.isStandalone = true;
+        window.dispatchEvent(new Event('apex:pwa-changed'));
+        console.log('[APEX] PWA installed');
+      });
+      // APEX: function-style accessors for Dart js_util.callMethod
+      // (Dart side calls window.apexCanInstall() / apexIsStandalone() as functions)
+      window.apexCanInstall = function() {
+        return !!(window.__APEX_PWA__ && window.__APEX_PWA__.canInstall);
+      };
+      window.apexIsStandalone = function() {
+        return !!(window.__APEX_PWA__ && window.__APEX_PWA__.isStandalone);
+      };
+      window.apexPromptInstall = function() {
+        return window.__APEX_PWA__ ? window.__APEX_PWA__.promptInstall() : false;
+      };
+    })();
+  </script>
+</head>
+<body>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
+
