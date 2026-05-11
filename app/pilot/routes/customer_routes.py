@@ -140,6 +140,18 @@ class SalesInvoiceCreate(BaseModel):
     lines: list[SalesInvoiceLineInput]
 
 
+# G-SALES-INVOICE-UPDATE (2026-05-11): PATCH-only schema for the new
+# edit-draft endpoint. All fields optional — `lines`, when present,
+# REPLACES the existing line set (delete + insert, same as create).
+class SalesInvoiceUpdate(BaseModel):
+    customer_id: Optional[str] = None
+    issue_date: Optional[str] = None
+    due_date: Optional[str] = None
+    currency: Optional[str] = None
+    memo: Optional[str] = None
+    lines: Optional[list[SalesInvoiceLineInput]] = None
+
+
 class SalesInvoiceRead(BaseModel):
     id: str
     invoice_number: str
@@ -165,6 +177,10 @@ class CustomerPaymentInput(BaseModel):
     # else-branch in _post_customer_payment_je — pre-existing behavior.
     method: str = Field(default="bank_transfer", pattern="^(cash|bank_transfer|cheque|card|mada)$")
     reference: Optional[str] = None
+    # G-CUSTOMER-PAYMENT-NOTES (2026-05-11): internal audit field —
+    # complements `reference` (merchant-visible) so the modal can keep
+    # the AR ledger memo clean while still capturing teller notes.
+    notes: Optional[str] = None
     receipt_number: Optional[str] = None
 
 
@@ -193,6 +209,8 @@ class CustomerPaymentRead(BaseModel):
     amount: float
     method: str
     reference: Optional[str] = None
+    # G-CUSTOMER-PAYMENT-NOTES (2026-05-11): internal audit notes.
+    notes: Optional[str] = None
     journal_entry_id: Optional[str] = None
 
 
@@ -615,6 +633,110 @@ def create_sales_invoice(payload: SalesInvoiceCreate = Body(...)):
         db.close()
 
 
+# G-SALES-INVOICE-UPDATE (2026-05-11): PATCH endpoint — edit a draft.
+# Closes the duplicate-create bug where the Edit flow's "Save" was
+# POSTing a new draft instead of updating the existing one. Only draft
+# invoices are editable; any other status → 409.
+#
+# When `lines` is provided, the existing lines are deleted and the new
+# lines inserted (mirrors create_sales_invoice's line-building loop).
+# Totals are recomputed server-side from the new lines.
+@router.patch("/sales-invoices/{invoice_id}", response_model=SalesInvoiceRead)
+def update_sales_invoice(
+    invoice_id: str = Path(...),
+    payload: SalesInvoiceUpdate = Body(...),
+    current_user: dict = Depends(get_current_user),
+):
+    db = _db()
+    try:
+        inv = assert_resource_in_tenant(
+            db, SalesInvoice, invoice_id, current_user, soft_delete_field=None,
+        )
+        if inv.status != SalesInvoiceStatus.draft.value:
+            raise HTTPException(
+                status_code=409,
+                detail=f"cannot edit invoice in status {inv.status!r} — only drafts editable",
+            )
+
+        # Header updates (only the fields the client actually sent)
+        if payload.customer_id is not None:
+            customer = (
+                db.query(Customer)
+                .filter(Customer.id == payload.customer_id)
+                .first()
+            )
+            if customer is None:
+                raise HTTPException(status_code=404, detail="customer not found")
+            inv.customer_id = customer.id
+        if payload.issue_date is not None:
+            inv.issue_date = date.fromisoformat(payload.issue_date)
+        if payload.due_date is not None:
+            inv.due_date = date.fromisoformat(payload.due_date)
+        if payload.currency is not None:
+            inv.currency = payload.currency
+        if payload.memo is not None:
+            inv.memo = payload.memo
+
+        # Replace-lines path: delete existing rows, rebuild, recompute totals.
+        if payload.lines is not None:
+            db.query(SalesInvoiceLine).filter(
+                SalesInvoiceLine.invoice_id == inv.id
+            ).delete(synchronize_session=False)
+            db.flush()
+
+            subtotal = Decimal("0")
+            vat_total = Decimal("0")
+            for i, ln in enumerate(payload.lines, start=1):
+                qty = Decimal(str(ln.quantity))
+                price = Decimal(str(ln.unit_price))
+                discount = price * qty * (Decimal(str(ln.discount_pct)) / Decimal(100))
+                line_sub = (qty * price) - discount
+                line_vat = line_sub * (Decimal(str(ln.vat_rate)) / Decimal(100))
+                line_total = line_sub + line_vat
+                subtotal += line_sub
+                vat_total += line_vat
+                db.add(SalesInvoiceLine(
+                    id=gen_uuid(),
+                    invoice_id=inv.id,
+                    line_number=i,
+                    product_id=ln.product_id,
+                    description=ln.description,
+                    quantity=qty,
+                    unit_price=price,
+                    discount_pct=Decimal(str(ln.discount_pct)),
+                    discount_amount=discount,
+                    vat_code=f"{int(ln.vat_rate)}",
+                    vat_rate=Decimal(str(ln.vat_rate)),
+                    subtotal=line_sub,
+                    vat_amount=line_vat,
+                    line_total=line_total,
+                    revenue_account_id=ln.revenue_account_id,
+                ))
+            inv.subtotal = subtotal
+            inv.vat_amount = vat_total
+            inv.total = subtotal + vat_total
+
+        db.commit()
+        db.refresh(inv)
+
+        return SalesInvoiceRead(
+            id=inv.id,
+            invoice_number=inv.invoice_number,
+            customer_id=inv.customer_id,
+            issue_date=inv.issue_date.isoformat(),
+            due_date=inv.due_date.isoformat() if inv.due_date else None,
+            status=inv.status,
+            currency=inv.currency,
+            subtotal=float(inv.subtotal),
+            vat_amount=float(inv.vat_amount),
+            total=float(inv.total),
+            paid_amount=float(inv.paid_amount or 0),
+            journal_entry_id=inv.journal_entry_id,
+        )
+    finally:
+        db.close()
+
+
 @router.get("/entities/{entity_id}/sales-invoices", response_model=list[SalesInvoiceRead])
 def list_sales_invoices(
     entity_id: str = Path(...),
@@ -782,6 +904,8 @@ def record_customer_payment(
             amount=Decimal(str(payload.amount)),
             method=payload.method,
             reference=payload.reference,
+            # G-CUSTOMER-PAYMENT-NOTES (2026-05-11): internal audit field.
+            notes=payload.notes,
         )
         db.add(pay)
 
@@ -1021,6 +1145,8 @@ def get_sales_invoice_detail(
                     amount=float(p.amount),
                     method=p.method,
                     reference=p.reference,
+                    # G-CUSTOMER-PAYMENT-NOTES (2026-05-11): internal audit notes.
+                    notes=getattr(p, "notes", None),
                     journal_entry_id=p.journal_entry_id,
                 )
                 for p in payment_rows

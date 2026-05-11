@@ -219,6 +219,12 @@ class CustomerPayment(Base):
     method = Column(String(30), nullable=False, default="bank_transfer")  # cash | bank | check | card
     reference = Column(String(100), nullable=True)                         # رقم الشيك أو المرجع البنكي
 
+    # G-CUSTOMER-PAYMENT-NOTES (2026-05-11): internal audit field —
+    # parity with VendorPayment.notes. `reference` stays the
+    # merchant-visible reference (cheque #, transfer ref); `notes`
+    # captures teller / cashier observations for the AR audit trail.
+    notes = Column(String(500), nullable=True)
+
     # المراجع المحاسبية
     journal_entry_id = Column(String(36), ForeignKey("pilot_journal_entries.id"), nullable=True)
 
