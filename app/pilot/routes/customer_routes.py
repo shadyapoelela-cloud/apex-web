@@ -21,7 +21,7 @@ from decimal import Decimal
 from typing import Any, Optional
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.phase1.models.platform_models import SessionLocal, gen_uuid
@@ -159,7 +159,11 @@ class CustomerPaymentInput(BaseModel):
     invoice_id: Optional[str] = None        # optional — unapplied payment OK
     payment_date: str
     amount: float
-    method: str = "bank_transfer"
+    # G-PAYMENT-METHOD-VALIDATION (2026-05-11): strict pattern matching
+    # customer_payment_modal.dart dropdown (cash/bank_transfer/cheque/card/mada).
+    # card/mada both route to 1120 (bank/merchant settlement) via the
+    # else-branch in _post_customer_payment_je — pre-existing behavior.
+    method: str = Field(default="bank_transfer", pattern="^(cash|bank_transfer|cheque|card|mada)$")
     reference: Optional[str] = None
     receipt_number: Optional[str] = None
 
