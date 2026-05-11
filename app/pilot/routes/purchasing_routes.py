@@ -459,6 +459,48 @@ def post_pi_endpoint(
         raise HTTPException(409, str(ex))
 
 
+# G-PURCHASE-MULTILINE-PARITY (2026-05-11): cancel endpoint, mirror of
+# the sales cancel flow. Moves PI → cancelled. If a JE was already
+# posted (status=posted), reverses it via gl_engine.reverse_journal_entry
+# so the GL stays balanced. Refuses when any vendor payment was applied
+# — those need to be voided first.
+@router.post("/purchase-invoices/{pi_id}/cancel", response_model=PiRead)
+def cancel_pi_endpoint(
+    pi_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    inv = assert_resource_in_tenant(
+        db, PurchaseInvoice, pi_id, current_user, soft_delete_field=None,
+    )
+    if inv.status == PurchaseInvoiceStatus.cancelled.value:
+        raise HTTPException(409, "invoice already cancelled")
+    if inv.status == PurchaseInvoiceStatus.paid.value:
+        raise HTTPException(
+            409, "cannot cancel a paid invoice — void payments first",
+        )
+    if (inv.amount_paid or Decimal(0)) > 0:
+        raise HTTPException(
+            409, "cannot cancel: invoice has applied payments",
+        )
+    if inv.journal_entry_id:
+        try:
+            from app.pilot.services.gl_engine import reverse_journal_entry
+            reverse_journal_entry(
+                db,
+                inv.journal_entry_id,
+                reversal_date=_date.today(),
+                memo_ar=f"عكس قيد فاتورة شراء ملغاة {inv.invoice_number}",
+            )
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(409, f"reversal failed: {e}")
+    inv.status = PurchaseInvoiceStatus.cancelled.value
+    db.commit()
+    db.refresh(inv)
+    return inv
+
+
 @router.get("/entities/{entity_id}/purchase-invoices", response_model=list[PiRead])
 def list_pis(
     entity_id: str,

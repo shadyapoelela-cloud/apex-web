@@ -718,6 +718,15 @@ class ApiService {
   // create endpoint backing the new PurchaseInvoiceCreateScreen.
   static Future<ApiResult> pilotCreatePurchaseInvoice(Map<String, dynamic> payload) =>
       _post('/pilot/purchase-invoices', payload);
+  // G-PURCHASE-MULTILINE-PARITY (2026-05-11): fetch full PI detail
+  // including lines — backs the new PurchaseInvoiceDetailsScreen and
+  // the `?bill_id=` prefill flow on the create screen.
+  static Future<ApiResult> pilotGetPurchaseInvoice(String piId) =>
+      _get('/pilot/purchase-invoices/$piId');
+  // G-PURCHASE-MULTILINE-PARITY (2026-05-11): cancel endpoint —
+  // reverses the JE if posted, refuses if any payment was applied.
+  static Future<ApiResult> pilotCancelPurchaseInvoice(String piId) =>
+      _post('/pilot/purchase-invoices/$piId/cancel', {});
   static Future<ApiResult> pilotCreateVendorPayment(Map<String, dynamic> payload) =>
       _post('/pilot/vendor-payments', payload);
 
