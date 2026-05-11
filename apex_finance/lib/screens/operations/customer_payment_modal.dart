@@ -138,6 +138,10 @@ class _CustomerPaymentModalState extends State<CustomerPaymentModal> {
       'amount': double.parse(_amount.text.trim()),
       'method': _method,
       if (combinedReference.isNotEmpty) 'reference': combinedReference,
+      // G-CUSTOMER-PAYMENT-NOTES (2026-05-11): send notes separately
+      // for the AR audit trail (parity with vendor modal). `reference`
+      // is the merchant-visible field; `notes` is the internal one.
+      if (notes.isNotEmpty) 'notes': notes,
     };
 
     final res = await ApiService.pilotRecordCustomerPayment(

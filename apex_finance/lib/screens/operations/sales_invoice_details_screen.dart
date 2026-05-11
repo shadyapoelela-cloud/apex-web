@@ -676,6 +676,18 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
                             '${p['payment_date'] ?? ''} · ${_methodLabel(p['method']?.toString() ?? '')}',
                             style: TextStyle(
                                 color: AC.td, fontSize: 11)),
+                        // G-CUSTOMER-PAYMENT-NOTES (2026-05-11): show
+                        // internal-audit notes below the date when set.
+                        if ((p['notes'] ?? '').toString().isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            p['notes'].toString(),
+                            style: TextStyle(
+                                color: AC.ts,
+                                fontSize: 10.5,
+                                fontStyle: FontStyle.italic),
+                          ),
+                        ],
                       ],
                     ),
                   ),
