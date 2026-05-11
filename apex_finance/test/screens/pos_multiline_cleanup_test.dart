@@ -97,9 +97,11 @@ void main() {
       // After a sale is recorded, the form should reset to a single
       // empty line so the cashier can start the next sale without
       // manually clearing fields.
+      // Hotfix: use RegExp instead of literal `\n` so Windows-CRLF
+      // checkouts still pass (same root cause as GAP-11 in PR #193).
       expect(
-        posSrc.contains(
-            '_lines\n        ..clear()\n        ..add(_PosLineDraft())'),
+        RegExp(r'_lines\s+\.\.clear\(\)\s+\.\.add\(_PosLineDraft\(\)\)')
+            .hasMatch(posSrc),
         isTrue,
         reason: 'submit success must reset _lines to one empty draft',
       );
