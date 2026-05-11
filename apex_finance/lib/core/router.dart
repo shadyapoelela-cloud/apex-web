@@ -569,6 +569,9 @@ final appRouter = GoRouter(
     //    pre-existing /compliance/depreciation + /compliance/fixed-assets screens.
         // Sprint 15 Stage 4e: V4 /compliance/depreciation-ai archived → V5 /app/erp/finance/depreciation
         // Sprint 15 Stage 4e: V4 /compliance/multi-currency archived → V5 /app/erp/treasury/dashboard
+    // G-POS-SESSION-HARDENING (2026-05-11): canonical `/onboarding/wizard`
+    // registration — a duplicate at line ~969 was deleted (go-router
+    // matches the first registration so the second was dead code).
     GoRoute(path: '/onboarding/wizard', redirect: (c, s) => '/app/erp/finance/onboarding'),
     GoRoute(path: '/admin/audit-chain', pageBuilder: (c, s) => _apexPage(const AuditChainViewerScreen(), s)),
     // Workflow Engine admin UI (Wave 1A Phase G + Wave 1C Phase M).
@@ -965,10 +968,10 @@ final appRouter = GoRouter(
     // the legacy /settings/entities screen which created a parallel
     // localStorage path — the duplicate setup journey UAT Issue #6
     // is closing.
-    GoRoute(
-      path: '/onboarding/wizard',
-      redirect: (c, s) => '/app/erp/finance/onboarding',
-    ),
+    // G-POS-SESSION-HARDENING (2026-05-11): the duplicate
+    // `/onboarding/wizard` registration that used to live here was
+    // removed — see the canonical entry at line ~572. go-router
+    // matches the first registration so the duplicate was dead code.
     GoRoute(
       path: '/clients/onboarding',
       redirect: (c, s) => '/app/erp/finance/onboarding',
