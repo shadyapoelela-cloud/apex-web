@@ -191,4 +191,109 @@ apex_finance/test/screens/pos_backend_integration_v2_test.dart
                                          ← 16 source-grep contracts
 apex_finance/test/screens/pos_multiline_cleanup_test.dart
                                          ← updated to assert new POS shape (qty / unit_price_override / vat_rate_override)
+
+
+## Hotfix delta (post-tester review) — G-POS-V2-HOTFIX
+
+Branch: `feat/g-pos-backend-integration-v2-hotfix`
+Date:   2026-05-11
+
+The tester ran the V2 branch end-to-end and surfaced 3 production-blocking
+bugs that all manifested on the *first* live POS sale of a fresh tenant.
+This section documents the bugs and the precise fixes layered on top of
+the V2 commits (no force-push or rebase — pure additive commits).
+
+### Bug #1 — `_ensureOpenSession` 422s on first sale
+
+**Symptom.** First POS sale on a fresh tenant: backend returns 422 with
+`field required: warehouse_id` / `field required: opened_by_user_id`.
+
+**Root cause.** `_ensureOpenSession` sent `{'opening_cash': 0}` as the
+session-open payload. `PosSessionOpen` (`app/pilot/schemas/pos.py:14-23`)
+requires `branch_id` + `warehouse_id` + `opened_by_user_id` — the
+backend cannot default these because warehouse is 1:N per branch and
+the JWT user_id check happens *after* schema validation.
+
+**Fix.**
+1. Added `pilotListBranchWarehouses(branchId)` →
+   `GET /pilot/branches/{branchId}/warehouses` (endpoint already existed
+   in `catalog_routes.py:637` — frontend was just missing the wrapper).
+2. `_ensureOpenSession` now: fetches warehouses → picks first `is_active`
+   (fallback: first row) → returns `null` if none → posts the full
+   payload `{branch_id, warehouse_id, opened_by_user_id, opening_cash}`.
+
+### Bug #2 — `cashier_user_id` was the tenant id
+
+**Symptom.** Every POS transaction's `cashier_user_id` audit column
+either FK-failed (when the FK is enforced) or pointed to the tenant id
+forever, breaking cashier-level Z-reports + audit lookups.
+
+**Root cause.** `_submit` set `'cashier_user_id': S.savedTenantId ?? custId`.
+`S.savedTenantId` is the *tenant* id; `custId` is the *customer* id.
+Neither is a user id.
+
+**Fix.**
+1. Hard-gate the whole `_submit` flow on `S.uid` being non-empty — if
+   missing, show Arabic snackbar "لا يوجد مستخدم مسجّل دخول" and abort.
+2. Pass `S.uid` (bound to local `cashierUid`) as `cashier_user_id`.
+
+### Bug #3 — Cash-customer auto-provision was non-idempotent
+
+**Symptom.** Every retry/refresh of the POS screen minted a new
+`CASH-<timestamp>` customer row, polluting the AR ledger with one-off
+"cash customer" entries that all referred to the same conceptual party.
+
+**Root cause.** `_ensureCashCustomer` generated
+`'CASH-${DateTime.now().millisecondsSinceEpoch}'` per call. The list-
+then-create check looked at "any customer" (limit=1), so as soon as
+*any* customer existed in the tenant, the cash-customer lookup would
+return a non-cash customer and the transaction would book against the
+wrong party.
+
+**Fix.**
+1. Stable canonical code: `static const _kCashCustomerCode = 'CASH-DEFAULT';`
+2. New helper `pilotGetCustomerByCode(tenantId, code)` reusing the
+   existing `?search=` query on `/pilot/tenants/{tid}/customers`
+   (customer_routes.py:225) — exact-match filtered client-side.
+3. New flow: GET by code → return if found → POST create with the
+   canonical code → on 409 "already exists", retry the GET (race-loser
+   path for two cashiers ringing simultaneously).
+4. Dropped timestamp-based code generation entirely.
+
+### Tests + Verification
+
+`apex_finance/test/screens/pos_v2_hotfix_test.dart` — 9 source-grep
+contracts covering all 3 bugs + the 2 new api_service helpers. All 4
+POS test suites stay green:
+
+- pos_v2_hotfix_test.dart            9 contracts (new)
+- pos_backend_integration_v2_test.dart  16 contracts (still green)
+- pos_multiline_cleanup_test.dart    11 contracts (still green)
+- pos_zatca_qr_test.dart              6 contracts (still green)
+
+### Files changed (hotfix)
+
+```
+apex_finance/lib/api_service.dart
+    + pilotListBranchWarehouses(branchId)
+    + pilotGetCustomerByCode(tenantId, code)
+
+apex_finance/lib/screens/operations/pos_quick_sale_screen.dart
+    _ensureOpenSession: full payload + warehouse resolver
+    _ensureCashCustomer: stable code + 409-retry path
+    _submit: S.uid gate + cashier_user_id source fix
+
+apex_finance/test/screens/pos_v2_hotfix_test.dart  (new, 9 contracts)
+docs/POS_BACKEND_INTEGRATION_V2_2026-05-11.md      (this section)
+```
+
+### UAT checklist
+
+1. Login as a cashier user (S.uid set, S.savedTenantId set, branch + warehouse exist).
+2. Open `/pos/quick-sale`. Add one misc line (no product picker), price > 0, qty > 0.
+3. Pick a payment method, hit "سجّل البيع".
+4. Expected: green receipt card with `إيصال #RCT-…`, ZATCA QR rendered, JE link visible.
+5. Refresh the page, run sale #2 → must succeed with NO new `CASH-…` customer row created (AR list still has exactly one `CASH-DEFAULT`).
+6. Logout and clear `apex_uid` from localStorage. Try to submit → must see the Arabic snackbar "لا يوجد مستخدم مسجّل دخول" instead of a backend error.
+
 ```
