@@ -606,7 +606,11 @@ class _PurchaseInvoiceDetailsScreenState
     final isDraft = status == 'draft';
     final isCancelled = status == 'cancelled';
     final isPaid = status == 'paid';
-    final canCancel = !isCancelled && !isPaid && paid <= 0.001;
+    // G-PURCHASE-FIXES (2026-05-11): align with backend (`amount_paid
+    // > 0` → 409). The 0.001 fuzz let the UI offer Cancel for a
+    // float-edge amount the backend would reject. Strict `paid <= 0`
+    // mirrors the server contract.
+    final canCancel = !isCancelled && !isPaid && paid <= 0;
     // G-PURCHASE-PAYMENT-COMPLETION (2026-05-11): payment is allowed
     // once the bill is posted (or partially_paid) AND there's a
     // remaining balance. Backend overpayment guard catches the edge.
@@ -643,7 +647,10 @@ class _PurchaseInvoiceDetailsScreenState
               padding: const EdgeInsets.symmetric(
                   horizontal: 12, vertical: 14)),
         ),
-      if (!isDraft)
+      // G-PURCHASE-FIXES (2026-05-11): drafts get print preview too —
+      // an author may want a draft copy before posting. Only cancelled
+      // invoices skip the print button (no reason to print a void).
+      if (!isCancelled)
         OutlinedButton.icon(
           onPressed: _busy ? null : _print,
           icon: const Icon(Icons.print_outlined, size: 16),

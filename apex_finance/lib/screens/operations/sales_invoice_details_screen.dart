@@ -721,7 +721,11 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
     final isPaid = status == 'paid';
     // Cancel is allowed when no payment has been applied AND the
     // invoice isn't already cancelled. Backend enforces this too.
-    final canCancel = !isCancelled && !isPaid && paid <= 0.001;
+    // G-PURCHASE-FIXES (2026-05-11): align with backend `> 0` guard
+    // — the 0.001 fuzz allowed a float-edge case where the UI offered
+    // Cancel but the backend rejected. Strict `paid <= 0` matches the
+    // server contract.
+    final canCancel = !isCancelled && !isPaid && paid <= 0;
 
     // G-SALES-INVOICE-UX-FOLLOWUP (2026-05-11): action row redesigned
     // with secondary [Edit / Cancel / Print] outline buttons on the
@@ -757,10 +761,12 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
               padding: const EdgeInsets.symmetric(
                   horizontal: 12, vertical: 14)),
         ),
-      // Print: available whenever the invoice has data (not draft-
-      // only — the user might want a copy of a paid invoice for the
-      // customer's records).
-      if (!isDraft)
+      // Print: available whenever the invoice has data — including
+      // drafts (an author may want a print preview). Only cancelled
+      // invoices skip Print.
+      // G-PURCHASE-FIXES (2026-05-11): switched gate from `!isDraft`
+      // to `!isCancelled` to match purchase side.
+      if (!isCancelled)
         OutlinedButton.icon(
           onPressed: _busy ? null : _print,
           icon: const Icon(Icons.print_outlined, size: 16),
