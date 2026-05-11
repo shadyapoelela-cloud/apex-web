@@ -22,14 +22,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-// G-SALES-INVOICE-UX-FOLLOWUP (2026-05-11): web-only browser print.
-// Conditionally imported — on non-web platforms the `html` symbol is
-// a stub. The print button is shown only in the browser bundle, so
-// the `avoid_web_libraries_in_flutter` lint is a false positive here.
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
 
 import '../../api_service.dart';
+// G-CLEANUP-FINAL (2026-05-11): conditional-import-by-library pattern
+// replaces the previous unconditional `import 'dart:html'` which
+// failed to compile on non-web targets. The default import gives the
+// no-op stub; on web, `dart.library.html` resolves and the real
+// implementation in `browser_print_web.dart` is selected.
+import '../../core/browser_print.dart'
+    if (dart.library.html) '../../core/browser_print_web.dart';
 import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/zatca_tlv.dart';
@@ -186,12 +187,13 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
     }
   }
 
-  // Web-only print invocation. Wrapped so the import lives at the
-  // top of the file behind a `kIsWeb` guard.
+  // Web-only print invocation. The `triggerBrowserPrint()` helper is
+  // a no-op on non-web platforms (see `core/browser_print.dart`), but
+  // we keep the `kIsWeb` guard as a defence-in-depth so the print
+  // button silently does nothing outside the browser bundle.
   void _invokeBrowserPrint() {
     if (!kIsWeb) return;
-    // ignore: deprecated_member_use
-    html.window.print();
+    triggerBrowserPrint();
   }
 
   Future<void> _recordPayment() async {
@@ -406,9 +408,21 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
 
   Widget _buildQrCode() {
     final inv = _invoice!;
-    final issued = (inv['status'] ?? '') != 'draft';
+    // G-CLEANUP-FINAL (2026-05-11): use an explicit whitelist of
+    // statuses that legitimately have a ZATCA QR. The previous gate
+    // `!= 'draft'` rendered a QR for `cancelled` invoices, which is
+    // misleading — it claims a transaction occurred that has been
+    // reversed. Only `issued`, `partially_paid`, and `paid` are
+    // post-issuance, non-reversed states.
+    final status = (inv['status'] ?? '').toString();
+    final issued = status == 'issued' ||
+                   status == 'partially_paid' ||
+                   status == 'paid';
     if (!issued) {
       // Phase 1 QR is meaningful only after issuance — show a hint.
+      final hintText = status == 'cancelled'
+          ? 'فاتورة ملغاة'
+          : 'بعد الإصدار';
       return Container(
         width: 140,
         height: 140,
@@ -418,7 +432,7 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
           borderRadius: BorderRadius.circular(8),
         ),
         child: Center(
-          child: Text('ZATCA QR\n(بعد الإصدار)',
+          child: Text('ZATCA QR\n($hintText)',
               textAlign: TextAlign.center,
               style: TextStyle(color: AC.td, fontSize: 11)),
         ),

@@ -21,10 +21,14 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:go_router/go_router.dart';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
 
 import '../../api_service.dart';
+// G-CLEANUP-FINAL (2026-05-11): conditional-import-by-library pattern
+// replaces the previous unconditional `import 'dart:html'` which
+// failed to compile on non-web targets. See `core/browser_print.dart`
+// for the rationale and the matching change in sales details.
+import '../../core/browser_print.dart'
+    if (dart.library.html) '../../core/browser_print_web.dart';
 import '../../core/theme.dart';
 import 'vendor_payment_modal.dart';
 
@@ -136,8 +140,7 @@ class _PurchaseInvoiceDetailsScreenState
 
   void _invokeBrowserPrint() {
     if (!kIsWeb) return;
-    // ignore: deprecated_member_use
-    html.window.print();
+    triggerBrowserPrint();
   }
 
   // G-PURCHASE-PAYMENT-COMPLETION (2026-05-11): record a vendor

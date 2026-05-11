@@ -748,6 +748,13 @@ class ApiService {
       _get('/pilot/pos-sessions/$sessionId/z-report');
   static Future<ApiResult> pilotListPosTransactions(String sessionId) =>
       _get('/pilot/pos-sessions/$sessionId/transactions');
+  /// Currently unreferenced in lib/screens/. Kept for the in-flight
+  /// G-POS-BACKEND-INTEGRATION-V2 work which will alias it as
+  /// `pilotPostPosTransactionToGl`. Remove once the alias is added.
+  ///
+  /// G-CLEANUP-FINAL (2026-05-11): documented as a deliberate orphan
+  /// rather than deleted — sibling task on a parallel branch will
+  /// wire this up.
   static Future<ApiResult> pilotPostPosToGL(String posTxnId) =>
       _post('/pilot/pos-transactions/$posTxnId/post-to-gl', {});
 
