@@ -507,6 +507,17 @@ class ApiService {
   }
   static Future<ApiResult> pilotCreateCustomer(String tenantId, Map<String, dynamic> payload) =>
       _post('/api/v1/pilot/tenants/$tenantId/customers', payload);
+  // G-POS-V2-HOTFIX (2026-05-11): customer-lookup-by-code helper for
+  // POS cash-customer auto-provision. The pre-hotfix flow generated a
+  // unique `CASH-${timestamp}` code on every retry, creating duplicate
+  // cash customers if the create call returned ambiguously. The new
+  // flow uses a stable canonical code (`CASH-DEFAULT`) and looks it up
+  // first via this helper, falling back to POST + 409-retry.
+  // customer_routes.py:225 supports `search=` which ILIKEs across
+  // code/name_ar/name_en/vat_number — pass the literal code; client-side
+  // filters down to exact-match to avoid picking a "CASH-DEFAULT-X" twin.
+  static Future<ApiResult> pilotGetCustomerByCode(String tenantId, String code) =>
+      _get('/api/v1/pilot/tenants/$tenantId/customers?search=${Uri.encodeQueryComponent(code)}&limit=5');
   static Future<ApiResult> pilotGetCustomer(String id) =>
       _get('/api/v1/pilot/customers/$id');
   static Future<ApiResult> pilotUpdateCustomer(String id, Map<String, dynamic> patch) =>
@@ -794,6 +805,14 @@ class ApiService {
   /// both since the V2 name is what new screens reach for.
   static Future<ApiResult> pilotListBranchesForEntity(String entityId) =>
       _get('/pilot/entities/$entityId/branches');
+  // G-POS-V2-HOTFIX (2026-05-11): list warehouses owned by a branch.
+  // Required to resolve the `warehouse_id` POS session payload field —
+  // the pre-hotfix `_ensureOpenSession` omitted it and 422'd on first
+  // sale because `PosSessionOpen` requires both warehouse_id and
+  // opened_by_user_id. Endpoint lives in catalog_routes.py:637 at
+  // GET /pilot/branches/{branch_id}/warehouses → list[WarehouseRead].
+  static Future<ApiResult> pilotListBranchWarehouses(String branchId) =>
+      _get('/pilot/branches/$branchId/warehouses');
 
   // Financial Statements endpoints are declared below (fsTrialBalance / fsIncomeStatement / fsBalanceSheet) — reused.
 
