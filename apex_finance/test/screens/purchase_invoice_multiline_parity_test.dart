@@ -157,9 +157,14 @@ void main() {
       expect(detailsSrc.contains('Future<void> _cancel()'), isTrue);
       expect(detailsSrc.contains('void _print()'), isTrue);
       // Edit button routes to create with ?bill_id query.
+      // G-POS-MULTILINE-CLEANUP (2026-05-11) closes GAP-11: pre-fix
+      // this assertion used a literal `\n` separator which broke on
+      // Windows where git checkout converts to CRLF. Use a multiline
+      // regex so the test passes on both line-ending conventions.
       expect(
-        detailsSrc.contains(
-            "'/app/erp/finance/purchase-invoice-create'\n                  '?bill_id="),
+        RegExp(
+                r"'/app/erp/finance/purchase-invoice-create'\s*'\?bill_id=")
+            .hasMatch(detailsSrc),
         isTrue,
         reason: 'Edit button must route to create with ?bill_id query',
       );

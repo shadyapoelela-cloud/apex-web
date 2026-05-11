@@ -76,9 +76,14 @@ void main() {
       expect(posSrc.contains("'issued_at_utc':"), isTrue);
       expect(posSrc.contains("'seller_vat_number':"), isTrue);
       expect(posSrc.contains("'seller_name':"), isTrue);
-      // VAT amount + total already captured pre-fix.
-      expect(posSrc.contains("'vat': _vatAmount"), isTrue);
-      expect(posSrc.contains("'total': _total"), isTrue);
+      // VAT amount + total captured on the receipt. G-POS-MULTILINE-
+      // CLEANUP (2026-05-11) renamed `_vatAmount`/`_total` (single-
+      // line) to `capturedVat`/`capturedTotal` (sum-of-lines). Pin
+      // the keys but allow either variable name.
+      expect(RegExp(r"'vat':\s*\w+").hasMatch(posSrc), isTrue,
+          reason: "receipt must persist a 'vat' field");
+      expect(RegExp(r"'total':\s*\w+").hasMatch(posSrc), isTrue,
+          reason: "receipt must persist a 'total' field");
     });
 
     test('test_tlv_helper_phase1_tag_schedule_unchanged', () {
