@@ -51,6 +51,13 @@ class EntityRead(BaseModel):
     email: Optional[str]
     zatca_csid_id: Optional[str]
     zatca_onboarding_status: Optional[str]
+    # G-ENTITY-SELLER-INFO (2026-05-11): seller identity surfaced for
+    # ZATCA Phase-1 QR rendering on POS receipts and sales-invoice
+    # details. All three are nullable so legacy entities still load
+    # (frontend uses placeholders when null).
+    seller_vat_number: Optional[str] = None
+    seller_name_ar: Optional[str] = None
+    seller_address_ar: Optional[str] = None
     icon_emoji: Optional[str]
     sort_order: int
     created_at: datetime
@@ -72,6 +79,10 @@ class EntityUpdate(BaseModel):
     email: Optional[EmailStr] = None
     zatca_csid_id: Optional[str] = None
     zatca_onboarding_status: Optional[str] = None
+    # G-ENTITY-SELLER-INFO (2026-05-11): PATCHable seller identity.
+    seller_vat_number: Optional[str] = None
+    seller_name_ar: Optional[str] = None
+    seller_address_ar: Optional[str] = None
     icon_emoji: Optional[str] = None
     sort_order: Optional[int] = None
     extras: Optional[dict[str, Any]] = None

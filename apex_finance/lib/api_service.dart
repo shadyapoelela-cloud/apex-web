@@ -793,6 +793,21 @@ class ApiService {
   static Future<ApiResult> pilotGoodsReceiptCreate(Map<String, dynamic> body) =>
       _post('/pilot/goods-receipts', body);
 
+  // ── G-ENTITY-SELLER-INFO (2026-05-11): Entity seller identity ──
+  // Surfaces seller_vat_number / seller_name_ar / seller_address_ar
+  // for ZATCA Phase-1 QR rendering on POS receipts + sales-invoice
+  // details. Pre-fix both screens hardcoded 'APEX' / '300000000000003'
+  // which any ZATCA scanner would read as the wrong selling entity.
+  // pilot_routes mounts at /pilot (no /api/v1 prefix) — matches the
+  // sibling branches/goods-receipts endpoints above.
+  static Future<ApiResult> pilotGetEntity(String entityId) =>
+      _get('/pilot/entities/$entityId');
+  static Future<ApiResult> pilotUpdateEntitySellerInfo(
+    String entityId,
+    Map<String, dynamic> payload,
+  ) =>
+      _patch('/pilot/entities/$entityId', payload);
+
   // ── SAP Universal Journal ──
   static Future<ApiResult> universalJournalQuery(Map<String, dynamic> filters) =>
       _post('/api/v1/ai/universal-journal/query', filters);
