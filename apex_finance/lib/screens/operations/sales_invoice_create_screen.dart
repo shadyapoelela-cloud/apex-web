@@ -335,19 +335,40 @@ class _SalesInvoiceCreateScreenState extends State<SalesInvoiceCreateScreen> {
       _submitting = true;
       _error = null;
     });
-    final create = await ApiService.pilotCreateSalesInvoice(payload);
+    // G-SALES-INVOICE-UPDATE (2026-05-11): branch on edit-mode — PATCH
+    // when prefilled, POST otherwise. Pre-fix this always POSTed and
+    // produced a duplicate draft from the Edit flow.
+    final editId = widget.prefillInvoiceId;
+    final ApiResult res;
+    if (editId != null && editId.isNotEmpty) {
+      res = await ApiService.pilotUpdateSalesInvoice(editId, payload);
+    } else {
+      res = await ApiService.pilotCreateSalesInvoice(payload);
+    }
     if (!mounted) return;
     setState(() => _submitting = false);
-    if (!create.success) {
-      setState(() => _error = 'فشل حفظ المسودة: ${create.error ?? '-'}');
+    if (!res.success) {
+      setState(() => _error = (editId != null && editId.isNotEmpty)
+          ? 'فشل تحديث المسودة: ${res.error ?? '-'}'
+          : 'فشل حفظ المسودة: ${res.error ?? '-'}');
       return;
     }
-    final invNum = (create.data as Map?)?['invoice_number'] ?? '';
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: AC.info,
-      content: Text('تم حفظ المسودة #$invNum — لم يُرحَّل القيد بعد'),
-    ));
-    context.go('/app/erp/finance/sales-invoices');
+    final invNum = (res.data as Map?)?['invoice_number'] ?? '';
+    final invId = (res.data as Map?)?['id']?.toString();
+    if (editId != null && editId.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.ok,
+        content: Text('تم تحديث الفاتورة #$invNum'),
+      ));
+      // Navigate to details, not list — keeps the user in context.
+      context.go('/app/erp/finance/sales-invoices/${invId ?? editId}');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.info,
+        content: Text('تم حفظ المسودة #$invNum — لم يُرحَّل القيد بعد'),
+      ));
+      context.go('/app/erp/finance/sales-invoices');
+    }
   }
 
   Future<void> _submit() async {
@@ -357,6 +378,33 @@ class _SalesInvoiceCreateScreenState extends State<SalesInvoiceCreateScreen> {
       _submitting = true;
       _error = null;
     });
+    // G-SALES-INVOICE-UPDATE (2026-05-11): in edit-mode (prefilled
+    // from a draft), PATCH the existing invoice instead of creating a
+    // duplicate. Pre-fix this always POSTed — the visible symptom was
+    // a second INV-XXX appearing in the list every time the user
+    // clicked Save on the Edit screen.
+    final editId = widget.prefillInvoiceId;
+    if (editId != null && editId.isNotEmpty) {
+      final upd = await ApiService.pilotUpdateSalesInvoice(editId, payload);
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      if (!upd.success) {
+        // No fallback to create — falling back would re-introduce the
+        // duplicate-draft bug we are fixing here.
+        setState(() => _error = 'فشل تحديث الفاتورة: ${upd.error ?? '-'}');
+        return;
+      }
+      final updData = (upd.data as Map?) ?? const {};
+      final invNum = updData['invoice_number']?.toString() ?? '';
+      final invId = updData['id']?.toString() ?? editId;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AC.ok,
+        content: Text('تم تحديث الفاتورة #$invNum'),
+      ));
+      context.go('/app/erp/finance/sales-invoices/$invId');
+      return;
+    }
+
     final create = await ApiService.pilotCreateSalesInvoice(payload);
     if (!mounted) return;
     if (!create.success) {

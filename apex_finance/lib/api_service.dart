@@ -515,6 +515,12 @@ class ApiService {
       _get('/api/v1/pilot/customers/$id/ledger');
   static Future<ApiResult> pilotCreateSalesInvoice(Map<String, dynamic> payload) =>
       _post('/api/v1/pilot/sales-invoices', payload);
+  // G-SALES-INVOICE-UPDATE (2026-05-11): true PATCH for the Edit-draft
+  // flow. Previously the create screen always POSTed, which produced
+  // a second draft instead of updating the existing one.
+  static Future<ApiResult> pilotUpdateSalesInvoice(
+          String invoiceId, Map<String, dynamic> payload) =>
+      _patch('/api/v1/pilot/sales-invoices/$invoiceId', payload);
   static Future<ApiResult> pilotIssueSalesInvoice(String id) =>
       _post('/api/v1/pilot/sales-invoices/$id/issue', {});
   // G-SALES-INVOICE-UX-FOLLOWUP (2026-05-11): cancel endpoint.
