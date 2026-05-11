@@ -76,6 +76,18 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
   Map<String, dynamic>? _lastReceipt;
 
   @override
+  void initState() {
+    super.initState();
+    // G-ENTITY-SELLER-INFO (2026-05-11): fire-and-forget refresh of
+    // the active entity's seller identity (VAT number + Arabic legal
+    // name + address). Fire-and-forget by design — the cashier shouldn't
+    // wait for the network before opening the POS, and the next sale
+    // picks up the real values once the response lands. Silent on
+    // failure (placeholder fallback keeps the QR rendering).
+    S.fetchEntitySellerInfo();
+  }
+
+  @override
   void dispose() {
     for (final l in _lines) {
       l.dispose();
@@ -227,14 +239,14 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
         'total': capturedTotal,
         'method': _paymentLabel(_method),
         'issued_at_utc': DateTime.now().toUtc().toIso8601String(),
-        // Phase 1 ZATCA QR requires seller VAT + name. These don't
-        // live in client session storage yet (entity_setup_screen
-        // doesn't persist them locally) so we fall back to the same
-        // placeholders the sales-details screen uses. When the entity
-        // settings API exposes VAT/name fields, swap these for the
-        // real values via a future sprint.
-        'seller_vat_number': '300000000000003',
-        'seller_name': 'APEX',
+        // G-ENTITY-SELLER-INFO (2026-05-11): Phase-1 ZATCA QR requires
+        // seller VAT + name. Read the real values from the session
+        // cache (populated by `S.fetchEntitySellerInfo()` in initState)
+        // and fall back to the documented placeholders when the
+        // entity hasn't filled them in yet — better a placeholder QR
+        // than no QR at all.
+        'seller_vat_number': S.savedSellerVatNumber ?? '300000000000003',
+        'seller_name': S.savedSellerNameAr ?? 'APEX',
         'line_count': linesPayload.length,
       };
       // Reset to a single empty line for the next sale.

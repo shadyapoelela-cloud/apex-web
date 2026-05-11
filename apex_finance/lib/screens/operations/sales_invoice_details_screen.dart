@@ -30,6 +30,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:html' as html;
 
 import '../../api_service.dart';
+import '../../core/session.dart';
 import '../../core/theme.dart';
 import '../../core/zatca_tlv.dart';
 import 'customer_payment_modal.dart';
@@ -61,6 +62,12 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    // G-ENTITY-SELLER-INFO (2026-05-11): fire-and-forget refresh of
+    // the active entity's ZATCA seller identity. The QR uses
+    // `S.savedSellerNameAr` / `S.savedSellerVatNumber` (falling back
+    // to placeholders); this call ensures the values are fresh by
+    // the time the user reaches the issued state. Silent on failure.
+    S.fetchEntitySellerInfo();
     _load();
   }
 
@@ -417,9 +424,16 @@ class _SalesInvoiceDetailsScreenState extends State<SalesInvoiceDetailsScreen> {
         ),
       );
     }
+    // G-ENTITY-SELLER-INFO (2026-05-11): read seller identity from
+    // the session cache populated by `S.fetchEntitySellerInfo()` in
+    // initState. Falls back to the legacy placeholders so the QR
+    // keeps rendering when the entity hasn't filled them in yet.
+    // Note: `customer_vat_number` is the *buyer's* VAT (not used by
+    // ZATCA Phase-1 tag 2 — that's the SELLER's VAT). Pre-fix this
+    // line incorrectly used the customer VAT as the seller VAT.
     final qr = zatcaQrBase64(
-      sellerName: 'APEX UAT',
-      vatNumber: inv['customer_vat_number']?.toString() ?? '300000000000003',
+      sellerName: S.savedSellerNameAr ?? 'APEX UAT',
+      vatNumber: S.savedSellerVatNumber ?? '300000000000003',
       invoiceTimestampUtc: DateTime.tryParse(
               inv['issue_date']?.toString() ?? '') ??
           DateTime.now().toUtc(),
