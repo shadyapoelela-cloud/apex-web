@@ -89,16 +89,21 @@ void main() {
     });
   });
 
-  group('G-PAYMENT-METHOD-VALIDATION — Vendor flow untouched', () {
-    test('test_vendor_payment_pattern_still_includes_credit_card', () {
-      // Don't accidentally rewrite the vendor schema while fixing the
-      // customer side. Vendor flow uses credit_card/other; customer
-      // flow uses card/mada — they are intentionally different.
+  group('G-PAYMENT-METHOD-VALIDATION — Vendor flow', () {
+    test('test_vendor_payment_pattern_includes_card_and_mada', () {
+      // G-PURCHASE-FIXES (PR #198, 2026-05-11) widened the vendor
+      // pattern to include `card` and `mada` for Saudi-market parity
+      // with the customer side. Legacy `credit_card` + `other` are
+      // retained for back-compat. The two patterns no longer diverge
+      // intentionally — the goal is now consistent Saudi vocabulary
+      // on both flows, with the vendor side keeping extra back-compat
+      // entries that customer-side never had.
       expect(
-        purchasingSchemasSrc.contains(
-            'pattern="^(cash|bank_transfer|cheque|credit_card|other)\$"'),
+        RegExp(
+                r'pattern\s*=\s*"\^\(cash\|bank_transfer\|cheque\|credit_card\|card\|mada\|other\)\$"')
+            .hasMatch(purchasingSchemasSrc),
         isTrue,
-        reason: 'VendorPaymentCreate.method pattern must remain unchanged',
+        reason: 'VendorPaymentCreate.method must include card + mada after PR #198',
       );
     });
   });
