@@ -4,7 +4,9 @@
 /// purchase invoice via `POST /pilot/purchase-invoices/{id}/payment`.
 /// The backend routes the cash/bank/cheque GL account based on
 /// `method` and auto-posts the corresponding JE (DR 2110 AP / CR
-/// 1110|1120|1310) — the modal stays slim.
+/// 1110 [cash] or CR 1120 [bank, cheque, card, mada, etc.]) — the
+/// modal stays slim. Outgoing vendor cheques settle through Bank,
+/// NOT through "Cheques on Hand" (1310 = customer-side asset).
 ///
 /// Returns the payment payload Map on success (includes
 /// `journal_entry_id`).
@@ -194,17 +196,19 @@ class _VendorPaymentModalState extends State<VendorPaymentModal> {
                   keyboardType: const TextInputType.numberWithOptions(
                       decimal: true)),
               _datePickerField(),
-              // G-PURCHASE-FIXES (2026-05-11): Saudi merchants
-              // commonly pay vendors via mada (local debit network)
-              // or credit/debit cards. `credit_card` and `other` are
-              // retained for backward compat with existing records.
+              // G-VENDOR-PAYMENT-LABEL-DEDUP (2026-05-11): `card` is the
+              // canonical Saudi-vocabulary key shipped in PR #198.
+              // `credit_card` is the legacy back-compat entry —
+              // relabeled with "(قديم)" so the cashier sees two
+              // distinct rows. Backend regex still accepts both for
+              // existing records. New payments should use `card`.
               _dropdown('طريقة الدفع', _method, const {
                 'cash': 'نقداً',
                 'bank_transfer': 'تحويل بنكي',
                 'cheque': 'شيك',
-                'card': 'بطاقة ائتمان',
+                'card': 'بطاقة',
                 'mada': 'مدى',
-                'credit_card': 'بطاقة ائتمان',
+                'credit_card': 'بطاقة ائتمان (قديم)',
                 'other': 'أخرى',
               }, (v) => setState(() => _method = v ?? 'bank_transfer')),
               _field('رقم المرجع (شيك/معاملة)', _reference),
