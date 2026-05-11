@@ -65,12 +65,24 @@ void main() {
       expect(posSrc.contains('linesPayload.add({'), isTrue,
           reason: 'payload must loop over _lines and serialise each');
       expect(posSrc.contains("'lines': linesPayload"), isTrue);
-      // POS routes through the sales-invoice endpoint so it uses
-      // sales-side keys: quantity + unit_price + vat_rate. Mirror of
-      // SalesInvoiceCreateScreen payload shape.
-      expect(posSrc.contains("'quantity': l.quantityValue"), isTrue);
-      expect(posSrc.contains("'unit_price': l.unitPriceValue"), isTrue);
-      expect(posSrc.contains("'vat_rate': l.vatRateValue"), isTrue);
+      // G-POS-BACKEND-INTEGRATION (2026-05-11): POS Quick Sale now
+      // calls /pilot/pos-transactions directly (was: /sales-invoices).
+      // The PosLineInput schema uses POS-native keys: variant_id +
+      // qty + unit_price_override. Pre-fix this test asserted the
+      // sales-invoice keys; those produced the double-JE bug.
+      expect(
+          posSrc.contains("'variant_id': l.product!['default_variant_id']"),
+          isTrue,
+          reason: 'POS payload must use variant_id (PosLineInput contract)');
+      expect(
+          RegExp(r"'qty'\s*:\s*l\.quantityValue").hasMatch(posSrc), isTrue,
+          reason: 'POS payload must use qty (not quantity)');
+      expect(
+          RegExp(r"'unit_price_override'\s*:\s*l\.unitPriceValue")
+              .hasMatch(posSrc),
+          isTrue,
+          reason:
+              'POS payload must use unit_price_override (skips price-list lookup)');
     });
 
     test('test_pos_uses_product_picker_in_line_card', () {
@@ -97,9 +109,13 @@ void main() {
       // After a sale is recorded, the form should reset to a single
       // empty line so the cashier can start the next sale without
       // manually clearing fields.
+      // G-POS-BACKEND-INTEGRATION (2026-05-11): the assertion was
+      // rewritten as a regex over flexible whitespace so it survives
+      // both LF and CRLF checkouts — same GAP-11 fix that the
+      // purchase-invoice parity test absorbed in PR #193.
       expect(
-        posSrc.contains(
-            '_lines\n        ..clear()\n        ..add(_PosLineDraft())'),
+        RegExp(r'_lines\s*\.\.clear\(\)\s*\.\.add\(_PosLineDraft\(\)\)')
+            .hasMatch(posSrc),
         isTrue,
         reason: 'submit success must reset _lines to one empty draft',
       );
