@@ -115,7 +115,11 @@ import '../screens/operations/sales_invoice_details_screen.dart';
 // `?invoice_id=` query param so the Edit button on the details screen
 // can deep-link into pre-fill mode.
 import '../screens/operations/sales_invoice_create_screen.dart';
-import '../screens/operations/vendor_payment_screen.dart';
+// G-POS-MULTILINE-CLEANUP (2026-05-11) closes GAP-12: legacy
+// VendorPaymentScreen archived to _archive/2026-05-11/. Superseded by
+// the VendorPaymentModal flow (PR #191). The /purchase/payment/:billId
+// route was a dead-end — no code-path called context.go(...) for it.
+// import '../screens/operations/vendor_payment_screen.dart';
 // G-CLEANUP-1 Stage 4b: JeListScreen archived to _archive/2026-05-04/v4-routes/.
 // Replaced by V5 list at /app/erp/finance/je-builder.
 import '../screens/reports/reports_hub_screen.dart';
@@ -784,13 +788,11 @@ final appRouter = GoRouter(
       ),
     ),
     // Sprint 15 Stage 4f: V4 /analytics/cash-flow-forecast archived (HAS_V5) -> V5 /app/erp/finance/cash-flow-forecast
-    GoRoute(
-      path: '/purchase/payment/:billId',
-      pageBuilder: (c, s) => _apexPage(
-        VendorPaymentScreen(billId: s.pathParameters['billId']!),
-        s,
-      ),
-    ),
+    // G-POS-MULTILINE-CLEANUP (2026-05-11) closes GAP-12: legacy
+    // /purchase/payment/:billId route removed. The screen it pointed
+    // at (VendorPaymentScreen) is archived; record_vendor_payment now
+    // happens via VendorPaymentModal opened from the purchase-invoice
+    // details screen (PR #191).
         // Sprint 15 Stage 4e: V4 /compliance/tax-calendar archived → V5 /app/compliance/tax/calendar
     // G-CLEANUP-1 Stage 4b: V4 /accounting/je-list pageBuilder deleted.
     // JeListScreen archived to _archive/2026-05-04/v4-routes/.
