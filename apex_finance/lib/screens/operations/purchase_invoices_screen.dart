@@ -1063,14 +1063,21 @@ class _PurchaseInvoicesScreenState extends State<PurchaseInvoicesScreen> {
     );
   }
 
+  // G-PURCHASE-MULTILINE-PARITY (2026-05-11): row click now opens the
+  // details screen for the bill, mirroring the sales fix. Pre-fix it
+  // jumped straight to /je-builder/{jeId} or showed a snackbar — both
+  // behaviours were the purchase analogue of Bug #1 from the sales UAT
+  // and meant the user had no way to see the bill's lines, totals, or
+  // payments. The JE-builder is now reachable only via the explicit
+  // "عرض القيد" button on the details screen.
   void _openInvoice(Map<String, dynamic> inv) {
-    final jeId = inv['journal_entry_id'] as String?;
-    if (jeId != null) {
-      context.go('/app/erp/finance/je-builder/$jeId');
-    } else {
+    final id = inv['id']?.toString();
+    if (id == null || id.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('الفاتورة ${inv['invoice_number']} لم تُرحَّل بعد'),
+        content: Text('الفاتورة ${inv['invoice_number']} بدون معرّف'),
       ));
+      return;
     }
+    context.go('/app/erp/finance/purchase-bills/$id');
   }
 }

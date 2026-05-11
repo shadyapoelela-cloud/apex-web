@@ -103,6 +103,10 @@ import '../screens/operations/vendor_details_screen.dart';
 // purchase invoice create screen with vendor picker + save-draft +
 // JE-link snackbar.
 import '../screens/operations/purchase_invoice_create_screen.dart';
+// G-PURCHASE-MULTILINE-PARITY (2026-05-11): purchase-invoice details
+// screen mirroring sales. Replaces the previous flow where there was
+// no details screen at all (clicking a bill row went nowhere).
+import '../screens/operations/purchase_invoice_details_screen.dart';
 // G-SALES-INVOICE-UX-COMPLETE (2026-05-10): sales-invoice details screen.
 // Closes the Bug-#1 (row click was opening JE-builder instead of details).
 import '../screens/operations/sales_invoice_details_screen.dart';
@@ -729,6 +733,29 @@ final appRouter = GoRouter(
       path: '/app/erp/finance/purchase-bills/new',
       pageBuilder: (c, s) =>
           _apexPage(const PurchaseInvoiceCreateScreen(), s),
+    ),
+    // G-PURCHASE-MULTILINE-PARITY (2026-05-11): explicit create/edit
+    // route reading `?bill_id=` query param so the Edit button on the
+    // details screen can deep-link into pre-fill mode.
+    GoRoute(
+      path: '/app/erp/finance/purchase-invoice-create',
+      pageBuilder: (c, s) => _apexPage(
+        PurchaseInvoiceCreateScreen(
+          prefillBillId: s.uri.queryParameters['bill_id'],
+        ),
+        s,
+      ),
+    ),
+    // G-PURCHASE-MULTILINE-PARITY (2026-05-11): purchase-invoice details
+    // mirroring /app/erp/finance/sales-invoices/:invoiceId. The list
+    // row now opens this screen instead of jumping straight to the JE
+    // builder, which is reachable only via "عرض القيد".
+    GoRoute(
+      path: '/app/erp/finance/purchase-bills/:billId',
+      pageBuilder: (c, s) => _apexPage(
+        PurchaseInvoiceDetailsScreen(billId: s.pathParameters['billId']!),
+        s,
+      ),
     ),
     // G-SALES-INVOICE-UX-COMPLETE (2026-05-10): sales invoice details.
     // Pre-fix the list-row click jumped straight to /je-builder/{jeId}.
