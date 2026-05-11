@@ -156,8 +156,12 @@ void main() {
     test('test_print_button_uses_kIsWeb_guard', () {
       expect(detailsSrc.contains('kIsWeb'), isTrue,
           reason: 'print path must guard with kIsWeb');
-      expect(detailsSrc.contains('html.window.print()'), isTrue,
-          reason: 'print must call browser window.print()');
+      // G-CLEANUP-FINAL (2026-05-11): direct `html.window.print()` was
+      // replaced by `triggerBrowserPrint()` from the conditional-import
+      // helper at `core/browser_print.dart` / `core/browser_print_web.dart`.
+      // The web implementation is what actually calls `html.window.print()`.
+      expect(detailsSrc.contains('triggerBrowserPrint()'), isTrue,
+          reason: 'print must call the conditional triggerBrowserPrint() helper');
       // Print button label
       expect(detailsSrc.contains('طباعة'), isTrue);
     });
