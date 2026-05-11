@@ -34,7 +34,11 @@ import '../../screens/operations/customer_payment_screen.dart';
 import '../../screens/operations/customer_360_screen.dart' as ops_customer_360;
 import '../../screens/operations/live_sales_cycle_screen.dart';
 import '../../screens/operations/ap_aging_screen.dart';
-import '../../screens/operations/vendor_payment_screen.dart';
+// G-POS-MULTILINE-CLEANUP (2026-05-11) closes GAP-12: legacy
+// VendorPaymentScreen archived. The 'erp/purchasing/payment' chip
+// below now points at the bills list — payments are recorded via
+// VendorPaymentModal from a bill's details screen (PR #191).
+// import '../../screens/operations/vendor_payment_screen.dart';
 import '../../screens/operations/vendor_360_screen.dart';
 import '../../screens/operations/purchase_cycle_screen.dart';
 import '../../screens/compliance/cashflow_screen.dart';
@@ -822,7 +826,10 @@ final Map<String, V5ChipBuilder> v5WiredScreens = {
 
   // Purchasing (4 new chips)
   'erp/purchasing/ap-aging': (ctx) => const ApAgingScreen(),
-  'erp/purchasing/payment': (ctx) => const VendorPaymentScreen(billId: ''),  // path-keyed
+  // G-POS-MULTILINE-CLEANUP (2026-05-11): chip retargeted to the
+  // bills list. Tapping a bill row opens its details where the user
+  // records a payment via VendorPaymentModal (PR #191).
+  'erp/purchasing/payment': (ctx) => const PurchaseInvoicesScreen(),
   'erp/purchasing/vendor-360': (ctx) => const Vendor360Screen(vendorId: ''),  // path-keyed
   'erp/purchasing/cycle': (ctx) => const PurchaseCycleScreen(),
 
