@@ -99,6 +99,83 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
   double get _grandVat => _lines.fold(0.0, (s, l) => s + l.vatAmount);
   double get _grandTotal => _grandSubtotal + _grandVat;
 
+  /// G-POS-BACKEND-INTEGRATION (2026-05-11): resolve a branch_id for
+  /// this entity so we can open a POS session against it. POS shifts
+  /// are scoped to (branch × station), and the backend rejects POS
+  /// transactions that have no session_id. Strategy: take the first
+  /// branch returned for the active entity. Multi-branch tenants will
+  /// want a picker later, but every entity that exists has at least
+  /// one branch by onboarding contract.
+  Future<String?> _resolveBranchId(String entityId) async {
+    final res = await ApiService.pilotEntityBranches(entityId);
+    if (!res.success || res.data is! List) return null;
+    final list = res.data as List;
+    if (list.isEmpty) return null;
+    final first = list.first;
+    if (first is Map) return first['id']?.toString();
+    return null;
+  }
+
+  /// G-POS-BACKEND-INTEGRATION (2026-05-11): get the currently open
+  /// POS session for [branchId], creating one on the fly if none is
+  /// open. The backend rule is "one open session per (branch, station)
+  /// at a time" — listing with `status=open` returns at most one row.
+  /// If we need to create, we pick the first sellable warehouse on the
+  /// branch (or fall back to the first warehouse if none flagged
+  /// sellable — `pilotCreatePosSession` will then surface the
+  /// `is_sellable_from=false` 400 with an Arabic-friendly error).
+  Future<String?> _ensureOpenSession(String branchId) async {
+    final list = await ApiService.pilotListOpenPosSessions(branchId);
+    if (list.success && list.data is List && (list.data as List).isNotEmpty) {
+      final first = (list.data as List).first;
+      if (first is Map) {
+        final sid = first['id']?.toString();
+        if (sid != null && sid.isNotEmpty) return sid;
+      }
+    }
+    // No open session — pick a warehouse and open one.
+    final whRes = await ApiService.pilotListBranchWarehouses(branchId);
+    if (!whRes.success || whRes.data is! List ||
+        (whRes.data as List).isEmpty) {
+      return null;
+    }
+    final whs = (whRes.data as List).cast<Map>();
+    Map? sellable;
+    for (final w in whs) {
+      if (w['is_sellable_from'] == true) {
+        sellable = w;
+        break;
+      }
+    }
+    sellable ??= whs.first;
+    final whId = sellable['id']?.toString();
+    final userId = S.uid;
+    if (whId == null || userId == null) return null;
+    final create = await ApiService.pilotCreatePosSession(branchId, {
+      'branch_id': branchId,
+      'warehouse_id': whId,
+      'opened_by_user_id': userId,
+      'opening_cash': 0,
+      'station_label': 'POS-Quick',
+    });
+    if (!create.success || create.data is! Map) return null;
+    return (create.data as Map)['id']?.toString();
+  }
+
+  /// Map the UI's payment-method enum to the string POS expects.
+  /// PosPaymentInput's pattern is the canonical list; unsupported
+  /// values like `card` (generic) fall through to `other` so the
+  /// payment is still recorded — the cashier can refine later in the
+  /// per-session report.
+  String _payloadMethod(ApexPaymentMethod m) => switch (m) {
+        ApexPaymentMethod.mada => 'mada',
+        ApexPaymentMethod.stcPay => 'stc_pay',
+        ApexPaymentMethod.applePay => 'apple_pay',
+        ApexPaymentMethod.cash => 'cash',
+        ApexPaymentMethod.card => 'visa',
+        ApexPaymentMethod.bankTransfer => 'bank_transfer',
+      };
+
   Future<void> _submit() async {
     final tenantId = S.savedTenantId;
     final entityId = S.savedEntityId;
@@ -108,20 +185,37 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
       );
       return;
     }
-    // Validate every line up-front so the cashier gets clear feedback
-    // per line rather than a single backend 400.
+    final cashierId = S.uid;
+    if (cashierId == null || cashierId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('لا يوجد مستخدم مسجَّل')),
+      );
+      return;
+    }
+    // G-POS-BACKEND-INTEGRATION (2026-05-11): the POS endpoint
+    // (PosLineInput) requires `variant_id` on every line — there is
+    // no ad-hoc / description-only flow. Validate per-line and
+    // surface an Arabic error so the cashier knows which line needs
+    // a product picker selection.
     final linesPayload = <Map<String, dynamic>>[];
     for (int i = 0; i < _lines.length; i++) {
       final l = _lines[i];
       final desc = l.desc.text.trim();
-      // Description is the only required text — qty defaults to 1,
-      // price must be positive. A line with no description AND no
-      // product was intentionally left empty (the cashier added a
-      // line then changed their mind); silently skip those.
+      final hasProduct = l.product != null &&
+          l.product!['default_variant_id'] != null;
       final emptyLine = desc.isEmpty &&
-          l.product == null &&
+          !hasProduct &&
           l.unitPriceValue <= 0;
+      // Skip blank lines if the cashier added an extra row by mistake.
       if (emptyLine && _lines.length > 1) continue;
+      if (!hasProduct) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AC.err,
+          content: Text(
+              'البند ${i + 1}: اختر منتجاً (نقطة البيع تتطلب صنفاً مع باركود/SKU)'),
+        ));
+        return;
+      }
       if (l.quantityValue <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: AC.err,
@@ -137,14 +231,11 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
         return;
       }
       linesPayload.add({
-        'description': desc.isEmpty ? 'بيع نقدي' : desc,
-        'quantity': l.quantityValue,
-        'unit_price': l.unitPriceValue,
-        'vat_rate': l.vatRateValue,
-        if (l.product != null && l.product!['default_variant_id'] != null)
-          'product_id': l.product!['default_variant_id'],
+        'variant_id': l.product!['default_variant_id'],
+        'qty': l.quantityValue,
+        'unit_price_override': l.unitPriceValue,
         if (l.product != null && l.product!['code'] != null)
-          'sku': l.product!['code'],
+          'barcode_scanned': l.product!['code'],
       });
     }
     if (linesPayload.isEmpty) {
@@ -154,35 +245,50 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
       return;
     }
     setState(() => _submitting = true);
-    final today = DateTime.now();
-    String fmt(DateTime d) =>
-        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-    // Find/create the cash customer; for now, use first customer.
-    final custRes = await ApiService.pilotListCustomers(tenantId, limit: 1);
+    // G-POS-BACKEND-INTEGRATION (2026-05-11): resolve branch +
+    // open-session BEFORE building the create payload, because
+    // PosTransactionCreate requires `session_id`.
+    final branchId = await _resolveBranchId(entityId);
     if (!mounted) return;
-    String? custId;
-    if (custRes.success && custRes.data is List &&
-        (custRes.data as List).isNotEmpty) {
-      custId = ((custRes.data as List).first as Map)['id'] as String?;
-    }
-    if (custId == null) {
+    if (branchId == null) {
       setState(() => _submitting = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'أنشئ عميلاً أولاً (سيكون هو "العميل النقدي")')),
+        const SnackBar(content: Text('لا يوجد فرع نشط لهذا الكيان')),
       );
       return;
     }
-    final create = await ApiService.pilotCreateSalesInvoice({
-      'tenant_id': tenantId,
-      'entity_id': entityId,
-      'customer_id': custId,
-      'issue_date': fmt(today),
-      'due_date': fmt(today),
-      'currency': 'SAR',
-      'memo': 'POS — ${_paymentLabel(_method)}',
+    final sessionId = await _ensureOpenSession(branchId);
+    if (!mounted) return;
+    if (sessionId == null) {
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('تعذّر فتح وردية POS — تحقق من إعداد المستودع')),
+      );
+      return;
+    }
+    // Captured before posting so the receipt card has stable
+    // amounts even after we reset _lines.
+    final capturedSubtotal = _grandSubtotal;
+    final capturedVat = _grandVat;
+    final capturedTotal = _grandTotal;
+    // G-POS-BACKEND-INTEGRATION (2026-05-11): call the dedicated POS
+    // endpoint (NOT /sales-invoices). This produces a single POS
+    // receipt JE (DR Cash / CR Revenue / CR VAT) instead of the old
+    // double-JE flow, deducts stock for every variant, locks against
+    // the open session, and uses CompanySettings.default_vat_rate.
+    final create = await ApiService.pilotCreatePosTransaction({
+      'session_id': sessionId,
+      'kind': 'sale',
+      'cashier_user_id': cashierId,
       'lines': linesPayload,
+      'payments': [
+        {
+          'method': _payloadMethod(_method),
+          'amount': capturedTotal,
+        }
+      ],
+      'notes': 'POS Quick Sale — ${_paymentLabel(_method)}',
     });
     if (!mounted) return;
     if (!create.success) {
@@ -193,46 +299,40 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
       ));
       return;
     }
-    final invId = (create.data as Map?)?['id'] as String?;
-    if (invId == null) {
+    final txnData = create.data as Map?;
+    final posTxnId = txnData?['id'] as String?;
+    final receiptNumber = txnData?['receipt_number'] as String?;
+    if (posTxnId == null) {
       setState(() => _submitting = false);
       return;
     }
-    final issue = await ApiService.pilotIssueSalesInvoice(invId);
+    // G-POS-BACKEND-INTEGRATION (2026-05-11): post the receipt to
+    // GL so the cashier (and downstream TB / Z-Report) sees it
+    // immediately. Single JE — no separate customer-payment leg.
+    final post = await ApiService.pilotPostPosTransactionToGl(posTxnId);
     if (!mounted) return;
-    if (!issue.success) {
+    if (!post.success) {
       setState(() => _submitting = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AC.err,
-        content: Text('فشل الإصدار: ${issue.error ?? '-'}'),
+        content: Text('فشل الترحيل: ${post.error ?? '-'}'),
       ));
       return;
     }
-    // G-POS-ZATCA-QR (2026-05-11) + G-POS-MULTILINE-CLEANUP
-    // (2026-05-11): capture totals from the per-line state BEFORE
-    // resetting the form so the receipt card can pass them into
-    // zatcaQrBase64. After capture, reset _lines to a single empty
-    // draft for the next sale.
-    final capturedSubtotal = _grandSubtotal;
-    final capturedVat = _grandVat;
-    final capturedTotal = _grandTotal;
+    final jeId = (post.data as Map?)?['id'] as String?;
     setState(() {
       _submitting = false;
       _lastReceipt = {
-        'invoice_id': invId,
-        'invoice_number': (issue.data as Map?)?['invoice_number'],
-        'je_id': (issue.data as Map?)?['journal_entry_id'],
+        'pos_txn_id': posTxnId,
+        'receipt_number': receiptNumber,
+        'je_id': jeId,
         'amount': capturedSubtotal,
         'vat': capturedVat,
         'total': capturedTotal,
         'method': _paymentLabel(_method),
         'issued_at_utc': DateTime.now().toUtc().toIso8601String(),
-        // Phase 1 ZATCA QR requires seller VAT + name. These don't
-        // live in client session storage yet (entity_setup_screen
-        // doesn't persist them locally) so we fall back to the same
-        // placeholders the sales-details screen uses. When the entity
-        // settings API exposes VAT/name fields, swap these for the
-        // real values via a future sprint.
+        // ZATCA Phase-1 QR fields — same placeholders as before until
+        // entity-settings exposes seller VAT / name to the client.
         'seller_vat_number': '300000000000003',
         'seller_name': 'APEX',
         'line_count': linesPayload.length,
@@ -611,8 +711,12 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
                   fontWeight: FontWeight.w800)),
         ]),
         const SizedBox(height: 6),
+        // G-POS-BACKEND-INTEGRATION (2026-05-11): show receipt_number
+        // (e.g. RCT-001234) rather than the old sales-invoice
+        // invoice_number — POS Quick Sale now creates a POS receipt
+        // (B2C simplified-tax invoice), not a B2B sales invoice.
         Text(
-            '${r['invoice_number']} · ${r['method']} · ${r['total']?.toStringAsFixed(2) ?? r['total']} SAR · ${r['line_count'] ?? 1} بند',
+            '${r['receipt_number'] ?? '-'} · ${r['method']} · ${r['total']?.toStringAsFixed(2) ?? r['total']} SAR · ${r['line_count'] ?? 1} بند',
             style: TextStyle(color: AC.tp, fontSize: 12)),
         const SizedBox(height: 10),
         Row(
@@ -646,7 +750,7 @@ class _PosQuickSaleScreenState extends State<PosQuickSaleScreen> {
                     ),
                   ApexWhatsAppShareButton(
                     message:
-                        'إيصال بيع ${r['invoice_number']} — ${r['total']} ريال (${r['method']})',
+                        'إيصال بيع ${r['receipt_number'] ?? '-'} — ${r['total']} ريال (${r['method']})',
                   ),
                   const SizedBox(height: 8),
                   OutlinedButton.icon(

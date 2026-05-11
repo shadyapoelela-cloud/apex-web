@@ -740,6 +740,12 @@ class ApiService {
   // ── Pilot: POS (pos_routes at /pilot — NOT /api/v1/pilot) ──
   static Future<ApiResult> pilotListPosSessions(String branchId, {int limit=50}) =>
       _get('/pilot/branches/$branchId/pos-sessions?limit=$limit');
+  // G-POS-BACKEND-INTEGRATION (2026-05-11): slim wrapper that filters
+  // by `status=open` so the POS screen can resolve "the current
+  // session for this branch" in one call. Returns at most one row
+  // because pos_routes enforces a single open session per branch+station.
+  static Future<ApiResult> pilotListOpenPosSessions(String branchId) =>
+      _get('/pilot/branches/$branchId/pos-sessions?status=open&limit=1');
   static Future<ApiResult> pilotCreatePosSession(String branchId, Map<String, dynamic> payload) =>
       _post('/pilot/branches/$branchId/pos-sessions', payload);
   static Future<ApiResult> pilotClosePosSession(String sessionId, Map<String, dynamic> payload) =>
@@ -748,7 +754,22 @@ class ApiService {
       _get('/pilot/pos-sessions/$sessionId/z-report');
   static Future<ApiResult> pilotListPosTransactions(String sessionId) =>
       _get('/pilot/pos-sessions/$sessionId/transactions');
+  // G-POS-BACKEND-INTEGRATION (2026-05-11): wraps the dedicated POS
+  // create endpoint. Replaces the previous sales-invoice path which
+  // produced double JEs, skipped stock deduction, and left ZATCA QR
+  // on the wrong document type. See PosTransactionCreate in
+  // app/pilot/schemas/pos.py for the expected payload shape.
+  // NB: pilot_client.dart already exposes the same call as
+  // `createPosTransaction`; we duplicate here so the POS screen can
+  // keep its existing `ApiService.pilot*` import style (consistency
+  // with sibling methods like pilotListPosSessions / pilotPostPosToGL).
+  static Future<ApiResult> pilotCreatePosTransaction(Map<String, dynamic> payload) =>
+      _post('/pilot/pos-transactions', payload);
   static Future<ApiResult> pilotPostPosToGL(String posTxnId) =>
+      _post('/pilot/pos-transactions/$posTxnId/post-to-gl', {});
+  // G-POS-BACKEND-INTEGRATION (2026-05-11): friendlier alias matching
+  // the naming used in the spec / contracts. Same backing endpoint.
+  static Future<ApiResult> pilotPostPosTransactionToGl(String posTxnId) =>
       _post('/pilot/pos-transactions/$posTxnId/post-to-gl', {});
 
   // Financial Statements endpoints are declared below (fsTrialBalance / fsIncomeStatement / fsBalanceSheet) — reused.
@@ -790,6 +811,12 @@ class ApiService {
       _get('/pilot/tenants/$tenantId/branches');
   static Future<ApiResult> pilotEntityBranches(String entityId) =>
       _get('/pilot/entities/$entityId/branches');
+  // G-POS-BACKEND-INTEGRATION (2026-05-11): list warehouses for a
+  // branch so the POS screen can pick the first sellable warehouse
+  // when opening a fresh session. Backend route is mounted at
+  // /pilot/branches/{bid}/warehouses (catalog_routes.py).
+  static Future<ApiResult> pilotListBranchWarehouses(String branchId) =>
+      _get('/pilot/branches/$branchId/warehouses');
   static Future<ApiResult> pilotGoodsReceiptCreate(Map<String, dynamic> body) =>
       _post('/pilot/goods-receipts', body);
 
