@@ -79,6 +79,24 @@ class Entity(Base):
     zatca_csid_expires_at = Column(DateTime(timezone=True), nullable=True)
     zatca_onboarding_status = Column(String(30), nullable=True)  # pending | onboarded | failed | expired
 
+    # G-ENTITY-SELLER-INFO (2026-05-11): real seller identification
+    # rendered into Phase-1 ZATCA QR codes (POS receipts + sales
+    # invoice details). Pre-fix the frontend used hardcoded placeholders
+    # ('APEX', '300000000000003') so any ZATCA scanner saw the wrong
+    # company info. These columns persist per-entity legal identity:
+    #   * seller_vat_number — 15-digit ZATCA VAT registration (no
+    #     validation enforced beyond optional string; UI is responsible
+    #     for masking + format).
+    #   * seller_name_ar — Arabic legal name shown on the receipt
+    #     (falls back to `name_ar` if null on the frontend).
+    #   * seller_address_ar — optional, for Phase 2 readiness when
+    #     ZATCA requires address on the simplified-tax invoice.
+    # Nullable so existing entities upgrade cleanly (SQLAlchemy
+    # create_all auto-adds the columns; no alembic migration needed).
+    seller_vat_number = Column(String(20), nullable=True)
+    seller_name_ar = Column(String(255), nullable=True)
+    seller_address_ar = Column(String(512), nullable=True)
+
     # Display / sorting
     sort_order = Column(Integer, nullable=False, default=0)
     icon_emoji = Column(String(10), nullable=True)  # 🇸🇦 🇦🇪 ...
