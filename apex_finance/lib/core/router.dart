@@ -276,6 +276,7 @@ final appRouter = GoRouter(
     GoRoute(path: '/settings-hub', pageBuilder: (c, s) => _apexPage(const ApexServiceHubScreen(serviceId: 'settings-hub'), s)),
 
     // Setup alias — keep simple redirect.
+    // Single canonical /setup → /settings/entities redirect. A duplicate at line ~689 was removed in G-CLEANUP-FINAL (2026-05-11).
     GoRoute(path: '/setup', redirect: (c, s) => '/settings/entities'),
     GoRoute(path: '/reports', pageBuilder: (c, s) => _apexPage(const ReportsHubScreen(), s)),
     // DASH-1.1: /today now mounts CustomizableDashboard. The legacy TodayDashboardScreen is archived.
@@ -686,7 +687,7 @@ final appRouter = GoRouter(
     // Sprint 15 Stage 4f: V4 /audit/benford archived (alias) -> V5 /app/audit/engagement/dashboard
     // Sprint 15 Stage 4f: V4 /audit/sampling archived (alias) -> V5 /app/audit/engagement/dashboard
     // Sprint 15 Stage 4f: V4 /audit/workpapers archived (alias) -> V5 /app/audit/engagement/dashboard
-    GoRoute(path: '/setup', redirect: (c, s) => '/settings/entities'),
+    // G-CLEANUP-FINAL (2026-05-11): duplicate `/setup` GoRoute removed — see line ~280 for the canonical one.
     GoRoute(path: '/setup/entity', redirect: (c, s) => '/settings/entities'),
     // Sprint 15 Stage 4f: V4 /operations/customer-360/:id archived (REAL_NEW_V5) -> V5 /app/erp/sales/customer-360/:id
     // Sprint 15 Stage 4f: V4 /operations/vendor-360/:id archived (REAL_NEW_V5) -> V5 /app/erp/purchasing/vendor-360/:id
