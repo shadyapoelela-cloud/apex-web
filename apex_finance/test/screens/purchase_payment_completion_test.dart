@@ -47,15 +47,16 @@ void main() {
     });
 
     test('test_backend_payment_routes_account_by_method', () {
-      // cash → 1110, cheque → 1310, default (bank/card/other) → 1120
-      // Mirror of _post_customer_payment_je on the sales side. Routing
-      // belongs server-side so the modal stays slim.
+      // G-PURCHASE-FIXES (2026-05-11): outgoing vendor cheques no
+      // longer route to 1310 (Cheques on Hand = customer-side asset).
+      // Mapping is now cash → 1110, everything else → 1120.
       expect(routesSrc.contains('paid_from = "1110"'), isTrue,
           reason: 'cash must route to 1110');
-      expect(routesSrc.contains('paid_from = "1310"'), isTrue,
-          reason: 'cheque must route to 1310');
+      expect(routesSrc.contains('paid_from = "1310"'), isFalse,
+          reason: 'outgoing vendor cheques must NOT debit 1310 '
+              '(Cheques on Hand is a customer-side asset)');
       expect(routesSrc.contains('paid_from = "1120"'), isTrue,
-          reason: 'bank/default must route to 1120');
+          reason: 'bank/cheque/card/mada/credit_card/other → 1120');
     });
 
     test('test_backend_payment_guards_overpayment_and_cancelled', () {

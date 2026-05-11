@@ -194,10 +194,16 @@ class _VendorPaymentModalState extends State<VendorPaymentModal> {
                   keyboardType: const TextInputType.numberWithOptions(
                       decimal: true)),
               _datePickerField(),
+              // G-PURCHASE-FIXES (2026-05-11): Saudi merchants
+              // commonly pay vendors via mada (local debit network)
+              // or credit/debit cards. `credit_card` and `other` are
+              // retained for backward compat with existing records.
               _dropdown('طريقة الدفع', _method, const {
                 'cash': 'نقداً',
                 'bank_transfer': 'تحويل بنكي',
                 'cheque': 'شيك',
+                'card': 'بطاقة ائتمان',
+                'mada': 'مدى',
                 'credit_card': 'بطاقة ائتمان',
                 'other': 'أخرى',
               }, (v) => setState(() => _method = v ?? 'bank_transfer')),

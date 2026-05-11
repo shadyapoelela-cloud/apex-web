@@ -465,8 +465,16 @@ def post_pi_endpoint(
 # payload including `entity_id`, `vendor_id`, and `paid_from_account_code`
 # — too much friction for a modal driven by the invoice details
 # screen. This shim accepts a slim payload and routes the cash/bank
-# account based on the payment method (cash→1110, bank→1120,
-# cheque→1310) matching the sales side's `_post_customer_payment_je`.
+# account based on the payment method.
+#
+# G-PURCHASE-FIXES (2026-05-11): cheque routing corrected. Account
+# 1310 = "Cheques on Hand" is an asset for cheques *received* from
+# customers — wrong side for an *outgoing* cheque to a vendor. Vendor
+# cheques settle through the bank account (1120) when issued; if the
+# tenant needs a "cheques issued / clearing" account that's a separate
+# follow-up. Mapping is now:
+#   cash → 1110, everything else (bank_transfer / cheque / credit_card
+#   / card / mada / other) → 1120.
 @router.post("/purchase-invoices/{pi_id}/payment", status_code=201)
 def record_vendor_payment_endpoint(
     pi_id: str,
@@ -502,15 +510,22 @@ def record_vendor_payment_endpoint(
         )
 
     method = (payload.get("method") or "bank_transfer").lower()
-    if method not in ("cash", "bank_transfer", "cheque", "credit_card", "other"):
+    # G-PURCHASE-FIXES (2026-05-11): allow Saudi-market card/mada too.
+    if method not in (
+        "cash", "bank_transfer", "cheque",
+        "credit_card", "card", "mada", "other",
+    ):
         raise HTTPException(400, f"invalid method {method!r}")
 
-    # Method → cash account routing, mirrors customer-payment.
+    # G-PURCHASE-FIXES (2026-05-11): outgoing cheques settle through
+    # bank, not the "cheques on hand" asset account (1310 = received
+    # cheques, customer side). Cash settles via petty cash; everything
+    # else (bank_transfer / cheque / credit_card / card / mada / other)
+    # debits AP and credits Bank 1120.
     if method == "cash":
         paid_from = "1110"
-    elif method in ("cheque", "check"):
-        paid_from = "1310"
     else:
+        # bank_transfer / cheque / credit_card / card / mada / other → 1120 bank
         paid_from = "1120"
 
     payment_date_raw = payload.get("payment_date")
@@ -658,12 +673,23 @@ def create_vp_endpoint(
         inv = db.query(PurchaseInvoice).filter(PurchaseInvoice.id == payload.invoice_id).first()
         if not inv:
             raise HTTPException(400, "invoice_id not found")
+    # G-PURCHASE-FIXES (2026-05-11): legacy schema default
+    # `paid_from_account_code="1110"` ignores the payment method. A
+    # client POSTing method=bank_transfer without an explicit
+    # paid_from_account_code would credit petty cash (1110) instead of
+    # bank (1120). Detect the default-with-non-cash combo and override
+    # to match the slim `/payment` endpoint mapping.
+    paid_from = payload.paid_from_account_code
+    if paid_from == "1110" and payload.method != "cash":
+        # Same mapping as /payment endpoint: only cash → 1110, all
+        # other methods (bank/cheque/card/mada/credit_card/other) → 1120.
+        paid_from = "1120"
     try:
         vp = create_vendor_payment(
             db, entity=entity, vendor=vendor,
             amount=payload.amount, payment_date=payload.payment_date,
             method=payload.method, invoice=inv,
-            paid_from_account_code=payload.paid_from_account_code,
+            paid_from_account_code=paid_from,
             reference_number=payload.reference_number, notes=payload.notes,
             created_by_user_id=payload.created_by_user_id,
         )

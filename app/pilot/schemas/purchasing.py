@@ -334,7 +334,11 @@ class VendorPaymentCreate(BaseModel):
     vendor_id: str
     amount: Decimal = Field(..., gt=0)
     payment_date: date
-    method: str = Field("bank_transfer", pattern="^(cash|bank_transfer|cheque|credit_card|other)$")
+    # G-PURCHASE-FIXES (2026-05-11): Saudi merchants frequently pay
+    # vendors via mada cards — pattern extended to include `card` and
+    # `mada` alongside the pre-existing `credit_card` (kept for
+    # backward compat with already-stored payments).
+    method: str = Field("bank_transfer", pattern="^(cash|bank_transfer|cheque|credit_card|card|mada|other)$")
     invoice_id: Optional[str] = None
     paid_from_account_code: str = Field("1110")   # 1110 cash, 1120 bank
     reference_number: Optional[str] = None
