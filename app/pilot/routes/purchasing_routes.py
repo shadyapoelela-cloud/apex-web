@@ -459,6 +459,100 @@ def post_pi_endpoint(
         raise HTTPException(409, str(ex))
 
 
+# G-PURCHASE-PAYMENT-COMPLETION (2026-05-11): modal-friendly payment
+# endpoint mirroring `POST /sales-invoices/{id}/payment` on the sales
+# side. Pre-existing `POST /vendor-payments` works but takes a full
+# payload including `entity_id`, `vendor_id`, and `paid_from_account_code`
+# — too much friction for a modal driven by the invoice details
+# screen. This shim accepts a slim payload and routes the cash/bank
+# account based on the payment method (cash→1110, bank→1120,
+# cheque→1310) matching the sales side's `_post_customer_payment_je`.
+@router.post("/purchase-invoices/{pi_id}/payment", status_code=201)
+def record_vendor_payment_endpoint(
+    pi_id: str,
+    payload: dict,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    inv = assert_resource_in_tenant(
+        db, PurchaseInvoice, pi_id, current_user, soft_delete_field=None,
+    )
+    if inv.status == PurchaseInvoiceStatus.cancelled.value:
+        raise HTTPException(409, "cannot pay a cancelled invoice")
+    if inv.status == PurchaseInvoiceStatus.paid.value:
+        raise HTTPException(409, "invoice already fully paid")
+
+    amount_raw = payload.get("amount")
+    if amount_raw is None:
+        raise HTTPException(400, "amount required")
+    try:
+        amount = Decimal(str(amount_raw))
+    except Exception:
+        raise HTTPException(400, "amount must be numeric")
+    if amount <= 0:
+        raise HTTPException(400, "amount must be positive")
+
+    # Overpayment guard — sales side has the same check.
+    new_paid = (inv.amount_paid or Decimal(0)) + amount
+    if new_paid > inv.grand_total + Decimal("0.001"):
+        raise HTTPException(
+            409,
+            f"overpayment: invoice total {inv.grand_total}, "
+            f"already paid {inv.amount_paid or 0}, attempted {amount}",
+        )
+
+    method = (payload.get("method") or "bank_transfer").lower()
+    if method not in ("cash", "bank_transfer", "cheque", "credit_card", "other"):
+        raise HTTPException(400, f"invalid method {method!r}")
+
+    # Method → cash account routing, mirrors customer-payment.
+    if method == "cash":
+        paid_from = "1110"
+    elif method in ("cheque", "check"):
+        paid_from = "1310"
+    else:
+        paid_from = "1120"
+
+    payment_date_raw = payload.get("payment_date")
+    if payment_date_raw:
+        try:
+            payment_date = _date.fromisoformat(str(payment_date_raw))
+        except Exception:
+            raise HTTPException(400, "payment_date must be YYYY-MM-DD")
+    else:
+        payment_date = _date.today()
+
+    entity = assert_entity_in_tenant(db, inv.entity_id, current_user)
+    vendor = _vendor_or_404(db, inv.vendor_id)
+
+    try:
+        vp = create_vendor_payment(
+            db, entity=entity, vendor=vendor,
+            amount=amount, payment_date=payment_date,
+            method=method, invoice=inv,
+            paid_from_account_code=paid_from,
+            reference_number=payload.get("reference"),
+            notes=payload.get("notes"),
+        )
+        db.commit()
+        db.refresh(vp)
+        db.refresh(inv)
+    except ValueError as ex:
+        db.rollback()
+        raise HTTPException(400, str(ex))
+
+    return {
+        "payment_id": vp.id,
+        "payment_number": vp.payment_number,
+        "amount": float(vp.amount),
+        "method": vp.method,
+        "invoice_status": inv.status,
+        "invoice_paid_amount": float(inv.amount_paid or 0),
+        "remaining_balance": float(inv.amount_due or 0),
+        "journal_entry_id": vp.journal_entry_id,
+    }
+
+
 # G-PURCHASE-MULTILINE-PARITY (2026-05-11): cancel endpoint, mirror of
 # the sales cancel flow. Moves PI → cancelled. If a JE was already
 # posted (status=posted), reverses it via gl_engine.reverse_journal_entry
@@ -534,9 +628,16 @@ def get_pi(
     lines = db.query(PurchaseInvoiceLine).filter(
         PurchaseInvoiceLine.invoice_id == pi_id
     ).order_by(PurchaseInvoiceLine.line_number).all()
+    # G-PURCHASE-PAYMENT-COMPLETION (2026-05-11): include vendor
+    # payments so the details screen can render history + JE links in
+    # a single request, matching the sales-details shape.
+    pays = db.query(VendorPayment).filter(
+        VendorPayment.invoice_id == pi_id
+    ).order_by(VendorPayment.payment_date).all()
     return PiDetail(
         **PiRead.model_validate(inv).model_dump(),
         lines=[PiLineRead.model_validate(l) for l in lines],
+        payments=[VendorPaymentRead.model_validate(p) for p in pays],
     )
 
 
