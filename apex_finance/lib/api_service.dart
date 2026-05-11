@@ -553,8 +553,15 @@ class ApiService {
   // pilotListPurchaseInvoices already defined further down — see line 681.
 
   // ── Pilot: Products (catalog_routes mounted at /pilot — NOT /api/v1/pilot) ──
-  static Future<ApiResult> pilotListProducts(String tenantId, {int limit=100}) =>
-      _get('/pilot/tenants/$tenantId/products?limit=$limit');
+  // G-SALES-INVOICE-MULTILINE-PREFILL (2026-05-11): `q` enables
+  // server-side substring search across code/name_ar/name_en. The
+  // ProductPickerOrCreate uses this with 300ms debounce so the picker
+  // scales beyond the previous 500-item client-cache limit.
+  static Future<ApiResult> pilotListProducts(String tenantId, {int limit=100, String? q}) {
+    final qs = <String>['limit=$limit'];
+    if (q != null && q.trim().isNotEmpty) qs.add('q=${Uri.encodeQueryComponent(q.trim())}');
+    return _get('/pilot/tenants/$tenantId/products?${qs.join('&')}');
+  }
   static Future<ApiResult> pilotCreateProduct(String tenantId, Map<String, dynamic> payload) =>
       _post('/pilot/tenants/$tenantId/products', payload);
   // G-FIN-PRODUCT-CATALOG (Sprint 4, 2026-05-09): get + variants + barcode lookup

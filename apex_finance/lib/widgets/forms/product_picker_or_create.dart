@@ -40,9 +40,17 @@ class ProductPickerOrCreate extends StatefulWidget {
 class _ProductPickerOrCreateState extends State<ProductPickerOrCreate> {
   final _ctl = TextEditingController();
   Map<String, dynamic>? _selected;
-  List<Map<String, dynamic>> _all = [];
+  // Suggestions shown in the dropdown.
+  List<Map<String, dynamic>> _suggestions = [];
   bool _loading = false;
   bool _scanLookupInFlight = false;
+  // G-SALES-INVOICE-MULTILINE-PREFILL (2026-05-11): debounce token —
+  // when the user types fast, only the last `Future` after the 300ms
+  // pause runs against the server. Pre-fix the picker held all 500
+  // products client-side; that broke for tenants with thousands of
+  // SKUs.
+  String _lastQuery = '';
+  int _searchSeq = 0;
 
   @override
   void initState() {
@@ -51,7 +59,9 @@ class _ProductPickerOrCreateState extends State<ProductPickerOrCreate> {
     if (_selected != null) {
       _ctl.text = (_selected!['name_ar'] ?? '').toString();
     }
-    _load();
+    // Initial fetch — top 20 by code so the dropdown is non-empty
+    // when the user clicks the field without typing.
+    _search('');
   }
 
   @override
@@ -60,32 +70,31 @@ class _ProductPickerOrCreateState extends State<ProductPickerOrCreate> {
     super.dispose();
   }
 
-  Future<void> _load() async {
+  /// G-SALES-INVOICE-MULTILINE-PREFILL (2026-05-11): debounced
+  /// server-side search. Each keystroke schedules a 300ms timer; if
+  /// another keystroke arrives before it fires, the previous request
+  /// is cancelled by sequence-number comparison.
+  Future<void> _search(String query) async {
     final tid = S.savedTenantId;
     if (tid == null) return;
+    _lastQuery = query;
+    final mySeq = ++_searchSeq;
+    // 300ms debounce
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    if (!mounted || mySeq != _searchSeq) return;
     setState(() => _loading = true);
-    final res = await ApiService.pilotListProducts(tid, limit: 500);
-    if (!mounted) return;
+    final res = await ApiService.pilotListProducts(
+      tid,
+      limit: 20,
+      q: query.isEmpty ? null : query,
+    );
+    if (!mounted || mySeq != _searchSeq) return;
     setState(() {
       _loading = false;
       if (res.success && res.data is List) {
-        _all = (res.data as List).cast<Map<String, dynamic>>();
+        _suggestions = (res.data as List).cast<Map<String, dynamic>>();
       }
     });
-  }
-
-  List<Map<String, dynamic>> _filter(String q) {
-    final query = q.trim().toLowerCase();
-    if (query.isEmpty) return _all.take(10).toList();
-    return _all.where((p) {
-      final hay = [
-        p['code'],
-        p['name_ar'],
-        p['name_en'],
-        p['default_uom'],
-      ].whereType<Object>().map((e) => e.toString().toLowerCase()).join(' ');
-      return hay.contains(query);
-    }).take(10).toList();
   }
 
   /// Looks up a barcode against `/pilot/tenants/{tid}/barcode/{value}`.
@@ -121,7 +130,7 @@ class _ProductPickerOrCreateState extends State<ProductPickerOrCreate> {
           initialBarcode: v);
       if (created == null || !mounted) return;
       setState(() {
-        _all = [..._all, created];
+        _suggestions = [..._suggestions, created];
         _selected = created;
         _ctl.text = (created['name_ar'] ?? '').toString();
       });
@@ -134,7 +143,7 @@ class _ProductPickerOrCreateState extends State<ProductPickerOrCreate> {
         await ProductCreateModal.show(context, initialNameAr: prefilledName);
     if (created == null || !mounted) return;
     setState(() {
-      _all = [..._all, created];
+      _suggestions = [..._suggestions, created];
       _selected = created;
       _ctl.text = (created['name_ar'] ?? '').toString();
     });
@@ -148,7 +157,19 @@ class _ProductPickerOrCreateState extends State<ProductPickerOrCreate> {
       child: Autocomplete<Map<String, dynamic>>(
         initialValue: TextEditingValue(text: _ctl.text),
         displayStringForOption: (p) => (p['name_ar'] ?? '').toString(),
-        optionsBuilder: (textValue) => _filter(textValue.text),
+        // G-SALES-INVOICE-MULTILINE-PREFILL (2026-05-11):
+        // optionsBuilder is sync and runs on every keystroke. We
+        // schedule a debounced server fetch as a side-effect and
+        // return whatever suggestions we already have. The Autocomplete
+        // re-runs optionsBuilder when _suggestions changes (via
+        // setState), so the dropdown updates ~300ms after typing.
+        optionsBuilder: (textValue) {
+          final q = textValue.text;
+          if (q != _lastQuery) {
+            _search(q);
+          }
+          return _suggestions;
+        },
         onSelected: (p) {
           setState(() {
             _selected = p;
@@ -232,19 +253,51 @@ class _ProductPickerOrCreateState extends State<ProductPickerOrCreate> {
                   shrinkWrap: true,
                   padding: EdgeInsets.zero,
                   children: [
-                    ...options.map((p) => ListTile(
-                          dense: true,
-                          leading: Icon(Icons.inventory_2_rounded,
-                              color: AC.gold, size: 18),
-                          title: Text((p['name_ar'] ?? '').toString(),
+                    // G-SALES-INVOICE-MULTILINE-PREFILL (2026-05-11):
+                    // dropdown row now shows a stock badge.
+                    // total_stock_on_hand comes from ProductRead.
+                    // Color: green when stock>0, red when 0, grey for
+                    // services (is_stockable=false).
+                    ...options.map((p) {
+                      final stock = double.tryParse('${p['total_stock_on_hand'] ?? 0}') ?? 0;
+                      final stockable = p['is_stockable'] != false;
+                      final stockColor = !stockable
+                          ? AC.td
+                          : (stock > 0 ? AC.ok : AC.err);
+                      final stockLabel = !stockable
+                          ? 'خدمة'
+                          : (stock > 0 ? '${stock.toStringAsFixed(0)} متوفر' : 'نفد');
+                      return ListTile(
+                        dense: true,
+                        leading: Icon(Icons.inventory_2_rounded,
+                            color: AC.gold, size: 18),
+                        title: Text((p['name_ar'] ?? '').toString(),
+                            style: TextStyle(
+                                color: AC.tp, fontSize: 13)),
+                        subtitle: Text(
+                            '${p['code'] ?? ''}  •  ${p['default_uom'] ?? ''}',
+                            style: TextStyle(
+                                color: AC.td, fontSize: 11)),
+                        trailing: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: stockColor.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: stockColor.withValues(alpha: 0.3),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Text(stockLabel,
                               style: TextStyle(
-                                  color: AC.tp, fontSize: 13)),
-                          subtitle: Text(
-                              '${p['code'] ?? ''}  •  ${p['default_uom'] ?? ''}',
-                              style: TextStyle(
-                                  color: AC.td, fontSize: 11)),
-                          onTap: () => onSelected(p),
-                        )),
+                                  color: stockColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700)),
+                        ),
+                        onTap: () => onSelected(p),
+                      );
+                    }),
                     Divider(color: AC.bdr, height: 1),
                     ListTile(
                       dense: true,

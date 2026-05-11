@@ -4,6 +4,42 @@
 
 ### 2026-05-11
 
+- [x] **G-SALES-INVOICE-MULTILINE-PREFILL** — closes 5 of the 7
+  deferred spec items from the QA on PR #188.
+  - Branch: `feat/g-sales-invoice-multiline-prefill`
+  - **Multi-line invoices**: `SalesInvoiceCreateScreen` rewritten
+    from a single-line form to a list of `_LineDraft` value-class
+    instances. Each line has its own controllers (desc/qty/price/
+    vat) + selected product + remove button. List starts with one
+    empty line; remove-button gated on `_lines.length > 1` so the
+    form is never empty. Reactive totals footer (subtotal / VAT /
+    grand-total) computed from `_lines`.
+  - **Edit pre-fill**: `prefillInvoiceId` widget param + new
+    `GoRoute('/app/erp/sales/invoice-create')` reading
+    `?invoice_id=` query. On init, the screen fetches
+    `GET /sales-invoices/{id}` and hydrates customer + dates +
+    lines. Non-draft invoices lock the form (`AbsorbPointer`) and
+    show a banner directing the user back to the details screen.
+  - **Picker — server-side debounced search**: 300ms debounce
+    with sequence-token cancellation so older fetches never
+    overwrite newer ones. `pilotListProducts` API gains `q`
+    parameter. Pre-PR the picker cached 500 products client-side;
+    new flow scales to any catalogue size.
+  - **Stock badge**: dropdown rows show a coloured badge — green
+    when `total_stock_on_hand > 0`, red ("نفد") when 0, grey
+    ("خدمة") for `is_stockable=false`.
+  - **Qty > stock warning**: per-line, when `qty > stock` on a
+    stockable product, a non-blocking warning banner appears
+    ("الكمية (N) تتجاوز المخزون المتوفر (M)"). Submit is NOT
+    gated on this — backend is SOT for negative-stock policy.
+  - **Deferred**: camera-based barcode scanner + CODE128 internal
+    barcode + dedicated print template (current `window.print()`
+    is acceptable interim).
+  - **Tests**: 12 source-grep contracts pinning every assertion
+    above. 12/12 pass.
+  - **Docs**: `docs/SALES_INVOICE_MULTILINE_PREFILL_2026-05-11.md`
+    captures the 12-step manual UAT.
+
 - [x] **G-SALES-INVOICE-UX-FOLLOWUP** — QA report on PR #187
   surfaced 2 live bugs + 4 spec gaps. All closed.
   - Branch: `feat/g-sales-invoice-ux-followup`

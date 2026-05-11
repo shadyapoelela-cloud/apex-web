@@ -106,6 +106,11 @@ import '../screens/operations/purchase_invoice_create_screen.dart';
 // G-SALES-INVOICE-UX-COMPLETE (2026-05-10): sales-invoice details screen.
 // Closes the Bug-#1 (row click was opening JE-builder instead of details).
 import '../screens/operations/sales_invoice_details_screen.dart';
+// G-SALES-INVOICE-MULTILINE-PREFILL (2026-05-11): create/edit screen
+// is exposed via its chip mapping AND via a GoRoute that reads the
+// `?invoice_id=` query param so the Edit button on the details screen
+// can deep-link into pre-fill mode.
+import '../screens/operations/sales_invoice_create_screen.dart';
 import '../screens/operations/vendor_payment_screen.dart';
 // G-CLEANUP-1 Stage 4b: JeListScreen archived to _archive/2026-05-04/v4-routes/.
 // Replaced by V5 list at /app/erp/finance/je-builder.
@@ -733,6 +738,21 @@ final appRouter = GoRouter(
       path: '/app/erp/finance/sales-invoices/:invoiceId',
       pageBuilder: (c, s) => _apexPage(
         SalesInvoiceDetailsScreen(invoiceId: s.pathParameters['invoiceId']!),
+        s,
+      ),
+    ),
+    // G-SALES-INVOICE-MULTILINE-PREFILL (2026-05-11): explicit route
+    // for the create/edit screen so `?invoice_id=` deep-links work.
+    // The chip mapping at `erp/sales/invoice-create` still handles the
+    // fresh-create case via v5_wired_screens.dart; this route only
+    // intercepts when the `?invoice_id=` query param is present so the
+    // Edit button on details can route here.
+    GoRoute(
+      path: '/app/erp/sales/invoice-create',
+      pageBuilder: (c, s) => _apexPage(
+        SalesInvoiceCreateScreen(
+          prefillInvoiceId: s.uri.queryParameters['invoice_id'],
+        ),
         s,
       ),
     ),
