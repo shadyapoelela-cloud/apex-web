@@ -319,6 +319,10 @@ class PiRead(BaseModel):
 
 class PiDetail(PiRead):
     lines: list[PiLineRead] = Field(default_factory=list)
+    # G-PURCHASE-PAYMENT-COMPLETION (2026-05-11): payments list so the
+    # details screen can render history without a second round-trip.
+    # Mirrors the SalesInvoiceDetail.payments shape on the sales side.
+    payments: list["VendorPaymentRead"] = Field(default_factory=list)
 
 
 # ──────────────────────────────────────────────────────────────────────────

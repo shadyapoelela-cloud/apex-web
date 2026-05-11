@@ -26,6 +26,7 @@ import 'dart:html' as html;
 
 import '../../api_service.dart';
 import '../../core/theme.dart';
+import 'vendor_payment_modal.dart';
 
 class PurchaseInvoiceDetailsScreen extends StatefulWidget {
   final String billId;
@@ -139,6 +140,59 @@ class _PurchaseInvoiceDetailsScreenState
     html.window.print();
   }
 
+  // G-PURCHASE-PAYMENT-COMPLETION (2026-05-11): record a vendor
+  // payment from the modal. The backend auto-posts the JE (DR 2110
+  // AP / CR 1110|1120|1310 depending on method) so we just need to
+  // refresh on success and surface the JE link in the snackbar —
+  // same UX as the sales side.
+  Future<void> _recordPayment() async {
+    final inv = _bill;
+    if (inv == null) return;
+    final remaining =
+        double.tryParse('${inv['amount_due'] ?? 0}') ?? 0;
+    final result = await VendorPaymentModal.show(
+      context,
+      billId: widget.billId,
+      invoiceNumber: inv['invoice_number']?.toString() ?? '—',
+      remainingBalance: remaining,
+      currency: inv['currency']?.toString() ?? 'SAR',
+    );
+    if (result == null || !mounted) return;
+    final jeId = result['journal_entry_id'];
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: AC.ok,
+      duration: const Duration(seconds: 6),
+      content: Text(jeId == null
+          ? 'تم تسجيل الدفع'
+          : 'تم تسجيل الدفع — قيد اليومية #$jeId'),
+      action: jeId == null
+          ? null
+          : SnackBarAction(
+              label: 'عرض القيد',
+              textColor: AC.navy,
+              onPressed: () =>
+                  context.go('/app/erp/finance/je-builder/$jeId'),
+            ),
+    ));
+    await _load();
+  }
+
+  String _methodLabel(String m) {
+    switch (m) {
+      case 'cash':
+        return 'نقداً';
+      case 'bank_transfer':
+        return 'تحويل بنكي';
+      case 'cheque':
+        return 'شيك';
+      case 'credit_card':
+        return 'بطاقة ائتمان';
+      case 'other':
+        return 'أخرى';
+    }
+    return m;
+  }
+
   String _statusLabel(String s) {
     switch (s) {
       case 'draft':
@@ -232,6 +286,8 @@ class _PurchaseInvoiceDetailsScreenState
                               _buildLinesTable(),
                               const SizedBox(height: 20),
                               _buildTotalsFooter(),
+                              const SizedBox(height: 20),
+                              _buildPayments(),
                               const SizedBox(height: 20),
                               _buildActions(),
                               const SizedBox(height: 40),
@@ -455,14 +511,109 @@ class _PurchaseInvoiceDetailsScreenState
     );
   }
 
+  // G-PURCHASE-PAYMENT-COMPLETION (2026-05-11): payments history
+  // mirroring the sales-details widget. Each row shows the payment
+  // number / date / method + amount + a JE link when posted.
+  Widget _buildPayments() {
+    final pays = (_bill!['payments'] as List?) ?? const [];
+    if (pays.isEmpty) return const SizedBox.shrink();
+    return Container(
+      decoration: BoxDecoration(
+        color: AC.navy2,
+        border: Border.all(color: AC.bdr),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AC.navy3,
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(10)),
+            ),
+            child: Row(children: [
+              Icon(Icons.payments_outlined, color: AC.gold, size: 16),
+              const SizedBox(width: 8),
+              Text('سجل المدفوعات (${pays.length})',
+                  style: TextStyle(
+                      color: AC.gold,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700)),
+            ]),
+          ),
+          ...pays.cast<Map<String, dynamic>>().map((p) => Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: AC.bdr)),
+                ),
+                child: Row(children: [
+                  Icon(Icons.receipt_outlined,
+                      color: AC.gold, size: 16),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(p['payment_number']?.toString() ?? '—',
+                            style:
+                                TextStyle(color: AC.tp, fontSize: 13)),
+                        const SizedBox(height: 2),
+                        Text(
+                            '${p['payment_date'] ?? ''} · ${_methodLabel(p['method']?.toString() ?? '')}',
+                            style: TextStyle(
+                                color: AC.td, fontSize: 11)),
+                      ],
+                    ),
+                  ),
+                  if ((p['journal_entry_id'] ?? '').toString().isNotEmpty)
+                    TextButton.icon(
+                      onPressed: () => context.go(
+                          '/app/erp/finance/je-builder/${p['journal_entry_id']}'),
+                      icon: Icon(Icons.account_balance,
+                          color: AC.gold, size: 14),
+                      label: Text(
+                        'JE',
+                        style: TextStyle(
+                            color: AC.gold,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  const SizedBox(width: 8),
+                  Text('${p['amount'] ?? 0}',
+                      style: TextStyle(
+                          color: AC.gold,
+                          fontWeight: FontWeight.w700,
+                          fontFeatures: const [
+                            FontFeature.tabularFigures()
+                          ])),
+                ]),
+              )),
+        ],
+      ),
+    );
+  }
+
   Widget _buildActions() {
     final inv = _bill!;
     final status = (inv['status'] ?? '').toString();
     final paid = double.tryParse('${inv['amount_paid'] ?? 0}') ?? 0;
+    final remaining = double.tryParse('${inv['amount_due'] ?? 0}') ?? 0;
     final isDraft = status == 'draft';
     final isCancelled = status == 'cancelled';
     final isPaid = status == 'paid';
     final canCancel = !isCancelled && !isPaid && paid <= 0.001;
+    // G-PURCHASE-PAYMENT-COMPLETION (2026-05-11): payment is allowed
+    // once the bill is posted (or partially_paid) AND there's a
+    // remaining balance. Backend overpayment guard catches the edge.
+    final isPosted =
+        status == 'posted' || status == 'partially_paid' ||
+            status == 'approved' || status == 'submitted';
+    final canPay = isPosted && remaining > 0.001;
 
     final secondary = <Widget>[
       if (isDraft)
@@ -505,7 +656,27 @@ class _PurchaseInvoiceDetailsScreenState
         ),
     ];
 
-    if (secondary.isEmpty) {
+    // G-PURCHASE-PAYMENT-COMPLETION (2026-05-11): primary "+ تسجيل دفع"
+    // button when the invoice is posted and has a remaining balance.
+    // Mirrors the sales-details primary action row.
+    final primary = <Widget>[
+      if (canPay)
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: _busy ? null : _recordPayment,
+            icon: const Icon(Icons.add_card),
+            label: const Text('+ تسجيل دفع'),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: AC.ok,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                textStyle: const TextStyle(
+                    fontSize: 13, fontWeight: FontWeight.w800)),
+          ),
+        ),
+    ];
+
+    if (secondary.isEmpty && primary.isEmpty) {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         alignment: Alignment.center,
@@ -523,7 +694,19 @@ class _PurchaseInvoiceDetailsScreenState
             style: TextStyle(color: AC.td, fontSize: 12)),
       );
     }
-    return Wrap(spacing: 10, runSpacing: 10, children: secondary);
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        ...secondary,
+        if (primary.isNotEmpty)
+          SizedBox(
+            width: 320,
+            child: Row(children: primary),
+          ),
+      ],
+    );
   }
 
   Widget _kv(String label, dynamic value) {

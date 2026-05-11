@@ -727,6 +727,13 @@ class ApiService {
   // reverses the JE if posted, refuses if any payment was applied.
   static Future<ApiResult> pilotCancelPurchaseInvoice(String piId) =>
       _post('/pilot/purchase-invoices/$piId/cancel', {});
+  // G-PURCHASE-PAYMENT-COMPLETION (2026-05-11): modal-friendly
+  // payment endpoint — backend routes cash/bank/cheque to the right
+  // GL account internally so the caller passes only the slim
+  // {amount, method, payment_date, reference, notes} payload.
+  static Future<ApiResult> pilotRecordVendorPayment(
+          String piId, Map<String, dynamic> payload) =>
+      _post('/pilot/purchase-invoices/$piId/payment', payload);
   static Future<ApiResult> pilotCreateVendorPayment(Map<String, dynamic> payload) =>
       _post('/pilot/vendor-payments', payload);
 
