@@ -571,13 +571,23 @@ def create_transaction(payload: PosTransactionCreate, db: Session = Depends(get_
     grand_line_total = Decimal("0")
 
     for idx, line_in in enumerate(payload.lines, start=1):
-        variant = db.query(ProductVariant).filter(
-            ProductVariant.id == line_in.variant_id,
-            ProductVariant.tenant_id == session.tenant_id,
-        ).first()
-        if not variant:
-            raise HTTPException(400, f"Variant {line_in.variant_id} not found")
-        product = db.query(Product).filter(Product.id == variant.product_id).first()
+        # G-POS-BACKEND-INTEGRATION-V2 (2026-05-11): branch on the
+        # `is_misc` discriminator. Misc lines skip price-lookup AND
+        # StockMovement (un-catalogued items have no inventory).
+        # The pydantic validator guarantees variant_id is set when
+        # !is_misc, and description+unit_price_override are set when
+        # is_misc — so we can rely on the discriminator here.
+        if line_in.is_misc:
+            variant = None
+            product = None
+        else:
+            variant = db.query(ProductVariant).filter(
+                ProductVariant.id == line_in.variant_id,
+                ProductVariant.tenant_id == session.tenant_id,
+            ).first()
+            if not variant:
+                raise HTTPException(400, f"Variant {line_in.variant_id} not found")
+            product = db.query(Product).filter(Product.id == variant.product_id).first()
 
         qty = line_in.qty
         if qty == 0:
@@ -587,10 +597,15 @@ def create_transaction(payload: PosTransactionCreate, db: Session = Depends(get_
         stock_qty_signed = qty if is_return else -qty
 
         # السعر
-        if line_in.unit_price_override is not None:
+        price_list_id = None
+        promo_badge = None
+        if line_in.is_misc:
+            # Misc line — unit_price_override is required (validator
+            # enforces it). No price-lookup possible without a variant.
             unit_price = line_in.unit_price_override
-            price_list_id = None
-            promo_badge = None
+            prices_incl_vat = True  # assume inclusive (Saudi B2C default)
+        elif line_in.unit_price_override is not None:
+            unit_price = line_in.unit_price_override
             prices_incl_vat = True  # assume inclusive by default
         else:
             unit_price, price_list_id, promo_badge, prices_incl_vat = _resolve_price_for_line(
@@ -600,16 +615,21 @@ def create_transaction(payload: PosTransactionCreate, db: Session = Depends(get_
         if unit_price is None or unit_price == 0:
             # للمرتجع يُسمح بسعر 0 إذا كان استرداد كامل
             if is_sale:
-                raise HTTPException(400, f"Line {idx}: لا يوجد سعر محدّد للمنتج {variant.sku}")
+                sku_label = variant.sku if variant else (line_in.description or f"line {idx}")
+                raise HTTPException(400, f"Line {idx}: لا يوجد سعر محدّد للمنتج {sku_label}")
 
-        # الضريبة
-        vat_code = product.vat_code if product else "standard"
-        if vat_code == "zero_rated":
-            vat_rate = Decimal("0")
-        elif vat_code == "exempt":
-            vat_rate = Decimal("0")
+        # الضريبة — vat_rate_override > product.vat_code > default
+        if line_in.vat_rate_override is not None:
+            vat_rate = line_in.vat_rate_override
+            vat_code = "standard" if vat_rate > 0 else "zero_rated"
         else:
-            vat_rate = default_vat
+            vat_code = product.vat_code if product else "standard"
+            if vat_code == "zero_rated":
+                vat_rate = Decimal("0")
+            elif vat_code == "exempt":
+                vat_rate = Decimal("0")
+            else:
+                vat_rate = default_vat
 
         # الخصم على مستوى البند
         line_subtotal = (unit_price * qty).quantize(Q2)
@@ -640,28 +660,41 @@ def create_transaction(payload: PosTransactionCreate, db: Session = Depends(get_
             line_vat = -line_vat
             line_total = -line_total
 
-        # StockMovement
-        movement = _apply_stock_movement(
-            db, session=session, variant=variant, warehouse=warehouse,
-            qty_signed=stock_qty_signed,
-            unit_cost=variant.default_cost or Decimal("0"),
-            reason="pos_return" if is_return else "pos_sale",
-            reference_number=receipt_number,
-            cashier_user_id=payload.cashier_user_id,
-        )
+        # StockMovement — only for catalogued lines. Misc lines have no
+        # inventory to move (un-catalogued ad-hoc sale).
+        movement_id = None
+        if not line_in.is_misc and variant is not None:
+            movement = _apply_stock_movement(
+                db, session=session, variant=variant, warehouse=warehouse,
+                qty_signed=stock_qty_signed,
+                unit_cost=variant.default_cost or Decimal("0"),
+                reason="pos_return" if is_return else "pos_sale",
+                reference_number=receipt_number,
+                cashier_user_id=payload.cashier_user_id,
+            )
+            movement_id = movement.id
+
+        # Description fallback chain:
+        #   misc        → caller's description (validator forces non-empty)
+        #   catalogued  → product.name_ar → variant.sku
+        if line_in.is_misc:
+            line_desc = (line_in.description or "").strip()
+        else:
+            line_desc = (product.name_ar if product else variant.sku) if variant else (line_in.description or "")
 
         line = PosTransactionLine(
             tenant_id=session.tenant_id,
             transaction_id=txn.id,
             line_number=idx,
-            variant_id=variant.id,
-            sku=variant.sku,
-            description=(product.name_ar if product else variant.sku),
+            variant_id=(variant.id if variant else None),
+            is_misc=line_in.is_misc,
+            sku=(variant.sku if variant else None),
+            description=line_desc,
             barcode_scanned=line_in.barcode_scanned,
             qty=qty if is_sale else qty,   # نخزّن كما أدخله الكاشير
             uom=(product.default_uom if product else "piece"),
             unit_price=unit_price,
-            unit_cost=variant.default_cost,
+            unit_cost=(variant.default_cost if variant else None),
             prices_include_vat=prices_incl_vat,
             discount_pct=line_in.discount_pct,
             discount_amount=abs(line_discount),
@@ -675,8 +708,8 @@ def create_transaction(payload: PosTransactionCreate, db: Session = Depends(get_
             line_total=line_total,
             price_list_id=price_list_id,
             promo_badge=promo_badge,
-            warehouse_id=warehouse.id,
-            stock_movement_id=movement.id,
+            warehouse_id=(warehouse.id if not line_in.is_misc else None),
+            stock_movement_id=movement_id,
             salesperson_user_id=line_in.salesperson_user_id,
         )
         db.add(line)
