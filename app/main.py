@@ -19,6 +19,11 @@ All 11 Phases + 6 Sprints:
 
 from contextlib import asynccontextmanager
 from typing import Optional
+
+# Centralized settings - loads .env into os.environ for all downstream modules.
+# MUST be imported before any app.* module that reads os.environ at import time.
+from app.core.config import settings  # noqa: F401
+
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Header
 from app.core.auth_utils import extract_user_id
 from fastapi.middleware.cors import CORSMiddleware

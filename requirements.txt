@@ -1,6 +1,8 @@
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
 pydantic[email]>=2.0.0
+pydantic-settings>=2.0.0  # app/core/config.py Settings (BaseSettings split out of pydantic v2)
+python-dotenv>=1.0.0      # app/core/config.py load_dotenv() — populate os.environ from .env
 pandas>=2.1.0,<2.3
 openpyxl>=3.1.0
 python-multipart>=0.0.26  # CVE-2026-40347
